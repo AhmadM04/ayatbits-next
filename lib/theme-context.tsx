@@ -51,15 +51,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setThemeState(newTheme);
   };
 
-  // Prevent flash by not rendering until mounted
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-[#0c0c0c]">
-        {children}
-      </div>
-    );
-  }
-
+  // Always render children immediately - don't block content
+  // Theme will be applied via useEffect
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
       {children}

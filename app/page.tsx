@@ -5,62 +5,51 @@ import { SignedIn, SignedOut, SignUpButton, SignOutButton } from "@clerk/nextjs"
 import { BookOpen, Target, Zap, Award, Play, LogOut, User as UserIcon } from "lucide-react";
 import LandingHeader from "@/components/LandingHeader";
 import PuzzleDemo from "@/components/PuzzleDemo";
-import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import ScrollAnimations from "@/components/ScrollAnimations";
 
 export default function Home() {
   const [isMobile, setIsMobile] = useState(true); // Default to mobile for faster initial render
   const [mounted, setMounted] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
+    // Set mounted immediately on client
     setMounted(true);
-    setIsMobile(window.innerWidth < 768);
+    setIsMobile(typeof window !== 'undefined' && window.innerWidth < 768);
   }, []);
-  
-  // Hooks MUST always be called - can't be conditional
-  // Always call useScroll, but we'll use static values on mobile
-  // Use null as fallback to prevent errors if ref isn't ready
-  const scrollOptions = containerRef.current ? { container: containerRef } : undefined;
-  const { scrollYProgress } = useScroll(scrollOptions || {});
-  
-  // Always call useTransform, but use static values on mobile or if scroll isn't ready
-  const y1Transform = useTransform(scrollYProgress, [0, 1], [0, -200]);
-  const y2Transform = useTransform(scrollYProgress, [0, 1], [0, -400]);
-  const opacityTransform = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-  
-  // Use static values on mobile or before mount, animated on desktop
-  const y1 = (isMobile || !mounted) ? 0 : y1Transform;
-  const y2 = (isMobile || !mounted) ? 0 : y2Transform;
-  const opacity = (isMobile || !mounted) ? 1 : opacityTransform;
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
       <LandingHeader />
 
       <main>
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
           {/* Animated Background */}
+          {mounted && !isMobile ? (
+            <ScrollAnimations>
+              {({ y1, y2, opacity }) => (
+                <>
+                  <motion.div 
+                    style={{ y: y1 }}
+                    className="absolute top-1/4 -left-32 w-96 h-96 bg-green-500/20 rounded-full blur-[120px]"
+                  />
+                  <motion.div 
+                    style={{ y: y2 }}
+                    className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px]"
+                  />
+                </>
+              )}
+            </ScrollAnimations>
+          ) : (
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-1/4 -left-32 w-96 h-96 bg-green-500/20 rounded-full blur-[120px]" />
+              <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px]" />
+            </div>
+          )}
+          
           <div className="absolute inset-0 pointer-events-none">
-            {/* Gradient orbs - Static on mobile for performance */}
-            {mounted && !isMobile ? (
-              <>
-                <motion.div 
-                  style={{ y: y1 }}
-                  className="absolute top-1/4 -left-32 w-96 h-96 bg-green-500/20 rounded-full blur-[120px]"
-                />
-                <motion.div 
-                  style={{ y: y2 }}
-                  className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px]"
-                />
-              </>
-            ) : (
-              <>
-                <div className="absolute top-1/4 -left-32 w-96 h-96 bg-green-500/20 rounded-full blur-[120px]" />
-                <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px]" />
-              </>
-            )}
             
             {/* Grid pattern */}
             <div 
@@ -156,9 +145,10 @@ export default function Home() {
             )}
           </div>
 
-          {/* Content */}
+          {/* Content - Always render immediately, don't wait for mounted */}
           <div 
             className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center pt-12 sm:pt-20 pointer-events-auto"
+            style={{ opacity: 1 }}
           >
             <div>
               <span className="inline-block px-4 py-1.5 mb-6 text-xs font-medium text-green-400 bg-green-500/10 rounded-full border border-green-500/20">
