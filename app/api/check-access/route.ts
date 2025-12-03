@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import User from '@/lib/models/User';
 import { checkSubscriptionAccess } from '@/lib/subscription';
+import { getAppUrl } from '@/lib/get-app-url';
 
 export async function GET() {
   try {
@@ -10,7 +11,8 @@ export async function GET() {
 
     if (!user) {
       // Not signed in - redirect to sign-in
-      return NextResponse.redirect(new URL('/sign-in', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'));
+      const appUrl = await getAppUrl();
+      return NextResponse.redirect(new URL('/sign-in', appUrl));
     }
 
     await connectDB();
@@ -31,7 +33,7 @@ export async function GET() {
 
     // Check subscription access
     const access = checkSubscriptionAccess(dbUser);
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const appUrl = await getAppUrl();
 
     if (access.hasAccess) {
       // Has access (bypass, active, or trialing) - go to dashboard
@@ -43,7 +45,8 @@ export async function GET() {
   } catch (error: any) {
     console.error('Check access error:', error);
     // On error, redirect to pricing as fallback
-    return NextResponse.redirect(new URL('/pricing?trial=true', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'));
+    const appUrl = await getAppUrl();
+    return NextResponse.redirect(new URL('/pricing?trial=true', appUrl));
   }
 }
 

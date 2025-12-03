@@ -1,6 +1,7 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { getAppUrl } from '@/lib/get-app-url';
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -49,7 +50,13 @@ export async function POST(request: NextRequest) {
     }
 
     const plan = PLANS[planId];
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    // Get URL from request headers or environment
+    const headersList = request.headers;
+    const host = headersList.get('host');
+    const protocol = headersList.get('x-forwarded-proto') || 
+                     (process.env.NODE_ENV === 'production' ? 'https' : 'http');
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
+                   (host ? `${protocol}://${host}` : 'http://localhost:3000');
 
     // Create Stripe Checkout Session with 7-day trial
     const session = await stripe.checkout.sessions.create({
