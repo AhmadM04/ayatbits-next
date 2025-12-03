@@ -2,8 +2,8 @@
 
 import { useI18n } from '@/lib/i18n';
 import Link from 'next/link';
-import { Flame, BookOpen, LogOut } from 'lucide-react';
-import { SignOutButton } from '@clerk/nextjs';
+import { Flame, BookOpen } from 'lucide-react';
+import BottomNav from '@/components/BottomNav';
 
 interface DashboardContentProps {
   userFirstName: string | null | undefined;
@@ -30,7 +30,7 @@ export default function DashboardContent({
   const { t } = useI18n();
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
         <div className="max-w-6xl mx-auto px-4">
@@ -51,11 +51,6 @@ export default function DashboardContent({
                   {userFirstName?.[0] || 'U'}
                 </span>
               </Link>
-              <SignOutButton>
-                <button className="p-2 hover:bg-white/5 rounded-lg transition-colors text-gray-400">
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </SignOutButton>
             </div>
           </div>
         </div>
@@ -127,6 +122,8 @@ export default function DashboardContent({
           </div>
         </section>
       </main>
+
+      <BottomNav />
     </div>
   );
 }

@@ -93,10 +93,28 @@ export async function POST(
       }
     );
 
-    // Update streak if puzzle was completed
+    // Update streak and lastPuzzleId if puzzle was completed
     if (body.status === 'COMPLETED') {
       await updateStreak(dbUser._id);
+      
+      // Update total puzzles completed (check if this puzzle was already completed)
+      const existingProgress = await UserProgress.findOne({
+        userId: dbUser._id,
+        puzzleId: new mongoose.Types.ObjectId(id),
+        status: 'COMPLETED',
+      });
+      
+      if (!existingProgress) {
+        await User.findByIdAndUpdate(dbUser._id, {
+          $inc: { totalPuzzlesCompleted: 1 },
+        });
+      }
     }
+
+    // Always update lastPuzzleId to track where user left off
+    await User.findByIdAndUpdate(dbUser._id, {
+      lastPuzzleId: new mongoose.Types.ObjectId(id),
+    });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

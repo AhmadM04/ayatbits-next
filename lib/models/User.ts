@@ -20,6 +20,9 @@ export interface IUser extends Document {
   currentStreak: number;
   longestStreak: number;
   lastActivityDate?: Date;
+  lastPuzzleId?: mongoose.Types.ObjectId;
+  totalPuzzlesCompleted: number;
+  totalTimeSpent: number; // in seconds
   createdAt: Date;
   updatedAt: Date;
   lastActiveAt: Date;
@@ -44,6 +47,9 @@ const UserSchema = new Schema<IUser>(
     currentStreak: { type: Number, default: 0 },
     longestStreak: { type: Number, default: 0 },
     lastActivityDate: Date,
+    lastPuzzleId: { type: Schema.Types.ObjectId, ref: 'Puzzle' },
+    totalPuzzlesCompleted: { type: Number, default: 0 },
+    totalTimeSpent: { type: Number, default: 0 },
     lastActiveAt: { type: Date, default: Date.now },
   },
   {

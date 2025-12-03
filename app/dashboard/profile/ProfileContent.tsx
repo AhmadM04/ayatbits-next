@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Flame, Trophy, BookOpen, Target, LogOut } from 'lucide-react';
 import { SignOutButton } from '@clerk/nextjs';
 import TranslationSelectorClient from './TranslationSelectorClient';
+import BottomNav from '@/components/BottomNav';
 
 interface ProfileContentProps {
   userName: string;
@@ -36,7 +37,7 @@ export default function ProfileContent({
   const { t } = useI18n();
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
         <div className="max-w-2xl mx-auto px-4">
@@ -153,6 +154,8 @@ export default function ProfileContent({
           </div>
         </div>
       </main>
+
+      <BottomNav />
     </div>
   );
 }

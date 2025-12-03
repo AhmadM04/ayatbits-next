@@ -3,6 +3,7 @@
 import { useI18n } from '@/lib/i18n';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import BottomNav from '@/components/BottomNav';
 
 interface JuzContentProps {
   juzName: string;
@@ -26,7 +27,7 @@ export default function JuzContent({
   const { t } = useI18n();
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
         <div className="max-w-4xl mx-auto px-4">
@@ -90,6 +91,8 @@ export default function JuzContent({
           })}
         </div>
       </main>
+
+      <BottomNav />
     </div>
   );
 }
