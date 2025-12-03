@@ -51,17 +51,56 @@ export async function POST(request: NextRequest) {
         const plan = session.metadata?.plan;
 
         if (userId) {
-          await User.findOneAndUpdate(
-            { clerkId: userId },
-            {
+          // Get subscription details to get trial end date
+          let trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Default 7 days
+          if (session.subscription) {
+            try {
+              const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+              if (subscription.trial_end) {
+                trialEndsAt = new Date(subscription.trial_end * 1000);
+              }
+            } catch (error) {
+              console.error('Error retrieving subscription:', error);
+            }
+          }
+
+          // Try to find user by clerkId first
+          let dbUser = await User.findOne({ clerkId: userId });
+          
+          if (!dbUser) {
+            // User doesn't exist yet - try to find by email from session
+            const customerEmail = session.customer_email || session.customer_details?.email;
+            if (customerEmail) {
+              dbUser = await User.findOne({ email: customerEmail.toLowerCase() });
+            }
+          }
+
+          if (dbUser) {
+            // Update existing user
+            await User.findOneAndUpdate(
+              { _id: dbUser._id },
+              {
+                subscriptionStatus: 'trialing',
+                subscriptionPlan: plan,
+                stripeCustomerId: session.customer as string,
+                stripeSubscriptionId: session.subscription as string,
+                trialEndsAt,
+              }
+            );
+            console.log(`User ${userId} started trial for ${plan} plan`);
+          } else {
+            // User doesn't exist - create them (shouldn't happen but handle it)
+            console.warn(`User ${userId} not found in database during webhook. Creating user.`);
+            await User.create({
+              clerkId: userId,
+              email: session.customer_email || session.customer_details?.email || '',
               subscriptionStatus: 'trialing',
               subscriptionPlan: plan,
               stripeCustomerId: session.customer as string,
               stripeSubscriptionId: session.subscription as string,
-              trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-            }
-          );
-          console.log(`User ${userId} started trial for ${plan} plan`);
+              trialEndsAt,
+            });
+          }
         }
         break;
       }

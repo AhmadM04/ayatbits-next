@@ -4,7 +4,6 @@ import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, SignOutButton, UserButton } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import { Menu, X, LogOut, User } from "lucide-react";
-import Link from "next/link";
 
 export default function LandingHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -69,11 +68,11 @@ export default function LandingHeader() {
               <div className="flex items-center gap-3">
                 <Link 
                   href="/profile" 
-                  className="p-2 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2 group"
+                  className="p-2 hover:bg-green-500/10 rounded-lg transition-colors flex items-center gap-2 group border border-green-500/20 hover:border-green-500/40"
                   title="View Profile"
                 >
-                  <User className="w-5 h-5 text-gray-400 group-hover:text-green-400 transition-colors" />
-                  <span className="text-sm text-gray-400 group-hover:text-white transition-colors hidden lg:inline">
+                  <User className="w-5 h-5 text-green-400 group-hover:text-green-300 transition-colors" />
+                  <span className="text-sm text-green-400 group-hover:text-green-300 transition-colors font-medium">
                     Profile
                   </span>
                 </Link>
