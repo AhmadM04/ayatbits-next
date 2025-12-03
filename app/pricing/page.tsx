@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import PricingContent from './PricingContent';
+import PricingRedirect from './PricingRedirect';
 import { Loader2 } from 'lucide-react';
 
 function PricingLoading() {
@@ -12,8 +13,11 @@ function PricingLoading() {
 
 export default function PricingPage() {
   return (
-    <Suspense fallback={<PricingLoading />}>
-      <PricingContent />
-    </Suspense>
+    <>
+      <PricingRedirect />
+      <Suspense fallback={<PricingLoading />}>
+        <PricingContent />
+      </Suspense>
+    </>
   );
 }

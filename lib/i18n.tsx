@@ -2,40 +2,77 @@
 
 import { createContext, useContext, ReactNode } from 'react';
 import { getLocaleFromTranslation } from './i18n-config';
+// Only import English synchronously - most users use English
+// Other translations are loaded on-demand to reduce initial bundle size
 import enMessages from '../messages/en.json';
-import zhMessages from '../messages/zh.json';
-import arMessages from '../messages/ar.json';
-import ruMessages from '../messages/ru.json';
-import frMessages from '../messages/fr.json';
-import esMessages from '../messages/es.json';
-import deMessages from '../messages/de.json';
-import trMessages from '../messages/tr.json';
-import urMessages from '../messages/ur.json';
-import idMessages from '../messages/id.json';
-import msMessages from '../messages/ms.json';
-import bnMessages from '../messages/bn.json';
-import hiMessages from '../messages/hi.json';
-import jaMessages from '../messages/ja.json';
-import nlMessages from '../messages/nl.json';
 
 type Messages = typeof enMessages;
 
-const messages: Record<string, Messages> = {
-  en: enMessages,
-  zh: zhMessages,
-  ar: arMessages,
-  ru: ruMessages,
-  fr: frMessages,
-  es: esMessages,
-  de: deMessages,
-  tr: trMessages,
-  ur: urMessages,
-  id: idMessages,
-  ms: msMessages,
-  bn: bnMessages,
-  hi: hiMessages,
-  ja: jaMessages,
-  nl: nlMessages,
+// Lazy-loaded messages cache
+const messagesCache: Record<string, Messages> = {
+  en: enMessages, // Preload English
+};
+
+// Lazy load other translations
+const loadMessages = async (locale: string): Promise<Messages> => {
+  if (messagesCache[locale]) {
+    return messagesCache[locale];
+  }
+
+  try {
+    let messages: Messages;
+    switch (locale) {
+      case 'zh':
+        messages = (await import('../messages/zh.json')).default;
+        break;
+      case 'ar':
+        messages = (await import('../messages/ar.json')).default;
+        break;
+      case 'ru':
+        messages = (await import('../messages/ru.json')).default;
+        break;
+      case 'fr':
+        messages = (await import('../messages/fr.json')).default;
+        break;
+      case 'es':
+        messages = (await import('../messages/es.json')).default;
+        break;
+      case 'de':
+        messages = (await import('../messages/de.json')).default;
+        break;
+      case 'tr':
+        messages = (await import('../messages/tr.json')).default;
+        break;
+      case 'ur':
+        messages = (await import('../messages/ur.json')).default;
+        break;
+      case 'id':
+        messages = (await import('../messages/id.json')).default;
+        break;
+      case 'ms':
+        messages = (await import('../messages/ms.json')).default;
+        break;
+      case 'bn':
+        messages = (await import('../messages/bn.json')).default;
+        break;
+      case 'hi':
+        messages = (await import('../messages/hi.json')).default;
+        break;
+      case 'ja':
+        messages = (await import('../messages/ja.json')).default;
+        break;
+      case 'nl':
+        messages = (await import('../messages/nl.json')).default;
+        break;
+      default:
+        messages = enMessages;
+    }
+    messagesCache[locale] = messages;
+    return messages;
+  } catch (error) {
+    console.warn(`Failed to load messages for locale: ${locale}`, error);
+    return enMessages; // Fallback to English
+  }
 };
 
 interface I18nContextType {
@@ -60,7 +97,17 @@ export function I18nProvider({
   translationCode: string;
 }) {
   const locale = getLocaleFromTranslation(translationCode);
-  const localeMessages = messages[locale] || messages.en;
+  
+  // Use cached messages or English as immediate fallback
+  // Other locales will load asynchronously and update when ready
+  const localeMessages = messagesCache[locale] || messagesCache.en;
+  
+  // Load non-English translations asynchronously (non-blocking)
+  if (locale !== 'en' && !messagesCache[locale]) {
+    loadMessages(locale).catch(() => {
+      // Already handled in loadMessages
+    });
+  }
   
   const t = (key: string, params?: Record<string, string | number>): string => {
     const keys = key.split('.');
@@ -70,7 +117,7 @@ export function I18nProvider({
       value = value?.[k];
       if (value === undefined) {
         // Fallback to English
-        let fallbackValue: any = messages.en;
+        let fallbackValue: any = messagesCache.en;
         for (const fk of keys) {
           fallbackValue = fallbackValue?.[fk];
         }

@@ -60,16 +60,6 @@ export default function LandingHeader() {
             ) : isSignedIn ? (
               <div className="flex items-center gap-3">
                 <Link 
-                  href="/profile" 
-                  className="px-3 py-2 bg-green-500/10 hover:bg-green-500/20 rounded-lg transition-all flex items-center gap-2 group border border-green-500/30 hover:border-green-500/50"
-                  title="View Profile"
-                >
-                  <User className="w-5 h-5 text-green-400 group-hover:text-green-300 transition-colors" />
-                  <span className="text-sm text-green-400 group-hover:text-green-300 transition-colors font-medium">
-                    Profile
-                  </span>
-                </Link>
-                <Link 
                   href="/api/check-access" 
                   className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-sm font-semibold rounded-lg transition-all shadow-lg shadow-green-500/20 hover:shadow-green-500/30"
                 >
@@ -150,14 +140,6 @@ export default function LandingHeader() {
                 </SignUpButton>
               </SignedOut>
               <SignedIn>
-                <Link 
-                  href="/profile" 
-                  className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <User className="w-5 h-5" />
-                  <span>Profile</span>
-                </Link>
                 <Link 
                   href="/api/check-access" 
                   className="block px-4 py-3 bg-green-600 hover:bg-green-700 text-white font-medium text-center rounded-lg transition-colors"
