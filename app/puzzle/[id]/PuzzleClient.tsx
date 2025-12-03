@@ -13,6 +13,7 @@ interface PuzzleClientProps {
     id: string;
     surah: { nameEnglish: string; nameArabic: string; number: number } | null;
     juz: { number: number } | null;
+    content?: { ayahNumber?: number };
     nextAyahUrl: string | null;
     ayahViewUrl: string | null;
   };
@@ -135,6 +136,8 @@ function PuzzleContent({
         <div className="bg-white/[0.02] rounded-2xl p-6 border border-white/5">
           <WordPuzzle
             ayahText={ayahText}
+            surahNumber={puzzle.surah?.number}
+            ayahNumber={puzzle.content?.ayahNumber}
             isLiked={isLiked}
             onToggleLike={handleToggleLike}
             onSolved={handleSolved}

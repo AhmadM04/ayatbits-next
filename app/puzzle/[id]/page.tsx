@@ -89,6 +89,9 @@ export default async function PuzzlePage({
     juz: puzzle.juzId ? {
       number: (puzzle.juzId as any).number || 0,
     } : null,
+    content: {
+      ayahNumber: currentAyahNumber,
+    },
     nextAyahUrl: nextPuzzle && puzzle.surahId && puzzle.juzId
       ? `/dashboard/juz/${(puzzle.juzId as any).number}/surah/${(puzzle.surahId as any).number}?ayah=${nextPuzzle.content.ayahNumber}`
       : null,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useI18n } from '@/lib/i18n';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -8,6 +8,7 @@ import { ArrowRight, ChevronLeft, RotateCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import AudioPlayer from './AudioPlayer';
 import TranslationDisplay from './TranslationDisplay';
+import { separateBismillah } from '@/lib/bismillah';
 
 interface VerseContentProps {
   ayahText: string;
@@ -39,6 +40,12 @@ export default function VerseContent({
   const { t } = useI18n();
   const router = useRouter();
   const [isPlaying, setIsPlaying] = useState(false);
+
+  // Separate Bismillah from the ayah text
+  const { bismillah, ayahText: displayAyahText } = useMemo(
+    () => separateBismillah(ayahText, surahNum, currentAyahNumber),
+    [ayahText, surahNum, currentAyahNumber]
+  );
 
   const handleReset = () => {
     router.push(`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${firstAyahNumber}`);
@@ -85,13 +92,22 @@ export default function VerseContent({
           )}
           
           <div className="relative text-center" dir="rtl">
+            {/* Bismillah - displayed separately on top */}
+            {bismillah && (
+              <div className="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b border-white/10">
+                <p className="text-2xl sm:text-3xl md:text-4xl font-medium leading-loose text-green-400/90 break-words" style={{ fontFamily: 'var(--font-amiri, "Amiri", serif)' }}>
+                  {bismillah}
+                </p>
+              </div>
+            )}
+            
             <div className="mb-3 sm:mb-4">
               <span className="text-xs sm:text-sm font-medium text-gray-500">
                 {t('verse.ayahNumber', { number: currentAyahNumber })}
               </span>
             </div>
             <p className="text-xl sm:text-2xl md:text-3xl font-medium leading-loose sm:leading-relaxed text-white mb-4 sm:mb-6 break-words">
-              {ayahText}
+              {displayAyahText || (bismillah ? '' : ayahText)}
             </p>
             <AudioPlayer 
               surahNumber={surahNum} 

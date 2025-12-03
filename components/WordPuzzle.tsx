@@ -31,9 +31,12 @@ import {
   validatePuzzleAnswer,
   type WordToken,
 } from '@/lib/puzzle-logic';
+import { separateBismillah } from '@/lib/bismillah';
 
 interface WordPuzzleProps {
   ayahText: string;
+  surahNumber?: number;
+  ayahNumber?: number;
   onSolved?: (isCorrect: boolean) => void;
   onWordCorrect?: (wordIndex: number, word: string) => void;
   onMistakeLimitExceeded?: () => void;
@@ -240,6 +243,8 @@ function DraggableWord({
 
 export default function WordPuzzle({
   ayahText,
+  surahNumber,
+  ayahNumber,
   onSolved,
   onWordCorrect,
   onMistakeLimitExceeded,
@@ -249,7 +254,19 @@ export default function WordPuzzle({
 }: WordPuzzleProps) {
   const { t } = useI18n();
   const router = useRouter();
-  const originalTokens = useMemo(() => tokenizeAyah(ayahText), [ayahText]);
+  
+  // Separate Bismillah from the ayah text
+  const { bismillah, ayahText: displayAyahText } = useMemo(
+    () => {
+      if (surahNumber && ayahNumber) {
+        return separateBismillah(ayahText, surahNumber, ayahNumber);
+      }
+      return { bismillah: null, ayahText };
+    },
+    [ayahText, surahNumber, ayahNumber]
+  );
+  
+  const originalTokens = useMemo(() => tokenizeAyah(displayAyahText || ayahText), [displayAyahText, ayahText]);
   // Initialize with original order to prevent hydration mismatch
   // Shuffle will happen in useEffect on client side only
   const [bank, setBank] = useState<WordToken[]>(originalTokens);
@@ -419,6 +436,15 @@ export default function WordPuzzle({
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-6">
+      {/* Bismillah - displayed separately on top if present */}
+      {bismillah && (
+        <div className="mb-2 pb-4 border-b border-white/10">
+          <p className="text-2xl sm:text-3xl font-medium leading-loose text-green-400/90 text-center break-words" dir="rtl" style={{ fontFamily: 'var(--font-amiri, "Amiri", serif)' }}>
+            {bismillah}
+          </p>
+        </div>
+      )}
+      
       {/* Header with Like Button */}
       <div className="flex items-center justify-between">
         <h3 className="text-lg sm:text-xl font-semibold text-white">{t('puzzle.buildTheAyah')}</h3>
