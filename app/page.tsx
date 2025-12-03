@@ -122,7 +122,7 @@ export default function Home() {
               <SignedOut>
                 <SignUpButton mode="modal">
                   <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 h-12 text-base font-medium rounded-full">
-                    Start Free
+                    Start 7-Day Trial
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </SignUpButton>
@@ -272,7 +272,7 @@ export default function Home() {
             <SignedOut>
               <SignUpButton mode="modal">
                 <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-10 h-14 text-lg font-medium rounded-full">
-                  Get Started Free
+                  Start Your Trial
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </SignUpButton>

@@ -52,7 +52,7 @@ export default function LandingHeader() {
               </SignInButton>
               <SignUpButton mode="modal">
                 <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
-                  Get Started
+                  Start Trial
                 </Button>
               </SignUpButton>
             </SignedOut>
@@ -90,7 +90,7 @@ export default function LandingHeader() {
                     <Button variant="ghost" size="sm" className="flex-1 text-gray-400">Log In</Button>
                   </SignInButton>
                   <SignUpButton mode="modal">
-                    <Button size="sm" className="flex-1 bg-green-600 hover:bg-green-700 text-white">Get Started</Button>
+                    <Button size="sm" className="flex-1 bg-green-600 hover:bg-green-700 text-white">Start Trial</Button>
                   </SignUpButton>
                 </SignedOut>
                 <SignedIn>

@@ -95,8 +95,8 @@
     "features": "المميزات",
     "pricing": "الأسعار",
     "questions": "الأسئلة",
-    "freeTrial": "تجربة مجانية",
-    "noCreditCard": "لا حاجة لبطاقة ائتمان",
+    "freeTrial": "تجربة مجانية لمدة 7 أيام",
+    "trialInfo": "جرب مجاناً لمدة 7 أيام",
     "expertSupport": "دعم متخصص"
   }
 }
