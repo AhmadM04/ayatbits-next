@@ -13,16 +13,18 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
+  // Hooks must always be called - can't be conditional
+  const { scrollYProgress } = useScroll({ container: containerRef });
+  
   useEffect(() => {
     setMounted(true);
     setIsMobile(window.innerWidth < 768);
   }, []);
   
-  // Only use scroll animations on desktop after mount
-  const scrollYProgress = mounted && !isMobile ? useScroll({ container: containerRef }).scrollYProgress : null;
-  const y1 = mounted && !isMobile && scrollYProgress ? useTransform(scrollYProgress, [0, 1], [0, -200]) : 0;
-  const y2 = mounted && !isMobile && scrollYProgress ? useTransform(scrollYProgress, [0, 1], [0, -400]) : 0;
-  const opacity = mounted && !isMobile && scrollYProgress ? useTransform(scrollYProgress, [0, 0.3], [1, 0]) : 1;
+  // Transform values - use 0 on mobile to disable animations
+  const y1 = isMobile ? 0 : useTransform(scrollYProgress, [0, 1], [0, -200]);
+  const y2 = isMobile ? 0 : useTransform(scrollYProgress, [0, 1], [0, -400]);
+  const opacity = isMobile ? 1 : useTransform(scrollYProgress, [0, 0.3], [1, 0]);
 
   return (
     <div ref={containerRef} className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
