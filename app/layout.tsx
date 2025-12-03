@@ -56,6 +56,9 @@ export default function RootLayout({
           rootBox: 'font-sans',
           card: 'bg-[#0f0f0f] border border-[#222] shadow-2xl rounded-2xl',
           
+          // Hide development mode badge
+          developmentModeAlert: 'hidden',
+          
           // Header
           headerTitle: 'text-white text-2xl font-bold',
           headerSubtitle: 'text-gray-400 text-sm',

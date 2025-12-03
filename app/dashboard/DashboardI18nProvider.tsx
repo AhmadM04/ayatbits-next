@@ -16,7 +16,6 @@ export default function DashboardI18nProvider({
   useLayoutEffect(() => {
     if (translationCode && typeof window !== 'undefined') {
       localStorage.setItem('selectedTranslation', translationCode);
-      console.log('DashboardI18nProvider - synced to localStorage:', translationCode);
     }
   }, [translationCode]);
 

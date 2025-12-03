@@ -62,9 +62,6 @@ export function I18nProvider({
   const locale = getLocaleFromTranslation(translationCode);
   const localeMessages = messages[locale] || messages.en;
   
-  // Debug logging
-  console.log('I18nProvider - translationCode:', translationCode, '-> locale:', locale);
-
   const t = (key: string, params?: Record<string, string | number>): string => {
     const keys = key.split('.');
     let value: any = localeMessages;

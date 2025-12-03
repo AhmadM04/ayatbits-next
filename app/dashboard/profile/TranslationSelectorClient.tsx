@@ -27,7 +27,6 @@ export default function TranslationSelectorClient({
     // Save to localStorage IMMEDIATELY before any async operation
     if (typeof window !== 'undefined') {
       localStorage.setItem('selectedTranslation', translationCode);
-      console.log('TranslationSelector - saved to localStorage:', translationCode);
     }
     
     setSelectedTranslation(translationCode);
