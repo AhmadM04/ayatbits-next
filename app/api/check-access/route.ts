@@ -57,12 +57,13 @@ export async function GET() {
 
     // Only check Stripe if user doesn't have access AND doesn't have a stripeCustomerId
     // This avoids slow Stripe API calls on every request
-    if (!access.hasAccess && !dbUser.stripeCustomerId && process.env.STRIPE_SECRET_KEY) {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!access.hasAccess && !dbUser.stripeCustomerId && stripeSecretKey) {
       // Use Promise.race with timeout to prevent hanging on slow networks
       const stripeCheck = (async () => {
         try {
           const Stripe = (await import('stripe')).default;
-          const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+          const stripe = new Stripe(stripeSecretKey, {
             apiVersion: '2025-11-17.clover',
           });
 
