@@ -14,17 +14,38 @@ export default async function DashboardPage() {
   await connectDB();
 
   // Find or create user (layout handles subscription check)
+  const userEmail = user.emailAddresses[0]?.emailAddress?.toLowerCase() || '';
   let dbUser = await User.findOne({ clerkId: user.id });
+  
   if (!dbUser) {
-    dbUser = await User.create({
-      clerkId: user.id,
-      email: user.emailAddresses[0]?.emailAddress || '',
-      firstName: user.firstName,
-      lastName: user.lastName,
-      name: user.fullName,
-      imageUrl: user.imageUrl,
-      subscriptionStatus: 'inactive',
-    });
+    // Check if user exists by email (created by admin before they signed in)
+    dbUser = await User.findOne({ email: userEmail });
+    
+    if (dbUser) {
+      // User was created by admin - update with Clerk ID and info
+      dbUser = await User.findOneAndUpdate(
+        { email: userEmail },
+        {
+          clerkId: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          name: user.fullName,
+          imageUrl: user.imageUrl,
+        },
+        { new: true }
+      );
+    } else {
+      // New user - create
+      dbUser = await User.create({
+        clerkId: user.id,
+        email: userEmail,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        name: user.fullName,
+        imageUrl: user.imageUrl,
+        subscriptionStatus: 'inactive',
+      });
+    }
   }
 
   // Fetch Juzs with puzzle counts

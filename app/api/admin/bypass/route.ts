@@ -53,22 +53,27 @@ export async function POST(request: NextRequest) {
     // Try to find user by email first
     let dbUser = await User.findOne({ email: email.toLowerCase() });
 
+    // If user doesn't exist, create them (they exist in Clerk but haven't visited the app yet)
     if (!dbUser) {
-      return NextResponse.json({ 
-        error: `User with email ${email} not found in database. They must sign in and visit the app at least once (e.g., go to /dashboard or /check-access) before you can grant bypass access.` 
-      }, { status: 404 });
-    }
-
-    // Update bypass status
-    const updatedUser = await User.findOneAndUpdate(
-      { email: email.toLowerCase() },
-      { 
+      dbUser = await User.create({
+        email: email.toLowerCase(),
+        // clerkId will be set when they first sign in
+        subscriptionStatus: 'active',
         hasBypass: true,
         bypassReason: reason || 'Admin granted access',
-        subscriptionStatus: 'active', // Give them active status
-      },
-      { new: true }
-    );
+      });
+    } else {
+      // Update existing user
+      dbUser = await User.findOneAndUpdate(
+        { email: email.toLowerCase() },
+        { 
+          hasBypass: true,
+          bypassReason: reason || 'Admin granted access',
+          subscriptionStatus: 'active', // Give them active status
+        },
+        { new: true }
+      );
+    }
 
     return NextResponse.json({ 
       success: true, 
