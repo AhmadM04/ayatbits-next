@@ -9,20 +9,20 @@ import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 export default function Home() {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(true); // Default to mobile for faster initial render
   const [mounted, setMounted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ container: containerRef });
   
   useEffect(() => {
     setMounted(true);
     setIsMobile(window.innerWidth < 768);
   }, []);
   
-  // Disable heavy animations on mobile for better performance
-  const y1 = isMobile ? 0 : useTransform(scrollYProgress, [0, 1], [0, -200]);
-  const y2 = isMobile ? 0 : useTransform(scrollYProgress, [0, 1], [0, -400]);
-  const opacity = isMobile ? 1 : useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+  // Only use scroll animations on desktop after mount
+  const scrollYProgress = mounted && !isMobile ? useScroll({ container: containerRef }).scrollYProgress : null;
+  const y1 = mounted && !isMobile && scrollYProgress ? useTransform(scrollYProgress, [0, 1], [0, -200]) : 0;
+  const y2 = mounted && !isMobile && scrollYProgress ? useTransform(scrollYProgress, [0, 1], [0, -400]) : 0;
+  const opacity = mounted && !isMobile && scrollYProgress ? useTransform(scrollYProgress, [0, 0.3], [1, 0]) : 1;
 
   return (
     <div ref={containerRef} className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
@@ -33,15 +33,24 @@ export default function Home() {
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
           {/* Animated Background */}
           <div className="absolute inset-0 pointer-events-none">
-            {/* Gradient orbs */}
-            <motion.div 
-              style={{ y: y1 }}
-              className="absolute top-1/4 -left-32 w-96 h-96 bg-green-500/20 rounded-full blur-[120px]"
-            />
-            <motion.div 
-              style={{ y: y2 }}
-              className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px]"
-            />
+            {/* Gradient orbs - Static on mobile for performance */}
+            {mounted && !isMobile ? (
+              <>
+                <motion.div 
+                  style={{ y: y1 }}
+                  className="absolute top-1/4 -left-32 w-96 h-96 bg-green-500/20 rounded-full blur-[120px]"
+                />
+                <motion.div 
+                  style={{ y: y2 }}
+                  className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px]"
+                />
+              </>
+            ) : (
+              <>
+                <div className="absolute top-1/4 -left-32 w-96 h-96 bg-green-500/20 rounded-full blur-[120px]" />
+                <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px]" />
+              </>
+            )}
             
             {/* Grid pattern */}
             <div 

@@ -9,8 +9,10 @@ export default function LandingHeader() {
   const { isSignedIn, isLoaded } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
@@ -53,7 +55,7 @@ export default function LandingHeader() {
 
           {/* Desktop Auth */}
           <div className="hidden md:flex items-center gap-4">
-            {!isLoaded ? (
+            {!mounted || !isLoaded ? (
               <div className="w-20 h-8" /> // Loading placeholder
             ) : isSignedIn ? (
               <div className="flex items-center gap-3">
