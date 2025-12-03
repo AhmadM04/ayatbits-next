@@ -4,6 +4,11 @@ import { connectDB } from '@/lib/db';
 import User from '@/lib/models/User';
 import { isAdmin } from '@/lib/admin';
 
+/**
+ * Grant or revoke admin access to a user
+ * POST /api/admin/manage
+ * Body: { email: string, action: 'grant' | 'revoke' }
+ */
 export async function POST(request: NextRequest) {
   try {
     const user = await currentUser();
@@ -19,76 +24,58 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { email, reason, action } = body;
+    const { email, action } = body;
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
-    await connectDB();
-
-    if (action === 'remove') {
-      // Remove bypass
-      const updatedUser = await User.findOneAndUpdate(
-        { email: email.toLowerCase() },
-        { 
-          hasBypass: false,
-          bypassReason: null,
-        },
-        { new: true }
-      );
-
-      if (!updatedUser) {
-        return NextResponse.json({ error: 'User not found' }, { status: 404 });
-      }
-
-      return NextResponse.json({ 
-        success: true, 
-        message: `Bypass removed for ${email}`,
-        user: { email: updatedUser.email, hasBypass: updatedUser.hasBypass }
-      });
+    if (!['grant', 'revoke'].includes(action)) {
+      return NextResponse.json({ error: 'Action must be "grant" or "revoke"' }, { status: 400 });
     }
 
-    // Add bypass
-    // Try to find user by email first
+    await connectDB();
+
+    // Try to find user by email
     let dbUser = await User.findOne({ email: email.toLowerCase() });
 
     if (!dbUser) {
       return NextResponse.json({ 
-        error: `User with email ${email} not found in database. They must sign in and visit the app at least once (e.g., go to /dashboard or /check-access) before you can grant bypass access.` 
+        error: `User with email ${email} not found in database. They must sign in and visit the app at least once (e.g., go to /dashboard or /check-access) before you can grant admin access.` 
       }, { status: 404 });
     }
 
-    // Update bypass status
+    // Update admin status
     const updatedUser = await User.findOneAndUpdate(
       { email: email.toLowerCase() },
       { 
-        hasBypass: true,
-        bypassReason: reason || 'Admin granted access',
-        subscriptionStatus: 'active', // Give them active status
+        isAdmin: action === 'grant',
       },
       { new: true }
     );
 
     return NextResponse.json({ 
       success: true, 
-      message: `Bypass granted to ${email}`,
+      message: `Admin access ${action === 'grant' ? 'granted' : 'revoked'} for ${email}`,
       user: { 
         email: updatedUser.email, 
-        hasBypass: updatedUser.hasBypass,
-        bypassReason: updatedUser.bypassReason 
+        isAdmin: updatedUser.isAdmin,
       }
     });
   } catch (error: any) {
-    console.error('Bypass error:', error);
+    console.error('Admin management error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to update bypass' },
+      { error: error.message || 'Failed to update admin access' },
       { status: 500 }
     );
   }
 }
 
-export async function GET(request: NextRequest) {
+/**
+ * Get all admins
+ * GET /api/admin/manage
+ */
+export async function GET() {
   try {
     const user = await currentUser();
     
@@ -104,22 +91,21 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    // Get all users with bypass
-    const bypassUsers = await User.find({ hasBypass: true })
-      .select('email name hasBypass bypassReason createdAt')
+    // Get all admins (both from database and legacy emails)
+    const dbAdmins = await User.find({ isAdmin: true })
+      .select('email name isAdmin createdAt')
       .lean();
 
     return NextResponse.json({ 
       success: true, 
-      users: bypassUsers 
+      admins: dbAdmins 
     });
   } catch (error: any) {
-    console.error('Get bypass users error:', error);
+    console.error('Get admins error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to get bypass users' },
+      { error: error.message || 'Failed to get admins' },
       { status: 500 }
     );
   }
 }
-
 

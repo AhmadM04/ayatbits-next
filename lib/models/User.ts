@@ -29,6 +29,8 @@ export interface IUser extends Document {
   stripeSubscriptionId?: string;
   trialEndsAt?: Date;
   currentPeriodEnd?: Date;
+  // Admin access
+  isAdmin?: boolean;
   // Admin bypass - users with lifetime access
   hasBypass?: boolean;
   bypassReason?: string;
@@ -69,6 +71,8 @@ const UserSchema = new Schema<IUser>(
     stripeSubscriptionId: String,
     trialEndsAt: Date,
     currentPeriodEnd: Date,
+    // Admin access
+    isAdmin: { type: Boolean, default: false },
     // Admin bypass - users with lifetime access
     hasBypass: { type: Boolean, default: false },
     bypassReason: String,

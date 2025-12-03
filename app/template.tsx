@@ -7,3 +7,4 @@ export default function Template({ children }: { children: ReactNode }) {
   return <PageTransition>{children}</PageTransition>;
 }
 
+

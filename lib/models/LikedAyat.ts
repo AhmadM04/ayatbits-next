@@ -24,3 +24,4 @@ LikedAyatSchema.index({ userId: 1, puzzleId: 1 }, { unique: true });
 
 export default mongoose.models.LikedAyat || mongoose.model<ILikedAyat>('LikedAyat', LikedAyatSchema);
 
+

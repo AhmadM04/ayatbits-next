@@ -23,3 +23,4 @@ const SurahSchema = new Schema<ISurah>(
 
 export default mongoose.models.Surah || mongoose.model<ISurah>('Surah', SurahSchema);
 
+

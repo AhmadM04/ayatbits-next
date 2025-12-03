@@ -30,3 +30,4 @@ export const QURAN_CONFIG = {
   MAX_AYAH_LENGTH: parseInt(process.env.MAX_AYAH_LENGTH || '50', 10),
 };
 
+

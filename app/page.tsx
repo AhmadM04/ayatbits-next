@@ -25,7 +25,7 @@ export default function Home() {
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
           {/* Animated Background */}
-          <div className="absolute inset-0">
+          <div className="absolute inset-0 pointer-events-none">
             {/* Gradient orbs */}
             <motion.div 
               style={{ y: y1 }}
@@ -125,7 +125,7 @@ export default function Home() {
           {/* Content */}
           <motion.div 
             style={{ opacity }}
-            className="relative z-10 max-w-4xl mx-auto px-4 text-center pt-20"
+            className="relative z-10 max-w-4xl mx-auto px-4 text-center pt-20 pointer-events-auto"
           >
             <motion.div
               initial={{ opacity: 0, y: 20 }}
