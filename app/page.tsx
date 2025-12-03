@@ -14,11 +14,17 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   
   useEffect(() => {
-    // Set mounted immediately on client
+    // Set mounted immediately on client - this confirms JS is working
     setMounted(true);
     setIsMobile(typeof window !== 'undefined' && window.innerWidth < 768);
+    
+    // Performance: Mark when JS is ready
+    if (typeof window !== 'undefined' && window.performance) {
+      window.performance.mark('js-ready');
+    }
   }, []);
 
+  // Show content immediately - don't wait for mounted state
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
       <LandingHeader />
@@ -43,6 +49,7 @@ export default function Home() {
               )}
             </ScrollAnimations>
           ) : (
+            // Static background for mobile - always visible
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute top-1/4 -left-32 w-96 h-96 bg-green-500/20 rounded-full blur-[120px]" />
               <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px]" />

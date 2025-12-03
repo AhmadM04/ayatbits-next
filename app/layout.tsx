@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Amiri } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/lib/theme-context";
+import JSCheck from "./js-check";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,8 +31,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  
   return (
     <ClerkProvider
+      {...(publishableKey ? { publishableKey } : {})}
       appearance={{
         layout: {
           socialButtonsPlacement: 'top',
@@ -128,6 +132,7 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${amiri.variable} antialiased`}
         >
+          <JSCheck />
           <ThemeProvider>
             {children}
           </ThemeProvider>

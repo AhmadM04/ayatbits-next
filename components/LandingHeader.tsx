@@ -12,12 +12,15 @@ export default function LandingHeader() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Set mounted immediately - don't block rendering
     setMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
   }, []);
 
   // Close mobile menu on scroll
