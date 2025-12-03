@@ -13,24 +13,26 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Hooks MUST always be called - can't be conditional
-  // Always call useScroll, but we'll use static values on mobile
-  const { scrollYProgress } = useScroll({ container: containerRef });
-  
   useEffect(() => {
     setMounted(true);
     setIsMobile(window.innerWidth < 768);
   }, []);
   
-  // Always call useTransform, but use static values on mobile
+  // Hooks MUST always be called - can't be conditional
+  // Always call useScroll, but we'll use static values on mobile
+  // Use null as fallback to prevent errors if ref isn't ready
+  const scrollOptions = containerRef.current ? { container: containerRef } : undefined;
+  const { scrollYProgress } = useScroll(scrollOptions || {});
+  
+  // Always call useTransform, but use static values on mobile or if scroll isn't ready
   const y1Transform = useTransform(scrollYProgress, [0, 1], [0, -200]);
   const y2Transform = useTransform(scrollYProgress, [0, 1], [0, -400]);
   const opacityTransform = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
   
-  // Use static values on mobile, animated on desktop
-  const y1 = isMobile ? 0 : y1Transform;
-  const y2 = isMobile ? 0 : y2Transform;
-  const opacity = isMobile ? 1 : opacityTransform;
+  // Use static values on mobile or before mount, animated on desktop
+  const y1 = (isMobile || !mounted) ? 0 : y1Transform;
+  const y2 = (isMobile || !mounted) ? 0 : y2Transform;
+  const opacity = (isMobile || !mounted) ? 1 : opacityTransform;
 
   return (
     <div ref={containerRef} className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
