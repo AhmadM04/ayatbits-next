@@ -11,11 +11,11 @@ export default async function DashboardPage() {
     redirect('/sign-in');
   }
 
-  await connectDB();
-
-  // Layout already handles user lookup - just get the user for queries
-  // Use lean() for better performance but handle types properly
-  const dbUser = await User.findOne({ clerkId: user.id }).lean() as any;
+  // Parallelize DB connection and user lookup
+  const [dbConnection, dbUser] = await Promise.all([
+    connectDB().catch(() => null), // Don't block if DB fails
+    User.findOne({ clerkId: user.id }).lean() as Promise<any>,
+  ]);
   
   if (!dbUser) {
     // User should exist from layout, but handle edge case

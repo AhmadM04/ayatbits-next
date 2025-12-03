@@ -7,58 +7,63 @@ import { getAppUrl } from '@/lib/get-app-url';
 
 export async function GET() {
   try {
-    const user = await currentUser();
+        const user = await currentUser();
 
-    if (!user) {
-      // Not signed in - redirect to sign-in
-      const appUrl = await getAppUrl();
-      return NextResponse.redirect(new URL('/sign-in', appUrl));
-    }
+        if (!user) {
+          // Not signed in - redirect to sign-in
+          const appUrl = await getAppUrl();
+          return NextResponse.redirect(new URL('/sign-in', appUrl));
+        }
 
-    await connectDB();
+        // Parallelize DB connection and user lookup
+        const [dbConnection, dbUser] = await Promise.all([
+          connectDB().catch(() => null),
+          User.findOne({ clerkId: user.id }).lean() as Promise<any>,
+        ]);
 
-    // Find or create user
-    const userEmail = user.emailAddresses[0]?.emailAddress?.toLowerCase() || '';
-    let dbUser = await User.findOne({ clerkId: user.id });
-    
-    if (!dbUser) {
-      // Check if user exists by email (created by admin before they signed in)
-      dbUser = await User.findOne({ email: userEmail });
-      
-      if (dbUser) {
-        // User was created by admin - update with Clerk ID and info
-        dbUser = await User.findOneAndUpdate(
-          { email: userEmail },
-          {
-            clerkId: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            name: user.fullName,
-            imageUrl: user.imageUrl,
-          },
-          { new: true }
-        );
-      } else {
-        // New user - create
-        dbUser = await User.create({
-          clerkId: user.id,
-          email: userEmail,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          name: user.fullName,
-          imageUrl: user.imageUrl,
-          subscriptionStatus: 'inactive',
-        });
-      }
-    }
+        // Find or create user
+        const userEmail = user.emailAddresses[0]?.emailAddress?.toLowerCase() || '';
+        let dbUserResult = dbUser;
+        
+        if (!dbUserResult) {
+          // Check if user exists by email (created by admin before they signed in)
+          dbUserResult = await User.findOne({ email: userEmail }).lean() as any;
+          
+          if (dbUserResult) {
+            // User was created by admin - update with Clerk ID and info
+            dbUserResult = await User.findOneAndUpdate(
+              { email: userEmail },
+              {
+                clerkId: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                name: user.fullName,
+                imageUrl: user.imageUrl,
+              },
+              { new: true, lean: true }
+            ) as any;
+          } else {
+            // New user - create
+            const newUser = await User.create({
+              clerkId: user.id,
+              email: userEmail,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              name: user.fullName,
+              imageUrl: user.imageUrl,
+              subscriptionStatus: 'inactive',
+            });
+            dbUserResult = newUser.toObject(); // Convert to plain object
+          }
+        }
 
-    // Check subscription access
-    let access = checkSubscriptionAccess(dbUser);
+        // Check subscription access
+        let access = checkSubscriptionAccess(dbUserResult);
 
-    // Only check Stripe if user doesn't have access AND doesn't have a stripeCustomerId
-    // This avoids slow Stripe API calls on every request
-    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-    if (!access.hasAccess && !dbUser.stripeCustomerId && stripeSecretKey) {
+        // Only check Stripe if user doesn't have access AND doesn't have a stripeCustomerId
+        // This avoids slow Stripe API calls on every request
+        const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+        if (!access.hasAccess && !dbUserResult.stripeCustomerId && stripeSecretKey) {
       // Use Promise.race with timeout to prevent hanging on slow networks
       const stripeCheck = (async () => {
         try {
@@ -91,7 +96,7 @@ export async function GET() {
                 : undefined;
               
               // Update user immediately
-              dbUser = await User.findOneAndUpdate(
+              dbUserResult = await User.findOneAndUpdate(
                 { clerkId: user.id },
                 {
                   subscriptionStatus: subscription.status === 'trialing' ? 'trialing' : subscription.status === 'active' ? 'active' : 'inactive',
@@ -101,11 +106,11 @@ export async function GET() {
                   trialEndsAt: trialEnd,
                   currentPeriodEnd,
                 },
-                { new: true }
-              );
+                { new: true, lean: true }
+              ) as any;
               
               // Re-check access
-              access = checkSubscriptionAccess(dbUser);
+              access = checkSubscriptionAccess(dbUserResult);
             }
           }
         } catch (error) {
@@ -113,9 +118,9 @@ export async function GET() {
         }
       })();
 
-      // Timeout after 3 seconds to prevent hanging
-      const timeout = new Promise(resolve => setTimeout(resolve, 3000));
-      await Promise.race([stripeCheck, timeout]);
+    // Timeout after 1.5 seconds to prevent hanging on mobile
+    const timeout = new Promise(resolve => setTimeout(resolve, 1500));
+    await Promise.race([stripeCheck, timeout]);
     }
 
     const appUrl = await getAppUrl();

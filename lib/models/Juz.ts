@@ -20,3 +20,4 @@ const JuzSchema = new Schema<IJuz>(
 export default mongoose.models.Juz || mongoose.model<IJuz>('Juz', JuzSchema);
 
 
+

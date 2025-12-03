@@ -19,18 +19,21 @@ export default async function JuzSurahPage({
   const { ayah } = await searchParams;
   const juzNumber = parseInt(number);
   const surahNum = parseInt(surahNumber);
-  const user = await currentUser();
+  
+  // Parallelize user fetch and DB connection
+  const [user, dbConnection] = await Promise.all([
+    currentUser(),
+    connectDB().catch(() => null),
+  ]);
 
   if (!user) {
     redirect('/sign-in');
   }
 
-  await connectDB();
-
-  // Find or create user
-  let dbUser = await User.findOne({ clerkId: user.id });
+  // Find or create user - use lean() for performance
+  let dbUser = await User.findOne({ clerkId: user.id }).lean() as any;
   if (!dbUser) {
-    dbUser = await User.create({
+    const newUser = await User.create({
       clerkId: user.id,
       email: user.emailAddresses[0]?.emailAddress || '',
       firstName: user.firstName,
@@ -38,10 +41,14 @@ export default async function JuzSurahPage({
       name: user.fullName,
       imageUrl: user.imageUrl,
     });
+    dbUser = newUser.toObject(); // Convert to plain object
   }
 
-  const juz = await Juz.findOne({ number: juzNumber }).lean() as any;
-  const surah = await Surah.findOne({ number: surahNum }).lean() as any;
+  // Parallelize Juz and Surah lookups
+  const [juz, surah] = await Promise.all([
+    Juz.findOne({ number: juzNumber }).lean() as Promise<any>,
+    Surah.findOne({ number: surahNum }).lean() as Promise<any>,
+  ]);
 
   if (!juz || !surah) {
     return (

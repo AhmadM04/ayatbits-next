@@ -37,3 +37,4 @@ const PuzzleSchema = new Schema<IPuzzle>(
 export default mongoose.models.Puzzle || mongoose.model<IPuzzle>('Puzzle', PuzzleSchema);
 
 
+

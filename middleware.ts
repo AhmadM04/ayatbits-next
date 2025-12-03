@@ -13,10 +13,10 @@ export default clerkMiddleware(async (auth, request) => {
     return; // Skip auth check for public routes
   }
   
-  // For protected routes, add timeout to prevent hanging
+  // For protected routes, add aggressive timeout for mobile performance
   try {
     const timeoutPromise = new Promise((resolve) => {
-      setTimeout(() => resolve(null), 5000); // 5 second timeout
+      setTimeout(() => resolve(null), 1500); // Reduced to 1.5 seconds for faster failure
     });
     
     const protectPromise = auth.protect();
@@ -24,7 +24,10 @@ export default clerkMiddleware(async (auth, request) => {
     await Promise.race([protectPromise, timeoutPromise]);
   } catch (error) {
     // If auth fails, let Clerk handle the redirect
-    console.error('Auth check error:', error);
+    // Don't log in production to avoid noise
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Auth check error:', error);
+    }
   }
 });
 

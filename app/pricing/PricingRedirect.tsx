@@ -32,3 +32,4 @@ export default async function PricingRedirect() {
   return null; // No subscription, show pricing page
 }
 
+

@@ -27,3 +27,4 @@ TrophySchema.index({ userId: 1, surahNumber: 1 }, { unique: true });
 export default mongoose.models.Trophy || mongoose.model<ITrophy>('Trophy', TrophySchema);
 
 
+

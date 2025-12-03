@@ -52,3 +52,4 @@ export function separateBismillah(
   return { bismillah: null, ayahText };
 }
 
+

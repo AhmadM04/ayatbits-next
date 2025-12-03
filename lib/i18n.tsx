@@ -1,19 +1,26 @@
 'use client';
 
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { getLocaleFromTranslation } from './i18n-config';
-// Only import English synchronously - most users use English
-// Other translations are loaded on-demand to reduce initial bundle size
-import enMessages from '../messages/en.json';
+// Dynamically import English to avoid blocking initial render
+// This allows the page to render immediately, then load translations
+import type enMessagesType from '../messages/en.json';
+type Messages = typeof enMessagesType;
 
-type Messages = typeof enMessages;
+let enMessagesPromise: Promise<Messages> | null = null;
+const loadEnMessages = async (): Promise<Messages> => {
+  if (!enMessagesPromise) {
+    enMessagesPromise = import('../messages/en.json').then(m => m.default);
+  }
+  return enMessagesPromise;
+};
+// Preload English immediately but don't block
+loadEnMessages();
 
 // Lazy-loaded messages cache
-const messagesCache: Record<string, Messages> = {
-  en: enMessages, // Preload English
-};
+const messagesCache: Record<string, Messages> = {};
 
-// Lazy load other translations
+// Lazy load translations (including English)
 const loadMessages = async (locale: string): Promise<Messages> => {
   if (messagesCache[locale]) {
     return messagesCache[locale];
@@ -22,6 +29,9 @@ const loadMessages = async (locale: string): Promise<Messages> => {
   try {
     let messages: Messages;
     switch (locale) {
+      case 'en':
+        messages = await loadEnMessages();
+        break;
       case 'zh':
         messages = (await import('../messages/zh.json')).default;
         break;
@@ -65,13 +75,13 @@ const loadMessages = async (locale: string): Promise<Messages> => {
         messages = (await import('../messages/nl.json')).default;
         break;
       default:
-        messages = enMessages;
+        messages = await loadEnMessages();
     }
     messagesCache[locale] = messages;
     return messages;
   } catch (error) {
     console.warn(`Failed to load messages for locale: ${locale}`, error);
-    return enMessages; // Fallback to English
+    return await loadEnMessages(); // Fallback to English
   }
 };
 
@@ -97,17 +107,21 @@ export function I18nProvider({
   translationCode: string;
 }) {
   const locale = getLocaleFromTranslation(translationCode);
+  const [messages, setMessages] = useState<Messages | null>(messagesCache[locale] || null);
   
-  // Use cached messages or English as immediate fallback
-  // Other locales will load asynchronously and update when ready
-  const localeMessages = messagesCache[locale] || messagesCache.en;
+  // Load messages asynchronously (non-blocking)
+  useEffect(() => {
+    if (!messagesCache[locale]) {
+      loadMessages(locale).then((loadedMessages) => {
+        setMessages(loadedMessages);
+      }).catch(() => {
+        // Fallback handled in loadMessages
+      });
+    }
+  }, [locale]);
   
-  // Load non-English translations asynchronously (non-blocking)
-  if (locale !== 'en' && !messagesCache[locale]) {
-    loadMessages(locale).catch(() => {
-      // Already handled in loadMessages
-    });
-  }
+  // Use cached messages or fallback to key
+  const localeMessages = messages || messagesCache[locale] || {};
   
   const t = (key: string, params?: Record<string, string | number>): string => {
     const keys = key.split('.');
@@ -116,13 +130,18 @@ export function I18nProvider({
     for (const k of keys) {
       value = value?.[k];
       if (value === undefined) {
-        // Fallback to English
+        // Fallback to English if available
         let fallbackValue: any = messagesCache.en;
-        for (const fk of keys) {
-          fallbackValue = fallbackValue?.[fk];
+        if (fallbackValue) {
+          for (const fk of keys) {
+            fallbackValue = fallbackValue?.[fk];
+          }
         }
         if (fallbackValue === undefined) {
-          console.warn('Translation not found:', key);
+          // Return key if no translation found (don't log in production)
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Translation not found:', key);
+          }
         }
         value = fallbackValue || key;
         break;

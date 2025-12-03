@@ -10,21 +10,36 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await currentUser();
+  // Parallelize user fetch and DB connection for faster loading
+  const [user, dbConnection] = await Promise.all([
+    currentUser(),
+    connectDB().catch(() => null), // Don't block if DB fails
+  ]);
 
   if (!user) {
     redirect('/sign-in');
   }
 
-  await connectDB();
+  // If DB connection failed, try once more with timeout
+  if (!dbConnection) {
+    try {
+      const timeoutPromise = new Promise((resolve) => {
+        setTimeout(() => resolve(null), 1000); // 1 second timeout
+      });
+      await Promise.race([connectDB(), timeoutPromise]);
+    } catch (error) {
+      // Continue anyway - some pages might work without DB
+      console.error('DB connection failed:', error);
+    }
+  }
 
-  // Find or create user
+  // Find or create user - use lean() for faster queries
   const userEmail = user.emailAddresses[0]?.emailAddress?.toLowerCase() || '';
-  let dbUser = await User.findOne({ clerkId: user.id });
+  let dbUser = await User.findOne({ clerkId: user.id }).lean() as any;
   
   if (!dbUser) {
     // Check if user exists by email (created by admin before they signed in)
-    dbUser = await User.findOne({ email: userEmail });
+    dbUser = await User.findOne({ email: userEmail }).lean() as any;
     
     if (dbUser) {
       // User was created by admin - update with Clerk ID and info
@@ -37,8 +52,8 @@ export default async function DashboardLayout({
           name: user.fullName,
           imageUrl: user.imageUrl,
         },
-        { new: true }
-      );
+        { new: true, lean: true }
+      ) as any;
     } else {
       // New user - create without subscription (needs to add payment first)
       dbUser = await User.create({
@@ -50,6 +65,7 @@ export default async function DashboardLayout({
         imageUrl: user.imageUrl,
         subscriptionStatus: 'inactive', // Must subscribe to access
       });
+      dbUser = dbUser.toObject(); // Convert to plain object
     }
   }
 
@@ -61,7 +77,7 @@ export default async function DashboardLayout({
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
   if (!access.hasAccess && !dbUser.stripeCustomerId && stripeSecretKey) {
     // Use Promise.race with timeout to prevent hanging on slow networks
-    const stripeCheck = (async () => {
+    const stripeCheck = async () => {
       try {
         const Stripe = (await import('stripe')).default;
         const stripe = new Stripe(stripeSecretKey, {
@@ -92,7 +108,7 @@ export default async function DashboardLayout({
               : undefined;
             
             // Update user immediately
-            dbUser = await User.findOneAndUpdate(
+            const updatedUser = await User.findOneAndUpdate(
               { clerkId: user.id },
               {
                 subscriptionStatus: subscription.status === 'trialing' ? 'trialing' : subscription.status === 'active' ? 'active' : 'inactive',
@@ -102,21 +118,22 @@ export default async function DashboardLayout({
                 trialEndsAt: trialEnd,
                 currentPeriodEnd,
               },
-              { new: true }
-            );
+              { new: true, lean: true }
+            ) as any;
             
-            // Re-check access
+            // Update outer scope variables
+            Object.assign(dbUser, updatedUser);
             access = checkSubscriptionAccess(dbUser);
           }
         }
       } catch (error) {
         console.error('Error checking Stripe subscription in layout:', error);
       }
-    })();
+    };
 
-    // Timeout after 3 seconds to prevent hanging
-    const timeout = new Promise(resolve => setTimeout(resolve, 3000));
-    await Promise.race([stripeCheck, timeout]);
+    // Timeout after 1.5 seconds to prevent hanging on mobile
+    const timeout = new Promise(resolve => setTimeout(resolve, 1500));
+    await Promise.race([stripeCheck(), timeout]);
   }
 
   // Note: Profile page has its own layout that bypasses subscription check

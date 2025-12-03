@@ -32,12 +32,16 @@ async function connectDB(): Promise<typeof mongoose> {
       // Connection pool settings for better performance
       maxPoolSize: 10,
       minPoolSize: 2,
-      // Timeout settings - reduced for faster failure on mobile
-      serverSelectionTimeoutMS: 3000, // Reduced from 5000
-      socketTimeoutMS: 30000, // Reduced from 45000
-      connectTimeoutMS: 3000, // Add connection timeout
-      // Keep alive
-      family: 4, // Use IPv4, skip trying IPv6
+      // Aggressive timeout settings for mobile - fail fast
+      serverSelectionTimeoutMS: 1500, // Reduced to 1.5 seconds
+      socketTimeoutMS: 20000, // Reduced to 20 seconds
+      connectTimeoutMS: 1500, // Reduced to 1.5 seconds
+      // Keep alive settings for faster reconnection
+      heartbeatFrequencyMS: 10000, // Check connection health every 10s
+      // Use IPv4, skip trying IPv6 (faster on mobile)
+      family: 4,
+      // Direct connection for faster initial connection
+      directConnection: false, // Use replica set if available
     };
 
     cached.promise = mongoose.connect(MONGODB_URL, opts).then((mongoose) => {
