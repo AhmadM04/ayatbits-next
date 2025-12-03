@@ -13,7 +13,8 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Hooks must always be called - can't be conditional
+  // Hooks MUST always be called - can't be conditional
+  // Always call useScroll, but we'll use static values on mobile
   const { scrollYProgress } = useScroll({ container: containerRef });
   
   useEffect(() => {
@@ -21,10 +22,15 @@ export default function Home() {
     setIsMobile(window.innerWidth < 768);
   }, []);
   
-  // Transform values - use 0 on mobile to disable animations
-  const y1 = isMobile ? 0 : useTransform(scrollYProgress, [0, 1], [0, -200]);
-  const y2 = isMobile ? 0 : useTransform(scrollYProgress, [0, 1], [0, -400]);
-  const opacity = isMobile ? 1 : useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+  // Always call useTransform, but use static values on mobile
+  const y1Transform = useTransform(scrollYProgress, [0, 1], [0, -200]);
+  const y2Transform = useTransform(scrollYProgress, [0, 1], [0, -400]);
+  const opacityTransform = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+  
+  // Use static values on mobile, animated on desktop
+  const y1 = isMobile ? 0 : y1Transform;
+  const y2 = isMobile ? 0 : y2Transform;
+  const opacity = isMobile ? 1 : opacityTransform;
 
   return (
     <div ref={containerRef} className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
