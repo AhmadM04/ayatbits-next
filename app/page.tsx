@@ -180,9 +180,9 @@ export default function Home() {
                 </Link>
               </SignedOut>
               <SignedIn>
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center">
                   <Link href="/profile">
-                    <button className="group px-6 sm:px-8 py-3 sm:py-4 bg-white/5 hover:bg-white/10 text-white text-sm sm:text-base font-semibold rounded-xl sm:rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2 backdrop-blur-sm">
+                    <button className="group px-6 sm:px-8 py-3 sm:py-4 bg-green-600/20 hover:bg-green-600/30 text-white text-sm sm:text-base font-semibold rounded-xl sm:rounded-2xl border border-green-500/30 hover:border-green-500/50 transition-all duration-300 flex items-center justify-center gap-2 backdrop-blur-sm">
                       <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
                       <span>View Profile</span>
                     </button>
@@ -194,19 +194,21 @@ export default function Home() {
                       <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-r from-green-400 to-emerald-400 opacity-0 group-hover:opacity-20 transition-opacity" />
                     </button>
                   </Link>
+                  <Link href="#demo">
+                    <button className="group px-6 sm:px-8 py-3 sm:py-4 bg-white/5 hover:bg-white/10 text-white text-sm sm:text-base font-semibold rounded-xl sm:rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2 backdrop-blur-sm">
+                      <Play className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
+                      <span>Try Demo</span>
+                    </button>
+                  </Link>
                 </div>
-                <Link href="#demo">
-                  <button className="group px-8 py-4 bg-white/5 hover:bg-white/10 text-white text-base font-semibold rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 flex items-center gap-2 backdrop-blur-sm">
-                    <Play className="w-5 h-5 text-green-400" />
-                    <span>Try Demo</span>
-                  </button>
-                </Link>
-                <SignOutButton>
-                  <button className="px-6 py-4 text-gray-400 hover:text-white text-base font-medium rounded-2xl hover:bg-white/5 transition-all duration-300 flex items-center gap-2">
-                    <LogOut className="w-4 h-4" />
-                    <span>Sign Out</span>
-                  </button>
-                </SignOutButton>
+                <div className="mt-4">
+                  <SignOutButton>
+                    <button className="px-6 py-3 text-gray-400 hover:text-white text-sm font-medium rounded-xl hover:bg-white/5 transition-all duration-300 flex items-center gap-2 mx-auto">
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </SignOutButton>
+                </div>
               </SignedIn>
             </motion.div>
 

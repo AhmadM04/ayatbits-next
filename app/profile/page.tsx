@@ -10,13 +10,14 @@ import Link from 'next/link';
  * Shows only email and basic info, no progress or dashboard stuff
  */
 export default async function ProfilePage() {
-  const user = await currentUser();
+  try {
+    const user = await currentUser();
 
-  if (!user) {
-    redirect('/sign-in');
-  }
+    if (!user) {
+      redirect('/sign-in');
+    }
 
-  await connectDB();
+    await connectDB();
 
   // Find or create user
   const userEmail = user.emailAddresses[0]?.emailAddress?.toLowerCase() || '';
@@ -145,5 +146,24 @@ export default async function ProfilePage() {
       </main>
     </div>
   );
+  } catch (error: any) {
+    console.error('Profile page error:', error);
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <h1 className="text-2xl font-bold mb-4">Error Loading Profile</h1>
+          <p className="text-gray-400 mb-6">
+            {error.message || 'Something went wrong. Please try again.'}
+          </p>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+          >
+            Go Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
 }
 

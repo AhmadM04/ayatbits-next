@@ -1,9 +1,10 @@
 'use client';
 
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, SignUpButton, SignOutButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, SignOutButton, UserButton } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut, User } from "lucide-react";
+import Link from "next/link";
 
 export default function LandingHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -65,18 +66,28 @@ export default function LandingHeader() {
               </SignUpButton>
             </SignedOut>
             <SignedIn>
-              <div className="flex items-center gap-4">
-                <Link href="/profile" className="text-gray-400 hover:text-white text-sm font-medium transition-colors">
-                  Profile
+              <div className="flex items-center gap-3">
+                <Link 
+                  href="/profile" 
+                  className="p-2 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2 group"
+                  title="View Profile"
+                >
+                  <User className="w-5 h-5 text-gray-400 group-hover:text-green-400 transition-colors" />
+                  <span className="text-sm text-gray-400 group-hover:text-white transition-colors hidden lg:inline">
+                    Profile
+                  </span>
                 </Link>
                 <Link href="/api/check-access" className="text-white text-sm font-medium hover:text-green-400 transition-colors">
                   Continue Learning
                 </Link>
-                <SignOutButton>
-                  <button className="text-gray-400 hover:text-white transition-colors">
-                    <LogOut className="w-4 h-4" />
-                  </button>
-                </SignOutButton>
+                <UserButton 
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8",
+                      userButtonPopoverCard: "bg-[#0a0a0a] border border-white/10",
+                    }
+                  }}
+                />
               </div>
             </SignedIn>
           </div>
@@ -133,10 +144,11 @@ export default function LandingHeader() {
               <SignedIn>
                 <Link 
                   href="/profile" 
-                  className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                  className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Profile
+                  <User className="w-5 h-5" />
+                  <span>Profile</span>
                 </Link>
                 <Link 
                   href="/api/check-access" 

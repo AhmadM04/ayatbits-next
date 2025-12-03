@@ -79,9 +79,9 @@ export async function POST(request: NextRequest) {
       success: true, 
       message: `Bypass granted to ${email}`,
       user: { 
-        email: updatedUser.email, 
-        hasBypass: updatedUser.hasBypass,
-        bypassReason: updatedUser.bypassReason 
+        email: dbUser.email, 
+        hasBypass: dbUser.hasBypass,
+        bypassReason: dbUser.bypassReason 
       }
     });
   } catch (error: any) {

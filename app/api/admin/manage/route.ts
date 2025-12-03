@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
       success: true, 
       message: `Admin access ${action === 'grant' ? 'granted' : 'revoked'} for ${email}`,
       user: { 
-        email: updatedUser.email, 
-        isAdmin: updatedUser.isAdmin,
+        email: dbUser.email, 
+        isAdmin: dbUser.isAdmin,
       }
     });
   } catch (error: any) {
