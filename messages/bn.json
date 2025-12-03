@@ -1,0 +1,69 @@
+{
+  "common": {
+    "ayah": "আয়াত",
+    "surah": "সূরা",
+    "juz": "পারা",
+    "play": "চালান",
+    "pause": "বিরতি",
+    "prev": "পূর্ববর্তী",
+    "next": "পরবর্তী",
+    "reset": "রিসেট",
+    "search": "খুঁজুন",
+    "menu": "মেনু",
+    "profile": "প্রোফাইল",
+    "dashboard": "ড্যাশবোর্ড",
+    "loading": "লোড হচ্ছে...",
+    "error": "ত্রুটি"
+  },
+  "verse": {
+    "ayahNumber": "আয়াত {number}",
+    "readyToStartPuzzle": "পাজল শুরু করতে প্রস্তুত",
+    "selectAyah": "আয়াত নির্বাচন করুন",
+    "enterAyahNumber": "আয়াত নম্বর লিখুন ({min}-{max})...",
+    "ayahFound": "আয়াত পাওয়া গেছে!",
+    "ayahNotFound": "এই বিভাগে আয়াত পাওয়া যায়নি।",
+    "goToAyah": "আয়াতে যান",
+    "englishTranslation": "ইংরেজি অনুবাদ"
+  },
+  "dashboard": {
+    "welcome": "ফিরে আসার জন্য স্বাগতম, {name}!",
+    "learner": "শিক্ষার্থী",
+    "continueJourney": "কুরআন মুখস্থ এবং বোঝার আপনার যাত্রা অব্যাহত রাখুন",
+    "completedPuzzles": "সম্পন্ন পাজল",
+    "juzsExplored": "অন্বেষিত পারা",
+    "currentStreak": "বর্তমান স্ট্রিক",
+    "days": "দিন",
+    "selectJuz": "শুরু করতে একটি পারা নির্বাচন করুন",
+    "noJuzsFound": "কোন পারা পাওয়া যায়নি। অনুগ্রহ করে seed script চালান: npm run db:seed",
+    "surahsAvailable": "উপলব্ধ"
+  },
+  "profile": {
+    "title": "প্রোফাইল",
+    "currentStreak": "বর্তমান স্ট্রিক",
+    "longestStreak": "দীর্ঘতম স্ট্রিক",
+    "lastActive": "সর্বশেষ সক্রিয়: {date}",
+    "never": "কখনোই না",
+    "bestStreak": "এখন পর্যন্ত আপনার সেরা স্ট্রিক",
+    "completedPuzzles": "সম্পন্ন পাজল",
+    "ofAllPuzzles": "সব পাজলের {percentage}%",
+    "juzsExplored": "অন্বেষিত পারা",
+    "uniqueSurahs": "{count} অনন্য সূরা সম্পন্ন",
+    "selectTranslation": "অনুবাদ নির্বাচন করুন",
+    "translationDescription": "এই অনুবাদ সমস্ত আয়াত প্রদর্শনের জন্য ব্যবহার করা হবে।",
+    "aboutStreaks": "স্ট্রিক সম্পর্কে",
+    "streakDescription1": "আপনি প্রতিদিন কমপক্ষে একটি পাজল সম্পন্ন করলে আপনার স্ট্রিক বৃদ্ধি পায়।",
+    "streakDescription2": "আপনার স্ট্রিক বজায় রাখতে এবং বৃদ্ধি করতে প্রতিদিন পাজল সম্পন্ন করুন!",
+    "streakDescription3": "আপনি যদি একটি দিন মিস করেন, আপনার স্ট্রিক রিসেট হয়ে যাবে। আপনার দীর্ঘতম স্ট্রিক তৈরি করতে শেখা চালিয়ে যান!"
+  },
+  "puzzle": {
+    "buildTheAyah": "আয়াত তৈরি করুন",
+    "wordBank": "শব্দ ব্যাংক",
+    "correct": "সঠিক!",
+    "mistake": "ভুল!",
+    "mistakes": "ভুল: {count}",
+    "completed": "সম্পন্ন!",
+    "continueToNextAyah": "পরবর্তী আয়াতে যান",
+    "puzzles": "পাজল"
+  }
+}
+

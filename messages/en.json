@@ -1,0 +1,74 @@
+{
+  "common": {
+    "ayah": "Ayah",
+    "surah": "Surah",
+    "juz": "Juz",
+    "play": "Play",
+    "pause": "Pause",
+    "prev": "Prev",
+    "next": "Next",
+    "reset": "Reset",
+    "search": "Search",
+    "menu": "Menu",
+    "profile": "Profile",
+    "dashboard": "Dashboard",
+    "loading": "Loading...",
+    "error": "Error"
+  },
+  "verse": {
+    "ayahNumber": "Ayah {number}",
+    "readyToStartPuzzle": "Ready to Start Puzzle",
+    "selectAyah": "Select Ayah",
+    "enterAyahNumber": "Enter ayah number ({min}-{max})...",
+    "ayahFound": "Ayah found!",
+    "ayahNotFound": "Ayah not found in this section.",
+    "goToAyah": "Go to Ayah",
+    "englishTranslation": "English Translation"
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {name}!",
+    "learner": "Learner",
+    "continueJourney": "Continue your journey of memorizing and understanding the Quran",
+    "completedPuzzles": "Completed Puzzles",
+    "juzsExplored": "Juzs Explored",
+    "currentStreak": "Current Streak",
+    "days": "days",
+    "selectJuz": "Select a Juz to begin",
+    "noJuzsFound": "No juzs found. Please run the seed script: npm run db:seed",
+    "surahsAvailable": "available"
+  },
+  "profile": {
+    "title": "Profile",
+    "currentStreak": "Current Streak",
+    "longestStreak": "Longest Streak",
+    "lastActive": "Last active: {date}",
+    "never": "Never",
+    "bestStreak": "Your best streak so far",
+    "completedPuzzles": "Completed Puzzles",
+    "ofAllPuzzles": "{percentage}% of all puzzles",
+    "juzsExplored": "Juzs Explored",
+    "uniqueSurahs": "{count} unique surahs completed",
+    "selectTranslation": "Select Translation",
+    "translationDescription": "This translation will be used for all ayah displays.",
+    "aboutStreaks": "About Streaks",
+    "streakDescription1": "Your streak increases when you complete at least one puzzle each day.",
+    "streakDescription2": "Complete puzzles daily to maintain and grow your streak!",
+    "streakDescription3": "If you miss a day, your streak will reset. Keep learning to build your longest streak!"
+  },
+  "puzzle": {
+    "buildTheAyah": "Build the Ayah",
+    "wordBank": "Word Bank",
+    "correct": "Correct!",
+    "mistake": "Mistake!",
+    "mistakes": "Mistakes: {count}",
+    "completed": "Completed!",
+    "continueToNextAyah": "Continue to Next Ayah",
+    "puzzles": "puzzles",
+    "tooManyMistakes": "Too Many Mistakes",
+    "mistakeLimitReached": "You've reached the mistake limit",
+    "reviewAyahMessage": "You've made too many mistakes. It's time to review the ayah again before attempting the puzzle. Take your time to read and understand the verse, then come back to try again.",
+    "goBackToAyahView": "Go Back to Ayah View",
+    "goBack": "Go Back"
+  }
+}
+

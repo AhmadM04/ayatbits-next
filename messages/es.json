@@ -1,0 +1,69 @@
+{
+  "common": {
+    "ayah": "Ayah",
+    "surah": "Sura",
+    "juz": "Juz",
+    "play": "Reproducir",
+    "pause": "Pausa",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "reset": "Reiniciar",
+    "search": "Buscar",
+    "menu": "Menú",
+    "profile": "Perfil",
+    "dashboard": "Panel de control",
+    "loading": "Cargando...",
+    "error": "Error"
+  },
+  "verse": {
+    "ayahNumber": "Ayah {number}",
+    "readyToStartPuzzle": "Listo para comenzar el puzzle",
+    "selectAyah": "Seleccionar Ayah",
+    "enterAyahNumber": "Ingrese el número de ayah ({min}-{max})...",
+    "ayahFound": "¡Ayah encontrado!",
+    "ayahNotFound": "Ayah no encontrado en esta sección.",
+    "goToAyah": "Ir a Ayah",
+    "englishTranslation": "Traducción al inglés"
+  },
+  "dashboard": {
+    "welcome": "¡Bienvenido de nuevo, {name}!",
+    "learner": "Estudiante",
+    "continueJourney": "Continúa tu viaje de memorización y comprensión del Corán",
+    "completedPuzzles": "Puzzles completados",
+    "juzsExplored": "Juz explorados",
+    "currentStreak": "Racha actual",
+    "days": "días",
+    "selectJuz": "Selecciona un Juz para comenzar",
+    "noJuzsFound": "No se encontraron juz. Por favor ejecuta el script de seed: npm run db:seed",
+    "surahsAvailable": "disponibles"
+  },
+  "profile": {
+    "title": "Perfil",
+    "currentStreak": "Racha actual",
+    "longestStreak": "Racha más larga",
+    "lastActive": "Última actividad: {date}",
+    "never": "Nunca",
+    "bestStreak": "Tu mejor racha hasta ahora",
+    "completedPuzzles": "Puzzles completados",
+    "ofAllPuzzles": "{percentage}% de todos los puzzles",
+    "juzsExplored": "Juz explorados",
+    "uniqueSurahs": "{count} suras únicas completadas",
+    "selectTranslation": "Seleccionar traducción",
+    "translationDescription": "Esta traducción se utilizará para todas las visualizaciones de ayah.",
+    "aboutStreaks": "Acerca de las rachas",
+    "streakDescription1": "Tu racha aumenta cuando completas al menos un puzzle cada día.",
+    "streakDescription2": "¡Completa puzzles diariamente para mantener y hacer crecer tu racha!",
+    "streakDescription3": "Si te pierdes un día, tu racha se reiniciará. ¡Sigue aprendiendo para construir tu racha más larga!"
+  },
+  "puzzle": {
+    "buildTheAyah": "Construir el Ayah",
+    "wordBank": "Banco de palabras",
+    "correct": "¡Correcto!",
+    "mistake": "¡Error!",
+    "mistakes": "Errores: {count}",
+    "completed": "¡Completado!",
+    "continueToNextAyah": "Continuar al siguiente Ayah",
+    "puzzles": "puzzles"
+  }
+}
+

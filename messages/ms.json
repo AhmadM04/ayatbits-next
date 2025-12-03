@@ -1,0 +1,69 @@
+{
+  "common": {
+    "ayah": "Ayat",
+    "surah": "Surah",
+    "juz": "Juz",
+    "play": "Mainkan",
+    "pause": "Jeda",
+    "prev": "Sebelum",
+    "next": "Seterusnya",
+    "reset": "Set semula",
+    "search": "Cari",
+    "menu": "Menu",
+    "profile": "Profil",
+    "dashboard": "Papan Pemuka",
+    "loading": "Memuatkan...",
+    "error": "Ralat"
+  },
+  "verse": {
+    "ayahNumber": "Ayat {number}",
+    "readyToStartPuzzle": "Bersedia untuk Mula Teka-teki",
+    "selectAyah": "Pilih Ayat",
+    "enterAyahNumber": "Masukkan nombor ayat ({min}-{max})...",
+    "ayahFound": "Ayat ditemui!",
+    "ayahNotFound": "Ayat tidak ditemui dalam bahagian ini.",
+    "goToAyah": "Pergi ke Ayat",
+    "englishTranslation": "Terjemahan Bahasa Inggeris"
+  },
+  "dashboard": {
+    "welcome": "Selamat kembali, {name}!",
+    "learner": "Pelajar",
+    "continueJourney": "Teruskan perjalanan anda menghafal dan memahami Al-Quran",
+    "completedPuzzles": "Teka-teki Selesai",
+    "juzsExplored": "Juz Diterokai",
+    "currentStreak": "Rentetan Semasa",
+    "days": "hari",
+    "selectJuz": "Pilih Juz untuk bermula",
+    "noJuzsFound": "Tiada juz ditemui. Sila jalankan skrip seed: npm run db:seed",
+    "surahsAvailable": "tersedia"
+  },
+  "profile": {
+    "title": "Profil",
+    "currentStreak": "Rentetan Semasa",
+    "longestStreak": "Rentetan Terpanjang",
+    "lastActive": "Aktif terakhir: {date}",
+    "never": "Tidak pernah",
+    "bestStreak": "Rentetan terbaik anda setakat ini",
+    "completedPuzzles": "Teka-teki Selesai",
+    "ofAllPuzzles": "{percentage}% daripada semua teka-teki",
+    "juzsExplored": "Juz Diterokai",
+    "uniqueSurahs": "{count} surah unik selesai",
+    "selectTranslation": "Pilih Terjemahan",
+    "translationDescription": "Terjemahan ini akan digunakan untuk semua paparan ayat.",
+    "aboutStreaks": "Mengenai Rentetan",
+    "streakDescription1": "Rentetan anda meningkat apabila anda menyelesaikan sekurang-kurangnya satu teka-teki setiap hari.",
+    "streakDescription2": "Selesaikan teka-teki setiap hari untuk mengekalkan dan meningkatkan rentetan anda!",
+    "streakDescription3": "Jika anda terlepas satu hari, rentetan anda akan diset semula. Teruskan belajar untuk membina rentetan terpanjang anda!"
+  },
+  "puzzle": {
+    "buildTheAyah": "Bina Ayat",
+    "wordBank": "Bank Perkataan",
+    "correct": "Betul!",
+    "mistake": "Kesilapan!",
+    "mistakes": "Kesilapan: {count}",
+    "completed": "Selesai!",
+    "continueToNextAyah": "Teruskan ke Ayat Seterusnya",
+    "puzzles": "teka-teki"
+  }
+}
+

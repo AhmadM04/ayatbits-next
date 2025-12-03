@@ -1,0 +1,69 @@
+{
+  "common": {
+    "ayah": "Ayah",
+    "surah": "Sure",
+    "juz": "Dschuz",
+    "play": "Abspielen",
+    "pause": "Pause",
+    "prev": "Zurück",
+    "next": "Weiter",
+    "reset": "Zurücksetzen",
+    "search": "Suchen",
+    "menu": "Menü",
+    "profile": "Profil",
+    "dashboard": "Dashboard",
+    "loading": "Lädt...",
+    "error": "Fehler"
+  },
+  "verse": {
+    "ayahNumber": "Ayah {number}",
+    "readyToStartPuzzle": "Bereit, das Puzzle zu starten",
+    "selectAyah": "Ayah auswählen",
+    "enterAyahNumber": "Ayah-Nummer eingeben ({min}-{max})...",
+    "ayahFound": "Ayah gefunden!",
+    "ayahNotFound": "Ayah in diesem Abschnitt nicht gefunden.",
+    "goToAyah": "Zu Ayah gehen",
+    "englishTranslation": "Englische Übersetzung"
+  },
+  "dashboard": {
+    "welcome": "Willkommen zurück, {name}!",
+    "learner": "Lernender",
+    "continueJourney": "Setzen Sie Ihre Reise des Auswendiglernens und Verstehens des Korans fort",
+    "completedPuzzles": "Abgeschlossene Puzzles",
+    "juzsExplored": "Erforschte Dschuz",
+    "currentStreak": "Aktuelle Serie",
+    "days": "Tage",
+    "selectJuz": "Wählen Sie einen Dschuz zum Beginnen",
+    "noJuzsFound": "Keine Dschuz gefunden. Bitte führen Sie das Seed-Skript aus: npm run db:seed",
+    "surahsAvailable": "verfügbar"
+  },
+  "profile": {
+    "title": "Profil",
+    "currentStreak": "Aktuelle Serie",
+    "longestStreak": "Längste Serie",
+    "lastActive": "Zuletzt aktiv: {date}",
+    "never": "Nie",
+    "bestStreak": "Ihre beste Serie bisher",
+    "completedPuzzles": "Abgeschlossene Puzzles",
+    "ofAllPuzzles": "{percentage}% aller Puzzles",
+    "juzsExplored": "Erforschte Dschuz",
+    "uniqueSurahs": "{count} einzigartige Suren abgeschlossen",
+    "selectTranslation": "Übersetzung auswählen",
+    "translationDescription": "Diese Übersetzung wird für alle Ayah-Anzeigen verwendet.",
+    "aboutStreaks": "Über Serien",
+    "streakDescription1": "Ihre Serie steigt, wenn Sie mindestens ein Puzzle pro Tag abschließen.",
+    "streakDescription2": "Schließen Sie täglich Puzzles ab, um Ihre Serie aufrechtzuerhalten und zu vergrößern!",
+    "streakDescription3": "Wenn Sie einen Tag verpassen, wird Ihre Serie zurückgesetzt. Lernen Sie weiter, um Ihre längste Serie aufzubauen!"
+  },
+  "puzzle": {
+    "buildTheAyah": "Ayah bauen",
+    "wordBank": "Wortbank",
+    "correct": "Richtig!",
+    "mistake": "Fehler!",
+    "mistakes": "Fehler: {count}",
+    "completed": "Abgeschlossen!",
+    "continueToNextAyah": "Zum nächsten Ayah fortfahren",
+    "puzzles": "Puzzles"
+  }
+}
+

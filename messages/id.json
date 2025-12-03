@@ -1,0 +1,69 @@
+{
+  "common": {
+    "ayah": "Ayat",
+    "surah": "Surah",
+    "juz": "Juz",
+    "play": "Putar",
+    "pause": "Jeda",
+    "prev": "Sebelumnya",
+    "next": "Selanjutnya",
+    "reset": "Reset",
+    "search": "Cari",
+    "menu": "Menu",
+    "profile": "Profil",
+    "dashboard": "Dasbor",
+    "loading": "Memuat...",
+    "error": "Kesalahan"
+  },
+  "verse": {
+    "ayahNumber": "Ayat {number}",
+    "readyToStartPuzzle": "Siap Memulai Puzzle",
+    "selectAyah": "Pilih Ayat",
+    "enterAyahNumber": "Masukkan nomor ayat ({min}-{max})...",
+    "ayahFound": "Ayat ditemukan!",
+    "ayahNotFound": "Ayat tidak ditemukan di bagian ini.",
+    "goToAyah": "Pergi ke Ayat",
+    "englishTranslation": "Terjemahan Bahasa Inggris"
+  },
+  "dashboard": {
+    "welcome": "Selamat datang kembali, {name}!",
+    "learner": "Pembelajar",
+    "continueJourney": "Lanjutkan perjalanan Anda dalam menghafal dan memahami Al-Quran",
+    "completedPuzzles": "Puzzle Selesai",
+    "juzsExplored": "Juz yang Dijelajahi",
+    "currentStreak": "Streak Saat Ini",
+    "days": "hari",
+    "selectJuz": "Pilih Juz untuk memulai",
+    "noJuzsFound": "Tidak ada juz ditemukan. Silakan jalankan script seed: npm run db:seed",
+    "surahsAvailable": "tersedia"
+  },
+  "profile": {
+    "title": "Profil",
+    "currentStreak": "Streak Saat Ini",
+    "longestStreak": "Streak Terpanjang",
+    "lastActive": "Terakhir aktif: {date}",
+    "never": "Tidak pernah",
+    "bestStreak": "Streak terbaik Anda sejauh ini",
+    "completedPuzzles": "Puzzle Selesai",
+    "ofAllPuzzles": "{percentage}% dari semua puzzle",
+    "juzsExplored": "Juz yang Dijelajahi",
+    "uniqueSurahs": "{count} surah unik selesai",
+    "selectTranslation": "Pilih Terjemahan",
+    "translationDescription": "Terjemahan ini akan digunakan untuk semua tampilan ayat.",
+    "aboutStreaks": "Tentang Streak",
+    "streakDescription1": "Streak Anda meningkat ketika Anda menyelesaikan setidaknya satu puzzle setiap hari.",
+    "streakDescription2": "Selesaikan puzzle setiap hari untuk mempertahankan dan meningkatkan streak Anda!",
+    "streakDescription3": "Jika Anda melewatkan satu hari, streak Anda akan direset. Teruslah belajar untuk membangun streak terpanjang Anda!"
+  },
+  "puzzle": {
+    "buildTheAyah": "Buat Ayat",
+    "wordBank": "Bank Kata",
+    "correct": "Benar!",
+    "mistake": "Salah!",
+    "mistakes": "Kesalahan: {count}",
+    "completed": "Selesai!",
+    "continueToNextAyah": "Lanjutkan ke Ayat Berikutnya",
+    "puzzles": "puzzle"
+  }
+}
+

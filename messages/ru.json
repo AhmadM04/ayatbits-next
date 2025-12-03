@@ -1,0 +1,69 @@
+{
+  "common": {
+    "ayah": "Аят",
+    "surah": "Сура",
+    "juz": "Джуз",
+    "play": "Воспроизвести",
+    "pause": "Пауза",
+    "prev": "Предыдущий",
+    "next": "Следующий",
+    "reset": "Сброс",
+    "search": "Поиск",
+    "menu": "Меню",
+    "profile": "Профиль",
+    "dashboard": "Панель управления",
+    "loading": "Загрузка...",
+    "error": "Ошибка"
+  },
+  "verse": {
+    "ayahNumber": "Аят {number}",
+    "readyToStartPuzzle": "Готов начать головоломку",
+    "selectAyah": "Выбрать аят",
+    "enterAyahNumber": "Введите номер аята ({min}-{max})...",
+    "ayahFound": "Аят найден!",
+    "ayahNotFound": "Аят не найден в этом разделе.",
+    "goToAyah": "Перейти к аяту",
+    "englishTranslation": "Английский перевод"
+  },
+  "dashboard": {
+    "welcome": "Добро пожаловать, {name}!",
+    "learner": "Ученик",
+    "continueJourney": "Продолжите свое путешествие по запоминанию и пониманию Корана",
+    "completedPuzzles": "Завершенные головоломки",
+    "juzsExplored": "Изученные джузы",
+    "currentStreak": "Текущая серия",
+    "days": "дней",
+    "selectJuz": "Выберите джуз для начала",
+    "noJuzsFound": "Джузы не найдены. Пожалуйста, запустите скрипт заполнения: npm run db:seed",
+    "surahsAvailable": "сур доступно"
+  },
+  "profile": {
+    "title": "Профиль",
+    "currentStreak": "Текущая серия",
+    "longestStreak": "Самая длинная серия",
+    "lastActive": "Последняя активность: {date}",
+    "never": "Никогда",
+    "bestStreak": "Ваша лучшая серия на данный момент",
+    "completedPuzzles": "Завершенные головоломки",
+    "ofAllPuzzles": "{percentage}% всех головоломок",
+    "juzsExplored": "Изученные джузы",
+    "uniqueSurahs": "{count} уникальных сур завершено",
+    "selectTranslation": "Выбрать перевод",
+    "translationDescription": "Этот перевод будет использоваться для всех отображений аятов.",
+    "aboutStreaks": "О сериях",
+    "streakDescription1": "Ваша серия увеличивается, когда вы завершаете хотя бы одну головоломку каждый день.",
+    "streakDescription2": "Завершайте головоломки ежедневно, чтобы поддерживать и увеличивать свою серию!",
+    "streakDescription3": "Если вы пропустите день, ваша серия сбросится. Продолжайте учиться, чтобы построить самую длинную серию!"
+  },
+  "puzzle": {
+    "buildTheAyah": "Построить аят",
+    "wordBank": "Банк слов",
+    "correct": "Правильно!",
+    "mistake": "Ошибка!",
+    "mistakes": "Ошибки: {count}",
+    "completed": "Завершено!",
+    "continueToNextAyah": "Перейти к следующему аяту",
+    "puzzles": "головоломки"
+  }
+}
+

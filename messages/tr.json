@@ -1,0 +1,69 @@
+{
+  "common": {
+    "ayah": "Ayet",
+    "surah": "Sure",
+    "juz": "Cüz",
+    "play": "Oynat",
+    "pause": "Duraklat",
+    "prev": "Önceki",
+    "next": "Sonraki",
+    "reset": "Sıfırla",
+    "search": "Ara",
+    "menu": "Menü",
+    "profile": "Profil",
+    "dashboard": "Kontrol Paneli",
+    "loading": "Yükleniyor...",
+    "error": "Hata"
+  },
+  "verse": {
+    "ayahNumber": "Ayet {number}",
+    "readyToStartPuzzle": "Bulmacaya Başlamaya Hazır",
+    "selectAyah": "Ayet Seç",
+    "enterAyahNumber": "Ayet numarasını girin ({min}-{max})...",
+    "ayahFound": "Ayet bulundu!",
+    "ayahNotFound": "Bu bölümde ayet bulunamadı.",
+    "goToAyah": "Ayete Git",
+    "englishTranslation": "İngilizce Çeviri"
+  },
+  "dashboard": {
+    "welcome": "Tekrar hoş geldin, {name}!",
+    "learner": "Öğrenci",
+    "continueJourney": "Kur'an'ı ezberleme ve anlama yolculuğunuza devam edin",
+    "completedPuzzles": "Tamamlanan Bulmacalar",
+    "juzsExplored": "Keşfedilen Cüzler",
+    "currentStreak": "Mevcut Seri",
+    "days": "gün",
+    "selectJuz": "Başlamak için bir Cüz seçin",
+    "noJuzsFound": "Cüz bulunamadı. Lütfen seed scriptini çalıştırın: npm run db:seed",
+    "surahsAvailable": "mevcut"
+  },
+  "profile": {
+    "title": "Profil",
+    "currentStreak": "Mevcut Seri",
+    "longestStreak": "En Uzun Seri",
+    "lastActive": "Son aktif: {date}",
+    "never": "Hiç",
+    "bestStreak": "Şimdiye kadarki en iyi seriniz",
+    "completedPuzzles": "Tamamlanan Bulmacalar",
+    "ofAllPuzzles": "Tüm bulmacaların %{percentage}",
+    "juzsExplored": "Keşfedilen Cüzler",
+    "uniqueSurahs": "{count} benzersiz sure tamamlandı",
+    "selectTranslation": "Çeviri Seç",
+    "translationDescription": "Bu çeviri tüm ayet görüntülemeleri için kullanılacaktır.",
+    "aboutStreaks": "Seriler Hakkında",
+    "streakDescription1": "Her gün en az bir bulmaca tamamladığınızda seriniz artar.",
+    "streakDescription2": "Serinizi korumak ve büyütmek için günlük olarak bulmaca tamamlayın!",
+    "streakDescription3": "Bir gün kaçırırsanız, seriniz sıfırlanacaktır. En uzun serinizi oluşturmak için öğrenmeye devam edin!"
+  },
+  "puzzle": {
+    "buildTheAyah": "Ayeti Oluştur",
+    "wordBank": "Kelime Bankası",
+    "correct": "Doğru!",
+    "mistake": "Hata!",
+    "mistakes": "Hatalar: {count}",
+    "completed": "Tamamlandı!",
+    "continueToNextAyah": "Sonraki Ayete Devam Et",
+    "puzzles": "bulmacalar"
+  }
+}
+

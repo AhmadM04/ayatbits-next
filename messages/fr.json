@@ -1,0 +1,69 @@
+{
+  "common": {
+    "ayah": "Ayah",
+    "surah": "Sourate",
+    "juz": "Juz",
+    "play": "Lire",
+    "pause": "Pause",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "reset": "Réinitialiser",
+    "search": "Rechercher",
+    "menu": "Menu",
+    "profile": "Profil",
+    "dashboard": "Tableau de bord",
+    "loading": "Chargement...",
+    "error": "Erreur"
+  },
+  "verse": {
+    "ayahNumber": "Ayah {number}",
+    "readyToStartPuzzle": "Prêt à commencer le puzzle",
+    "selectAyah": "Sélectionner un Ayah",
+    "enterAyahNumber": "Entrez le numéro de l'ayah ({min}-{max})...",
+    "ayahFound": "Ayah trouvé !",
+    "ayahNotFound": "Ayah introuvable dans cette section.",
+    "goToAyah": "Aller à l'Ayah",
+    "englishTranslation": "Traduction anglaise"
+  },
+  "dashboard": {
+    "welcome": "Bon retour, {name} !",
+    "learner": "Apprenant",
+    "continueJourney": "Continuez votre voyage de mémorisation et de compréhension du Coran",
+    "completedPuzzles": "Puzzles terminés",
+    "juzsExplored": "Juz explorés",
+    "currentStreak": "Série actuelle",
+    "days": "jours",
+    "selectJuz": "Sélectionnez un Juz pour commencer",
+    "noJuzsFound": "Aucun juz trouvé. Veuillez exécuter le script de seed : npm run db:seed",
+    "surahsAvailable": "disponibles"
+  },
+  "profile": {
+    "title": "Profil",
+    "currentStreak": "Série actuelle",
+    "longestStreak": "Série la plus longue",
+    "lastActive": "Dernière activité : {date}",
+    "never": "Jamais",
+    "bestStreak": "Votre meilleure série jusqu'à présent",
+    "completedPuzzles": "Puzzles terminés",
+    "ofAllPuzzles": "{percentage}% de tous les puzzles",
+    "juzsExplored": "Juz explorés",
+    "uniqueSurahs": "{count} sourates uniques terminées",
+    "selectTranslation": "Sélectionner la traduction",
+    "translationDescription": "Cette traduction sera utilisée pour tous les affichages d'ayah.",
+    "aboutStreaks": "À propos des séries",
+    "streakDescription1": "Votre série augmente lorsque vous terminez au moins un puzzle chaque jour.",
+    "streakDescription2": "Terminez des puzzles quotidiennement pour maintenir et faire grandir votre série !",
+    "streakDescription3": "Si vous manquez un jour, votre série sera réinitialisée. Continuez à apprendre pour construire votre série la plus longue !"
+  },
+  "puzzle": {
+    "buildTheAyah": "Construire l'Ayah",
+    "wordBank": "Banque de mots",
+    "correct": "Correct !",
+    "mistake": "Erreur !",
+    "mistakes": "Erreurs : {count}",
+    "completed": "Terminé !",
+    "continueToNextAyah": "Continuer vers le prochain Ayah",
+    "puzzles": "puzzles"
+  }
+}
+

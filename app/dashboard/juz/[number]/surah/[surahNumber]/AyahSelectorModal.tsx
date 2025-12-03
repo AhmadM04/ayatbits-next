@@ -1,0 +1,151 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { X, Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useI18n } from '@/lib/i18n';
+
+interface AyahSelectorModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  puzzles: Array<{ _id: string; content: { ayahNumber?: number } }>;
+  currentAyahNumber: number;
+  juzNumber: number;
+  surahNumber: number;
+}
+
+export default function AyahSelectorModal({
+  isOpen,
+  onClose,
+  puzzles,
+  currentAyahNumber,
+  juzNumber,
+  surahNumber,
+}: AyahSelectorModalProps) {
+  const { t } = useI18n();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedAyah, setSelectedAyah] = useState<number | null>(null);
+  const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      // Focus input when modal opens
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    } else {
+      document.body.style.overflow = 'unset';
+      setSearchTerm('');
+      setSelectedAyah(null);
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const ayahNumbers = puzzles
+    .map((p) => p.content.ayahNumber || 0)
+    .filter((n) => n > 0)
+    .sort((a, b) => a - b);
+
+  const minAyah = Math.min(...ayahNumbers);
+  const maxAyah = Math.max(...ayahNumbers);
+
+  // Validate search input
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    const num = parseInt(value);
+    if (!isNaN(num) && num >= minAyah && num <= maxAyah && ayahNumbers.includes(num)) {
+      setSelectedAyah(num);
+    } else {
+      setSelectedAyah(null);
+    }
+  };
+
+  const handleGo = () => {
+    if (selectedAyah !== null) {
+      router.push(`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${selectedAyah}`);
+      onClose();
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && selectedAyah !== null) {
+      handleGo();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/50"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">{t('verse.selectAyah')}</h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-600" />
+          </button>
+        </div>
+
+        {/* Search Input */}
+        <div className="p-6">
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                ref={inputRef}
+                type="number"
+                placeholder={t('verse.enterAyahNumber', { min: minAyah, max: maxAyah })}
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                onKeyPress={handleKeyPress}
+                min={minAyah}
+                max={maxAyah}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-lg"
+              />
+            </div>
+
+            {searchTerm && (
+              <div className="text-sm text-gray-600">
+                {selectedAyah !== null ? (
+                  <p className="text-green-600 font-medium">{t('verse.ayahFound')}</p>
+                ) : (
+                  <p className="text-red-600">{t('verse.ayahNotFound')}</p>
+                )}
+              </div>
+            )}
+
+            <button
+              onClick={handleGo}
+              disabled={selectedAyah === null}
+              className={`
+                w-full py-3 px-4 rounded-lg font-semibold transition-colors
+                ${
+                  selectedAyah !== null
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }
+              `}
+            >
+              {t('verse.goToAyah')}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+

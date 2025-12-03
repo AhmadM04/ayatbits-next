@@ -1,0 +1,67 @@
+{
+  "common": {
+    "ayah": "节",
+    "surah": "章",
+    "juz": "卷",
+    "play": "播放",
+    "pause": "暂停",
+    "prev": "上一节",
+    "next": "下一节",
+    "reset": "重置",
+    "search": "搜索",
+    "menu": "菜单",
+    "profile": "个人资料",
+    "dashboard": "仪表板",
+    "loading": "加载中...",
+    "error": "错误"
+  },
+  "verse": {
+    "ayahNumber": "第 {number} 节",
+    "readyToStartPuzzle": "准备开始拼图",
+    "selectAyah": "选择节",
+    "enterAyahNumber": "输入节号 ({min}-{max})...",
+    "ayahFound": "找到节！",
+    "ayahNotFound": "此部分中未找到节。",
+    "goToAyah": "转到节",
+    "englishTranslation": "英文翻译"
+  },
+  "dashboard": {
+    "welcome": "欢迎回来，{name}！",
+    "learner": "学习者",
+    "continueJourney": "继续您记忆和理解古兰经的旅程",
+    "completedPuzzles": "已完成的拼图",
+    "juzsExplored": "已探索的卷",
+    "currentStreak": "当前连续天数",
+    "days": "天",
+    "selectJuz": "选择一个卷开始",
+    "noJuzsFound": "未找到卷。请运行种子脚本：npm run db:seed"
+  },
+  "profile": {
+    "title": "个人资料",
+    "currentStreak": "当前连续天数",
+    "longestStreak": "最长连续天数",
+    "lastActive": "最后活动：{date}",
+    "never": "从未",
+    "bestStreak": "您的最佳连续天数",
+    "completedPuzzles": "已完成的拼图",
+    "ofAllPuzzles": "所有拼图的 {percentage}%",
+    "juzsExplored": "已探索的卷",
+    "uniqueSurahs": "已完成 {count} 个独特的章",
+    "selectTranslation": "选择翻译",
+    "translationDescription": "此翻译将用于所有节的显示。",
+    "aboutStreaks": "关于连续天数",
+    "streakDescription1": "当您每天至少完成一个拼图时，您的连续天数会增加。",
+    "streakDescription2": "每天完成拼图以维持和增长您的连续天数！",
+    "streakDescription3": "如果您错过一天，您的连续天数将重置。继续学习以建立您最长的连续天数！"
+  },
+  "puzzle": {
+    "buildTheAyah": "构建节",
+    "wordBank": "词库",
+    "correct": "正确！",
+    "mistake": "错误！",
+    "mistakes": "错误：{count}",
+    "completed": "完成！",
+    "continueToNextAyah": "继续到下一节"
+  }
+}
+

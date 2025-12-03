@@ -1,0 +1,67 @@
+{
+  "common": {
+    "ayah": "آية",
+    "surah": "سورة",
+    "juz": "جزء",
+    "play": "تشغيل",
+    "pause": "إيقاف",
+    "prev": "السابق",
+    "next": "التالي",
+    "reset": "إعادة تعيين",
+    "search": "بحث",
+    "menu": "القائمة",
+    "profile": "الملف الشخصي",
+    "dashboard": "لوحة التحكم",
+    "loading": "جاري التحميل...",
+    "error": "خطأ"
+  },
+  "verse": {
+    "ayahNumber": "آية {number}",
+    "readyToStartPuzzle": "جاهز لبدء اللغز",
+    "selectAyah": "اختر آية",
+    "enterAyahNumber": "أدخل رقم الآية ({min}-{max})...",
+    "ayahFound": "تم العثور على الآية!",
+    "ayahNotFound": "الآية غير موجودة في هذا القسم.",
+    "goToAyah": "انتقل إلى الآية",
+    "englishTranslation": "الترجمة الإنجليزية"
+  },
+  "dashboard": {
+    "welcome": "مرحباً بعودتك، {name}!",
+    "learner": "المتعلم",
+    "continueJourney": "تابع رحلتك في حفظ وفهم القرآن",
+    "completedPuzzles": "الألغاز المكتملة",
+    "juzsExplored": "الأجزاء المستكشفة",
+    "currentStreak": "السلسلة الحالية",
+    "days": "أيام",
+    "selectJuz": "اختر جزءاً للبدء",
+    "noJuzsFound": "لم يتم العثور على أجزاء. يرجى تشغيل سكريبت البذور: npm run db:seed"
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "currentStreak": "السلسلة الحالية",
+    "longestStreak": "أطول سلسلة",
+    "lastActive": "آخر نشاط: {date}",
+    "never": "أبداً",
+    "bestStreak": "أفضل سلسلة لديك حتى الآن",
+    "completedPuzzles": "الألغاز المكتملة",
+    "ofAllPuzzles": "{percentage}% من جميع الألغاز",
+    "juzsExplored": "الأجزاء المستكشفة",
+    "uniqueSurahs": "{count} سورة فريدة مكتملة",
+    "selectTranslation": "اختر الترجمة",
+    "translationDescription": "سيتم استخدام هذه الترجمة لجميع عروض الآيات.",
+    "aboutStreaks": "حول السلاسل",
+    "streakDescription1": "تزداد سلسلتك عند إكمال لغز واحد على الأقل كل يوم.",
+    "streakDescription2": "أكمل الألغاز يومياً للحفاظ على سلسلتك ونموها!",
+    "streakDescription3": "إذا فاتك يوم، فسيتم إعادة تعيين سلسلتك. استمر في التعلم لبناء أطول سلسلة لديك!"
+  },
+  "puzzle": {
+    "buildTheAyah": "بناء الآية",
+    "wordBank": "بنك الكلمات",
+    "correct": "صحيح!",
+    "mistake": "خطأ!",
+    "mistakes": "الأخطاء: {count}",
+    "completed": "مكتمل!",
+    "continueToNextAyah": "المتابعة إلى الآية التالية"
+  }
+}
+

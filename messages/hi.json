@@ -1,0 +1,69 @@
+{
+  "common": {
+    "ayah": "आयत",
+    "surah": "सूरह",
+    "juz": "जुज़",
+    "play": "चलाएं",
+    "pause": "रोकें",
+    "prev": "पिछला",
+    "next": "अगला",
+    "reset": "रीसेट",
+    "search": "खोजें",
+    "menu": "मेनू",
+    "profile": "प्रोफ़ाइल",
+    "dashboard": "डैशबोर्ड",
+    "loading": "लोड हो रहा है...",
+    "error": "त्रुटि"
+  },
+  "verse": {
+    "ayahNumber": "आयत {number}",
+    "readyToStartPuzzle": "पहेली शुरू करने के लिए तैयार",
+    "selectAyah": "आयत चुनें",
+    "enterAyahNumber": "आयत संख्या दर्ज करें ({min}-{max})...",
+    "ayahFound": "आयत मिल गई!",
+    "ayahNotFound": "इस खंड में आयत नहीं मिली।",
+    "goToAyah": "आयत पर जाएं",
+    "englishTranslation": "अंग्रेजी अनुवाद"
+  },
+  "dashboard": {
+    "welcome": "वापसी पर स्वागत है, {name}!",
+    "learner": "शिक्षार्थी",
+    "continueJourney": "कुरान को याद करने और समझने की अपनी यात्रा जारी रखें",
+    "completedPuzzles": "पूर्ण पहेलियां",
+    "juzsExplored": "खोजे गए जुज़",
+    "currentStreak": "वर्तमान स्ट्रीक",
+    "days": "दिन",
+    "selectJuz": "शुरू करने के लिए एक जुज़ चुनें",
+    "noJuzsFound": "कोई जुज़ नहीं मिला। कृपया seed script चलाएं: npm run db:seed",
+    "surahsAvailable": "उपलब्ध"
+  },
+  "profile": {
+    "title": "प्रोफ़ाइल",
+    "currentStreak": "वर्तमान स्ट्रीक",
+    "longestStreak": "सबसे लंबा स्ट्रीक",
+    "lastActive": "अंतिम सक्रिय: {date}",
+    "never": "कभी नहीं",
+    "bestStreak": "अब तक का सबसे अच्छा स्ट्रीक",
+    "completedPuzzles": "पूर्ण पहेलियां",
+    "ofAllPuzzles": "सभी पहेलियों का {percentage}%",
+    "juzsExplored": "खोजे गए जुज़",
+    "uniqueSurahs": "{count} अद्वितीय सूरह पूर्ण",
+    "selectTranslation": "अनुवाद चुनें",
+    "translationDescription": "यह अनुवाद सभी आयत प्रदर्शन के लिए उपयोग किया जाएगा।",
+    "aboutStreaks": "स्ट्रीक के बारे में",
+    "streakDescription1": "जब आप हर दिन कम से कम एक पहेली पूरी करते हैं तो आपका स्ट्रीक बढ़ता है।",
+    "streakDescription2": "अपने स्ट्रीक को बनाए रखने और बढ़ाने के लिए रोजाना पहेलियां पूरी करें!",
+    "streakDescription3": "यदि आप एक दिन चूक जाते हैं, तो आपका स्ट्रीक रीसेट हो जाएगा। अपना सबसे लंबा स्ट्रीक बनाने के लिए सीखना जारी रखें!"
+  },
+  "puzzle": {
+    "buildTheAyah": "आयत बनाएं",
+    "wordBank": "शब्द बैंक",
+    "correct": "सही!",
+    "mistake": "गलती!",
+    "mistakes": "गलतियां: {count}",
+    "completed": "पूर्ण!",
+    "continueToNextAyah": "अगली आयत पर जाएं",
+    "puzzles": "पहेलियां"
+  }
+}
+

@@ -1,0 +1,69 @@
+{
+  "common": {
+    "ayah": "Ayah",
+    "surah": "Soera",
+    "juz": "Juz",
+    "play": "Afspelen",
+    "pause": "Pauzeren",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "reset": "Resetten",
+    "search": "Zoeken",
+    "menu": "Menu",
+    "profile": "Profiel",
+    "dashboard": "Dashboard",
+    "loading": "Laden...",
+    "error": "Fout"
+  },
+  "verse": {
+    "ayahNumber": "Ayah {number}",
+    "readyToStartPuzzle": "Klaar om te beginnen met puzzel",
+    "selectAyah": "Selecteer Ayah",
+    "enterAyahNumber": "Voer ayah nummer in ({min}-{max})...",
+    "ayahFound": "Ayah gevonden!",
+    "ayahNotFound": "Ayah niet gevonden in dit gedeelte.",
+    "goToAyah": "Ga naar Ayah",
+    "englishTranslation": "Engelse vertaling"
+  },
+  "dashboard": {
+    "welcome": "Welkom terug, {name}!",
+    "learner": "Leerling",
+    "continueJourney": "Ga door met uw reis van het memoriseren en begrijpen van de Koran",
+    "completedPuzzles": "Voltooide puzzels",
+    "juzsExplored": "Onderzochte Juz",
+    "currentStreak": "Huidige reeks",
+    "days": "dagen",
+    "selectJuz": "Selecteer een Juz om te beginnen",
+    "noJuzsFound": "Geen juz gevonden. Voer het seed script uit: npm run db:seed",
+    "surahsAvailable": "beschikbaar"
+  },
+  "profile": {
+    "title": "Profiel",
+    "currentStreak": "Huidige reeks",
+    "longestStreak": "Langste reeks",
+    "lastActive": "Laatst actief: {date}",
+    "never": "Nooit",
+    "bestStreak": "Uw beste reeks tot nu toe",
+    "completedPuzzles": "Voltooide puzzels",
+    "ofAllPuzzles": "{percentage}% van alle puzzels",
+    "juzsExplored": "Onderzochte Juz",
+    "uniqueSurahs": "{count} unieke soera's voltooid",
+    "selectTranslation": "Selecteer vertaling",
+    "translationDescription": "Deze vertaling wordt gebruikt voor alle ayah weergaven.",
+    "aboutStreaks": "Over reeksen",
+    "streakDescription1": "Uw reeks neemt toe wanneer u elke dag ten minste één puzzel voltooit.",
+    "streakDescription2": "Voltooi dagelijks puzzels om uw reeks te behouden en te laten groeien!",
+    "streakDescription3": "Als u een dag mist, wordt uw reeks gereset. Blijf leren om uw langste reeks op te bouwen!"
+  },
+  "puzzle": {
+    "buildTheAyah": "Bouw de Ayah",
+    "wordBank": "Woordenbank",
+    "correct": "Correct!",
+    "mistake": "Fout!",
+    "mistakes": "Fouten: {count}",
+    "completed": "Voltooid!",
+    "continueToNextAyah": "Doorgaan naar volgende Ayah",
+    "puzzles": "puzzels"
+  }
+}
+

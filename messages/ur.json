@@ -1,0 +1,69 @@
+{
+  "common": {
+    "ayah": "آیت",
+    "surah": "سورہ",
+    "juz": "جز",
+    "play": "چلائیں",
+    "pause": "روکیں",
+    "prev": "پچھلا",
+    "next": "اگلا",
+    "reset": "دوبارہ ترتیب دیں",
+    "search": "تلاش",
+    "menu": "مینو",
+    "profile": "پروفائل",
+    "dashboard": "ڈیش بورڈ",
+    "loading": "لوڈ ہو رہا ہے...",
+    "error": "خرابی"
+  },
+  "verse": {
+    "ayahNumber": "آیت {number}",
+    "readyToStartPuzzle": "پزل شروع کرنے کے لیے تیار",
+    "selectAyah": "آیت منتخب کریں",
+    "enterAyahNumber": "آیت نمبر درج کریں ({min}-{max})...",
+    "ayahFound": "آیت مل گئی!",
+    "ayahNotFound": "اس حصے میں آیت نہیں ملی۔",
+    "goToAyah": "آیت پر جائیں",
+    "englishTranslation": "انگریزی ترجمہ"
+  },
+  "dashboard": {
+    "welcome": "خوش آمدید، {name}!",
+    "learner": "طالب علم",
+    "continueJourney": "قرآن کو یاد کرنے اور سمجھنے کے سفر کو جاری رکھیں",
+    "completedPuzzles": "مکمل شدہ پزل",
+    "juzsExplored": "کھوجے گئے اجزاء",
+    "currentStreak": "موجودہ سلسلہ",
+    "days": "دن",
+    "selectJuz": "شروع کرنے کے لیے ایک جز منتخب کریں",
+    "noJuzsFound": "جز نہیں ملے۔ براہ کرم seed script چلائیں: npm run db:seed",
+    "surahsAvailable": "دستیاب"
+  },
+  "profile": {
+    "title": "پروفائل",
+    "currentStreak": "موجودہ سلسلہ",
+    "longestStreak": "طویل ترین سلسلہ",
+    "lastActive": "آخری سرگرمی: {date}",
+    "never": "کبھی نہیں",
+    "bestStreak": "اب تک کا بہترین سلسلہ",
+    "completedPuzzles": "مکمل شدہ پزل",
+    "ofAllPuzzles": "تمام پزلز کا {percentage}%",
+    "juzsExplored": "کھوجے گئے اجزاء",
+    "uniqueSurahs": "{count} منفرد سورتیں مکمل",
+    "selectTranslation": "ترجمہ منتخب کریں",
+    "translationDescription": "یہ ترجمہ تمام آیت ڈسپلے کے لیے استعمال ہوگا۔",
+    "aboutStreaks": "سلسلوں کے بارے میں",
+    "streakDescription1": "آپ کا سلسلہ اس وقت بڑھتا ہے جب آپ ہر روز کم از کم ایک پزل مکمل کرتے ہیں۔",
+    "streakDescription2": "اپنے سلسلے کو برقرار رکھنے اور بڑھانے کے لیے روزانہ پزل مکمل کریں!",
+    "streakDescription3": "اگر آپ ایک دن چھوڑ دیتے ہیں، تو آپ کا سلسلہ ری سیٹ ہو جائے گا۔ اپنا طویل ترین سلسلہ بنانے کے لیے سیکھتے رہیں!"
+  },
+  "puzzle": {
+    "buildTheAyah": "آیت بنائیں",
+    "wordBank": "الفاظ کا بینک",
+    "correct": "درست!",
+    "mistake": "غلطی!",
+    "mistakes": "غلطیاں: {count}",
+    "completed": "مکمل!",
+    "continueToNextAyah": "اگلی آیت پر جائیں",
+    "puzzles": "پزل"
+  }
+}
+

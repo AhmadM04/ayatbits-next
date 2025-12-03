@@ -1,0 +1,69 @@
+{
+  "common": {
+    "ayah": "アーヤ",
+    "surah": "スーラ",
+    "juz": "ジュズ",
+    "play": "再生",
+    "pause": "一時停止",
+    "prev": "前へ",
+    "next": "次へ",
+    "reset": "リセット",
+    "search": "検索",
+    "menu": "メニュー",
+    "profile": "プロフィール",
+    "dashboard": "ダッシュボード",
+    "loading": "読み込み中...",
+    "error": "エラー"
+  },
+  "verse": {
+    "ayahNumber": "アーヤ {number}",
+    "readyToStartPuzzle": "パズルを開始する準備ができました",
+    "selectAyah": "アーヤを選択",
+    "enterAyahNumber": "アーヤ番号を入力 ({min}-{max})...",
+    "ayahFound": "アーヤが見つかりました！",
+    "ayahNotFound": "このセクションでアーヤが見つかりませんでした。",
+    "goToAyah": "アーヤに移動",
+    "englishTranslation": "英語翻訳"
+  },
+  "dashboard": {
+    "welcome": "おかえりなさい、{name}！",
+    "learner": "学習者",
+    "continueJourney": "コーランを暗記し理解する旅を続けましょう",
+    "completedPuzzles": "完了したパズル",
+    "juzsExplored": "探索したジュズ",
+    "currentStreak": "現在のストリーク",
+    "days": "日",
+    "selectJuz": "開始するジュズを選択",
+    "noJuzsFound": "ジュズが見つかりません。seedスクリプトを実行してください: npm run db:seed",
+    "surahsAvailable": "利用可能"
+  },
+  "profile": {
+    "title": "プロフィール",
+    "currentStreak": "現在のストリーク",
+    "longestStreak": "最長ストリーク",
+    "lastActive": "最終アクティブ: {date}",
+    "never": "なし",
+    "bestStreak": "これまでの最高ストリーク",
+    "completedPuzzles": "完了したパズル",
+    "ofAllPuzzles": "全パズルの{percentage}%",
+    "juzsExplored": "探索したジュズ",
+    "uniqueSurahs": "{count}個のユニークなスーラ完了",
+    "selectTranslation": "翻訳を選択",
+    "translationDescription": "この翻訳はすべてのアーヤ表示に使用されます。",
+    "aboutStreaks": "ストリークについて",
+    "streakDescription1": "毎日少なくとも1つのパズルを完了すると、ストリークが増加します。",
+    "streakDescription2": "ストリークを維持し成長させるために、毎日パズルを完了しましょう！",
+    "streakDescription3": "1日逃すと、ストリークがリセットされます。最長ストリークを構築するために学習を続けましょう！"
+  },
+  "puzzle": {
+    "buildTheAyah": "アーヤを構築",
+    "wordBank": "単語バンク",
+    "correct": "正解！",
+    "mistake": "間違い！",
+    "mistakes": "間違い: {count}",
+    "completed": "完了！",
+    "continueToNextAyah": "次のアーヤに進む",
+    "puzzles": "パズル"
+  }
+}
+
