@@ -50,16 +50,45 @@ export async function POST(request: NextRequest) {
     }
 
     const plan = PLANS[planId];
-    // Get URL from request headers or environment
-    const headersList = request.headers;
-    const host = headersList.get('host');
-    const protocol = headersList.get('x-forwarded-proto') || 
-                     (process.env.NODE_ENV === 'production' ? 'https' : 'http');
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
-                   (host ? `${protocol}://${host}` : 'http://localhost:3000');
+    const appUrl = await getAppUrl();
+
+    // Get or create Stripe customer
+    let customerId: string | undefined;
+    try {
+      const { connectDB, User } = await import('@/lib/db');
+      await connectDB();
+      const dbUser = await User.findOne({ clerkId: user.id });
+      
+      if (dbUser?.stripeCustomerId) {
+        customerId = dbUser.stripeCustomerId;
+      } else {
+        // Create new Stripe customer
+        const customer = await stripe.customers.create({
+          email: user.emailAddresses[0]?.emailAddress,
+          name: user.fullName || undefined,
+          metadata: {
+            userId: user.id,
+            clerkId: user.id,
+          },
+        });
+        customerId = customer.id;
+        
+        // Update user with customer ID
+        if (dbUser) {
+          await User.findOneAndUpdate(
+            { clerkId: user.id },
+            { stripeCustomerId: customerId }
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Error getting/creating Stripe customer:', error);
+      // Continue without customer ID - Stripe will create one
+    }
 
     // Create Stripe Checkout Session with 7-day trial
     const session = await stripe.checkout.sessions.create({
+      ...(customerId && { customer: customerId }),
       payment_method_types: ['card'],
       line_items: [
         {
@@ -87,7 +116,7 @@ export async function POST(request: NextRequest) {
       },
       success_url: `${appUrl}/dashboard?success=true&plan=${planId}`,
       cancel_url: `${appUrl}/pricing?canceled=true`,
-      customer_email: user.emailAddresses[0]?.emailAddress,
+      ...(!customerId && { customer_email: user.emailAddresses[0]?.emailAddress }),
       metadata: {
         userId: user.id,
         plan: planId,

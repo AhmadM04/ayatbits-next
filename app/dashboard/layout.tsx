@@ -82,16 +82,21 @@ export default async function DashboardLayout({
           const subscription = subscriptions.data[0];
           const trialEnd = subscription.trial_end ? new Date(subscription.trial_end * 1000) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
           
+          // Safely access current_period_end (exists at runtime but TypeScript types may not include it)
+          const currentPeriodEnd = (subscription as any).current_period_end 
+            ? new Date((subscription as any).current_period_end * 1000) 
+            : undefined;
+          
           // Update user immediately
           dbUser = await User.findOneAndUpdate(
             { clerkId: user.id },
             {
-              subscriptionStatus: subscription.status === 'trialing' ? 'trialing' : 'active',
+              subscriptionStatus: subscription.status === 'trialing' ? 'trialing' : subscription.status === 'active' ? 'active' : 'inactive',
               subscriptionPlan: subscription.items.data[0]?.price?.recurring?.interval === 'month' ? 'monthly' : 'yearly',
               stripeCustomerId: customer.id,
               stripeSubscriptionId: subscription.id,
               trialEndsAt: trialEnd,
-              currentPeriodEnd: subscription.current_period_end ? new Date(subscription.current_period_end * 1000) : undefined,
+              currentPeriodEnd,
             },
             { new: true }
           );

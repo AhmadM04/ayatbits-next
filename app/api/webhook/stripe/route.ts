@@ -49,58 +49,97 @@ export async function POST(request: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.userId;
         const plan = session.metadata?.plan;
+        const customerId = session.customer as string;
+        const subscriptionId = session.subscription as string;
 
+        // Get subscription details to get trial end date and current period end
+        let trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Default 7 days
+        let currentPeriodEnd: Date | undefined = undefined;
+        
+        if (subscriptionId) {
+          try {
+            const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+            if (subscription.trial_end) {
+              trialEndsAt = new Date(subscription.trial_end * 1000);
+            }
+            // Get current period end
+            const periodEnd = (subscription as any).current_period_end;
+            if (periodEnd) {
+              currentPeriodEnd = new Date(periodEnd * 1000);
+            }
+          } catch (error) {
+            console.error('Error retrieving subscription:', error);
+          }
+        }
+
+        // Try multiple ways to find the user
+        let dbUser: any = null;
+        
+        // 1. Try by clerkId from metadata
         if (userId) {
-          // Get subscription details to get trial end date
-          let trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Default 7 days
-          if (session.subscription) {
-            try {
-              const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-              if (subscription.trial_end) {
-                trialEndsAt = new Date(subscription.trial_end * 1000);
-              }
-            } catch (error) {
-              console.error('Error retrieving subscription:', error);
-            }
+          dbUser = await User.findOne({ clerkId: userId });
+        }
+        
+        // 2. Try by email from session
+        if (!dbUser) {
+          const customerEmail = session.customer_email || session.customer_details?.email;
+          if (customerEmail) {
+            dbUser = await User.findOne({ email: customerEmail.toLowerCase() });
           }
+        }
+        
+        // 3. Try by Stripe customer ID (in case user was created elsewhere)
+        if (!dbUser && customerId) {
+          dbUser = await User.findOne({ stripeCustomerId: customerId });
+        }
 
-          // Try to find user by clerkId first
-          let dbUser = await User.findOne({ clerkId: userId });
-          
-          if (!dbUser) {
-            // User doesn't exist yet - try to find by email from session
-            const customerEmail = session.customer_email || session.customer_details?.email;
-            if (customerEmail) {
-              dbUser = await User.findOne({ email: customerEmail.toLowerCase() });
+        // Get customer email if we have customer ID
+        let customerEmail = session.customer_email || session.customer_details?.email;
+        if (!customerEmail && customerId) {
+          try {
+            const customer = await stripe.customers.retrieve(customerId);
+            if (customer && !customer.deleted) {
+              customerEmail = (customer as Stripe.Customer).email || undefined;
             }
+          } catch (error) {
+            console.error('Error retrieving customer:', error);
           }
+        }
 
-          if (dbUser) {
-            // Update existing user
-            await User.findOneAndUpdate(
-              { _id: dbUser._id },
-              {
-                subscriptionStatus: 'trialing',
-                subscriptionPlan: plan,
-                stripeCustomerId: session.customer as string,
-                stripeSubscriptionId: session.subscription as string,
-                trialEndsAt,
-              }
-            );
-            console.log(`User ${userId} started trial for ${plan} plan`);
-          } else {
-            // User doesn't exist - create them (shouldn't happen but handle it)
-            console.warn(`User ${userId} not found in database during webhook. Creating user.`);
-            await User.create({
-              clerkId: userId,
-              email: session.customer_email || session.customer_details?.email || '',
+        if (dbUser) {
+          // Update existing user
+          await User.findOneAndUpdate(
+            { _id: dbUser._id },
+            {
               subscriptionStatus: 'trialing',
-              subscriptionPlan: plan,
-              stripeCustomerId: session.customer as string,
-              stripeSubscriptionId: session.subscription as string,
+              subscriptionPlan: plan || 'monthly',
+              stripeCustomerId: customerId,
+              stripeSubscriptionId: subscriptionId,
               trialEndsAt,
-            });
-          }
+              currentPeriodEnd,
+            }
+          );
+          console.log(`User ${dbUser.clerkId || dbUser.email} started trial for ${plan || 'monthly'} plan`);
+        } else if (userId && customerEmail) {
+          // User doesn't exist - create them
+          console.warn(`User ${userId} not found in database during webhook. Creating user.`);
+          await User.create({
+            clerkId: userId,
+            email: customerEmail.toLowerCase(),
+            subscriptionStatus: 'trialing',
+            subscriptionPlan: plan || 'monthly',
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: subscriptionId,
+            trialEndsAt,
+            currentPeriodEnd,
+          });
+        } else {
+          console.error('Cannot process checkout.session.completed: missing userId or customerEmail', {
+            userId,
+            customerEmail,
+            customerId,
+            subscriptionId,
+          });
         }
         break;
       }
@@ -108,27 +147,50 @@ export async function POST(request: NextRequest) {
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription;
         const userId = subscription.metadata?.userId;
+        const customerId = subscription.customer as string;
 
+        const status = subscription.status;
+        let subscriptionStatus = 'inactive';
+        
+        if (status === 'active') subscriptionStatus = 'active';
+        else if (status === 'trialing') subscriptionStatus = 'trialing';
+        else if (status === 'past_due') subscriptionStatus = 'past_due';
+        else if (status === 'canceled') subscriptionStatus = 'canceled';
+
+        // Get current period end and trial end from the subscription object
+        const periodEnd = (subscription as any).current_period_end;
+        const trialEnd = subscription.trial_end;
+        const currentPeriodEnd = periodEnd ? new Date(periodEnd * 1000) : undefined;
+        const trialEndsAt = trialEnd ? new Date(trialEnd * 1000) : undefined;
+
+        // Try to find user by multiple methods
+        let dbUser = null;
         if (userId) {
-          const status = subscription.status;
-          let subscriptionStatus = 'inactive';
-          
-          if (status === 'active') subscriptionStatus = 'active';
-          else if (status === 'trialing') subscriptionStatus = 'trialing';
-          else if (status === 'past_due') subscriptionStatus = 'past_due';
-          else if (status === 'canceled') subscriptionStatus = 'canceled';
+          dbUser = await User.findOne({ clerkId: userId });
+        }
+        if (!dbUser && customerId) {
+          dbUser = await User.findOne({ stripeCustomerId: customerId });
+        }
+        if (!dbUser && subscription.id) {
+          dbUser = await User.findOne({ stripeSubscriptionId: subscription.id });
+        }
 
-          // Get current period end from the subscription object
-          const periodEnd = (subscription as any).current_period_end;
-          
+        if (dbUser) {
           await User.findOneAndUpdate(
-            { clerkId: userId },
+            { _id: dbUser._id },
             {
               subscriptionStatus,
-              ...(periodEnd && { currentPeriodEnd: new Date(periodEnd * 1000) }),
+              ...(currentPeriodEnd && { currentPeriodEnd }),
+              ...(trialEndsAt && { trialEndsAt }),
+              // Update subscription plan if available
+              ...(subscription.items.data[0]?.price?.recurring?.interval && {
+                subscriptionPlan: subscription.items.data[0].price.recurring.interval === 'month' ? 'monthly' : 'yearly',
+              }),
             }
           );
-          console.log(`User ${userId} subscription updated: ${subscriptionStatus}`);
+          console.log(`User ${dbUser.clerkId || dbUser.email} subscription updated: ${subscriptionStatus}`);
+        } else {
+          console.warn(`Subscription updated but user not found: ${userId || customerId || subscription.id}`);
         }
         break;
       }
@@ -136,16 +198,36 @@ export async function POST(request: NextRequest) {
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         const userId = subscription.metadata?.userId;
+        const customerId = subscription.customer as string;
 
+        // Try to find user by multiple methods
+        let dbUser = null;
         if (userId) {
+          dbUser = await User.findOne({ clerkId: userId });
+        }
+        if (!dbUser && customerId) {
+          dbUser = await User.findOne({ stripeCustomerId: customerId });
+        }
+        if (!dbUser && subscription.id) {
+          dbUser = await User.findOne({ stripeSubscriptionId: subscription.id });
+        }
+
+        if (dbUser) {
+          // Get current period end before canceling (user should have access until period ends)
+          const periodEnd = (subscription as any).current_period_end;
+          const currentPeriodEnd = periodEnd ? new Date(periodEnd * 1000) : undefined;
+
           await User.findOneAndUpdate(
-            { clerkId: userId },
+            { _id: dbUser._id },
             {
               subscriptionStatus: 'canceled',
               subscriptionPlan: null,
+              ...(currentPeriodEnd && { currentPeriodEnd }),
             }
           );
-          console.log(`User ${userId} subscription canceled`);
+          console.log(`User ${dbUser.clerkId || dbUser.email} subscription canceled`);
+        } else {
+          console.warn(`Subscription deleted but user not found: ${userId || customerId || subscription.id}`);
         }
         break;
       }
@@ -153,21 +235,41 @@ export async function POST(request: NextRequest) {
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object as Stripe.Invoice;
         const subscriptionId = (invoice as any).subscription as string;
+        const customerId = invoice.customer as string;
 
         if (subscriptionId) {
-          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-          const userId = subscription.metadata?.userId;
-          const periodEnd = (subscription as any).current_period_end;
+          try {
+            const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+            const userId = subscription.metadata?.userId;
+            const periodEnd = (subscription as any).current_period_end;
+            const currentPeriodEnd = periodEnd ? new Date(periodEnd * 1000) : undefined;
 
-          if (userId) {
-            await User.findOneAndUpdate(
-              { clerkId: userId },
-              {
-                subscriptionStatus: 'active',
-                ...(periodEnd && { currentPeriodEnd: new Date(periodEnd * 1000) }),
-              }
-            );
-            console.log(`User ${userId} payment succeeded`);
+            // Try to find user by multiple methods
+            let dbUser = null;
+            if (userId) {
+              dbUser = await User.findOne({ clerkId: userId });
+            }
+            if (!dbUser && customerId) {
+              dbUser = await User.findOne({ stripeCustomerId: customerId });
+            }
+            if (!dbUser && subscriptionId) {
+              dbUser = await User.findOne({ stripeSubscriptionId: subscriptionId });
+            }
+
+            if (dbUser) {
+              await User.findOneAndUpdate(
+                { _id: dbUser._id },
+                {
+                  subscriptionStatus: 'active',
+                  ...(currentPeriodEnd && { currentPeriodEnd }),
+                }
+              );
+              console.log(`User ${dbUser.clerkId || dbUser.email} payment succeeded`);
+            } else {
+              console.warn(`Payment succeeded but user not found: ${userId || customerId || subscriptionId}`);
+            }
+          } catch (error) {
+            console.error('Error processing invoice.payment_succeeded:', error);
           }
         }
         break;
@@ -176,17 +278,36 @@ export async function POST(request: NextRequest) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
         const subscriptionId = (invoice as any).subscription as string;
+        const customerId = invoice.customer as string;
 
         if (subscriptionId) {
-          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-          const userId = subscription.metadata?.userId;
+          try {
+            const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+            const userId = subscription.metadata?.userId;
 
-          if (userId) {
-            await User.findOneAndUpdate(
-              { clerkId: userId },
-              { subscriptionStatus: 'past_due' }
-            );
-            console.log(`User ${userId} payment failed`);
+            // Try to find user by multiple methods
+            let dbUser = null;
+            if (userId) {
+              dbUser = await User.findOne({ clerkId: userId });
+            }
+            if (!dbUser && customerId) {
+              dbUser = await User.findOne({ stripeCustomerId: customerId });
+            }
+            if (!dbUser && subscriptionId) {
+              dbUser = await User.findOne({ stripeSubscriptionId: subscriptionId });
+            }
+
+            if (dbUser) {
+              await User.findOneAndUpdate(
+                { _id: dbUser._id },
+                { subscriptionStatus: 'past_due' }
+              );
+              console.log(`User ${dbUser.clerkId || dbUser.email} payment failed`);
+            } else {
+              console.warn(`Payment failed but user not found: ${userId || customerId || subscriptionId}`);
+            }
+          } catch (error) {
+            console.error('Error processing invoice.payment_failed:', error);
           }
         }
         break;
