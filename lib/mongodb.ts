@@ -31,10 +31,11 @@ async function connectDB(): Promise<typeof mongoose> {
       bufferCommands: false,
       // Connection pool settings for better performance
       maxPoolSize: 10,
-      minPoolSize: 5,
-      // Timeout settings
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
+      minPoolSize: 2,
+      // Timeout settings - reduced for faster failure on mobile
+      serverSelectionTimeoutMS: 3000, // Reduced from 5000
+      socketTimeoutMS: 30000, // Reduced from 45000
+      connectTimeoutMS: 3000, // Add connection timeout
       // Keep alive
       family: 4, // Use IPv4, skip trying IPv6
     };
