@@ -1,11 +1,12 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
 import { connectDB, User } from '@/lib/db';
-import DashboardI18nProvider from './DashboardI18nProvider';
-import { checkSubscriptionAccess } from '@/lib/subscription';
 
-export default async function DashboardLayout({
+/**
+ * Profile layout - allows access even without subscription
+ * Users can view their profile, email, and settings before starting a trial
+ */
+export default async function ProfileLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -18,7 +19,7 @@ export default async function DashboardLayout({
 
   await connectDB();
 
-  // Find or create user
+  // Find or create user (same logic as dashboard layout)
   const userEmail = user.emailAddresses[0]?.emailAddress?.toLowerCase() || '';
   let dbUser = await User.findOne({ clerkId: user.id });
   
@@ -40,7 +41,7 @@ export default async function DashboardLayout({
         { new: true }
       );
     } else {
-      // New user - create without subscription (needs to add payment first)
+      // New user - create without subscription
       dbUser = await User.create({
         clerkId: user.id,
         email: userEmail,
@@ -48,33 +49,12 @@ export default async function DashboardLayout({
         lastName: user.lastName,
         name: user.fullName,
         imageUrl: user.imageUrl,
-        subscriptionStatus: 'inactive', // Must subscribe to access
+        subscriptionStatus: 'inactive',
       });
     }
   }
 
-  // Check subscription access
-  const access = checkSubscriptionAccess(dbUser);
-
-  // Note: Profile page has its own layout that bypasses subscription check
-  // Only check subscription for other dashboard pages
-  // The profile layout will handle its own access
-  if (!access.hasAccess) {
-    // Try to get pathname from headers (set by middleware if available)
-    const headersList = await headers();
-    const pathname = headersList.get('x-pathname') || '';
-    
-    // Allow profile page access
-    if (!pathname.includes('/dashboard/profile')) {
-      redirect('/pricing?trial=true');
-    }
-  }
-
-  const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
-
-  return (
-    <DashboardI18nProvider translationCode={selectedTranslation}>
-      {children}
-    </DashboardI18nProvider>
-  );
+  // No subscription check - allow access to profile
+  return <>{children}</>;
 }
+

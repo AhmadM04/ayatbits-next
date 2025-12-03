@@ -125,7 +125,7 @@ export default function Home() {
           {/* Content */}
           <motion.div 
             style={{ opacity }}
-            className="relative z-10 max-w-4xl mx-auto px-4 text-center pt-20 pointer-events-auto"
+            className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center pt-12 sm:pt-20 pointer-events-auto"
           >
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -141,7 +141,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight"
+              className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight px-2"
             >
               Master the Quran
               <br />
@@ -152,7 +152,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg sm:text-xl text-gray-400 max-w-xl mx-auto mb-10"
+              className="text-base sm:text-lg md:text-xl text-gray-400 max-w-xl mx-auto mb-8 sm:mb-10 px-4"
             >
               Interactive puzzles that make memorization stick. 
               Track progress, build streaks, learn your way.
@@ -162,14 +162,14 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4"
             >
               <SignedOut>
                 <SignUpButton mode="modal">
-                  <button className="group relative px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-base font-semibold rounded-2xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-300 hover:scale-[1.02] flex items-center gap-3">
+                  <button className="group relative px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-sm sm:text-base font-semibold rounded-xl sm:rounded-2xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2 sm:gap-3">
                     <span>Start Learning</span>
-                    <BookOpen className="w-5 h-5 text-green-200" />
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-400 to-emerald-400 opacity-0 group-hover:opacity-20 transition-opacity" />
+                    <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-green-200" />
+                    <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-r from-green-400 to-emerald-400 opacity-0 group-hover:opacity-20 transition-opacity" />
                   </button>
                 </SignUpButton>
                 <Link href="#demo">
@@ -207,7 +207,7 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="mt-16 flex flex-wrap justify-center gap-6 sm:gap-12"
+              className="mt-12 sm:mt-16 flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-12 px-4"
             >
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-white">6,236</div>
@@ -229,7 +229,7 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="py-24 px-4 bg-gradient-to-b from-[#0a0a0a] to-[#111]">
+        <section id="features" className="py-16 sm:py-24 px-4 sm:px-6 bg-gradient-to-b from-[#0a0a0a] to-[#111]">
           <div className="max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -238,15 +238,15 @@ export default function Home() {
               transition={{ duration: 0.6 }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-2">
                 Why learners love AyatBits
               </h2>
-              <p className="text-gray-400 max-w-lg mx-auto">
+              <p className="text-sm sm:text-base text-gray-400 max-w-lg mx-auto px-4">
                 Built for the modern Muslim who wants to connect deeply with the Quran
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {[
                 { icon: BookOpen, title: "Interactive Puzzles", desc: "Drag and drop to build verses from memory", iconColor: "text-green-500", bgColor: "bg-green-500/10" },
                 { icon: Target, title: "Track Progress", desc: "See your journey across all 30 Juz", iconColor: "text-blue-500", bgColor: "bg-blue-500/10" },
@@ -273,7 +273,7 @@ export default function Home() {
         </section>
 
         {/* Demo Section */}
-        <section id="demo" className="py-24 px-4 bg-[#111]">
+        <section id="demo" className="py-16 sm:py-24 px-4 sm:px-6 bg-[#111]">
           <div className="max-w-4xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -282,10 +282,10 @@ export default function Home() {
               transition={{ duration: 0.6 }}
               className="text-center mb-12"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-2">
                 Try it yourself
               </h2>
-              <p className="text-gray-400">
+              <p className="text-sm sm:text-base text-gray-400 px-4">
                 Drag the words to reconstruct the verse
               </p>
             </motion.div>
@@ -302,7 +302,7 @@ export default function Home() {
         </section>
 
         {/* Final CTA */}
-        <section className="py-24 px-4 bg-gradient-to-b from-[#111] to-[#0a0a0a]">
+        <section className="py-16 sm:py-24 px-4 sm:px-6 bg-gradient-to-b from-[#111] to-[#0a0a0a]">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -310,10 +310,10 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="max-w-2xl mx-auto text-center"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 px-2">
               Start your journey today
             </h2>
-            <p className="text-gray-400 mb-8">
+            <p className="text-sm sm:text-base text-gray-400 mb-6 sm:mb-8 px-4">
               Join thousands who are building a deeper connection with the Quran.
             </p>
             <SignedOut>
