@@ -4,10 +4,12 @@ import Link from "next/link";
 import { SignedIn, SignedOut, SignUpButton, SignOutButton } from "@clerk/nextjs";
 import { BookOpen, Target, Zap, Award, Play, LogOut, User as UserIcon } from "lucide-react";
 import LandingHeader from "@/components/LandingHeader";
-import PuzzleDemo from "@/components/PuzzleDemo";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import ScrollAnimations from "@/components/ScrollAnimations";
+
+// Lazy load PuzzleDemo to reduce initial bundle size
+const PuzzleDemo = lazy(() => import("@/components/PuzzleDemo"));
 
 export default function Home() {
   const [isMobile, setIsMobile] = useState(true); // Default to mobile for faster initial render
@@ -306,7 +308,13 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <PuzzleDemo />
+              <Suspense fallback={
+                <div className="w-full h-64 flex items-center justify-center">
+                  <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              }>
+                <PuzzleDemo />
+              </Suspense>
             </motion.div>
           </div>
         </section>

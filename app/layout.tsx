@@ -8,17 +8,23 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: 'swap', // Show fallback font immediately
+  preload: true,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: 'swap',
+  preload: false, // Not critical, can load later
 });
 
 const amiri = Amiri({
   variable: "--font-amiri",
   subsets: ["arabic"],
   weight: ["400", "700"],
+  display: 'swap',
+  preload: false, // Arabic font can load later
 });
 
 export const metadata: Metadata = {

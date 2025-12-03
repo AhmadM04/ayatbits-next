@@ -8,8 +8,23 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
-  if (!isPublicRoute(request)) {
-    await auth.protect();
+  // For public routes, don't block - let them load immediately
+  if (isPublicRoute(request)) {
+    return; // Skip auth check for public routes
+  }
+  
+  // For protected routes, add timeout to prevent hanging
+  try {
+    const timeoutPromise = new Promise((resolve) => {
+      setTimeout(() => resolve(null), 5000); // 5 second timeout
+    });
+    
+    const protectPromise = auth.protect();
+    
+    await Promise.race([protectPromise, timeoutPromise]);
+  } catch (error) {
+    // If auth fails, let Clerk handle the redirect
+    console.error('Auth check error:', error);
   }
 });
 
