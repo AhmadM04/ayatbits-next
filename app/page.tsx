@@ -181,12 +181,6 @@ export default function Home() {
               </SignedOut>
               <SignedIn>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center">
-                  <Link href="/profile">
-                    <button className="group px-6 sm:px-8 py-3 sm:py-4 bg-green-600/20 hover:bg-green-600/30 text-white text-sm sm:text-base font-semibold rounded-xl sm:rounded-2xl border border-green-500/30 hover:border-green-500/50 transition-all duration-300 flex items-center justify-center gap-2 backdrop-blur-sm">
-                      <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
-                      <span>View Profile</span>
-                    </button>
-                  </Link>
                   <Link href="/api/check-access">
                     <button className="group relative px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-sm sm:text-base font-semibold rounded-xl sm:rounded-2xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2 sm:gap-3">
                       <span>Continue Learning</span>
