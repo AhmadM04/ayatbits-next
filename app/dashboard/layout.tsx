@@ -2,6 +2,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { connectDB, User } from '@/lib/db';
 import DashboardI18nProvider from './DashboardI18nProvider';
+import { checkSubscriptionAccess } from '@/lib/subscription';
 
 export default async function DashboardLayout({
   children,
@@ -19,6 +20,7 @@ export default async function DashboardLayout({
   // Find or create user
   let dbUser = await User.findOne({ clerkId: user.id });
   if (!dbUser) {
+    // New user - create without subscription (needs to add payment first)
     dbUser = await User.create({
       clerkId: user.id,
       email: user.emailAddresses[0]?.emailAddress || '',
@@ -26,7 +28,16 @@ export default async function DashboardLayout({
       lastName: user.lastName,
       name: user.fullName,
       imageUrl: user.imageUrl,
+      subscriptionStatus: 'inactive', // Must subscribe to access
     });
+  }
+
+  // Check subscription access
+  const access = checkSubscriptionAccess(dbUser);
+
+  // If no access, redirect to pricing page to start trial
+  if (!access.hasAccess) {
+    redirect('/pricing?trial=true');
   }
 
   const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
@@ -37,4 +48,3 @@ export default async function DashboardLayout({
     </DashboardI18nProvider>
   );
 }
-

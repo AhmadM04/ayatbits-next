@@ -7,13 +7,14 @@ import { useI18n } from '@/lib/i18n';
 interface AudioPlayerProps {
   surahNumber: number;
   ayahNumber: number;
+  onPlayingChange?: (isPlaying: boolean) => void;
 }
 
-export default function AudioPlayer({ surahNumber, ayahNumber }: AudioPlayerProps) {
+export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }: AudioPlayerProps) {
   const { t } = useI18n();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [playbackRate, setPlaybackRate] = useState(0.75);
+  const [playbackRate, setPlaybackRate] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -93,10 +94,16 @@ export default function AudioPlayer({ surahNumber, ayahNumber }: AudioPlayerProp
         
         audio.addEventListener('play', () => {
           setIsPlaying(true);
+          onPlayingChange?.(true);
         });
         
         audio.addEventListener('pause', () => {
           setIsPlaying(false);
+          onPlayingChange?.(false);
+        });
+        
+        audio.addEventListener('ended', () => {
+          onPlayingChange?.(false);
         });
         
         audioRef.current = audio;
@@ -126,11 +133,29 @@ export default function AudioPlayer({ surahNumber, ayahNumber }: AudioPlayerProp
   };
 
   return (
-    <div className="flex items-center justify-center gap-3">
+    <div className="flex items-center justify-center gap-2 sm:gap-3">
+      {/* Speed buttons */}
+      <div className="flex items-center rounded-lg overflow-hidden border border-white/10">
+        {[1, 0.5].map((speed) => (
+          <button
+            key={speed}
+            onClick={() => handleSpeedChange(speed)}
+            className={`px-3 sm:px-4 py-2 text-sm sm:text-base font-medium transition-colors ${
+              playbackRate === speed
+                ? 'bg-green-600 text-white'
+                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+            }`}
+          >
+            {speed}x
+          </button>
+        ))}
+      </div>
+      
+      {/* Play button */}
       <button
         onClick={handlePlayPause}
         disabled={isLoading}
-        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-6 py-3 rounded-lg transition-colors"
+        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white px-4 sm:px-6 py-2 rounded-lg transition-colors text-sm sm:text-base"
       >
         {isLoading ? (
           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -139,27 +164,11 @@ export default function AudioPlayer({ surahNumber, ayahNumber }: AudioPlayerProp
         ) : (
           <Play className="w-4 h-4" />
         )}
-        <span>{isLoading ? t('common.loading') : isPlaying ? t('common.pause') : t('common.play')}</span>
+        <span className="hidden sm:inline">{isLoading ? t('common.loading') : isPlaying ? t('common.pause') : t('common.play')}</span>
       </button>
       
-      <div className="flex items-center gap-2">
-        {[0.75, 1].map((speed) => (
-          <button
-            key={speed}
-            onClick={() => handleSpeedChange(speed)}
-            className={`px-4 py-2 rounded-lg transition-colors font-medium ${
-              playbackRate === speed
-                ? 'bg-green-600 text-white'
-                : 'bg-green-100 text-green-700 hover:bg-green-200'
-            }`}
-          >
-            {speed}x
-          </button>
-        ))}
-      </div>
-      
       {error && (
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="text-xs sm:text-sm text-red-500">{error}</p>
       )}
     </div>
   );

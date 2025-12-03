@@ -13,7 +13,62 @@
     "profile": "Profil",
     "dashboard": "Tableau de bord",
     "loading": "Chargement...",
-    "error": "Erreur"
+    "error": "Erreur",
+    "goBack": "Retour",
+    "notFound": "Non trouvé",
+    "home": "Accueil",
+    "liked": "Favoris",
+    "resume": "Reprendre",
+    "awards": "Récompenses",
+    "startLearning": "Commencer",
+    "settings": "Paramètres",
+    "signOut": "Déconnexion",
+    "cancel": "Annuler"
+  },
+  "search": {
+    "placeholder": "Rechercher sourate:ayah (ex. 2:255)",
+    "surahPlaceholder": "Numéro ou nom de sourate",
+    "goToVerse": "Aller au verset",
+    "startLearning": "Commencer",
+    "invalidFormat": "Format invalide. Essayez 2:255 ou juste 2",
+    "surahNotFound": "Sourate non trouvée",
+    "examples": "Exemples",
+    "goToDashboard": "Retour à l'accueil",
+    "notAvailable": "Ce verset n'est pas encore disponible"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subscription": "Abonnement",
+    "lifetimeAccess": "Accès à vie",
+    "proMonthly": "Pro Mensuel",
+    "proYearly": "Pro Annuel",
+    "trial": "Essai ({days} jours restants)",
+    "canceled": "Annulé",
+    "inactive": "Inactif",
+    "manageBilling": "Gérer la facturation",
+    "manageBillingDesc": "Modifier le paiement, annuler, voir les factures",
+    "viewPlans": "Voir les forfaits",
+    "viewPlansDesc": "Mettre à niveau ou changer votre forfait",
+    "accountSettings": "Paramètres du compte",
+    "accountSettingsDesc": "Email, mot de passe, sécurité",
+    "privacySecurity": "Confidentialité et sécurité",
+    "privacySecurityDesc": "Authentification à deux facteurs, sessions",
+    "helpSupport": "Aide et support",
+    "helpSupportDesc": "Obtenir de l'aide ou envoyer des commentaires",
+    "faq": "FAQ",
+    "faqDesc": "Questions fréquemment posées",
+    "termsOfService": "Conditions d'utilisation",
+    "termsOfServiceDesc": "Conditions légales et politique de confidentialité",
+    "clearData": "Effacer les données",
+    "clearDataDesc": "Réinitialisez votre progression",
+    "clearDataTitle": "Effacer toutes les données ?",
+    "clearDataMessage": "Cela supprimera définitivement votre progression, vos séries et vos versets favoris.",
+    "clearDataWarning": "Cette action est irréversible. Votre abonnement restera actif.",
+    "clearDataConfirm": "Effacer",
+    "clearDataClerkInfo": "Pour supprimer votre compte :",
+    "manageViaClerk": "Gérer le compte →",
+    "signOutTitle": "Déconnexion ?",
+    "signOutMessage": "Êtes-vous sûr de vouloir vous déconnecter ?"
   },
   "verse": {
     "ayahNumber": "Ayah {number}",
@@ -23,7 +78,10 @@
     "ayahFound": "Ayah trouvé !",
     "ayahNotFound": "Ayah introuvable dans cette section.",
     "goToAyah": "Aller à l'Ayah",
-    "englishTranslation": "Traduction anglaise"
+    "englishTranslation": "Traduction",
+    "verseOfTheDay": "Verset du jour",
+    "playRecitation": "Lire la récitation",
+    "openAyah": "Ouvrir l'ayah"
   },
   "dashboard": {
     "welcome": "Bon retour, {name} !",
@@ -35,7 +93,9 @@
     "days": "jours",
     "selectJuz": "Sélectionnez un Juz pour commencer",
     "noJuzsFound": "Aucun juz trouvé. Veuillez exécuter le script de seed : npm run db:seed",
-    "surahsAvailable": "disponibles"
+    "surahsAvailable": "disponibles",
+    "progress": "Progression",
+    "viewTrophies": "Voir les trophées"
   },
   "profile": {
     "title": "Profil",
@@ -63,7 +123,166 @@
     "mistakes": "Erreurs : {count}",
     "completed": "Terminé !",
     "continueToNextAyah": "Continuer vers le prochain Ayah",
-    "puzzles": "puzzles"
+    "puzzles": "puzzles",
+    "tooManyMistakes": "Trop d'erreurs",
+    "mistakeLimitReached": "Vous avez atteint la limite d'erreurs",
+    "reviewAyahMessage": "Vous avez fait trop d'erreurs. Il est temps de revoir l'ayah avant de réessayer le puzzle. Prenez le temps de lire et de comprendre le verset, puis revenez pour réessayer.",
+    "goBackToAyahView": "Retour à la vue de l'Ayah",
+    "goBack": "Retour",
+    "dragOrClickWords": "Glissez ou cliquez sur les mots ci-dessous pour construire l'ayah",
+    "allWordsUsed": "Tous les mots utilisés. Cliquez sur les mots ci-dessus pour les retirer."
+  },
+  "liked": {
+    "title": "Ayahs aimées",
+    "ayahsSaved": "{count} ayahs sauvegardées",
+    "noLikedYet": "Pas encore d'ayahs aimées",
+    "tapHeartToSave": "Appuyez sur l'icône cœur sur n'importe quel ayah pour le sauvegarder ici",
+    "ayahInfo": "Ayah {ayahNumber} • Juz {juzNumber}"
+  },
+  "achievements": {
+    "title": "Accomplissements",
+    "unlockedOf": "{unlocked} sur {total} débloqués",
+    "puzzles": "Puzzles",
+    "bestStreak": "Meilleure série",
+    "trophies": "Trophées",
+    "unlocked": "Débloqués ({count})",
+    "inProgress": "En cours ({count})"
+  },
+  "trophies": {
+    "first_puzzle": {
+      "name": "Premier pas",
+      "description": "Complétez votre premier puzzle"
+    },
+    "puzzle_10": {
+      "name": "Premiers pas",
+      "description": "Complétez 10 puzzles"
+    },
+    "puzzle_50": {
+      "name": "Apprenant dévoué",
+      "description": "Complétez 50 puzzles"
+    },
+    "puzzle_100": {
+      "name": "Centurion",
+      "description": "Complétez 100 puzzles"
+    },
+    "puzzle_500": {
+      "name": "Érudit",
+      "description": "Complétez 500 puzzles"
+    },
+    "streak_3": {
+      "name": "Constant",
+      "description": "Atteignez une série de 3 jours"
+    },
+    "streak_7": {
+      "name": "Guerrier de la semaine",
+      "description": "Atteignez une série de 7 jours"
+    },
+    "streak_30": {
+      "name": "Maître du mois",
+      "description": "Atteignez une série de 30 jours"
+    },
+    "juz_1": {
+      "name": "Premier Juz",
+      "description": "Complétez tous les puzzles d'un Juz"
+    },
+    "juz_5": {
+      "name": "Cinq Juz",
+      "description": "Complétez 5 Juz"
+    },
+    "surah_fatiha": {
+      "name": "L'Ouverture",
+      "description": "Complétez la Sourate Al-Fatiha"
+    },
+    "liked_10": {
+      "name": "Collectionneur",
+      "description": "Aimez 10 ayahs"
+    }
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "welcomeBack": "Bon retour",
+    "createAccount": "Créer un compte",
+    "signInDescription": "Connectez-vous pour continuer votre apprentissage du Coran",
+    "signUpDescription": "Rejoignez des milliers d'apprenants qui maîtrisent le Coran",
+    "email": "Email",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "orContinueWith": "Ou continuer avec"
+  },
+  "landing": {
+    "heroTitle": "Rendez l'apprentissage du Coran",
+    "heroTitleHighlight": "plus rapide",
+    "heroDescription": "Puzzles de mots interactifs pour maîtriser le Coran. Apprenez avec 18 traductions et suivez vos progrès.",
+    "startLearning": "Commencer",
+    "viewPricing": "Voir les tarifs",
+    "features": "Fonctionnalités",
+    "pricing": "Tarifs",
+    "questions": "Questions",
+    "freeTrial": "Essai gratuit de 7 jours",
+    "trialInfo": "Essayez gratuitement pendant 7 jours",
+    "expertSupport": "Support expert"
+  },
+  "faq": {
+    "title": "Questions fréquemment posées",
+    "subtitle": "Des questions ?",
+    "description": "Trouvez ci-dessous les réponses aux questions courantes sur AyatBits.",
+    "stillHaveQuestions": "Encore des questions ?",
+    "contactSupport": "Contacter le support",
+    "q1": "Qu'est-ce qu'AyatBits ?",
+    "a1": "AyatBits est une application interactive d'apprentissage du Coran qui utilise des puzzles de mots pour vous aider à mémoriser et comprendre le Coran. En arrangeant les mots dans le bon ordre, vous vous engagez activement avec chaque ayah, rendant la mémorisation plus efficace et agréable.",
+    "q2": "Comment fonctionne le système de puzzles ?",
+    "a2": "Chaque puzzle vous présente les mots d'une ayah dans un ordre mélangé. Votre tâche est de glisser ou de toucher les mots pour les arranger dans la bonne séquence. Cet engagement actif aide à renforcer votre mémoire de la structure du verset et de l'ordre des mots.",
+    "q3": "Que se passe-t-il si je fais des erreurs ?",
+    "a3": "Vous avez 3 tentatives par puzzle. Si vous dépassez la limite d'erreurs, vous serez invité à revoir l'ayah avant de réessayer. Cela garantit que vous comprenez le verset avant de passer à la suite.",
+    "q4": "Comment fonctionnent les séries ?",
+    "a4": "Votre série augmente de 1 pour chaque jour consécutif où vous terminez au moins un puzzle. Si vous manquez un jour, votre série est remise à zéro. Les séries aident à motiver une pratique quotidienne régulière.",
+    "q5": "Quelles traductions sont disponibles ?",
+    "a5": "Nous proposons plus de 18 traductions dont l'anglais (Sahih International, Pickthall, Yusuf Ali), le Tafsir arabe, le français, l'allemand, l'espagnol, le turc, l'ourdou, l'indonésien, le malais, le bengali, l'hindi, le russe, le chinois, le japonais et le néerlandais.",
+    "q6": "Puis-je utiliser AyatBits hors ligne ?",
+    "a6": "Actuellement, AyatBits nécessite une connexion Internet pour charger les puzzles et sauvegarder votre progression. Nous travaillons sur la fonctionnalité hors ligne pour les futures mises à jour.",
+    "q7": "Comment ma progression est-elle sauvegardée ?",
+    "a7": "Votre progression est automatiquement sauvegardée sur votre compte. Chaque puzzle que vous terminez, ayah que vous aimez, et série que vous construisez est stockée en toute sécurité. Vous pouvez accéder à votre progression depuis n'importe quel appareil en vous connectant.",
+    "q8": "Qu'est-ce que l'essai gratuit de 7 jours ?",
+    "a8": "Les nouveaux utilisateurs bénéficient d'un accès complet à toutes les fonctionnalités pendant 7 jours sans frais. Après l'essai, vous pouvez choisir un plan d'abonnement pour continuer à apprendre.",
+    "q9": "Puis-je annuler mon abonnement à tout moment ?",
+    "a9": "Oui, vous pouvez annuler votre abonnement à tout moment. Votre accès continuera jusqu'à la fin de votre période de facturation actuelle.",
+    "q10": "Comment contacter le support ?",
+    "a10": "Vous pouvez contacter notre équipe de support à support@ayatbits.com. Nous répondons généralement dans les 24 à 48 heures."
+  },
+  "tos": {
+    "title": "Conditions d'utilisation",
+    "lastUpdated": "Dernière mise à jour : Décembre 2025",
+    "section1Title": "1. Acceptation des conditions",
+    "section1Content": "En accédant et en utilisant AyatBits (« le Service »), vous acceptez et convenez d'être lié par les termes et conditions de cet accord. Si vous n'êtes pas d'accord avec ces termes, veuillez ne pas utiliser le Service.",
+    "section2Title": "2. Description du service",
+    "section2Content": "AyatBits est une plateforme éducative conçue pour aider les utilisateurs à apprendre, mémoriser et comprendre le Coran grâce à des puzzles de mots interactifs. Le Service comprend l'accès au texte coranique, aux traductions, aux récitations audio et aux fonctionnalités d'apprentissage gamifiées.",
+    "section3Title": "3. Comptes utilisateurs",
+    "section3Content": "Vous êtes responsable du maintien de la confidentialité des informations d'identification de votre compte. Vous acceptez la responsabilité de toutes les activités qui se produisent sous votre compte. Vous devez nous informer immédiatement de toute utilisation non autorisée de votre compte.",
+    "section4Title": "4. Abonnement et paiements",
+    "section4Content": "Certaines fonctionnalités d'AyatBits nécessitent un abonnement payant. En vous abonnant, vous acceptez de payer les frais applicables. Les abonnements se renouvellent automatiquement sauf annulation avant la date de renouvellement. Vous serez débité automatiquement à chaque cycle de facturation sauf si vous annulez avant la date de renouvellement. Les remboursements sont fournis conformément à notre politique de remboursement.",
+    "section5Title": "5. Essai gratuit",
+    "section5Content": "Les nouveaux utilisateurs sont éligibles à un essai gratuit de 7 jours. L'essai donne un accès complet à toutes les fonctionnalités premium. Pour commencer votre essai, vous devez fournir des informations de paiement valides. IMPORTANT : Si vous n'annulez pas votre abonnement avant la fin de la période d'essai, vous serez automatiquement facturé pour le plan d'abonnement que vous avez sélectionné. Vous pouvez annuler à tout moment pendant la période d'essai pour éviter d'être facturé.",
+    "section6Title": "6. Utilisation acceptable",
+    "section6Content": "Vous acceptez d'utiliser le Service uniquement à des fins légales et conformément à ces Conditions. Vous acceptez de ne pas :",
+    "section6List1": "Utiliser le Service d'une manière qui viole les lois applicables",
+    "section6List2": "Tenter d'accéder sans autorisation à nos systèmes",
+    "section6List3": "Partager vos identifiants de compte avec d'autres",
+    "section6List4": "Reproduire, distribuer ou créer des œuvres dérivées de notre contenu",
+    "section6List5": "Utiliser des systèmes automatisés pour accéder au Service",
+    "section7Title": "7. Propriété intellectuelle",
+    "section7Content": "Le Service et son contenu original, ses fonctionnalités et sa fonctionnalité sont la propriété d'AyatBits et sont protégés par les lois internationales sur le droit d'auteur, les marques et autres lois sur la propriété intellectuelle. Le texte coranique est dans le domaine public.",
+    "section8Title": "8. Politique de confidentialité",
+    "section8Content": "Votre confidentialité est importante pour nous. Nous collectons et utilisons les informations personnelles comme décrit dans notre Politique de confidentialité. En utilisant le Service, vous consentez à notre collecte et utilisation de vos informations comme décrit ci-dessus.",
+    "section9Title": "9. Exclusion de garanties",
+    "section9Content": "Le Service est fourni « tel quel » sans garantie d'aucune sorte. Nous ne garantissons pas que le Service sera ininterrompu, sécurisé ou sans erreur. Nous ne faisons aucune garantie concernant l'exactitude de tout contenu coranique ou traductions.",
+    "section10Title": "10. Limitation de responsabilité",
+    "section10Content": "Dans toute la mesure permise par la loi, AyatBits ne sera pas responsable des dommages indirects, accessoires, spéciaux, consécutifs ou punitifs résultant de votre utilisation du Service.",
+    "section11Title": "11. Modifications des conditions",
+    "section11Content": "Nous nous réservons le droit de modifier ces conditions à tout moment. Nous informerons les utilisateurs des changements importants par e-mail ou notification dans l'application. L'utilisation continue du Service après les changements constitue l'acceptation des nouvelles conditions.",
+    "section12Title": "12. Nous contacter",
+    "section12Content": "Si vous avez des questions concernant ces Conditions, veuillez nous contacter à"
   }
 }
-

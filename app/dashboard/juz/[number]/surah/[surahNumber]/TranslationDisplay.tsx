@@ -74,7 +74,7 @@ export default function TranslationDisplay({
   const translationName = translationNames[selectedTranslation] || 'Translation';
 
   return (
-    <div className="bg-white rounded-xl p-6 mb-6 shadow-sm border border-gray-200">
+    <div className="bg-white/[0.02] rounded-2xl p-6 mb-6 border border-white/5">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Globe className="w-4 h-4 text-gray-500" />
@@ -83,7 +83,7 @@ export default function TranslationDisplay({
           </span>
         </div>
       </div>
-      <p className="text-gray-900 leading-relaxed">
+      <p className="text-gray-300 leading-relaxed">
         {isLoading ? t('common.loading') : translation || t('common.error')}
       </p>
     </div>

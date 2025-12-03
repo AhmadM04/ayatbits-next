@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Amiri } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/lib/theme-context";
 import "./globals.css";
@@ -12,6 +12,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const amiri = Amiri({
+  variable: "--font-amiri",
+  subsets: ["arabic"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -55,9 +61,11 @@ export default function RootLayout({
           headerSubtitle: 'text-gray-400 text-sm',
           
           // Social Buttons
-          socialButtonsBlockButton: 'bg-[#1a1a1a] hover:bg-[#252525] text-white border border-[#333] rounded-xl h-12 font-medium transition-all',
-          socialButtonsBlockButtonText: 'text-white font-medium',
-          socialButtonsProviderIcon: 'w-5 h-5',
+          socialButtonsBlockButton: 'bg-[#1a1a1a] hover:bg-[#252525] border border-[#333] rounded-xl h-12 font-medium transition-all [&>span]:text-white',
+          socialButtonsBlockButtonText: 'text-white! font-semibold',
+          socialButtonsProviderIcon: 'w-5 h-5 brightness-0 invert',
+          socialButtonsIconButton: 'bg-[#1a1a1a] hover:bg-[#252525] border border-[#333] rounded-xl',
+          socialButtonsBlockButtonArrow: 'text-white',
           
           // Divider
           dividerLine: 'bg-[#333]',
@@ -115,7 +123,7 @@ export default function RootLayout({
     >
       <html lang="en" className="dark" suppressHydrationWarning>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} ${amiri.variable} antialiased`}
         >
           <ThemeProvider>
             {children}

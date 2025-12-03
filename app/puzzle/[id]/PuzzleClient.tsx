@@ -7,7 +7,6 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { I18nProvider, useI18n } from '@/lib/i18n';
-import ThemeToggle from '@/components/ThemeToggle';
 
 interface PuzzleClientProps {
   puzzle: {
@@ -79,20 +78,20 @@ function PuzzleContent({
   };
 
   return (
-    <div className="min-h-screen bg-[var(--background)] transition-colors duration-300">
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
       <AnimatePresence>
         {isTransitioning && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
           >
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              className="bg-[var(--bg-card)] rounded-2xl p-8 text-center shadow-2xl max-w-sm mx-4 border border-[var(--border-color)]"
+              className="bg-[#111] rounded-2xl p-8 text-center shadow-2xl max-w-sm mx-4 border border-white/10"
             >
               <motion.div
                 animate={{ rotate: 360 }}
@@ -101,40 +100,39 @@ function PuzzleContent({
               >
                 ✓
               </motion.div>
-              <h3 className="text-2xl font-bold text-green-600 mb-2">{t('puzzle.completed')}</h3>
-              <p className="text-[var(--text-secondary)]">{t('puzzle.continueToNextAyah')}</p>
+              <h3 className="text-2xl font-bold text-green-500 mb-2">{t('puzzle.completed')}</h3>
+              <p className="text-gray-400">{t('puzzle.continueToNextAyah')}</p>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Header */}
-      <header className="bg-[var(--bg-card)] border-b border-[var(--border-color)] sticky top-0 z-10 transition-colors duration-300">
+      <header className="bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <Link
                 href="/dashboard"
-                className="p-2 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
+                className="p-2 hover:bg-white/5 rounded-lg transition-colors"
               >
-                <ArrowLeft className="w-5 h-5 text-[var(--text-secondary)]" />
+                <ArrowLeft className="w-5 h-5 text-gray-400" />
               </Link>
               <div>
-                <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+                <h1 className="text-lg font-semibold text-white">
                   {puzzle.surah?.nameEnglish || `Juz ${puzzle.juz?.number}`}
                 </h1>
                 {puzzle.surah && (
-                  <p className="text-sm text-[var(--text-secondary)]">{puzzle.surah.nameArabic}</p>
+                  <p className="text-sm text-gray-500">{puzzle.surah.nameArabic}</p>
                 )}
               </div>
             </div>
-            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-[var(--bg-card)] rounded-xl shadow-lg p-6 border border-[var(--border-color)] transition-colors">
+        <div className="bg-white/[0.02] rounded-2xl p-6 border border-white/5">
           <WordPuzzle
             ayahText={ayahText}
             isLiked={isLiked}

@@ -61,6 +61,9 @@ export function I18nProvider({
 }) {
   const locale = getLocaleFromTranslation(translationCode);
   const localeMessages = messages[locale] || messages.en;
+  
+  // Debug logging
+  console.log('I18nProvider - translationCode:', translationCode, '-> locale:', locale);
 
   const t = (key: string, params?: Record<string, string | number>): string => {
     const keys = key.split('.');
@@ -73,6 +76,9 @@ export function I18nProvider({
         let fallbackValue: any = messages.en;
         for (const fk of keys) {
           fallbackValue = fallbackValue?.[fk];
+        }
+        if (fallbackValue === undefined) {
+          console.warn('Translation not found:', key);
         }
         value = fallbackValue || key;
         break;
@@ -94,4 +100,3 @@ export function I18nProvider({
     </I18nContext.Provider>
   );
 }
-

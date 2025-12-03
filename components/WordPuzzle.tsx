@@ -93,12 +93,12 @@ function SortableWord({
       }
       transition={{ duration: 0.3 }}
       className={`
-        px-4 py-2 rounded-xl cursor-grab active:cursor-grabbing
-        ${isCorrect ? 'bg-emerald-100 border-2 border-emerald-600 text-emerald-900' : ''}
-        ${isIncorrect ? 'bg-red-100 border-2 border-red-500 text-red-900' : ''}
-        ${!isCorrect && !isIncorrect ? 'bg-slate-100 border border-slate-300 text-slate-800' : ''}
+        px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl cursor-grab active:cursor-grabbing
+        ${isCorrect ? 'bg-emerald-500/20 border-2 border-emerald-500 text-emerald-400' : ''}
+        ${isIncorrect ? 'bg-red-500/20 border-2 border-red-500 text-red-400' : ''}
+        ${!isCorrect && !isIncorrect ? 'bg-white/5 border border-white/20 text-white' : ''}
         shadow-sm hover:shadow-md transition-all
-        font-medium text-lg
+        font-medium text-sm sm:text-lg
       `}
       dir="rtl"
     >
@@ -118,23 +118,24 @@ function AnswerDroppable({
   recentlyCorrectId: string | null;
   onWordClick: (token: WordToken) => void;
 }) {
+  const { t } = useI18n();
   const { setNodeRef } = useDroppable({ id: 'answer-area' });
 
   return (
     <div
       ref={setNodeRef}
-      className="min-h-[120px] bg-emerald-50 border-2 border-dashed border-emerald-300 rounded-xl p-6"
+      className="min-h-[80px] sm:min-h-[120px] bg-emerald-500/10 border-2 border-dashed border-emerald-500/30 rounded-xl p-3 sm:p-6"
     >
       {answer.length === 0 ? (
-        <div className="flex items-center justify-center h-full text-slate-500">
-          Drag or click words from below to build the ayah
+        <div className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base text-center px-2">
+          {t('puzzle.dragOrClickWords')}
         </div>
       ) : (
         <SortableContext
           items={answer.map((t) => t.id)}
           strategy={horizontalListSortingStrategy}
         >
-          <div className="flex flex-wrap gap-3 justify-center" dir="rtl">
+          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center" dir="rtl">
             {answer.map((token, index) => (
               <SortableWord
                 key={token.id}
@@ -167,15 +168,15 @@ function WordBankDroppable({
   return (
     <div
       ref={setNodeRef}
-      className="min-h-[200px] bg-white border-2 border-slate-200 rounded-xl p-6"
+      className="min-h-[120px] sm:min-h-[200px] bg-white/[0.02] border border-white/10 rounded-xl p-3 sm:p-6"
     >
-      <h4 className="text-lg font-semibold text-slate-800 mb-4">{t('puzzle.wordBank')}</h4>
+      <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">{t('puzzle.wordBank')}</h4>
       {bank.length === 0 ? (
-        <div className="flex items-center justify-center h-full text-slate-500">
+        <div className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base text-center">
           All words used. Click words above to remove them.
         </div>
       ) : (
-        <div className="flex flex-wrap gap-3" dir="rtl">
+        <div className="flex flex-wrap gap-2 sm:gap-3" dir="rtl">
           {bank.map((token) => (
             <DraggableWord
               key={token.id}
@@ -220,14 +221,14 @@ function DraggableWord({
       {...attributes}
       {...listeners}
       className={`
-        px-4 py-2 rounded-xl cursor-grab active:cursor-grabbing
+        px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl cursor-grab active:cursor-grabbing
         ${
           isIncorrect
-            ? 'bg-red-100 border-2 border-red-500 text-red-900'
-            : 'bg-slate-100 border border-slate-300 hover:bg-slate-200 text-slate-800'
+            ? 'bg-red-500/20 border-2 border-red-500 text-red-400'
+            : 'bg-white/5 border border-white/20 hover:bg-white/10 text-white'
         }
         shadow-sm hover:shadow-md
-        font-medium text-lg
+        font-medium text-sm sm:text-lg
         ${isDragging ? 'opacity-50' : 'transition-all'}
       `}
       dir="rtl"
@@ -417,18 +418,18 @@ export default function WordPuzzle({
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-6">
       {/* Header with Like Button */}
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-slate-800">{t('puzzle.buildTheAyah')}</h3>
+        <h3 className="text-lg sm:text-xl font-semibold text-white">{t('puzzle.buildTheAyah')}</h3>
         {onToggleLike && (
           <button
             onClick={onToggleLike}
-            className="p-2 rounded-full hover:bg-red-50 transition-colors"
+            className="p-2 rounded-full hover:bg-red-500/10 transition-colors"
           >
             <Heart
-              className={`w-6 h-6 ${
-                isLiked ? 'fill-red-500 text-red-500' : 'text-slate-400'
+              className={`w-5 sm:w-6 h-5 sm:h-6 ${
+                isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400'
               }`}
             />
           </button>
@@ -437,25 +438,25 @@ export default function WordPuzzle({
 
       {/* Mistake Counter */}
       <div
-        className={`flex items-center justify-between p-4 rounded-lg ${
+        className={`flex items-center justify-between p-3 sm:p-4 rounded-lg ${
           hasExceededMistakeLimit
-            ? 'bg-red-50 border-2 border-red-200'
-            : 'bg-slate-50 border border-slate-200'
+            ? 'bg-red-500/20 border-2 border-red-500/50'
+            : 'bg-white/[0.02] border border-white/10'
         }`}
       >
         <span
-          className={`font-semibold ${
-            hasExceededMistakeLimit ? 'text-red-700' : 'text-slate-800'
+          className={`font-semibold text-sm sm:text-base ${
+            hasExceededMistakeLimit ? 'text-red-400' : 'text-white'
           }`}
         >
           {hasExceededMistakeLimit ? t('puzzle.mistake') + '!' : t('puzzle.mistakes', { count: mistakeCount }) + '/3'}
         </span>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5 sm:gap-2">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className={`w-3 h-3 rounded-full ${
-                i <= mistakeCount ? 'bg-red-500' : 'bg-slate-300'
+              className={`w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full ${
+                i <= mistakeCount ? 'bg-red-500' : 'bg-white/20'
               }`}
             />
           ))}
@@ -490,34 +491,34 @@ export default function WordPuzzle({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
             onClick={(e) => e.stopPropagation()}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+              className="bg-[#111] border border-white/10 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="bg-red-50 border-b border-red-200 p-6">
+              <div className="bg-red-500/20 border-b border-red-500/20 p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                      <X className="w-6 h-6 text-red-600" />
+                    <div className="w-10 sm:w-12 h-10 sm:h-12 bg-red-500/20 rounded-full flex items-center justify-center">
+                      <X className="w-5 sm:w-6 h-5 sm:h-6 text-red-500" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-red-900">{t('puzzle.tooManyMistakes')}</h3>
-                      <p className="text-sm text-red-700">{t('puzzle.mistakeLimitReached')}</p>
+                      <h3 className="text-lg sm:text-xl font-bold text-red-400">{t('puzzle.tooManyMistakes')}</h3>
+                      <p className="text-xs sm:text-sm text-red-400/70">{t('puzzle.mistakeLimitReached')}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Content */}
-              <div className="p-6">
-                <p className="text-gray-700 mb-6 leading-relaxed">
+              <div className="p-4 sm:p-6">
+                <p className="text-gray-400 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">
                   {t('puzzle.reviewAyahMessage')}
                 </p>
 
@@ -526,17 +527,17 @@ export default function WordPuzzle({
                   {ayahViewUrl ? (
                     <Link
                       href={ayahViewUrl}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                     >
-                      <BookOpen className="w-5 h-5" />
+                      <BookOpen className="w-4 sm:w-5 h-4 sm:h-5" />
                       {t('puzzle.goBackToAyahView')}
                     </Link>
                   ) : (
                     <button
                       onClick={() => router.back()}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                     >
-                      <BookOpen className="w-5 h-5" />
+                      <BookOpen className="w-4 sm:w-5 h-4 sm:h-5" />
                       {t('puzzle.goBack')}
                     </button>
                   )}

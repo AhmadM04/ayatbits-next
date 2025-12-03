@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import Link from 'next/link';
-import { ArrowRight, ChevronLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowRight, ChevronLeft, RotateCcw } from 'lucide-react';
+import { motion } from 'framer-motion';
 import AudioPlayer from './AudioPlayer';
 import TranslationDisplay from './TranslationDisplay';
 
@@ -17,6 +20,7 @@ interface VerseContentProps {
   nextPuzzle: { content: { ayahNumber: number } } | null;
   juzNumber: number;
   surahNumber: number;
+  firstAyahNumber: number;
 }
 
 export default function VerseContent({
@@ -30,26 +34,72 @@ export default function VerseContent({
   nextPuzzle,
   juzNumber,
   surahNumber,
+  firstAyahNumber,
 }: VerseContentProps) {
   const { t } = useI18n();
+  const router = useRouter();
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const handleReset = () => {
+    router.push(`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${firstAyahNumber}`);
+  };
 
   return (
     <>
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
+      <main className="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 pb-28">
         {/* Arabic Verse */}
-        <div className="bg-[var(--bg-card)] rounded-xl p-8 mb-6 shadow-sm border border-[var(--border-color)] transition-colors">
-          <div className="text-center" dir="rtl">
-            <div className="mb-4">
-              <span className="text-sm font-medium text-[var(--text-muted)]">
+        <motion.div 
+          className="relative rounded-2xl p-4 sm:p-8 mb-4 sm:mb-6 overflow-hidden"
+          animate={{
+            boxShadow: isPlaying 
+              ? ['0 0 0 2px rgba(34, 197, 94, 0.3)', '0 0 0 4px rgba(34, 197, 94, 0.5)', '0 0 0 2px rgba(34, 197, 94, 0.3)']
+              : '0 0 0 1px rgba(255, 255, 255, 0.05)',
+          }}
+          transition={{
+            duration: 1.5,
+            repeat: isPlaying ? Infinity : 0,
+            ease: 'easeInOut',
+          }}
+          style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: isPlaying ? '2px solid rgba(34, 197, 94, 0.5)' : '1px solid rgba(255, 255, 255, 0.05)',
+          }}
+        >
+          {/* Animated glow effect when playing */}
+          {isPlaying && (
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              animate={{
+                background: [
+                  'radial-gradient(circle at center, rgba(34, 197, 94, 0.1) 0%, transparent 70%)',
+                  'radial-gradient(circle at center, rgba(34, 197, 94, 0.15) 0%, transparent 70%)',
+                  'radial-gradient(circle at center, rgba(34, 197, 94, 0.1) 0%, transparent 70%)',
+                ],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            />
+          )}
+          
+          <div className="relative text-center" dir="rtl">
+            <div className="mb-3 sm:mb-4">
+              <span className="text-xs sm:text-sm font-medium text-gray-500">
                 {t('verse.ayahNumber', { number: currentAyahNumber })}
               </span>
             </div>
-            <p className="text-3xl font-medium leading-relaxed text-[var(--text-primary)] mb-6">
+            <p className="text-xl sm:text-2xl md:text-3xl font-medium leading-loose sm:leading-relaxed text-white mb-4 sm:mb-6 break-words">
               {ayahText}
             </p>
-            <AudioPlayer surahNumber={surahNum} ayahNumber={currentAyahNumber} />
+            <AudioPlayer 
+              surahNumber={surahNum} 
+              ayahNumber={currentAyahNumber} 
+              onPlayingChange={setIsPlaying}
+            />
           </div>
-        </div>
+        </motion.div>
 
         {/* Translation */}
         <TranslationDisplay
@@ -62,37 +112,40 @@ export default function VerseContent({
         {/* Ready to Start Puzzle Button */}
         <Link
           href={`/puzzle/${puzzleId}`}
-          className="block w-full bg-green-600 hover:bg-green-700 text-white text-center font-semibold py-4 px-6 rounded-lg transition-colors mb-8"
+          className="block w-full bg-green-600 hover:bg-green-700 text-white text-center font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-colors mb-4 sm:mb-8 text-sm sm:text-base"
         >
           {t('verse.readyToStartPuzzle')}
         </Link>
       </main>
 
       {/* Footer Navigation */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-[var(--bg-card)] border-t border-[var(--border-color)] shadow-lg transition-colors">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20 py-2">
+      <footer className="fixed bottom-0 left-0 right-0 bg-[#111]/95 backdrop-blur-md border-t border-white/5">
+        <div className="max-w-4xl mx-auto px-2 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-20 py-2">
             {/* Left: Previous Button */}
             <div className="flex items-center">
               {previousPuzzle ? (
                 <Link 
                   href={`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${previousPuzzle.content.ayahNumber}`}
-                  className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-card)] border-2 border-[var(--border-color)] rounded-lg hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 transition-all shadow-sm hover:shadow-md"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 bg-white/5 border border-white/10 rounded-lg hover:border-green-500 hover:bg-green-500/10 transition-all"
                 >
-                  <ChevronLeft className="w-5 h-5 text-[var(--text-secondary)]" />
-                  <span className="text-sm font-medium text-[var(--text-secondary)]">{t('common.prev')}</span>
+                  <ChevronLeft className="w-4 sm:w-5 h-4 sm:h-5 text-gray-400" />
+                  <span className="text-xs sm:text-sm font-medium text-gray-300">{t('common.prev')}</span>
                 </Link>
               ) : (
-                <div className="w-20"></div>
+                <div className="w-16 sm:w-20"></div>
               )}
             </div>
             
             {/* Center: Reset Button */}
-            <div className="flex flex-col items-center gap-1">
-              <button className="w-12 h-12 rounded-full border-2 border-[var(--border-color)] flex items-center justify-center hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 transition-all shadow-md hover:shadow-lg bg-[var(--bg-card)]">
-                <span className="text-[var(--text-secondary)] text-xl font-bold">↻</span>
+            <div className="flex flex-col items-center gap-0.5 sm:gap-1">
+              <button 
+                onClick={handleReset}
+                className="w-10 sm:w-12 h-10 sm:h-12 rounded-full border border-white/10 bg-white/5 flex items-center justify-center hover:border-green-500 hover:bg-green-500/10 transition-all"
+              >
+                <RotateCcw className="w-4 sm:w-5 h-4 sm:h-5 text-gray-300" />
               </button>
-              <span className="text-xs text-[var(--text-muted)] font-medium">{t('common.reset')}</span>
+              <span className="text-[10px] sm:text-xs text-gray-500 font-medium">{t('common.reset')}</span>
             </div>
             
             {/* Right: Next Button */}
@@ -100,13 +153,13 @@ export default function VerseContent({
               {nextPuzzle ? (
                 <Link 
                   href={`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${nextPuzzle.content.ayahNumber}`}
-                  className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-card)] border-2 border-[var(--border-color)] rounded-lg hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 transition-all shadow-sm hover:shadow-md"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 bg-white/5 border border-white/10 rounded-lg hover:border-green-500 hover:bg-green-500/10 transition-all"
                 >
-                  <span className="text-sm font-medium text-[var(--text-secondary)]">{t('common.next')}</span>
-                  <ArrowRight className="w-5 h-5 text-[var(--text-secondary)]" />
+                  <span className="text-xs sm:text-sm font-medium text-gray-300">{t('common.next')}</span>
+                  <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 text-gray-400" />
                 </Link>
               ) : (
-                <div className="w-20"></div>
+                <div className="w-16 sm:w-20"></div>
               )}
             </div>
           </div>

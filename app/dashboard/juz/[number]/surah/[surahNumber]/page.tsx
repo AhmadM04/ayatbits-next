@@ -2,7 +2,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { connectDB, Juz, Surah, Puzzle, UserProgress, User } from '@/lib/db';
 import Link from 'next/link';
-import { ArrowLeft, Menu, Search, Moon, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Search } from 'lucide-react';
 import { fetchSurah } from '@/lib/quran-api';
 import AyahSelectorClient from './AyahSelectorClient';
 import VersePageClient from './VersePageClient';
@@ -45,10 +45,10 @@ export default async function JuzSurahPage({
 
   if (!juz || !surah) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Not found</h1>
-          <Link href="/dashboard" className="text-green-600 hover:underline">
+          <h1 className="text-2xl font-bold text-white mb-2">Not found</h1>
+          <Link href="/dashboard" className="text-green-500 hover:underline">
             Go back to dashboard
           </Link>
         </div>
@@ -64,10 +64,10 @@ export default async function JuzSurahPage({
 
   if (puzzles.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">No puzzles found</h1>
-          <Link href={`/dashboard/juz/${juz.number}`} className="text-green-600 hover:underline">
+          <h1 className="text-2xl font-bold text-white mb-2">No puzzles found</h1>
+          <Link href={`/dashboard/juz/${juz.number}`} className="text-green-500 hover:underline">
             Go back to Juz {juz.number}
           </Link>
         </div>
@@ -156,51 +156,39 @@ export default async function JuzSurahPage({
     allUserProgress.map((p: any) => [p.puzzleId.toString(), p.status === 'COMPLETED'])
   );
 
+  // Update lastPuzzleId to track where user is viewing
+  await User.findByIdAndUpdate(dbUser._id, {
+    lastPuzzleId: selectedPuzzle._id,
+  });
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <header className="bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link
               href={`/dashboard/juz/${juz.number}`}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/5 rounded-lg transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className="w-5 h-5 text-gray-400" />
             </Link>
             <div className="flex-1 text-center">
-              <h1 className="text-xl font-semibold text-gray-900" dir="rtl">{surah.nameArabic}</h1>
-              <div className="w-full max-w-xs mx-auto bg-gray-200 rounded-full h-1.5 mt-2">
+              <h1 className="text-xl font-semibold text-white" dir="rtl">{surah.nameArabic}</h1>
+              <div className="w-full max-w-xs mx-auto bg-white/10 rounded-full h-1.5 mt-2">
                 <div
-                  className="bg-green-600 h-1.5 rounded-full transition-all"
+                  className="bg-green-500 h-1.5 rounded-full transition-all"
                   style={{ width: `${progressPercentage}%` }}
                 />
               </div>
             </div>
-            {/* Desktop: Individual Icons */}
-            <div className="hidden sm:flex items-center gap-2">
-              <button
-                id="search-ayah-button"
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Search Ayah"
-              >
-                <Search className="w-5 h-5 text-gray-600" />
-              </button>
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <Moon className="w-5 h-5 text-gray-600" />
-              </button>
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <Lightbulb className="w-5 h-5 text-gray-600" />
-              </button>
-            </div>
-            
-            {/* Mobile: Burger Menu */}
+            {/* Search Button */}
             <button
-              id="search-ayah-button-mobile"
-              className="sm:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              title="Menu"
+              id="search-ayah-button"
+              className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+              title="Search Ayah"
             >
-              <Menu className="w-6 h-6 text-gray-600" />
+              <Search className="w-5 h-5 text-gray-400" />
             </button>
           </div>
         </div>
@@ -218,6 +206,7 @@ export default async function JuzSurahPage({
           nextPuzzle={nextPuzzle}
           juzNumber={juz.number}
           surahNumber={surah.number}
+          firstAyahNumber={puzzles[0]?.content?.ayahNumber || 1}
         />
         {/* Ayah Selector Modal */}
         <AyahSelectorClient

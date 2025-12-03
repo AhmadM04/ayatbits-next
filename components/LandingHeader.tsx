@@ -1,10 +1,9 @@
 'use client';
 
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, SignOutButton } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 
 export default function LandingHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -52,25 +51,30 @@ export default function LandingHeader() {
           </nav>
 
           {/* Desktop Auth */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-4">
             <SignedOut>
               <SignInButton mode="modal">
-                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10 h-9">
+                <button className="text-gray-400 hover:text-white text-sm font-medium transition-colors">
                   Log In
-                </Button>
+                </button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white h-9 px-4">
-                  Start Trial
-                </Button>
+                <button className="text-white text-sm font-medium hover:text-green-400 transition-colors">
+                  Sign Up
+                </button>
               </SignUpButton>
             </SignedOut>
             <SignedIn>
-              <Link href="/dashboard">
-                <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white h-9 px-4">
-                  Dashboard
-                </Button>
-              </Link>
+              <div className="flex items-center gap-4">
+                <Link href="/api/check-access" className="text-white text-sm font-medium hover:text-green-400 transition-colors">
+                  Continue Learning
+                </Link>
+                <SignOutButton>
+                  <button className="text-gray-400 hover:text-white transition-colors">
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </SignOutButton>
+              </div>
             </SignedIn>
           </div>
 
@@ -125,12 +129,21 @@ export default function LandingHeader() {
               </SignedOut>
               <SignedIn>
                 <Link 
-                  href="/dashboard" 
+                  href="/api/check-access" 
                   className="block px-4 py-3 bg-green-600 hover:bg-green-700 text-white font-medium text-center rounded-lg transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Go to Dashboard
+                  Continue Learning
                 </Link>
+                <SignOutButton>
+                  <button 
+                    className="w-full px-4 py-3 text-left text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </button>
+                </SignOutButton>
               </SignedIn>
             </div>
           </nav>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import TranslationSelector from './TranslationSelector';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
@@ -16,7 +16,22 @@ export default function TranslationSelectorClient({
   const router = useRouter();
   const { t } = useI18n();
 
+  // Sync initial translation to localStorage on mount (immediately)
+  useLayoutEffect(() => {
+    if (initialSelectedTranslation && typeof window !== 'undefined') {
+      localStorage.setItem('selectedTranslation', initialSelectedTranslation);
+    }
+  }, [initialSelectedTranslation]);
+
   const handleSelect = async (translationCode: string) => {
+    // Save to localStorage IMMEDIATELY before any async operation
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedTranslation', translationCode);
+      console.log('TranslationSelector - saved to localStorage:', translationCode);
+    }
+    
+    setSelectedTranslation(translationCode);
+
     try {
       const response = await fetch('/api/user/translation', {
         method: 'POST',
@@ -27,7 +42,6 @@ export default function TranslationSelectorClient({
       });
 
       if (response.ok) {
-        setSelectedTranslation(translationCode);
         router.refresh();
       } else {
         console.error('Failed to update translation');

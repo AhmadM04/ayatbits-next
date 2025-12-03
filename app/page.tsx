@@ -1,11 +1,11 @@
 'use client';
 
 import Link from "next/link";
-import { SignedIn, SignedOut, SignUpButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
-import { BookOpen, Target, Zap, Award, ArrowRight, Play } from "lucide-react";
+import { SignedIn, SignedOut, SignUpButton, SignOutButton } from "@clerk/nextjs";
+import { BookOpen, Target, Zap, Award, Play, LogOut } from "lucide-react";
 import LandingHeader from "@/components/LandingHeader";
-import { useEffect, useState, useRef } from "react";
+import PuzzleDemo from "@/components/PuzzleDemo";
+import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 export default function Home() {
@@ -45,35 +45,80 @@ export default function Home() {
               }}
             />
 
-            {/* Floating elements */}
+            {/* Floating Ayah Words */}
             <motion.div
               animate={{ 
                 y: [0, -20, 0],
-                rotate: [0, 5, 0]
+                rotate: [0, 3, 0]
               }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute top-1/3 left-[10%] text-4xl opacity-20"
+              className="absolute top-1/4 left-[8%] text-2xl sm:text-3xl font-arabic text-green-500/30 select-none"
+              dir="rtl"
             >
-              📖
+              بِسْمِ
             </motion.div>
             <motion.div
               animate={{ 
-                y: [0, 20, 0],
-                rotate: [0, -5, 0]
+                y: [0, 15, 0],
+                rotate: [0, -2, 0]
               }}
-              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute top-1/2 right-[15%] text-3xl opacity-20"
+              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+              className="absolute top-1/3 right-[12%] text-xl sm:text-2xl font-arabic text-green-500/25 select-none"
+              dir="rtl"
             >
-              ✨
+              الرَّحْمَٰنِ
             </motion.div>
             <motion.div
               animate={{ 
                 y: [0, -15, 0],
               }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute bottom-1/3 left-[20%] text-2xl opacity-20"
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              className="absolute bottom-1/3 left-[15%] text-lg sm:text-xl font-arabic text-green-500/20 select-none"
+              dir="rtl"
             >
-              🕌
+              الْحَمْدُ
+            </motion.div>
+            <motion.div
+              animate={{ 
+                y: [0, 18, 0],
+                rotate: [0, 2, 0]
+              }}
+              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+              className="absolute top-1/2 left-[5%] text-xl sm:text-2xl font-arabic text-green-500/20 select-none"
+              dir="rtl"
+            >
+              اللَّهِ
+            </motion.div>
+            <motion.div
+              animate={{ 
+                y: [0, -12, 0],
+              }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+              className="absolute bottom-1/4 right-[10%] text-2xl sm:text-3xl font-arabic text-green-500/25 select-none"
+              dir="rtl"
+            >
+              الرَّحِيمِ
+            </motion.div>
+            <motion.div
+              animate={{ 
+                y: [0, 10, 0],
+                rotate: [0, -3, 0]
+              }}
+              transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+              className="absolute top-[60%] right-[20%] text-lg sm:text-xl font-arabic text-green-500/15 select-none"
+              dir="rtl"
+            >
+              رَبِّ
+            </motion.div>
+            <motion.div
+              animate={{ 
+                y: [0, -18, 0],
+              }}
+              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
+              className="absolute top-[20%] right-[25%] text-xl sm:text-2xl font-arabic text-green-500/20 select-none"
+              dir="rtl"
+            >
+              الْعَالَمِينَ
             </motion.div>
           </div>
 
@@ -88,7 +133,7 @@ export default function Home() {
               transition={{ duration: 0.6 }}
             >
               <span className="inline-block px-4 py-1.5 mb-6 text-xs font-medium text-green-400 bg-green-500/10 rounded-full border border-green-500/20">
-                🚀 The modern way to learn Quran
+                ✦ The modern way to learn Quran
               </span>
             </motion.div>
 
@@ -121,26 +166,40 @@ export default function Home() {
             >
               <SignedOut>
                 <SignUpButton mode="modal">
-                  <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 h-12 text-base font-medium rounded-full">
-                    Start 7-Day Trial
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
+                  <button className="group relative px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-base font-semibold rounded-2xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-300 hover:scale-[1.02] flex items-center gap-3">
+                    <span>Start Learning</span>
+                    <BookOpen className="w-5 h-5 text-green-200" />
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-400 to-emerald-400 opacity-0 group-hover:opacity-20 transition-opacity" />
+                  </button>
                 </SignUpButton>
+                <Link href="#demo">
+                  <button className="group px-8 py-4 bg-white/5 hover:bg-white/10 text-white text-base font-semibold rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 flex items-center gap-2 backdrop-blur-sm">
+                    <Play className="w-5 h-5 text-green-400" />
+                    <span>Try Demo</span>
+                  </button>
+                </Link>
               </SignedOut>
               <SignedIn>
-                <Link href="/dashboard">
-                  <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 h-12 text-base font-medium rounded-full">
-                    Go to Dashboard
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
+                <Link href="/api/check-access">
+                  <button className="group relative px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-base font-semibold rounded-2xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-300 hover:scale-[1.02] flex items-center gap-3">
+                    <span>Continue Learning</span>
+                    <BookOpen className="w-5 h-5 text-green-200" />
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-400 to-emerald-400 opacity-0 group-hover:opacity-20 transition-opacity" />
+                  </button>
                 </Link>
+                <Link href="#demo">
+                  <button className="group px-8 py-4 bg-white/5 hover:bg-white/10 text-white text-base font-semibold rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 flex items-center gap-2 backdrop-blur-sm">
+                    <Play className="w-5 h-5 text-green-400" />
+                    <span>Try Demo</span>
+                  </button>
+                </Link>
+                <SignOutButton>
+                  <button className="px-6 py-4 text-gray-400 hover:text-white text-base font-medium rounded-2xl hover:bg-white/5 transition-all duration-300 flex items-center gap-2">
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </SignOutButton>
               </SignedIn>
-              <Link href="#demo">
-                <Button size="lg" variant="outline" className="border-gray-700 text-gray-300 hover:bg-white/5 px-8 h-12 text-base font-medium rounded-full">
-                  <Play className="mr-2 w-4 h-4" />
-                  Try Demo
-                </Button>
-              </Link>
             </motion.div>
 
             {/* Stats */}
@@ -167,20 +226,6 @@ export default function Home() {
             </motion.div>
           </motion.div>
 
-          {/* Scroll indicator */}
-          <motion.div 
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          >
-            <div className="w-6 h-10 rounded-full border-2 border-gray-700 flex items-start justify-center p-2">
-              <motion.div 
-                animate={{ y: [0, 12, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="w-1 h-2 bg-gray-500 rounded-full"
-              />
-            </div>
-          </motion.div>
         </section>
 
         {/* Features Section */}
@@ -251,7 +296,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <DemoWidget />
+              <PuzzleDemo />
             </motion.div>
           </div>
         </section>
@@ -273,18 +318,20 @@ export default function Home() {
             </p>
             <SignedOut>
               <SignUpButton mode="modal">
-                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-10 h-14 text-lg font-medium rounded-full">
-                  Start Your Trial
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
+                <button className="group relative px-10 py-5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-lg font-semibold rounded-2xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-300 hover:scale-[1.02] flex items-center gap-3 mx-auto">
+                  <span>Start Your Trial</span>
+                  <BookOpen className="w-5 h-5 text-green-200" />
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-400 to-emerald-400 opacity-0 group-hover:opacity-20 transition-opacity" />
+                </button>
               </SignUpButton>
             </SignedOut>
             <SignedIn>
-              <Link href="/dashboard">
-                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-10 h-14 text-lg font-medium rounded-full">
-                  Continue Learning
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
+              <Link href="/api/check-access">
+                <button className="group relative px-10 py-5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-lg font-semibold rounded-2xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-300 hover:scale-[1.02] flex items-center gap-3 mx-auto">
+                  <span>Continue Learning</span>
+                  <BookOpen className="w-5 h-5 text-green-200" />
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-400 to-emerald-400 opacity-0 group-hover:opacity-20 transition-opacity" />
+                </button>
               </Link>
             </SignedIn>
           </motion.div>
@@ -300,106 +347,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </div>
-  );
-}
-
-// Inline Demo Widget for better performance
-function DemoWidget() {
-  const [words, setWords] = useState([
-    { id: 1, text: 'بِسْمِ', placed: false },
-    { id: 2, text: 'اللَّهِ', placed: false },
-    { id: 3, text: 'الرَّحْمَٰنِ', placed: false },
-    { id: 4, text: 'الرَّحِيمِ', placed: false },
-  ]);
-  const [answer, setAnswer] = useState<typeof words>([]);
-  const [shuffled, setShuffled] = useState(false);
-
-  useEffect(() => {
-    if (!shuffled) {
-      setWords(prev => [...prev].sort(() => Math.random() - 0.5));
-      setShuffled(true);
-    }
-  }, [shuffled]);
-
-  const correctOrder = ['بِسْمِ', 'اللَّهِ', 'الرَّحْمَٰنِ', 'الرَّحِيمِ'];
-  const isComplete = answer.length === 4 && answer.every((w, i) => w.text === correctOrder[i]);
-
-  const handleWordClick = (word: typeof words[0]) => {
-    if (word.placed) {
-      setAnswer(prev => prev.filter(w => w.id !== word.id));
-      setWords(prev => prev.map(w => w.id === word.id ? { ...w, placed: false } : w));
-    } else {
-      setAnswer(prev => [...prev, word]);
-      setWords(prev => prev.map(w => w.id === word.id ? { ...w, placed: true } : w));
-    }
-  };
-
-  const reset = () => {
-    setAnswer([]);
-    setWords(prev => prev.map(w => ({ ...w, placed: false })).sort(() => Math.random() - 0.5));
-  };
-
-  return (
-    <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 sm:p-8">
-      {/* Answer area */}
-      <div className="min-h-[80px] rounded-xl border-2 border-dashed border-white/10 p-4 mb-6 flex flex-wrap gap-3 justify-center" dir="rtl">
-        {answer.length === 0 ? (
-          <span className="text-gray-600 text-sm">Tap words below to build the verse</span>
-        ) : (
-          answer.map((word, i) => (
-            <motion.button
-              key={word.id}
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              onClick={() => handleWordClick(word)}
-              className={`px-4 py-2 rounded-lg text-lg font-medium transition-all ${
-                i < answer.length && answer[i].text === correctOrder[i]
-                  ? 'bg-green-600/20 text-green-400 border border-green-500/30'
-                  : 'bg-white/5 text-white border border-white/10'
-              }`}
-            >
-              {word.text}
-            </motion.button>
-          ))
-        )}
-      </div>
-
-      {/* Word bank */}
-      <div className="flex flex-wrap gap-3 justify-center mb-6" dir="rtl">
-        {words.filter(w => !w.placed).map((word) => (
-          <motion.button
-            key={word.id}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleWordClick(word)}
-            className="px-4 py-2 rounded-lg bg-white/5 text-white border border-white/10 hover:border-green-500/50 text-lg font-medium transition-all"
-          >
-            {word.text}
-          </motion.button>
-        ))}
-      </div>
-
-      {/* Status */}
-      {isComplete && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-600/20 text-green-400 rounded-full text-sm font-medium">
-            ✓ Perfect! بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-          </div>
-        </motion.div>
-      )}
-
-      {answer.length > 0 && !isComplete && (
-        <div className="text-center">
-          <button onClick={reset} className="text-sm text-gray-500 hover:text-white transition-colors">
-            Reset
-          </button>
-        </div>
-      )}
     </div>
   );
 }

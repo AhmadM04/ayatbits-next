@@ -2,6 +2,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { connectDB, Juz, UserProgress, User, Puzzle } from '@/lib/db';
 import DashboardContent from './DashboardContent';
+import { getTrialDaysRemaining } from '@/lib/subscription';
 
 export default async function DashboardPage() {
   const user = await currentUser();
@@ -12,7 +13,7 @@ export default async function DashboardPage() {
 
   await connectDB();
 
-  // Find or create user
+  // Find or create user (layout handles subscription check)
   let dbUser = await User.findOne({ clerkId: user.id });
   if (!dbUser) {
     dbUser = await User.create({
@@ -22,6 +23,7 @@ export default async function DashboardPage() {
       lastName: user.lastName,
       name: user.fullName,
       imageUrl: user.imageUrl,
+      subscriptionStatus: 'inactive',
     });
   }
 
@@ -65,12 +67,17 @@ export default async function DashboardPage() {
     };
   });
 
+  const trialDaysLeft = getTrialDaysRemaining(dbUser.trialEndsAt);
+
   return (
     <DashboardContent
       userFirstName={user.firstName}
       currentStreak={dbUser.currentStreak || 0}
       completedPuzzles={userProgress.length}
       juzsExplored={juzsExplored}
+      selectedTranslation={dbUser.selectedTranslation || 'en.sahih'}
+      trialDaysLeft={trialDaysLeft}
+      subscriptionStatus={dbUser.subscriptionStatus}
       juzs={serializedJuzs}
     />
   );

@@ -49,11 +49,11 @@ export default async function JuzPage({
 
   // Get all puzzles in this juz to find unique surahs
   const puzzles = await Puzzle.find({ juzId: juz._id }).select('surahId').lean() as any;
-  const uniqueSurahIds = [...new Set(puzzles.map((p: any) => p.surahId?.toString()).filter(Boolean))];
+  const uniqueSurahIds: string[] = [...new Set(puzzles.map((p: any) => p.surahId?.toString()).filter(Boolean))] as string[];
   
   // Get surahs that appear in this juz
   const surahs = await Surah.find({
-    _id: { $in: uniqueSurahIds.map((id: string) => new mongoose.Types.ObjectId(id)) }
+    _id: { $in: uniqueSurahIds.map((id) => new mongoose.Types.ObjectId(id)) }
   }).sort({ number: 1 }).lean() as any;
 
   // Get puzzle counts and progress for each surah

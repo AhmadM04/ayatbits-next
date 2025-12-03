@@ -2,6 +2,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { connectDB, User, UserProgress, Puzzle } from '@/lib/db';
 import ProfileContent from './ProfileContent';
+import { getTrialDaysRemaining } from '@/lib/subscription';
 
 export default async function ProfilePage() {
   const user = await currentUser();
@@ -73,6 +74,13 @@ export default async function ProfilePage() {
   const userEmail = user.emailAddresses[0]?.emailAddress || '';
   const userInitial = user.firstName?.[0] || userEmail[0]?.toUpperCase() || 'U';
   const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
+  
+  // Subscription info
+  const subscriptionStatus = dbUser.subscriptionStatus || 'inactive';
+  const subscriptionPlan = dbUser.subscriptionPlan || undefined;
+  const trialDaysLeft = getTrialDaysRemaining(dbUser.trialEndsAt);
+  const hasBypass = dbUser.hasBypass || false;
+  const hasStripeCustomer = !!dbUser.stripeCustomerId;
 
   return (
     <ProfileContent
@@ -87,6 +95,11 @@ export default async function ProfilePage() {
       uniqueJuzs={uniqueJuzs}
       uniqueSurahs={uniqueSurahs}
       selectedTranslation={selectedTranslation}
+      subscriptionStatus={subscriptionStatus}
+      subscriptionPlan={subscriptionPlan}
+      trialDaysLeft={trialDaysLeft}
+      hasBypass={hasBypass}
+      hasStripeCustomer={hasStripeCustomer}
     />
   );
 }

@@ -1,9 +1,16 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export enum SubscriptionStatus {
-  FREE = 'FREE',
-  PRO = 'PRO',
-  ENTERPRISE = 'ENTERPRISE',
+export enum SubscriptionPlan {
+  MONTHLY = 'monthly',
+  YEARLY = 'yearly',
+}
+
+export enum SubscriptionStatusEnum {
+  INACTIVE = 'inactive',
+  TRIALING = 'trialing',
+  ACTIVE = 'active',
+  PAST_DUE = 'past_due',
+  CANCELED = 'canceled',
 }
 
 export interface IUser extends Document {
@@ -15,8 +22,17 @@ export interface IUser extends Document {
   username?: string;
   imageUrl?: string;
   selectedTranslation?: string;
-  subscriptionStatus: SubscriptionStatus;
+  // Subscription fields
+  subscriptionStatus: string;
+  subscriptionPlan?: string;
   stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  trialEndsAt?: Date;
+  currentPeriodEnd?: Date;
+  // Admin bypass - users with lifetime access
+  hasBypass?: boolean;
+  bypassReason?: string;
+  // Activity & Progress
   currentStreak: number;
   longestStreak: number;
   lastActivityDate?: Date;
@@ -38,12 +54,25 @@ const UserSchema = new Schema<IUser>(
     username: String,
     imageUrl: String,
     selectedTranslation: { type: String, default: 'en.sahih' },
+    // Subscription fields
     subscriptionStatus: {
       type: String,
-      enum: Object.values(SubscriptionStatus),
-      default: SubscriptionStatus.FREE,
+      enum: Object.values(SubscriptionStatusEnum),
+      default: SubscriptionStatusEnum.INACTIVE,
+    },
+    subscriptionPlan: {
+      type: String,
+      enum: [...Object.values(SubscriptionPlan), null],
+      default: null,
     },
     stripeCustomerId: String,
+    stripeSubscriptionId: String,
+    trialEndsAt: Date,
+    currentPeriodEnd: Date,
+    // Admin bypass - users with lifetime access
+    hasBypass: { type: Boolean, default: false },
+    bypassReason: String,
+    // Activity & Progress
     currentStreak: { type: Number, default: 0 },
     longestStreak: { type: Number, default: 0 },
     lastActivityDate: Date,
@@ -58,4 +87,3 @@ const UserSchema = new Schema<IUser>(
 );
 
 export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
-

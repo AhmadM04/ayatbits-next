@@ -15,7 +15,60 @@
     "loading": "Loading...",
     "error": "Error",
     "goBack": "Go Back",
-    "notFound": "Not Found"
+    "notFound": "Not Found",
+    "home": "Home",
+    "liked": "Liked",
+    "resume": "Resume",
+    "awards": "Awards",
+    "startLearning": "Start Learning",
+    "settings": "Settings",
+    "signOut": "Sign Out",
+    "cancel": "Cancel"
+  },
+  "search": {
+    "placeholder": "Search surah:ayah (e.g. 2:255)",
+    "surahPlaceholder": "Surah number or name",
+    "goToVerse": "Go to verse",
+    "startLearning": "Start Learning",
+    "invalidFormat": "Invalid format. Try 2:255 or just 2",
+    "surahNotFound": "Surah not found",
+    "examples": "Examples",
+    "goToDashboard": "Go back to Dashboard",
+    "notAvailable": "This verse is not available yet"
+  },
+  "settings": {
+    "title": "Settings",
+    "subscription": "Subscription",
+    "lifetimeAccess": "Lifetime Access",
+    "proMonthly": "Pro Monthly",
+    "proYearly": "Pro Yearly",
+    "trial": "Trial ({days} days left)",
+    "canceled": "Canceled",
+    "inactive": "Inactive",
+    "manageBilling": "Manage Billing",
+    "manageBillingDesc": "Update payment, cancel, view invoices",
+    "viewPlans": "View Plans",
+    "viewPlansDesc": "Upgrade or change your plan",
+    "accountSettings": "Account Settings",
+    "accountSettingsDesc": "Email, password, security",
+    "privacySecurity": "Privacy & Security",
+    "privacySecurityDesc": "Two-factor authentication, sessions",
+    "helpSupport": "Help & Support",
+    "helpSupportDesc": "Get help or send feedback",
+    "faq": "FAQ",
+    "faqDesc": "Frequently asked questions",
+    "termsOfService": "Terms of Service",
+    "termsOfServiceDesc": "Legal terms and privacy policy",
+    "clearData": "Clear Learning Data",
+    "clearDataDesc": "Reset your progress and start fresh",
+    "clearDataTitle": "Clear All Data?",
+    "clearDataMessage": "This will permanently delete all your learning progress, streaks, and liked verses.",
+    "clearDataWarning": "This action cannot be undone. Your subscription will remain active.",
+    "clearDataConfirm": "Clear Data",
+    "clearDataClerkInfo": "To delete your entire account:",
+    "manageViaClerk": "Manage account settings →",
+    "signOutTitle": "Sign Out?",
+    "signOutMessage": "Are you sure you want to sign out? You'll need to sign in again to continue learning."
   },
   "verse": {
     "ayahNumber": "Ayah {number}",
@@ -25,7 +78,10 @@
     "ayahFound": "Ayah found!",
     "ayahNotFound": "Ayah not found in this section.",
     "goToAyah": "Go to Ayah",
-    "englishTranslation": "Translation"
+    "englishTranslation": "Translation",
+    "verseOfTheDay": "Verse of the Day",
+    "playRecitation": "Play recitation",
+    "openAyah": "Open ayah"
   },
   "dashboard": {
     "welcome": "Welcome back, {name}!",
@@ -37,7 +93,9 @@
     "days": "days",
     "selectJuz": "Select a Juz to begin",
     "noJuzsFound": "No juzs found. Please run the seed script: npm run db:seed",
-    "surahsAvailable": "available"
+    "surahsAvailable": "available",
+    "progress": "Progress",
+    "viewTrophies": "View Trophies"
   },
   "profile": {
     "title": "Profile",
@@ -70,7 +128,75 @@
     "mistakeLimitReached": "You've reached the mistake limit",
     "reviewAyahMessage": "You've made too many mistakes. It's time to review the ayah again before attempting the puzzle. Take your time to read and understand the verse, then come back to try again.",
     "goBackToAyahView": "Go Back to Ayah View",
-    "goBack": "Go Back"
+    "goBack": "Go Back",
+    "dragOrClickWords": "Drag or click words from below to build the ayah",
+    "allWordsUsed": "All words used. Click words above to remove them."
+  },
+  "liked": {
+    "title": "Liked Ayahs",
+    "ayahsSaved": "{count} ayahs saved",
+    "noLikedYet": "No liked ayahs yet",
+    "tapHeartToSave": "Tap the heart icon on any ayah to save it here",
+    "ayahInfo": "Ayah {ayahNumber} • Juz {juzNumber}"
+  },
+  "achievements": {
+    "title": "Achievements",
+    "unlockedOf": "{unlocked} of {total} unlocked",
+    "puzzles": "Puzzles",
+    "bestStreak": "Best Streak",
+    "trophies": "Trophies",
+    "unlocked": "Unlocked ({count})",
+    "inProgress": "In Progress ({count})"
+  },
+  "trophies": {
+    "first_puzzle": {
+      "name": "First Step",
+      "description": "Complete your first puzzle"
+    },
+    "puzzle_10": {
+      "name": "Getting Started",
+      "description": "Complete 10 puzzles"
+    },
+    "puzzle_50": {
+      "name": "Dedicated Learner",
+      "description": "Complete 50 puzzles"
+    },
+    "puzzle_100": {
+      "name": "Century",
+      "description": "Complete 100 puzzles"
+    },
+    "puzzle_500": {
+      "name": "Scholar",
+      "description": "Complete 500 puzzles"
+    },
+    "streak_3": {
+      "name": "Consistent",
+      "description": "Achieve a 3-day streak"
+    },
+    "streak_7": {
+      "name": "Week Warrior",
+      "description": "Achieve a 7-day streak"
+    },
+    "streak_30": {
+      "name": "Monthly Master",
+      "description": "Achieve a 30-day streak"
+    },
+    "juz_1": {
+      "name": "First Juz",
+      "description": "Complete all puzzles in one Juz"
+    },
+    "juz_5": {
+      "name": "Five Juz",
+      "description": "Complete 5 Juz"
+    },
+    "surah_fatiha": {
+      "name": "The Opening",
+      "description": "Complete Surah Al-Fatiha"
+    },
+    "liked_10": {
+      "name": "Collector",
+      "description": "Like 10 ayahs"
+    }
   },
   "auth": {
     "signIn": "Sign In",
@@ -98,5 +224,65 @@
     "freeTrial": "7-Day Free Trial",
     "trialInfo": "Try free for 7 days",
     "expertSupport": "Expert Support"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Got Questions?",
+    "description": "Find answers to common questions about AyatBits below.",
+    "stillHaveQuestions": "Still have questions?",
+    "contactSupport": "Contact Support",
+    "q1": "What is AyatBits?",
+    "a1": "AyatBits is an interactive Quran learning app that uses word puzzles to help you memorize and understand the Quran. By arranging words in the correct order, you actively engage with each ayah, making memorization more effective and enjoyable.",
+    "q2": "How does the puzzle system work?",
+    "a2": "Each puzzle presents you with the words of an ayah in a shuffled order. Your task is to drag or tap the words to arrange them in the correct sequence. This active engagement helps reinforce your memory of the verse structure and word order.",
+    "q3": "What happens if I make mistakes?",
+    "a3": "You have 3 attempts per puzzle. If you exceed the mistake limit, you'll be prompted to review the ayah before trying again. This ensures you understand the verse before moving on.",
+    "q4": "How do streaks work?",
+    "a4": "Your streak increases by 1 for each consecutive day you complete at least one puzzle. If you miss a day, your streak resets to zero. Streaks help motivate consistent daily practice.",
+    "q5": "What translations are available?",
+    "a5": "We offer 18+ translations including English (Sahih International, Pickthall, Yusuf Ali), Arabic Tafsir, French, German, Spanish, Turkish, Urdu, Indonesian, Malay, Bengali, Hindi, Russian, Chinese, Japanese, and Dutch.",
+    "q6": "Can I use AyatBits offline?",
+    "a6": "Currently, AyatBits requires an internet connection to load puzzles and save your progress. We're working on offline functionality for future updates.",
+    "q7": "How is my progress saved?",
+    "a7": "Your progress is automatically saved to your account. Every puzzle you complete, ayah you like, and streak you build is stored securely. You can access your progress from any device by signing in.",
+    "q8": "What is the 7-day free trial?",
+    "a8": "New users get full access to all features for 7 days at no cost. After the trial, you can choose a subscription plan to continue learning.",
+    "q9": "Can I cancel my subscription anytime?",
+    "a9": "Yes, you can cancel your subscription at any time. Your access will continue until the end of your current billing period.",
+    "q10": "How do I contact support?",
+    "a10": "You can reach our support team at support@ayatbits.com. We typically respond within 24-48 hours."
+  },
+  "tos": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: December 2025",
+    "section1Title": "1. Acceptance of Terms",
+    "section1Content": "By accessing and using AyatBits (\"the Service\"), you accept and agree to be bound by the terms and conditions of this agreement. If you do not agree to these terms, please do not use the Service.",
+    "section2Title": "2. Description of Service",
+    "section2Content": "AyatBits is an educational platform designed to help users learn, memorize, and understand the Quran through interactive word puzzles. The Service includes access to Quranic text, translations, audio recitations, and gamified learning features.",
+    "section3Title": "3. User Accounts",
+    "section3Content": "You are responsible for maintaining the confidentiality of your account credentials. You agree to accept responsibility for all activities that occur under your account. You must notify us immediately of any unauthorized use of your account.",
+    "section4Title": "4. Subscription and Payments",
+    "section4Content": "Some features of AyatBits require a paid subscription. By subscribing, you agree to pay the applicable fees. Subscriptions automatically renew unless cancelled before the renewal date. You will be charged automatically on each billing cycle unless you cancel before the renewal date. Refunds are provided in accordance with our refund policy.",
+    "section5Title": "5. Free Trial",
+    "section5Content": "New users are eligible for a 7-day free trial. The trial provides full access to all premium features. To start your trial, you must provide valid payment information. IMPORTANT: If you do not cancel your subscription before the trial period ends, you will automatically be charged for the subscription plan you selected. You can cancel anytime during the trial period to avoid being charged.",
+    "section6Title": "6. Acceptable Use",
+    "section6Content": "You agree to use the Service only for lawful purposes and in accordance with these Terms. You agree not to:",
+    "section6List1": "Use the Service in any way that violates applicable laws",
+    "section6List2": "Attempt to gain unauthorized access to our systems",
+    "section6List3": "Share your account credentials with others",
+    "section6List4": "Reproduce, distribute, or create derivative works from our content",
+    "section6List5": "Use automated systems to access the Service",
+    "section7Title": "7. Intellectual Property",
+    "section7Content": "The Service and its original content, features, and functionality are owned by AyatBits and are protected by international copyright, trademark, and other intellectual property laws. The Quranic text is in the public domain.",
+    "section8Title": "8. Privacy Policy",
+    "section8Content": "Your privacy is important to us. We collect and use personal information as described in our Privacy Policy. By using the Service, you consent to our collection and use of your information as described therein.",
+    "section9Title": "9. Disclaimer of Warranties",
+    "section9Content": "The Service is provided \"as is\" without warranties of any kind. We do not guarantee that the Service will be uninterrupted, secure, or error-free. We make no warranties regarding the accuracy of any Quranic content or translations.",
+    "section10Title": "10. Limitation of Liability",
+    "section10Content": "To the maximum extent permitted by law, AyatBits shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of the Service.",
+    "section11Title": "11. Changes to Terms",
+    "section11Content": "We reserve the right to modify these terms at any time. We will notify users of significant changes via email or in-app notification. Continued use of the Service after changes constitutes acceptance of the new terms.",
+    "section12Title": "12. Contact Us",
+    "section12Content": "If you have any questions about these Terms, please contact us at"
   }
 }

@@ -27,11 +27,20 @@ async function connectDB(): Promise<typeof mongoose> {
   }
 
   if (!cached.promise) {
-    const opts = {
+    const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
+      // Connection pool settings for better performance
+      maxPoolSize: 10,
+      minPoolSize: 5,
+      // Timeout settings
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      // Keep alive
+      family: 4, // Use IPv4, skip trying IPv6
     };
 
     cached.promise = mongoose.connect(MONGODB_URL, opts).then((mongoose) => {
+      console.log('MongoDB connected successfully');
       return mongoose;
     });
   }
@@ -47,4 +56,3 @@ async function connectDB(): Promise<typeof mongoose> {
 }
 
 export default connectDB;
-

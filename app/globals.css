@@ -154,3 +154,25 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--neutral-dark-gray);
 }
+
+/* Arabic Font */
+.font-arabic {
+  font-family: var(--font-amiri), 'Amiri', 'Traditional Arabic', serif;
+}
+
+/* Clerk Social Button Overrides */
+.cl-socialButtonsBlockButton {
+  color: white !important;
+}
+
+.cl-socialButtonsBlockButtonText {
+  color: white !important;
+}
+
+.cl-socialButtonsBlockButton span {
+  color: white !important;
+}
+
+.cl-socialButtonsProviderIcon {
+  filter: brightness(0) invert(1);
+}

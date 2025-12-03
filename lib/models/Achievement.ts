@@ -25,7 +25,7 @@ UserAchievementSchema.index({ userId: 1, achievementId: 1 }, { unique: true });
 
 export default mongoose.models.UserAchievement || mongoose.model<IUserAchievement>('UserAchievement', UserAchievementSchema);
 
-// Achievement definitions
+// Achievement definitions - English only
 export const ACHIEVEMENTS = [
   {
     id: 'first_puzzle',
@@ -125,4 +125,3 @@ export const ACHIEVEMENTS = [
     type: 'liked_ayahs',
   },
 ];
-

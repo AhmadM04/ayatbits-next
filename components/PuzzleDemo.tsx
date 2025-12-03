@@ -336,7 +336,7 @@ export default function PuzzleDemo() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-4 p-4 bg-green-50 dark:bg-green-900/30 border-2 border-green-200 dark:border-green-700 rounded-lg text-center"
         >
-          <p className="text-green-800 dark:text-green-200 font-semibold">✓ Perfect! You've completed the puzzle!</p>
+          <p className="text-green-800 dark:text-green-200 font-semibold">✓ Perfect!</p>
         </motion.div>
       )}
 

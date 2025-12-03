@@ -5,9 +5,11 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
+    "build:analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "eslint",
-    "db:seed": "tsx prisma/seed.ts"
+    "lint:fix": "eslint --fix",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.35.5",
@@ -31,6 +33,7 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.0.7",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20.19.25",
     "@types/react": "^19",

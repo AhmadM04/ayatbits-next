@@ -1,5 +1,5 @@
 import { currentUser } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = process.env.STRIPE_SECRET_KEY
@@ -8,7 +8,22 @@ const stripe = process.env.STRIPE_SECRET_KEY
     })
   : null;
 
-export async function POST() {
+const PLANS = {
+  monthly: {
+    name: 'AyatBits Pro Monthly',
+    description: 'Unlimited access to all puzzles and features',
+    amount: 599, // $5.99
+    interval: 'month' as const,
+  },
+  yearly: {
+    name: 'AyatBits Pro Yearly',
+    description: 'Unlimited access with 33% savings',
+    amount: 4799, // $47.99
+    interval: 'year' as const,
+  },
+};
+
+export async function POST(request: NextRequest) {
   try {
     if (!stripe) {
       return NextResponse.json(
@@ -23,7 +38,20 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Create Stripe Checkout Session
+    const body = await request.json();
+    const planId = body.plan as keyof typeof PLANS;
+    
+    if (!planId || !PLANS[planId]) {
+      return NextResponse.json(
+        { error: 'Invalid plan selected' },
+        { status: 400 }
+      );
+    }
+
+    const plan = PLANS[planId];
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+    // Create Stripe Checkout Session with 7-day trial
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -31,24 +59,33 @@ export async function POST() {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'AyatBits Pro',
-              description: 'Unlimited access to all puzzles and features',
+              name: plan.name,
+              description: plan.description,
             },
-            unit_amount: 999, // $9.99
+            unit_amount: plan.amount,
             recurring: {
-              interval: 'month',
+              interval: plan.interval,
             },
           },
           quantity: 1,
         },
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?canceled=true`,
+      subscription_data: {
+        trial_period_days: 7,
+        metadata: {
+          userId: user.id,
+          plan: planId,
+        },
+      },
+      success_url: `${appUrl}/dashboard?success=true&plan=${planId}`,
+      cancel_url: `${appUrl}/pricing?canceled=true`,
       customer_email: user.emailAddresses[0]?.emailAddress,
       metadata: {
         userId: user.id,
+        plan: planId,
       },
+      allow_promotion_codes: true,
     });
 
     return NextResponse.json({ url: session.url });
@@ -60,4 +97,3 @@ export async function POST() {
     );
   }
 }
-
