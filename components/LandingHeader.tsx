@@ -54,22 +54,25 @@ export default function LandingHeader() {
           </nav>
 
           {/* Desktop Auth */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
             {!mounted || !isLoaded ? (
               <div className="w-20 h-8" /> // Loading placeholder
             ) : isSignedIn ? (
               <div className="flex items-center gap-3">
                 <Link 
                   href="/profile" 
-                  className="px-3 py-2 bg-green-500/10 hover:bg-green-500/20 rounded-lg transition-all flex items-center gap-2 group border-2 border-green-500/30 hover:border-green-500/60"
+                  className="px-3 py-2 bg-green-500/10 hover:bg-green-500/20 rounded-lg transition-all flex items-center gap-2 group border border-green-500/30 hover:border-green-500/50"
                   title="View Profile"
                 >
                   <User className="w-5 h-5 text-green-400 group-hover:text-green-300 transition-colors" />
-                  <span className="text-sm text-green-400 group-hover:text-green-300 transition-colors font-semibold">
+                  <span className="text-sm text-green-400 group-hover:text-green-300 transition-colors font-medium">
                     Profile
                   </span>
                 </Link>
-                <Link href="/api/check-access" className="text-white text-sm font-medium hover:text-green-400 transition-colors">
+                <Link 
+                  href="/api/check-access" 
+                  className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-sm font-semibold rounded-lg transition-all shadow-lg shadow-green-500/20 hover:shadow-green-500/30"
+                >
                   Continue Learning
                 </Link>
                 <UserButton 
@@ -89,7 +92,7 @@ export default function LandingHeader() {
                   </button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <button className="text-white text-sm font-medium hover:text-green-400 transition-colors">
+                  <button className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-sm font-semibold rounded-lg transition-all shadow-lg shadow-green-500/20">
                     Sign Up
                   </button>
                 </SignUpButton>
