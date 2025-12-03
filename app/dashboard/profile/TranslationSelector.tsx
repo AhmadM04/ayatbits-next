@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Globe } from 'lucide-react';
+import { Check, ChevronDown, Globe } from 'lucide-react';
 
 interface Translation {
   code: string;
@@ -47,16 +47,18 @@ export default function TranslationSelector({
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full justify-between"
+        className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors w-full justify-between"
       >
-        <div className="flex items-center gap-2">
-          <Globe className="w-4 h-4 text-gray-600" />
-          <span className="text-sm font-medium text-gray-900">
-            {currentTranslationData.nativeName}
-          </span>
-          <span className="text-xs text-gray-500">({currentTranslationData.name})</span>
+        <div className="flex items-center gap-3">
+          <Globe className="w-4 h-4 text-gray-400" />
+          <div className="text-left">
+            <div className="text-sm font-medium text-white">
+              {currentTranslationData.nativeName}
+            </div>
+            <div className="text-xs text-gray-500">{currentTranslationData.name}</div>
+          </div>
         </div>
-        <span className="text-gray-400">▼</span>
+        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
@@ -65,7 +67,7 @@ export default function TranslationSelector({
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl z-20 max-h-72 overflow-y-auto">
             {translations.map((translation) => (
               <button
                 key={translation.code}
@@ -73,14 +75,16 @@ export default function TranslationSelector({
                   onSelect(translation.code);
                   setIsOpen(false);
                 }}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between border-b border-gray-100 last:border-b-0"
+                className={`w-full px-4 py-3 text-left hover:bg-white/5 transition-colors flex items-center justify-between border-b border-white/5 last:border-b-0 ${
+                  currentTranslation === translation.code ? 'bg-green-500/10' : ''
+                }`}
               >
                 <div>
-                  <div className="font-medium text-gray-900">{translation.nativeName}</div>
+                  <div className="font-medium text-white text-sm">{translation.nativeName}</div>
                   <div className="text-xs text-gray-500">{translation.name}</div>
                 </div>
                 {currentTranslation === translation.code && (
-                  <Check className="w-5 h-5 text-green-600" />
+                  <Check className="w-4 h-4 text-green-500" />
                 )}
               </button>
             ))}
@@ -90,4 +94,3 @@ export default function TranslationSelector({
     </div>
   );
 }
-

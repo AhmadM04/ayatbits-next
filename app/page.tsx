@@ -148,19 +148,21 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="mt-16 flex flex-wrap justify-center gap-8 sm:gap-16 text-center"
+              className="mt-16 flex flex-wrap justify-center gap-6 sm:gap-12"
             >
-              <div>
+              <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-white">6,236</div>
-                <div className="text-sm text-gray-500">Verses</div>
+                <div className="text-xs text-gray-500">Verses</div>
               </div>
-              <div>
+              <div className="w-px h-10 bg-white/10 hidden sm:block" />
+              <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-white">18+</div>
-                <div className="text-sm text-gray-500">Languages</div>
+                <div className="text-xs text-gray-500">Languages</div>
               </div>
-              <div>
+              <div className="w-px h-10 bg-white/10 hidden sm:block" />
+              <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-white">30</div>
-                <div className="text-sm text-gray-500">Juz</div>
+                <div className="text-xs text-gray-500">Juz</div>
               </div>
             </motion.div>
           </motion.div>
@@ -201,10 +203,10 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
-                { icon: BookOpen, title: "Interactive Puzzles", desc: "Drag and drop to build verses from memory", color: "green" },
-                { icon: Target, title: "Track Progress", desc: "See your journey across all 30 Juz", color: "blue" },
-                { icon: Zap, title: "Daily Streaks", desc: "Stay consistent, grow your streak", color: "purple" },
-                { icon: Award, title: "18+ Languages", desc: "Learn in your preferred translation", color: "orange" },
+                { icon: BookOpen, title: "Interactive Puzzles", desc: "Drag and drop to build verses from memory", iconColor: "text-green-500", bgColor: "bg-green-500/10" },
+                { icon: Target, title: "Track Progress", desc: "See your journey across all 30 Juz", iconColor: "text-blue-500", bgColor: "bg-blue-500/10" },
+                { icon: Zap, title: "Daily Streaks", desc: "Stay consistent, grow your streak", iconColor: "text-purple-500", bgColor: "bg-purple-500/10" },
+                { icon: Award, title: "18+ Languages", desc: "Learn in your preferred translation", iconColor: "text-orange-500", bgColor: "bg-orange-500/10" },
               ].map((feature, i) => (
                 <motion.div
                   key={feature.title}
@@ -214,8 +216,8 @@ export default function Home() {
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                   className="group p-6 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-green-500/30 transition-all"
                 >
-                  <div className={`w-12 h-12 rounded-xl bg-${feature.color}-500/10 flex items-center justify-center mb-4`}>
-                    <feature.icon className={`w-6 h-6 text-${feature.color}-500`} />
+                  <div className={`w-10 h-10 rounded-xl ${feature.bgColor} flex items-center justify-center mb-4`}>
+                    <feature.icon className={`w-5 h-5 ${feature.iconColor}`} />
                   </div>
                   <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
                   <p className="text-gray-500 text-sm">{feature.desc}</p>

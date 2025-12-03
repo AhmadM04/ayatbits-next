@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import TranslationSelector from './TranslationSelector';
 import { useRouter } from 'next/navigation';
+import { useI18n } from '@/lib/i18n';
 
 interface TranslationSelectorClientProps {
   initialSelectedTranslation: string;
@@ -13,6 +14,7 @@ export default function TranslationSelectorClient({
 }: TranslationSelectorClientProps) {
   const [selectedTranslation, setSelectedTranslation] = useState(initialSelectedTranslation);
   const router = useRouter();
+  const { t } = useI18n();
 
   const handleSelect = async (translationCode: string) => {
     try {
@@ -26,7 +28,6 @@ export default function TranslationSelectorClient({
 
       if (response.ok) {
         setSelectedTranslation(translationCode);
-        // Refresh the page to show updated translation
         router.refresh();
       } else {
         console.error('Failed to update translation');
@@ -37,8 +38,9 @@ export default function TranslationSelectorClient({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-3">Select Translation</h3>
+    <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5">
+      <h3 className="font-semibold mb-1">{t('profile.selectTranslation')}</h3>
+      <p className="text-xs text-gray-500 mb-4">{t('profile.translationDescription')}</p>
       <TranslationSelector
         currentTranslation={selectedTranslation}
         onSelect={handleSelect}
@@ -46,4 +48,3 @@ export default function TranslationSelectorClient({
     </div>
   );
 }
-
