@@ -1,59 +1,93 @@
-import { SignUp } from '@clerk/nextjs';
+'use client';
+
+import { SignUp } from "@clerk/nextjs";
+import Link from "next/link";
+import { useTheme } from "@/lib/theme-context";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function SignUpPage() {
-  return (
-    <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-10 w-20 h-20">
-          <svg viewBox="0 0 24 24" fill="none" className="w-full h-full text-green-500">
-            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-        <div className="absolute top-40 right-20 w-16 h-16 rotate-45">
-          <svg viewBox="0 0 24 24" fill="none" className="w-full h-full text-green-500">
-            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-        <div className="absolute bottom-32 left-1/4 w-12 h-12 -rotate-12">
-          <svg viewBox="0 0 24 24" fill="none" className="w-full h-full text-green-500">
-            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-      </div>
+  const { theme } = useTheme();
 
-      <div className="relative z-10 w-full max-w-md px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
-            Start Your Journey
+  return (
+    <div className="min-h-screen bg-[var(--background)] transition-colors duration-300">
+      {/* Header */}
+      <header className="w-full border-b border-[var(--border-color)] bg-[var(--bg-card)]/80 backdrop-blur-sm sticky top-0 z-50 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/" className="text-2xl font-bold text-green-500">
+              AyatBits
+            </Link>
+            <div className="flex items-center gap-4">
+              <ThemeToggle />
+              <Link href="/sign-in" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                Sign In
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] py-12 px-4">
+        {/* Welcome Text */}
+        <div className="text-center mb-8 max-w-md">
+          <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-3">
+            Create Account
           </h1>
-          <p className="text-gray-400">
-            Create an account to begin mastering the Quran
+          <p className="text-[var(--text-secondary)]">
+            Join thousands of learners mastering the Quran
           </p>
         </div>
-        <div className="bg-gray-900/80 backdrop-blur-xl rounded-3xl p-8 border border-gray-800 shadow-2xl">
-          <SignUp 
+
+        {/* Clerk SignUp Component */}
+        <div className="w-full max-w-md">
+          <SignUp
             appearance={{
+              baseTheme: theme === 'dark' ? undefined : undefined,
               elements: {
-                rootBox: "mx-auto",
-                card: "bg-transparent shadow-none",
-                headerTitle: "text-white",
-                headerSubtitle: "text-gray-400",
-                socialButtonsBlockButton: "bg-gray-800 hover:bg-gray-700 text-white border-gray-700",
+                rootBox: "w-full",
+                card: "bg-[var(--bg-card)] border border-[var(--border-color)] shadow-xl rounded-2xl",
+                headerTitle: "text-[var(--text-primary)]",
+                headerSubtitle: "text-[var(--text-secondary)]",
+                socialButtonsBlockButton: "bg-[var(--bg-tertiary)] hover:bg-[var(--bg-secondary)] text-[var(--text-primary)] border-[var(--border-color)]",
+                socialButtonsBlockButtonText: "text-[var(--text-primary)]",
+                dividerLine: "bg-[var(--border-color)]",
+                dividerText: "text-[var(--text-muted)]",
                 formButtonPrimary: "bg-green-600 hover:bg-green-700 text-white",
-                formFieldInput: "bg-gray-800 border-gray-700 text-white",
-                formFieldLabel: "text-gray-300",
+                formFieldLabel: "text-[var(--text-secondary)]",
+                formFieldInput: "bg-[var(--bg-tertiary)] border-[var(--border-color)] text-[var(--text-primary)] focus:border-green-500",
                 footerActionLink: "text-green-500 hover:text-green-400",
-                identityPreviewText: "text-white",
+                identityPreviewText: "text-[var(--text-primary)]",
                 identityPreviewEditButton: "text-green-500",
                 formResendCodeLink: "text-green-500",
-                otpCodeFieldInput: "bg-gray-800 border-gray-700 text-white",
+                otpCodeFieldInput: "bg-[var(--bg-tertiary)] border-[var(--border-color)] text-[var(--text-primary)]",
+                footer: "hidden",
               },
+              variables: {
+                colorPrimary: "#16a34a",
+                colorBackground: theme === 'dark' ? "#1a1a1a" : "#ffffff",
+                colorText: theme === 'dark' ? "#ffffff" : "#111827",
+                colorTextSecondary: theme === 'dark' ? "#a1a1aa" : "#4b5563",
+                colorInputBackground: theme === 'dark' ? "#27272a" : "#f3f4f6",
+                colorInputText: theme === 'dark' ? "#ffffff" : "#111827",
+                borderRadius: "0.75rem",
+              }
             }}
+            routing="path"
+            path="/sign-up"
+            signInUrl="/sign-in"
           />
         </div>
-      </div>
+
+        {/* Custom Footer */}
+        <div className="mt-6 text-center">
+          <p className="text-[var(--text-muted)]">
+            Already have an account?{" "}
+            <Link href="/sign-in" className="text-green-500 hover:text-green-400 font-medium">
+              Sign in
+            </Link>
+          </p>
+        </div>
+      </main>
     </div>
   );
 }
-

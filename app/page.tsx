@@ -1,276 +1,403 @@
+'use client';
+
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Target, Zap, Award, ArrowRight, Check } from "lucide-react";
-import PuzzleDemo from "@/components/PuzzleDemo";
-import Testimonials from "@/components/Testimonials";
+import { BookOpen, Target, Zap, Award, ArrowRight, Play } from "lucide-react";
 import LandingHeader from "@/components/LandingHeader";
+import { useEffect, useState, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 export default function Home() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll();
+  
+  // Parallax transforms
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -200]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -400]);
+  const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+
   return (
-    <div className="min-h-screen bg-[var(--background)] transition-colors duration-300">
+    <div ref={containerRef} className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
       <LandingHeader />
 
       <main>
         {/* Hero Section */}
-        <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 overflow-hidden">
-          {/* Background decorative elements */}
-          <div className="absolute inset-0 opacity-10 dark:opacity-10">
-            {/* Arrows pattern */}
-            <div className="absolute top-20 left-10 w-20 h-20">
-              <svg viewBox="0 0 24 24" fill="none" className="w-full h-full text-green-500">
-                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <div className="absolute top-40 right-20 w-16 h-16 rotate-45">
-              <svg viewBox="0 0 24 24" fill="none" className="w-full h-full text-green-500">
-                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <div className="absolute bottom-32 left-1/4 w-12 h-12 -rotate-12">
-              <svg viewBox="0 0 24 24" fill="none" className="w-full h-full text-green-500">
-                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <div className="absolute top-1/2 right-10 w-24 h-24 -rotate-45 opacity-50">
-              <svg viewBox="0 0 24 24" fill="none" className="w-full h-full text-green-500">
-                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <div className="absolute bottom-20 right-1/3 w-14 h-14 rotate-90">
-              <svg viewBox="0 0 24 24" fill="none" className="w-full h-full text-green-500">
-                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            {/* Geometric shapes */}
-            <div className="absolute top-10 right-1/4 w-8 h-8 border-2 border-green-500 rotate-45"></div>
-            <div className="absolute bottom-40 left-20 w-6 h-6 bg-green-500 rounded-full"></div>
-            <div className="absolute top-1/3 left-1/3 w-4 h-4 border-2 border-green-500"></div>
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+          {/* Animated Background */}
+          <div className="absolute inset-0">
+            {/* Gradient orbs */}
+            <motion.div 
+              style={{ y: y1 }}
+              className="absolute top-1/4 -left-32 w-96 h-96 bg-green-500/20 rounded-full blur-[120px]"
+            />
+            <motion.div 
+              style={{ y: y2 }}
+              className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px]"
+            />
+            
+            {/* Grid pattern */}
+            <div 
+              className="absolute inset-0 opacity-[0.03]"
+              style={{
+                backgroundImage: `linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)`,
+                backgroundSize: '60px 60px'
+              }}
+            />
+
+            {/* Floating elements */}
+            <motion.div
+              animate={{ 
+                y: [0, -20, 0],
+                rotate: [0, 5, 0]
+              }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-1/3 left-[10%] text-4xl opacity-20"
+            >
+              📖
+            </motion.div>
+            <motion.div
+              animate={{ 
+                y: [0, 20, 0],
+                rotate: [0, -5, 0]
+              }}
+              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-1/2 right-[15%] text-3xl opacity-20"
+            >
+              ✨
+            </motion.div>
+            <motion.div
+              animate={{ 
+                y: [0, -15, 0],
+              }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute bottom-1/3 left-[20%] text-2xl opacity-20"
+            >
+              🕌
+            </motion.div>
           </div>
 
-          <div className="relative z-10 max-w-4xl mx-auto">
-            <div className="bg-[var(--bg-card)] dark:bg-[#1a1a1a] rounded-3xl p-12 md:p-16 shadow-2xl border border-[var(--border-color)] transition-colors duration-300">
-              <div className="text-center">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[var(--text-primary)] mb-6 leading-tight">
-                  Making Quran learning
-                  <br />
-                  <span className="text-green-500 italic">faster.</span>
-                </h1>
-                <p className="text-lg md:text-xl text-[var(--text-secondary)] max-w-2xl mx-auto mb-10 leading-relaxed">
-                  Interactive word puzzles to master the Quran. Learn with 18 translations and track your progress.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                  <SignedOut>
-                    <SignUpButton mode="modal">
-                      <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg font-semibold rounded-lg">
-                        Start Learning
-                      </Button>
-                    </SignUpButton>
-                    <Link href="/pricing">
-                      <Button size="lg" variant="outline" className="bg-[var(--bg-tertiary)] hover:bg-[var(--bg-secondary)] text-[var(--text-primary)] border-[var(--border-color)] px-8 py-6 text-lg font-semibold rounded-lg">
-                        View Pricing
-                      </Button>
-                    </Link>
-                  </SignedOut>
-                  <SignedIn>
-                    <Link href="/dashboard">
-                      <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg font-semibold rounded-lg">
-                        Start Learning
-                      </Button>
-                    </Link>
-                    <Link href="/pricing">
-                      <Button size="lg" variant="outline" className="bg-[var(--bg-tertiary)] hover:bg-[var(--bg-secondary)] text-[var(--text-primary)] border-[var(--border-color)] px-8 py-6 text-lg font-semibold rounded-lg">
-                        View Pricing
-                      </Button>
-                    </Link>
-                  </SignedIn>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+          {/* Content */}
+          <motion.div 
+            style={{ opacity }}
+            className="relative z-10 max-w-4xl mx-auto px-4 text-center pt-20"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <span className="inline-block px-4 py-1.5 mb-6 text-xs font-medium text-green-400 bg-green-500/10 rounded-full border border-green-500/20">
+                🚀 The modern way to learn Quran
+              </span>
+            </motion.div>
 
-        {/* Features Section */}
-        <section id="features" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-[var(--bg-secondary)] transition-colors duration-300">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-4">
-              Why Choose AyatBits?
-            </h2>
-            <p className="text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
-              A modern approach to Quranic memorization and understanding
-            </p>
-          </div>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight"
+            >
+              Master the Quran
+              <br />
+              <span className="text-green-500">one puzzle at a time</span>
+            </motion.h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Feature 1 */}
-            <div className="bg-[var(--bg-card)] rounded-xl p-8 shadow-lg border border-[var(--border-color)] hover:border-green-500 transition-all">
-              <div className="w-14 h-14 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center mb-6">
-                <BookOpen className="w-7 h-7 text-green-600" />
-              </div>
-              <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-3">Interactive Puzzles</h3>
-              <p className="text-[var(--text-secondary)] leading-relaxed">
-                Drag and drop words to reconstruct verses. Learn through hands-on practice that makes memorization engaging.
-              </p>
-            </div>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-lg sm:text-xl text-gray-400 max-w-xl mx-auto mb-10"
+            >
+              Interactive puzzles that make memorization stick. 
+              Track progress, build streaks, learn your way.
+            </motion.p>
 
-            {/* Feature 2 */}
-            <div className="bg-[var(--bg-card)] rounded-xl p-8 shadow-lg border border-[var(--border-color)] hover:border-green-500 transition-all">
-              <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center mb-6">
-                <Target className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-3">Track Progress</h3>
-              <p className="text-[var(--text-secondary)] leading-relaxed">
-                Monitor your learning journey with streaks, completion stats, and progress tracking across all 30 Juz.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="bg-[var(--bg-card)] rounded-xl p-8 shadow-lg border border-[var(--border-color)] hover:border-green-500 transition-all">
-              <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center mb-6">
-                <Zap className="w-7 h-7 text-purple-600 dark:text-purple-400" />
-              </div>
-              <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-3">Daily Streaks</h3>
-              <p className="text-[var(--text-secondary)] leading-relaxed">
-                Build consistency with daily practice. Maintain your streak and watch your longest streak grow over time.
-              </p>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="bg-[var(--bg-card)] rounded-xl p-8 shadow-lg border border-[var(--border-color)] hover:border-green-500 transition-all">
-              <div className="w-14 h-14 bg-orange-100 dark:bg-orange-900/50 rounded-lg flex items-center justify-center mb-6">
-                <Award className="w-7 h-7 text-orange-600 dark:text-orange-400" />
-              </div>
-              <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-3">Multiple Translations</h3>
-              <p className="text-[var(--text-secondary)] leading-relaxed">
-                Access 18+ translations in multiple languages. Learn in your preferred language and switch anytime.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* How It Works Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-[var(--background)] transition-colors duration-300">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-4">
-              How It Works
-            </h2>
-            <p className="text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
-              Get started in three simple steps
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-20">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
-                1
-              </div>
-              <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3">Choose a Juz</h3>
-              <p className="text-[var(--text-secondary)]">
-                Select any of the 30 Juz to begin your learning journey. Each Juz contains multiple surahs and verses.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
-                2
-              </div>
-              <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3">Read & Listen</h3>
-              <p className="text-[var(--text-secondary)]">
-                Read the verse, listen to the recitation, and understand the translation before attempting the puzzle.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
-                3
-              </div>
-              <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3">Solve Puzzles</h3>
-              <p className="text-[var(--text-secondary)]">
-                Drag and drop words to reconstruct the verse. Build your streak by completing puzzles daily.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Interactive Demo Section */}
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-[var(--bg-secondary)] transition-colors duration-300">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-4">
-              Experience It Yourself
-            </h2>
-            <p className="text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
-              Try our interactive puzzle demo. Drag and drop words to reconstruct the verse!
-            </p>
-          </div>
-
-          <div className="max-w-3xl mx-auto">
-            <PuzzleDemo />
-          </div>
-        </section>
-
-        {/* Testimonials Section */}
-        <Testimonials />
-
-        {/* CTA Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-2xl p-12 md:p-16 text-center text-white">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Ready to Start Your Journey?
-            </h2>
-            <p className="text-xl mb-10 max-w-2xl mx-auto opacity-90">
-              Join thousands of learners who are mastering the Quran one puzzle at a time.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
               <SignedOut>
                 <SignUpButton mode="modal">
-                  <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100 px-8 py-6 text-lg font-semibold">
-                    Get Started Free
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                  <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 h-12 text-base font-medium rounded-full">
+                    Start Free
+                    <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </SignUpButton>
               </SignedOut>
               <SignedIn>
                 <Link href="/dashboard">
-                  <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100 px-8 py-6 text-lg font-semibold">
+                  <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 h-12 text-base font-medium rounded-full">
                     Go to Dashboard
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </Link>
               </SignedIn>
+              <Link href="#demo">
+                <Button size="lg" variant="outline" className="border-gray-700 text-gray-300 hover:bg-white/5 px-8 h-12 text-base font-medium rounded-full">
+                  <Play className="mr-2 w-4 h-4" />
+                  Try Demo
+                </Button>
+              </Link>
+            </motion.div>
+
+            {/* Stats */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="mt-16 flex flex-wrap justify-center gap-8 sm:gap-16 text-center"
+            >
+              <div>
+                <div className="text-2xl sm:text-3xl font-bold text-white">6,236</div>
+                <div className="text-sm text-gray-500">Verses</div>
+              </div>
+              <div>
+                <div className="text-2xl sm:text-3xl font-bold text-white">18+</div>
+                <div className="text-sm text-gray-500">Languages</div>
+              </div>
+              <div>
+                <div className="text-2xl sm:text-3xl font-bold text-white">30</div>
+                <div className="text-sm text-gray-500">Juz</div>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Scroll indicator */}
+          <motion.div 
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          >
+            <div className="w-6 h-10 rounded-full border-2 border-gray-700 flex items-start justify-center p-2">
+              <motion.div 
+                animate={{ y: [0, 12, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="w-1 h-2 bg-gray-500 rounded-full"
+              />
+            </div>
+          </motion.div>
+        </section>
+
+        {/* Features Section */}
+        <section id="features" className="py-24 px-4 bg-gradient-to-b from-[#0a0a0a] to-[#111]">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                Why learners love AyatBits
+              </h2>
+              <p className="text-gray-400 max-w-lg mx-auto">
+                Built for the modern Muslim who wants to connect deeply with the Quran
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                { icon: BookOpen, title: "Interactive Puzzles", desc: "Drag and drop to build verses from memory", color: "green" },
+                { icon: Target, title: "Track Progress", desc: "See your journey across all 30 Juz", color: "blue" },
+                { icon: Zap, title: "Daily Streaks", desc: "Stay consistent, grow your streak", color: "purple" },
+                { icon: Award, title: "18+ Languages", desc: "Learn in your preferred translation", color: "orange" },
+              ].map((feature, i) => (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  className="group p-6 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-green-500/30 transition-all"
+                >
+                  <div className={`w-12 h-12 rounded-xl bg-${feature.color}-500/10 flex items-center justify-center mb-4`}>
+                    <feature.icon className={`w-6 h-6 text-${feature.color}-500`} />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-gray-500 text-sm">{feature.desc}</p>
+                </motion.div>
+              ))}
             </div>
           </div>
+        </section>
+
+        {/* Demo Section */}
+        <section id="demo" className="py-24 px-4 bg-[#111]">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                Try it yourself
+              </h2>
+              <p className="text-gray-400">
+                Drag the words to reconstruct the verse
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <DemoWidget />
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="py-24 px-4 bg-gradient-to-b from-[#111] to-[#0a0a0a]">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-2xl mx-auto text-center"
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+              Start your journey today
+            </h2>
+            <p className="text-gray-400 mb-8">
+              Join thousands who are building a deeper connection with the Quran.
+            </p>
+            <SignedOut>
+              <SignUpButton mode="modal">
+                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-10 h-14 text-lg font-medium rounded-full">
+                  Get Started Free
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <Link href="/dashboard">
+                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-10 h-14 text-lg font-medium rounded-full">
+                  Continue Learning
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
+            </SignedIn>
+          </motion.div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="bg-[var(--background)] border-t border-[var(--border-color)] mt-20 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">A</span>
-              </div>
-              <span className="text-xl font-bold text-[var(--text-primary)]">AyatBits</span>
-            </div>
-            <div className="text-[var(--text-muted)] text-sm mb-4 md:mb-0">
-              Inspired by the beauty of the Quran
-            </div>
-            <div className="flex items-center gap-6">
-              <Link href="#faq" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm transition-colors">
-                FAQ
-              </Link>
-              <Link href="/terms" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm transition-colors">
-                Terms
-              </Link>
-            </div>
-          </div>
-          <div className="text-center mt-8 pt-8 border-t border-[var(--border-color)]">
-            <p className="text-[var(--text-muted)] text-sm">
-              © 2025 AyatBits. All rights reserved.
-            </p>
+      <footer className="py-8 px-4 border-t border-white/5">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="text-xl font-bold text-green-500">AyatBits</div>
+          <div className="text-sm text-gray-500">
+            © 2025 AyatBits. Made with ❤️ for the Ummah.
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+// Inline Demo Widget for better performance
+function DemoWidget() {
+  const [words, setWords] = useState([
+    { id: 1, text: 'بِسْمِ', placed: false },
+    { id: 2, text: 'اللَّهِ', placed: false },
+    { id: 3, text: 'الرَّحْمَٰنِ', placed: false },
+    { id: 4, text: 'الرَّحِيمِ', placed: false },
+  ]);
+  const [answer, setAnswer] = useState<typeof words>([]);
+  const [shuffled, setShuffled] = useState(false);
+
+  useEffect(() => {
+    if (!shuffled) {
+      setWords(prev => [...prev].sort(() => Math.random() - 0.5));
+      setShuffled(true);
+    }
+  }, [shuffled]);
+
+  const correctOrder = ['بِسْمِ', 'اللَّهِ', 'الرَّحْمَٰنِ', 'الرَّحِيمِ'];
+  const isComplete = answer.length === 4 && answer.every((w, i) => w.text === correctOrder[i]);
+
+  const handleWordClick = (word: typeof words[0]) => {
+    if (word.placed) {
+      setAnswer(prev => prev.filter(w => w.id !== word.id));
+      setWords(prev => prev.map(w => w.id === word.id ? { ...w, placed: false } : w));
+    } else {
+      setAnswer(prev => [...prev, word]);
+      setWords(prev => prev.map(w => w.id === word.id ? { ...w, placed: true } : w));
+    }
+  };
+
+  const reset = () => {
+    setAnswer([]);
+    setWords(prev => prev.map(w => ({ ...w, placed: false })).sort(() => Math.random() - 0.5));
+  };
+
+  return (
+    <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 sm:p-8">
+      {/* Answer area */}
+      <div className="min-h-[80px] rounded-xl border-2 border-dashed border-white/10 p-4 mb-6 flex flex-wrap gap-3 justify-center" dir="rtl">
+        {answer.length === 0 ? (
+          <span className="text-gray-600 text-sm">Tap words below to build the verse</span>
+        ) : (
+          answer.map((word, i) => (
+            <motion.button
+              key={word.id}
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              onClick={() => handleWordClick(word)}
+              className={`px-4 py-2 rounded-lg text-lg font-medium transition-all ${
+                i < answer.length && answer[i].text === correctOrder[i]
+                  ? 'bg-green-600/20 text-green-400 border border-green-500/30'
+                  : 'bg-white/5 text-white border border-white/10'
+              }`}
+            >
+              {word.text}
+            </motion.button>
+          ))
+        )}
+      </div>
+
+      {/* Word bank */}
+      <div className="flex flex-wrap gap-3 justify-center mb-6" dir="rtl">
+        {words.filter(w => !w.placed).map((word) => (
+          <motion.button
+            key={word.id}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleWordClick(word)}
+            className="px-4 py-2 rounded-lg bg-white/5 text-white border border-white/10 hover:border-green-500/50 text-lg font-medium transition-all"
+          >
+            {word.text}
+          </motion.button>
+        ))}
+      </div>
+
+      {/* Status */}
+      {isComplete && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-600/20 text-green-400 rounded-full text-sm font-medium">
+            ✓ Perfect! بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+          </div>
+        </motion.div>
+      )}
+
+      {answer.length > 0 && !isComplete && (
+        <div className="text-center">
+          <button onClick={reset} className="text-sm text-gray-500 hover:text-white transition-colors">
+            Reset
+          </button>
+        </div>
+      )}
     </div>
   );
 }

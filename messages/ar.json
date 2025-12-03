@@ -7,34 +7,37 @@
     "pause": "إيقاف",
     "prev": "السابق",
     "next": "التالي",
-    "reset": "إعادة تعيين",
+    "reset": "إعادة",
     "search": "بحث",
     "menu": "القائمة",
     "profile": "الملف الشخصي",
-    "dashboard": "لوحة التحكم",
+    "dashboard": "الرئيسية",
     "loading": "جاري التحميل...",
-    "error": "خطأ"
+    "error": "خطأ",
+    "goBack": "رجوع",
+    "notFound": "غير موجود"
   },
   "verse": {
-    "ayahNumber": "آية {number}",
-    "readyToStartPuzzle": "جاهز لبدء اللغز",
+    "ayahNumber": "الآية {number}",
+    "readyToStartPuzzle": "ابدأ اللغز",
     "selectAyah": "اختر آية",
     "enterAyahNumber": "أدخل رقم الآية ({min}-{max})...",
     "ayahFound": "تم العثور على الآية!",
-    "ayahNotFound": "الآية غير موجودة في هذا القسم.",
-    "goToAyah": "انتقل إلى الآية",
-    "englishTranslation": "الترجمة الإنجليزية"
+    "ayahNotFound": "لم يتم العثور على الآية في هذا القسم.",
+    "goToAyah": "اذهب إلى الآية",
+    "englishTranslation": "الترجمة"
   },
   "dashboard": {
     "welcome": "مرحباً بعودتك، {name}!",
-    "learner": "المتعلم",
-    "continueJourney": "تابع رحلتك في حفظ وفهم القرآن",
+    "learner": "متعلم",
+    "continueJourney": "واصل رحلتك في حفظ وفهم القرآن الكريم",
     "completedPuzzles": "الألغاز المكتملة",
     "juzsExplored": "الأجزاء المستكشفة",
     "currentStreak": "السلسلة الحالية",
     "days": "أيام",
     "selectJuz": "اختر جزءاً للبدء",
-    "noJuzsFound": "لم يتم العثور على أجزاء. يرجى تشغيل سكريبت البذور: npm run db:seed"
+    "noJuzsFound": "لم يتم العثور على أجزاء. يرجى تشغيل البرنامج النصي: npm run db:seed",
+    "surahsAvailable": "متاحة"
   },
   "profile": {
     "title": "الملف الشخصي",
@@ -48,20 +51,52 @@
     "juzsExplored": "الأجزاء المستكشفة",
     "uniqueSurahs": "{count} سورة فريدة مكتملة",
     "selectTranslation": "اختر الترجمة",
-    "translationDescription": "سيتم استخدام هذه الترجمة لجميع عروض الآيات.",
+    "translationDescription": "ستُستخدم هذه الترجمة لجميع عروض الآيات.",
     "aboutStreaks": "حول السلاسل",
     "streakDescription1": "تزداد سلسلتك عند إكمال لغز واحد على الأقل كل يوم.",
-    "streakDescription2": "أكمل الألغاز يومياً للحفاظ على سلسلتك ونموها!",
-    "streakDescription3": "إذا فاتك يوم، فسيتم إعادة تعيين سلسلتك. استمر في التعلم لبناء أطول سلسلة لديك!"
+    "streakDescription2": "أكمل الألغاز يومياً للحفاظ على سلسلتك وتنميتها!",
+    "streakDescription3": "إذا فاتك يوم، ستُعاد سلسلتك إلى الصفر. واصل التعلم لبناء أطول سلسلة!"
   },
   "puzzle": {
-    "buildTheAyah": "بناء الآية",
+    "buildTheAyah": "ابنِ الآية",
     "wordBank": "بنك الكلمات",
     "correct": "صحيح!",
     "mistake": "خطأ!",
     "mistakes": "الأخطاء: {count}",
     "completed": "مكتمل!",
-    "continueToNextAyah": "المتابعة إلى الآية التالية"
+    "continueToNextAyah": "انتقل إلى الآية التالية",
+    "puzzles": "ألغاز",
+    "tooManyMistakes": "أخطاء كثيرة جداً",
+    "mistakeLimitReached": "لقد وصلت إلى الحد الأقصى للأخطاء",
+    "reviewAyahMessage": "لقد ارتكبت الكثير من الأخطاء. حان الوقت لمراجعة الآية مرة أخرى قبل محاولة اللغز. خذ وقتك لقراءة وفهم الآية، ثم عُد للمحاولة مرة أخرى.",
+    "goBackToAyahView": "العودة إلى عرض الآية",
+    "goBack": "رجوع"
+  },
+  "auth": {
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "welcomeBack": "مرحباً بعودتك",
+    "createAccount": "إنشاء حساب",
+    "signInDescription": "سجل دخولك لمتابعة رحلة تعلم القرآن",
+    "signUpDescription": "انضم إلى آلاف المتعلمين الذين يتقنون القرآن",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "noAccount": "ليس لديك حساب؟",
+    "haveAccount": "لديك حساب بالفعل؟",
+    "orContinueWith": "أو تابع باستخدام"
+  },
+  "landing": {
+    "heroTitle": "اجعل تعلم القرآن",
+    "heroTitleHighlight": "أسرع",
+    "heroDescription": "ألغاز كلمات تفاعلية لإتقان القرآن. تعلم مع 18 ترجمة وتتبع تقدمك.",
+    "startLearning": "ابدأ التعلم",
+    "viewPricing": "عرض الأسعار",
+    "features": "المميزات",
+    "pricing": "الأسعار",
+    "questions": "الأسئلة",
+    "freeTrial": "تجربة مجانية",
+    "noCreditCard": "لا حاجة لبطاقة ائتمان",
+    "expertSupport": "دعم متخصص"
   }
 }
-

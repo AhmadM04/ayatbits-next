@@ -13,7 +13,9 @@
     "profile": "Profile",
     "dashboard": "Dashboard",
     "loading": "Loading...",
-    "error": "Error"
+    "error": "Error",
+    "goBack": "Go Back",
+    "notFound": "Not Found"
   },
   "verse": {
     "ayahNumber": "Ayah {number}",
@@ -23,7 +25,7 @@
     "ayahFound": "Ayah found!",
     "ayahNotFound": "Ayah not found in this section.",
     "goToAyah": "Go to Ayah",
-    "englishTranslation": "English Translation"
+    "englishTranslation": "Translation"
   },
   "dashboard": {
     "welcome": "Welcome back, {name}!",
@@ -69,6 +71,32 @@
     "reviewAyahMessage": "You've made too many mistakes. It's time to review the ayah again before attempting the puzzle. Take your time to read and understand the verse, then come back to try again.",
     "goBackToAyahView": "Go Back to Ayah View",
     "goBack": "Go Back"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "welcomeBack": "Welcome Back",
+    "createAccount": "Create Account",
+    "signInDescription": "Sign in to continue your Quran learning journey",
+    "signUpDescription": "Join thousands of learners mastering the Quran",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "orContinueWith": "Or continue with"
+  },
+  "landing": {
+    "heroTitle": "Making Quran learning",
+    "heroTitleHighlight": "faster",
+    "heroDescription": "Interactive word puzzles to master the Quran. Learn with 18 translations and track your progress.",
+    "startLearning": "Start Learning",
+    "viewPricing": "View Pricing",
+    "features": "Features",
+    "pricing": "Pricing",
+    "questions": "Questions",
+    "freeTrial": "Free Trial",
+    "noCreditCard": "No Credit Card Required",
+    "expertSupport": "Expert Support"
   }
 }
-
