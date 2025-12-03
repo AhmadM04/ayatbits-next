@@ -66,6 +66,9 @@ export default function LandingHeader() {
             </SignedOut>
             <SignedIn>
               <div className="flex items-center gap-4">
+                <Link href="/profile" className="text-gray-400 hover:text-white text-sm font-medium transition-colors">
+                  Profile
+                </Link>
                 <Link href="/api/check-access" className="text-white text-sm font-medium hover:text-green-400 transition-colors">
                   Continue Learning
                 </Link>
@@ -128,6 +131,13 @@ export default function LandingHeader() {
                 </SignUpButton>
               </SignedOut>
               <SignedIn>
+                <Link 
+                  href="/profile" 
+                  className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Profile
+                </Link>
                 <Link 
                   href="/api/check-access" 
                   className="block px-4 py-3 bg-green-600 hover:bg-green-700 text-white font-medium text-center rounded-lg transition-colors"

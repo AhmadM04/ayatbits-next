@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { SignedIn, SignedOut, SignUpButton, SignOutButton } from "@clerk/nextjs";
-import { BookOpen, Target, Zap, Award, Play, LogOut } from "lucide-react";
+import { BookOpen, Target, Zap, Award, Play, LogOut, User as UserIcon } from "lucide-react";
 import LandingHeader from "@/components/LandingHeader";
 import PuzzleDemo from "@/components/PuzzleDemo";
 import { useRef } from "react";
@@ -180,13 +180,21 @@ export default function Home() {
                 </Link>
               </SignedOut>
               <SignedIn>
-                <Link href="/api/check-access">
-                  <button className="group relative px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-base font-semibold rounded-2xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-300 hover:scale-[1.02] flex items-center gap-3">
-                    <span>Continue Learning</span>
-                    <BookOpen className="w-5 h-5 text-green-200" />
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-400 to-emerald-400 opacity-0 group-hover:opacity-20 transition-opacity" />
-                  </button>
-                </Link>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <Link href="/profile">
+                    <button className="group px-6 sm:px-8 py-3 sm:py-4 bg-white/5 hover:bg-white/10 text-white text-sm sm:text-base font-semibold rounded-xl sm:rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2 backdrop-blur-sm">
+                      <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
+                      <span>View Profile</span>
+                    </button>
+                  </Link>
+                  <Link href="/api/check-access">
+                    <button className="group relative px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-sm sm:text-base font-semibold rounded-xl sm:rounded-2xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2 sm:gap-3">
+                      <span>Continue Learning</span>
+                      <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-green-200" />
+                      <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-r from-green-400 to-emerald-400 opacity-0 group-hover:opacity-20 transition-opacity" />
+                    </button>
+                  </Link>
+                </div>
                 <Link href="#demo">
                   <button className="group px-8 py-4 bg-white/5 hover:bg-white/10 text-white text-base font-semibold rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 flex items-center gap-2 backdrop-blur-sm">
                     <Play className="w-5 h-5 text-green-400" />
