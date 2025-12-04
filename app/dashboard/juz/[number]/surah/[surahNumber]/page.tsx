@@ -78,6 +78,22 @@ export default async function SurahVersePage({
   const currentPuzzle = puzzles.find((p: any) => p.content?.ayahNumber === selectedAyah);
   const currentIndex = puzzles.findIndex((p: any) => p.content?.ayahNumber === selectedAyah);
 
+  // Pre-fetch translation on server side for faster loading
+  let initialTranslation = '';
+  try {
+    const translationResponse = await fetch(
+      `https://api.alquran.cloud/v1/ayah/${parseInt(surahNumber)}:${selectedAyah}/${selectedTranslation}`,
+      { next: { revalidate: 86400 } } // Cache for 24 hours
+    );
+    if (translationResponse.ok) {
+      const translationData = await translationResponse.json();
+      initialTranslation = translationData.data?.text || '';
+    }
+  } catch (error) {
+    console.error('Failed to pre-fetch translation:', error);
+    // Continue without initial translation - client will fetch it
+  }
+
   // Calculate progress
   const totalAyahs = puzzles.length;
   const completedAyahs = completedPuzzleIds.size;
@@ -179,6 +195,7 @@ export default async function SurahVersePage({
                 surahNumber={parseInt(surahNumber)}
                 ayahNumber={selectedAyah}
                 selectedTranslation={selectedTranslation}
+                initialTranslation={initialTranslation}
               />
 
               {/* Start Puzzle Button */}

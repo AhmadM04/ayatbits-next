@@ -39,30 +39,36 @@ export default function TranslationDisplay({
   initialTranslation,
 }: TranslationDisplayProps) {
   const { t } = useI18n();
-  const [translation, setTranslation] = useState(initialTranslation);
+  const [translation, setTranslation] = useState<string | undefined>(initialTranslation);
   const [isLoading, setIsLoading] = useState(!initialTranslation);
 
   useEffect(() => {
     const fetchTranslation = async () => {
       if (initialTranslation) {
         setTranslation(initialTranslation);
+        setIsLoading(false);
         return;
       }
 
       setIsLoading(true);
       try {
+        // Use our API route which caches server-side - much faster!
         const response = await fetch(
-          `https://api.alquran.cloud/v1/surah/${surahNumber}/${selectedTranslation}`
+          `/api/verse/translation?surah=${surahNumber}&ayah=${ayahNumber}&translation=${selectedTranslation}`
         );
         if (response.ok) {
           const data = await response.json();
-          const ayah = data.data?.ayahs?.find((a: any) => a.numberInSurah === ayahNumber);
-          if (ayah) {
-            setTranslation(ayah.text);
+          if (data.translation) {
+            setTranslation(data.translation);
+          } else {
+            setTranslation(undefined);
           }
+        } else {
+          setTranslation(undefined);
         }
       } catch (error) {
         console.error('Error fetching translation:', error);
+        setTranslation(undefined);
       } finally {
         setIsLoading(false);
       }

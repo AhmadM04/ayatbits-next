@@ -72,10 +72,15 @@ export function checkSubscriptionAccess(user: IUser): SubscriptionAccess {
   };
 }
 
-export function getTrialDaysRemaining(trialEndsAt: Date | undefined): number {
+export function getTrialDaysRemaining(trialEndsAt: Date | string | undefined | null): number {
   if (!trialEndsAt) return 0;
-  const now = new Date();
-  const endDate = new Date(trialEndsAt);
-  const diff = endDate.getTime() - now.getTime();
-  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  try {
+    const now = new Date();
+    const endDate = new Date(trialEndsAt);
+    if (isNaN(endDate.getTime())) return 0;
+    const diff = endDate.getTime() - now.getTime();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  } catch {
+    return 0;
+  }
 }

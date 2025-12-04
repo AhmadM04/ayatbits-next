@@ -29,11 +29,9 @@ export default async function DashboardPage() {
     });
   }
 
-  // Check subscription access
+  // Check subscription access - allow inactive users to see dashboard but show pricing prompts
   const access = checkSubscriptionAccess(dbUser);
-  if (!access.hasAccess) {
-    redirect(`/pricing?reason=${access.status}`);
-  }
+  // Don't redirect - let them see the dashboard but they'll need to subscribe to use features
 
   const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
 
@@ -83,8 +81,8 @@ export default async function DashboardPage() {
       .filter(Boolean)
   ).size;
 
-  const currentStreak = dbUser.currentStreak || 0;
-  const trialDaysLeft = getTrialDaysRemaining(dbUser);
+  const currentStreak = dbUser.currentStreak ?? 0;
+  const trialDaysLeft = getTrialDaysRemaining(dbUser.trialEndDate);
 
   return (
     <DashboardI18nProvider translationCode={selectedTranslation}>

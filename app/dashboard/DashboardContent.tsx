@@ -39,6 +39,7 @@ export default function DashboardContent({
 }: DashboardContentProps) {
   const { t } = useI18n();
   const showTrialBanner = subscriptionStatus === 'trialing' && trialDaysLeft && trialDaysLeft > 0;
+  const needsSubscription = !subscriptionStatus || subscriptionStatus === 'inactive' || subscriptionStatus === 'INACTIVE';
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
@@ -67,7 +68,7 @@ export default function DashboardContent({
                 >
                   <Flame className="w-4 h-4 group-hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]" />
                 </motion.div>
-                <span className="font-semibold text-sm">{currentStreak}</span>
+                <span className="font-semibold text-sm">{Number.isNaN(currentStreak) ? 0 : (currentStreak ?? 0)}</span>
               </Link>
               
               <Link 
@@ -93,6 +94,21 @@ export default function DashboardContent({
             {t('dashboard.continueJourney')}
           </p>
         </div>
+
+        {/* Subscription Required Banner */}
+        {needsSubscription && (
+          <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
+            <p className="text-sm text-yellow-400 mb-2">
+              Start your 7-day free trial to access all puzzles and features.
+            </p>
+            <Link
+              href="/pricing?reason=needs_subscription"
+              className="inline-block px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              Start Free Trial
+            </Link>
+          </div>
+        )}
 
         {/* Daily Quote */}
         <div className="mb-6">
@@ -125,7 +141,7 @@ export default function DashboardContent({
                     <div className="w-full bg-white/5 rounded-full h-1.5 mb-1">
                       <div
                         className="bg-green-500 h-1.5 rounded-full transition-all"
-                        style={{ width: `${juz.progress}%` }}
+                        style={{ width: `${isNaN(juz.progress) ? 0 : Math.max(0, Math.min(100, juz.progress))}%` }}
                       />
                     </div>
                     <div className="text-[10px] text-gray-600">
