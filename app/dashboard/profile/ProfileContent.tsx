@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import Link from 'next/link';
 import { ArrowLeft, Flame, Trophy, BookOpen, Target, LogOut, CreditCard, Settings, ChevronRight, HelpCircle, FileText, MessageCircleQuestion, X, Trash2, AlertTriangle, Loader2 } from 'lucide-react';
-import { SignOutButton } from '@clerk/nextjs';
+import { SignOutButton, UserButton } from '@clerk/nextjs';
 import { motion, AnimatePresence } from 'framer-motion';
 import TranslationSelectorClient from './TranslationSelectorClient';
 import BottomNav from '@/components/BottomNav';
@@ -51,6 +51,7 @@ export default function ProfileContent({
   const router = useRouter();
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [showClearDataModal, setShowClearDataModal] = useState(false);
+  const [showAccountSettingsModal, setShowAccountSettingsModal] = useState(false);
   const [loadingBilling, setLoadingBilling] = useState(false);
   const [loadingClearData, setLoadingClearData] = useState(false);
   const [clearDataError, setClearDataError] = useState('');
@@ -285,7 +286,7 @@ export default function ProfileContent({
           )}
 
           <button
-            onClick={() => window.open('https://accounts.clerk.dev/user', '_blank')}
+            onClick={() => setShowAccountSettingsModal(true)}
             className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors border-b border-white/5 text-left"
           >
             <div className="flex items-center gap-3">
@@ -497,12 +498,72 @@ export default function ProfileContent({
                 <div className="mt-4 pt-4 border-t border-white/5">
                   <p className="text-xs text-gray-500 mb-2">{t('settings.clearDataClerkInfo')}</p>
                   <button
-                    onClick={() => window.open('https://accounts.clerk.dev/user', '_blank')}
+                    onClick={() => {
+                      setShowClearDataModal(false);
+                      setShowAccountSettingsModal(true);
+                    }}
                     className="text-xs text-blue-400 hover:text-blue-300 underline"
                   >
                     {t('settings.manageViaClerk')}
                   </button>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Account Settings Modal */}
+      <AnimatePresence>
+        {showAccountSettingsModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={() => setShowAccountSettingsModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-[#111] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between p-4 border-b border-white/5">
+                <h3 className="text-lg font-semibold text-white">{t('settings.accountSettings')}</h3>
+                <button
+                  onClick={() => setShowAccountSettingsModal(false)}
+                  className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+
+              {/* Clerk UserButton in Modal */}
+              <div className="p-6 flex justify-center">
+                <UserButton 
+                  appearance={{
+                    baseTheme: "dark" as any,
+                    variables: {
+                      colorPrimary: "#16a34a",
+                      colorBackground: "#111",
+                      colorText: "#ffffff",
+                      colorTextSecondary: "#9ca3af",
+                      borderRadius: "0.75rem",
+                    },
+                    elements: {
+                      card: "bg-[#111] border border-white/10 shadow-none",
+                      userButtonPopoverCard: "bg-[#111] border border-white/10",
+                      userButtonPopoverActionButton: "hover:bg-white/10 text-white",
+                      userButtonPopoverActionButtonText: "text-white",
+                      userButtonPopoverActionButtonIcon: "text-gray-400",
+                      userButtonPopoverFooter: "hidden",
+                    },
+                  } as any}
+                  afterSignOutUrl="/"
+                />
               </div>
             </motion.div>
           </motion.div>

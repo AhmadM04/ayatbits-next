@@ -1,10 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Sparkles, Loader2, CreditCard, Shield, Clock } from 'lucide-react';
+import { Check, Sparkles, Loader2, CreditCard, Shield, Clock, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
 
@@ -12,13 +11,15 @@ export default function PricingContent() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const isTrialFlow = searchParams.get('trial') === 'true';
+  const reason = searchParams.get('reason');
 
+  // Stripe Price IDs - these should match your Stripe dashboard
   const plans = [
     {
       name: 'Monthly',
       price: '$5.99',
       period: '/month',
-      priceId: 'monthly',
+      priceId: process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID || 'price_monthly',
       features: [
         'Unlimited puzzles',
         'All 30 Juzs & 114 Surahs',
@@ -34,7 +35,7 @@ export default function PricingContent() {
       name: 'Yearly',
       price: '$47.99',
       period: '/year',
-      priceId: 'yearly',
+      priceId: process.env.NEXT_PUBLIC_STRIPE_YEARLY_PRICE_ID || 'price_yearly',
       originalPrice: '$71.88',
       savings: 'Save 33%',
       features: [
@@ -54,7 +55,7 @@ export default function PricingContent() {
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: priceId }),
+        body: JSON.stringify({ priceId }),
       });
       
       const data = await response.json();
@@ -62,27 +63,29 @@ export default function PricingContent() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        console.error('No checkout URL returned');
+        console.error('No checkout URL returned:', data);
         setLoadingPlan(null);
+        alert(data.error || 'Failed to start checkout. Please try again.');
       }
     } catch (error) {
       console.error('Checkout error:', error);
       setLoadingPlan(null);
+      alert('An error occurred. Please try again.');
     }
   };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Header */}
-      <header className="fixed w-full top-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-gray-800/50">
+      <header className="fixed w-full top-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-xl font-bold text-green-500">
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
               AyatBits
             </Link>
             <SignedIn>
-              <span className="text-sm text-gray-400">
-                Almost there! Choose your plan below.
+              <span className="text-sm text-gray-400 hidden sm:inline">
+                {reason === 'subscription_required' ? 'Subscription required to continue' : 'Choose your plan'}
               </span>
             </SignedIn>
           </div>
@@ -97,11 +100,11 @@ export default function PricingContent() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            {isTrialFlow ? (
+            {isTrialFlow || reason === 'subscription_required' ? (
               <>
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full mb-6">
                   <Sparkles className="w-4 h-4 text-green-500" />
-                  <span className="text-green-400 text-sm font-medium">Welcome to AyatBits!</span>
+                  <span className="text-green-400 text-sm font-medium">Start Your Journey</span>
                 </div>
                 <h1 className="text-3xl sm:text-4xl font-bold mb-4">
                   Start your 7-day free trial
@@ -112,7 +115,9 @@ export default function PricingContent() {
               </>
             ) : (
               <>
-                <h1 className="text-4xl sm:text-5xl font-bold mb-4">Simple pricing</h1>
+                <h1 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                  Simple pricing
+                </h1>
                 <p className="text-gray-400 text-lg">
                   Start with a 7-day free trial. Cancel anytime.
                 </p>
@@ -121,7 +126,7 @@ export default function PricingContent() {
           </motion.div>
 
           {/* Trial Info Banner */}
-          {isTrialFlow && (
+          {(isTrialFlow || reason === 'subscription_required') && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -213,33 +218,46 @@ export default function PricingContent() {
 
                 <SignedOut>
                   <SignUpButton mode="modal">
-                    <Button
-                      className={`w-full h-12 rounded-xl font-semibold ${
+                    <button
+                      className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all ${
                         plan.popular
-                          ? 'bg-green-600 hover:bg-green-700 text-white'
-                          : 'bg-white/10 hover:bg-white/20 text-white'
+                          ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white'
+                          : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
                       }`}
                     >
-                      {plan.cta}
-                    </Button>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-100%] group-hover:translate-x-[100%] animate-shimmer" />
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {plan.cta}
+                        <ArrowRight className="w-4 h-4" />
+                      </span>
+                    </button>
                   </SignUpButton>
                 </SignedOut>
                 <SignedIn>
-                  <Button
+                  <button
                     onClick={() => handleSubscribe(plan.priceId)}
                     disabled={loadingPlan !== null}
-                    className={`w-full h-12 rounded-xl font-semibold ${
+                    className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       plan.popular
-                        ? 'bg-green-600 hover:bg-green-700 text-white'
-                        : 'bg-white/10 hover:bg-white/20 text-white'
+                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white'
+                        : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
                     }`}
                   >
-                    {loadingPlan === plan.priceId ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      plan.cta
-                    )}
-                  </Button>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-100%] group-hover:translate-x-[100%] animate-shimmer" />
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      {loadingPlan === plan.priceId ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          {plan.cta}
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </span>
+                  </button>
                 </SignedIn>
               </motion.div>
             ))}
@@ -270,9 +288,9 @@ export default function PricingContent() {
                 Contact us at support@ayatbits.com
               </p>
               <Link href="/">
-                <Button variant="outline" className="border-gray-700 text-gray-300 hover:bg-white/5 rounded-full">
+                <button className="px-6 py-3 border border-white/20 text-gray-300 hover:bg-white/5 rounded-full transition-colors">
                   Back to Home
-                </Button>
+                </button>
               </Link>
             </motion.div>
           )}
@@ -281,7 +299,3 @@ export default function PricingContent() {
     </div>
   );
 }
-
-
-
-

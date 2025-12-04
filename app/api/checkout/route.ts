@@ -1,14 +1,14 @@
 import { currentUser } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2025-11-17.clover',
+      apiVersion: '2025-11-17.clover' as any,
     })
   : null;
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
     if (!stripe) {
       return NextResponse.json(
@@ -23,10 +23,17 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Create Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
+    const body = await req.json();
+    const { priceId } = body;
+
+    // If priceId is provided, use it; otherwise create a default subscription
+    let lineItems: any[];
+    if (priceId && priceId.startsWith('price_')) {
+      // Use existing Stripe price
+      lineItems = [{ price: priceId, quantity: 1 }];
+    } else {
+      // Fallback: create price on the fly (for development)
+      lineItems = [
         {
           price_data: {
             currency: 'usd',
@@ -34,22 +41,36 @@ export async function POST() {
               name: 'AyatBits Pro',
               description: 'Unlimited access to all puzzles and features',
             },
-            unit_amount: 999, // $9.99
+            unit_amount: priceId === 'price_yearly' ? 4799 : 599, // $47.99 or $5.99
             recurring: {
-              interval: 'month',
+              interval: priceId === 'price_yearly' ? 'year' : 'month',
             },
           },
           quantity: 1,
         },
-      ],
+      ];
+    }
+
+    // Create Stripe Checkout Session
+    const sessionParams: any = {
+      payment_method_types: ['card'],
+      line_items: lineItems,
       mode: 'subscription',
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?success=true`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?canceled=true`,
       customer_email: user.emailAddresses[0]?.emailAddress,
       metadata: {
-        userId: user.id,
+        clerkId: user.id,
       },
-    });
+      subscription_data: {
+        trial_period_days: 7,
+        metadata: {
+          clerkId: user.id,
+        },
+      },
+    };
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ url: session.url });
   } catch (error: any) {
@@ -60,4 +81,3 @@ export async function POST() {
     );
   }
 }
-

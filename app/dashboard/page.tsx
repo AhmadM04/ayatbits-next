@@ -1,9 +1,11 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { connectDB, Juz, Puzzle, UserProgress, User } from '@/lib/db';
-import { checkSubscriptionAccess } from '@/lib/subscription';
+import mongoose from 'mongoose';
 import DashboardContent from './DashboardContent';
 import DashboardI18nProvider from './DashboardI18nProvider';
+import { checkSubscriptionAccess } from '@/lib/subscription';
+import { getTrialDaysRemaining } from '@/lib/subscription';
 
 export default async function DashboardPage() {
   const user = await currentUser();
@@ -17,7 +19,6 @@ export default async function DashboardPage() {
   // Find or create user
   let dbUser = await User.findOne({ clerkId: user.id });
   if (!dbUser) {
-    // New user - create with inactive subscription status
     dbUser = await User.create({
       clerkId: user.id,
       email: user.emailAddresses[0]?.emailAddress || '',
@@ -25,92 +26,77 @@ export default async function DashboardPage() {
       lastName: user.lastName,
       name: user.fullName,
       imageUrl: user.imageUrl,
-      subscriptionStatus: 'inactive', // New users start as inactive
     });
   }
 
   // Check subscription access
-  const accessCheck = checkSubscriptionAccess(dbUser);
-  
-  // If user doesn't have access, redirect to pricing page
-  if (!accessCheck.hasAccess && !dbUser.hasBypass) {
-    redirect('/pricing?reason=subscription_required');
+  const access = checkSubscriptionAccess(dbUser);
+  if (!access.hasAccess) {
+    redirect(`/pricing?reason=${access.status}`);
   }
+
+  const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
 
   // Fetch all Juzs
   const juzs = await Juz.find().sort({ number: 1 }).lean() as any[];
 
   // Get puzzle counts for each juz
-  const juzsWithData = await Promise.all(
-    juzs.map(async (juz: any) => {
-      const puzzleCount = await Puzzle.countDocuments({ juzId: juz._id });
-      const puzzles = await Puzzle.find({ juzId: juz._id }).select('_id').lean() as any[];
-      const puzzleIds = puzzles.map((p: any) => p._id);
-      
-      const completedCount = await UserProgress.countDocuments({
-        userId: dbUser._id,
-        puzzleId: { $in: puzzleIds },
-        status: 'COMPLETED',
-      });
+  const puzzleCounts = await Puzzle.aggregate([
+    { $group: { _id: '$juzId', count: { $sum: 1 } } }
+  ]);
 
-      const progress = puzzleCount > 0 ? Math.round((completedCount / puzzleCount) * 100) : 0;
-
-      return {
-        _id: juz._id.toString(),
-        number: juz.number,
-        name: juz.name,
-        _count: { puzzles: puzzleCount },
-        completedPuzzles: completedCount,
-        progress,
-      };
-    })
+  const puzzleCountMap = new Map(
+    puzzleCounts.map((p: any) => [p._id.toString(), p.count])
   );
 
-  // Get user progress stats
-  const totalCompletedPuzzles = await UserProgress.countDocuments({
-    userId: dbUser._id,
-    status: 'COMPLETED',
-  });
-
-  // Get unique juzs explored
-  const completedProgress = await UserProgress.find({
+  // Get user progress
+  const userProgress = await UserProgress.find({
     userId: dbUser._id,
     status: 'COMPLETED',
   })
-    .populate({
-      path: 'puzzleId',
-      select: 'juzId',
-    })
+    .populate('puzzleId')
     .lean() as any[];
 
-  const juzsExplored = new Set(
-    completedProgress
+  // Calculate progress for each juz
+  const juzsWithProgress = juzs.map((juz: any) => {
+    const totalPuzzles = puzzleCountMap.get(juz._id.toString()) || 0;
+    const completedPuzzles = userProgress.filter(
+      (p: any) => p.puzzleId?.juzId?.toString() === juz._id.toString()
+    ).length;
+    const progress = totalPuzzles > 0 ? (completedPuzzles / totalPuzzles) * 100 : 0;
+
+    return {
+      _id: juz._id.toString(),
+      number: juz.number,
+      name: juz.name,
+      _count: { puzzles: totalPuzzles },
+      progress,
+      completedPuzzles,
+    };
+  });
+
+  // Calculate stats
+  const completedPuzzles = userProgress.length;
+  const uniqueJuzs = new Set(
+    userProgress
       .map((p: any) => p.puzzleId?.juzId?.toString())
       .filter(Boolean)
   ).size;
 
-  // Get user settings
-  const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
-  
-  // Calculate streak (simplified - you may want more complex logic)
   const currentStreak = dbUser.currentStreak || 0;
-
-  // Trial and subscription info
-  const trialDaysLeft = dbUser.trialEndDate 
-    ? Math.max(0, Math.ceil((new Date(dbUser.trialEndDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-    : accessCheck.trialDaysLeft || 0;
+  const trialDaysLeft = getTrialDaysRemaining(dbUser);
 
   return (
     <DashboardI18nProvider translationCode={selectedTranslation}>
       <DashboardContent
         userFirstName={user.firstName}
         currentStreak={currentStreak}
-        completedPuzzles={totalCompletedPuzzles}
-        juzsExplored={juzsExplored}
+        completedPuzzles={completedPuzzles}
+        juzsExplored={uniqueJuzs}
         selectedTranslation={selectedTranslation}
         trialDaysLeft={trialDaysLeft}
-        subscriptionStatus={dbUser.subscriptionStatus || accessCheck.status}
-        juzs={juzsWithData}
+        subscriptionStatus={dbUser.subscriptionStatus}
+        juzs={juzsWithProgress}
       />
     </DashboardI18nProvider>
   );

@@ -88,11 +88,11 @@ function SortableWord({
       transition={{ duration: 0.3 }}
       className={`
         px-4 py-2 rounded-xl cursor-grab active:cursor-grabbing
-        ${isCorrect ? 'bg-green-100 border-2 border-green-500' : ''}
-        ${isIncorrect ? 'bg-red-100 border-2 border-red-500' : ''}
-        ${!isCorrect && !isIncorrect ? 'bg-blue-50 border border-gray-200' : ''}
+        ${isCorrect ? 'bg-green-500/20 border-2 border-green-500 text-green-400' : ''}
+        ${isIncorrect ? 'bg-red-500/20 border-2 border-red-500 text-red-400' : ''}
+        ${!isCorrect && !isIncorrect ? 'bg-white/5 border border-white/10 text-white hover:bg-white/10' : ''}
         shadow-sm hover:shadow-md transition-all
-        text-right font-medium text-lg
+        text-right font-medium text-lg font-arabic
       `}
     >
       {token.text}
@@ -239,18 +239,22 @@ export default function WordPuzzle({
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6">
       {/* Header with Like Button */}
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-gray-900">Build the Ayah</h3>
+        <h3 className="text-xl font-semibold text-white">Build the Ayah</h3>
         {onToggleLike && (
           <button
             onClick={onToggleLike}
-            className="p-2 rounded-full hover:bg-red-50 transition-colors"
+            className={`p-2 rounded-lg transition-colors ${
+              isLiked 
+                ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' 
+                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+            }`}
           >
             <Heart
               className={`w-6 h-6 ${
-                isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400'
+                isLiked ? 'fill-red-400 text-red-400' : ''
               }`}
             />
           </button>
@@ -259,15 +263,15 @@ export default function WordPuzzle({
 
       {/* Mistake Counter */}
       <div
-        className={`flex items-center justify-between p-4 rounded-lg ${
+        className={`flex items-center justify-between p-4 rounded-xl ${
           hasExceededMistakeLimit
-            ? 'bg-red-50 border-2 border-red-200'
-            : 'bg-gray-50 border border-gray-200'
+            ? 'bg-red-500/10 border-2 border-red-500/30'
+            : 'bg-white/5 border border-white/10'
         }`}
       >
         <span
           className={`font-semibold ${
-            hasExceededMistakeLimit ? 'text-red-600' : 'text-gray-700'
+            hasExceededMistakeLimit ? 'text-red-400' : 'text-gray-300'
           }`}
         >
           {hasExceededMistakeLimit ? 'Too Many Mistakes!' : `Mistakes: ${mistakeCount}/3`}
@@ -276,8 +280,8 @@ export default function WordPuzzle({
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className={`w-3 h-3 rounded-full ${
-                i <= mistakeCount ? 'bg-red-500' : 'bg-gray-300'
+              className={`w-3 h-3 rounded-full transition-colors ${
+                i <= mistakeCount ? 'bg-red-500' : 'bg-white/20'
               }`}
             />
           ))}
@@ -290,9 +294,9 @@ export default function WordPuzzle({
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <div className="min-h-[120px] bg-green-50 border-2 border-dashed border-green-300 rounded-xl p-6">
+        <div className="min-h-[120px] bg-green-500/10 border-2 border-dashed border-green-500/30 rounded-xl p-6">
           {answer.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-gray-400">
+            <div className="flex items-center justify-center h-full text-gray-500 text-sm">
               Drag or click words from below to build the ayah
             </div>
           ) : (
@@ -317,10 +321,10 @@ export default function WordPuzzle({
         </div>
 
         {/* Word Bank */}
-        <div className="min-h-[200px] bg-white border-2 border-gray-200 rounded-xl p-6">
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">Word Bank</h4>
+        <div className="min-h-[200px] bg-white/5 border-2 border-white/10 rounded-xl p-6">
+          <h4 className="text-lg font-semibold text-white mb-4">Word Bank</h4>
           {bank.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-gray-400">
+            <div className="flex items-center justify-center h-full text-gray-500 text-sm">
               All words used. Click words above to remove them.
             </div>
           ) : (
@@ -342,11 +346,11 @@ export default function WordPuzzle({
                     px-4 py-2 rounded-xl cursor-pointer
                     ${
                       incorrectTokenId === token.id
-                        ? 'bg-red-100 border-2 border-red-500'
-                        : 'bg-blue-50 border border-gray-200 hover:bg-blue-100'
+                        ? 'bg-red-500/20 border-2 border-red-500 text-red-400'
+                        : 'bg-white/10 border border-white/20 hover:bg-white/15 text-white'
                     }
                     shadow-sm hover:shadow-md transition-all
-                    text-right font-medium text-lg
+                    text-right font-medium text-lg font-arabic
                   `}
                 >
                   {token.text}
@@ -364,22 +368,26 @@ export default function WordPuzzle({
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+            className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50"
           >
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: [0, 1.2, 1] }}
-              className="bg-white rounded-2xl p-8 text-center shadow-2xl"
+              className="bg-[#111] border border-white/10 rounded-2xl p-8 text-center shadow-2xl relative overflow-hidden"
             >
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 0.5 }}
-                className="text-6xl mb-4"
-              >
-                🎉
-              </motion.div>
-              <h3 className="text-2xl font-bold text-green-600 mb-2">Excellent!</h3>
-              <p className="text-gray-600">You've completed this puzzle correctly!</p>
+              {/* Animated border glow */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-500/30 via-emerald-500/30 to-green-500/30 animate-pulse" />
+              <div className="relative z-10">
+                <motion.div
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 0.5 }}
+                  className="text-6xl mb-4"
+                >
+                  🎉
+                </motion.div>
+                <h3 className="text-2xl font-bold text-green-400 mb-2">Excellent!</h3>
+                <p className="text-gray-300">You've completed this puzzle correctly!</p>
+              </div>
             </motion.div>
           </motion.div>
         )}

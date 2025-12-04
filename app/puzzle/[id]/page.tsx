@@ -63,6 +63,18 @@ export default async function PuzzlePage({
     );
   }
 
+  // Find previous and next puzzles in the same surah/juz
+  const puzzles = await Puzzle.find({
+    juzId: puzzle.juzId,
+    surahId: puzzle.surahId,
+  })
+    .sort({ 'content.ayahNumber': 1 })
+    .lean() as any[];
+
+  const currentIndex = puzzles.findIndex((p: any) => p._id.toString() === id);
+  const previousPuzzle = currentIndex > 0 ? puzzles[currentIndex - 1] : null;
+  const nextPuzzle = currentIndex < puzzles.length - 1 ? puzzles[currentIndex + 1] : null;
+
   const content = puzzle.content as { ayahText: string };
   const ayahText = content.ayahText || '';
 
@@ -95,6 +107,8 @@ export default async function PuzzlePage({
       ayahText={ayahText}
       userId={user.id}
       isLiked={!!likedAyat}
+      previousPuzzleId={previousPuzzle?._id.toString() || null}
+      nextPuzzleId={nextPuzzle?._id.toString() || null}
     />
   );
 }

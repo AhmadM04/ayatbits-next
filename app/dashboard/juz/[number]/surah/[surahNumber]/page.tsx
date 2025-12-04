@@ -2,7 +2,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { redirect, notFound } from 'next/navigation';
 import { connectDB, Surah, Juz, Puzzle, UserProgress, User, LikedAyat } from '@/lib/db';
 import Link from 'next/link';
-import { ArrowLeft, Play, CheckCircle, Heart } from 'lucide-react';
+import { ArrowLeft, Play, CheckCircle, Heart, Search } from 'lucide-react';
 import VersePageClient from './VersePageClient';
 import TranslationDisplay from './TranslationDisplay';
 import AudioPlayer from './AudioPlayer';
@@ -76,6 +76,12 @@ export default async function SurahVersePage({
 
   // Find the current puzzle
   const currentPuzzle = puzzles.find((p: any) => p.content?.ayahNumber === selectedAyah);
+  const currentIndex = puzzles.findIndex((p: any) => p.content?.ayahNumber === selectedAyah);
+
+  // Calculate progress
+  const totalAyahs = puzzles.length;
+  const completedAyahs = completedPuzzleIds.size;
+  const progressPercentage = totalAyahs > 0 ? (completedAyahs / totalAyahs) * 100 : 0;
 
   return (
     <VersePageClient translationCode={selectedTranslation}>
@@ -99,6 +105,35 @@ export default async function SurahVersePage({
         </header>
 
         <main className="max-w-4xl mx-auto px-4 py-6">
+          {/* Progress Bar and Search Button */}
+          <div className="mb-6 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-400">Progress</span>
+                  <span className="text-sm font-medium text-green-400">
+                    {completedAyahs}/{totalAyahs} Ayahs
+                  </span>
+                </div>
+                <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full transition-all duration-500"
+                    style={{ width: `${progressPercentage}%` }}
+                  />
+                </div>
+              </div>
+              <button
+                id="search-ayah-button"
+                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all group"
+              >
+                <Search className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
+                <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">
+                  Select Ayah
+                </span>
+              </button>
+            </div>
+          </div>
+
           {/* Ayah Selector */}
           <AyahSelectorClient
             puzzles={puzzles.map((p: any) => ({
@@ -149,10 +184,15 @@ export default async function SurahVersePage({
               {/* Start Puzzle Button */}
               <Link
                 href={`/puzzle/${currentPuzzle._id.toString()}`}
-                className="flex items-center justify-center gap-3 w-full py-4 bg-green-600 hover:bg-green-700 rounded-xl font-medium transition-colors"
+                className="group relative flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-xl font-semibold transition-all overflow-hidden"
               >
-                <Play className="w-5 h-5" />
-                Start Puzzle
+                {/* Animated border glow */}
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-green-400 via-emerald-400 to-green-400 opacity-0 group-hover:opacity-50 blur-lg transition-opacity duration-500 animate-pulse" />
+                {/* Animated edge glow */}
+                <div className="absolute inset-0 rounded-xl border-2 border-green-400/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-x-[-100%] group-hover:translate-x-[100%] animate-shimmer" />
+                <Play className="w-5 h-5 relative z-10 group-hover:scale-110 transition-transform" />
+                <span className="relative z-10">Start Puzzle</span>
               </Link>
             </div>
           ) : (
