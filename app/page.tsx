@@ -1,10 +1,10 @@
 'use client';
 
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { BookOpen, Puzzle, Trophy, Flame, Star, Sparkles, User } from "lucide-react";
+import { BookOpen, Puzzle, Trophy, Flame, Star, Sparkles } from "lucide-react";
 
 // Floating Arabic letters/words for the background
 const floatingArabicWords = [
@@ -31,7 +31,7 @@ function UserProfileSection() {
       animate={{ opacity: 1, y: 0 }}
       className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 border border-white/10"
     >
-      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0">
         {user.imageUrl ? (
           <img src={user.imageUrl} alt={user.firstName || 'User'} className="w-full h-full rounded-full object-cover" />
         ) : (
@@ -48,7 +48,11 @@ function UserProfileSection() {
           {user.emailAddresses[0]?.emailAddress}
         </div>
       </div>
-      <UserButton afterSignOutUrl="/" />
+      <Link href="/dashboard">
+        <Button className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2">
+          Dashboard
+        </Button>
+      </Link>
     </motion.div>
   );
 }
@@ -63,15 +67,15 @@ export default function Home() {
         <div className="absolute top-1/2 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
         <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-green-600/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '0.5s' }} />
         
-        {/* Floating Arabic words - increased opacity for visibility */}
+        {/* Floating Arabic words - much more visible now */}
         {floatingArabicWords.map((word, index) => (
           <motion.div
             key={index}
-            className="absolute text-3xl sm:text-4xl md:text-5xl font-arabic text-green-500/15 select-none pointer-events-none"
+            className="absolute text-4xl sm:text-5xl md:text-6xl font-arabic text-green-500/30 select-none pointer-events-none"
             style={{ left: word.x, top: word.y }}
             animate={{
               y: [0, -30, 0],
-              opacity: [0.15, 0.25, 0.15],
+              opacity: [0.3, 0.5, 0.3],
               rotate: [0, 5, 0],
             }}
             transition={{
@@ -102,7 +106,7 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <SignedOut>
                   <SignInButton mode="modal">
-                    <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10">
+                    <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/20">
                       Sign In
                     </Button>
                   </SignInButton>
@@ -149,7 +153,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <SignedOut>
                   <SignInButton mode="modal">
-                    <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-6 text-lg rounded-xl">
+                    <Button size="lg" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-6 text-lg rounded-xl">
                       Sign In
                     </Button>
                   </SignInButton>
@@ -275,7 +279,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <SignedOut>
                   <SignInButton mode="modal">
-                    <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-6 text-lg rounded-xl">
+                    <Button size="lg" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-6 text-lg rounded-xl">
                       Sign In
                     </Button>
                   </SignInButton>

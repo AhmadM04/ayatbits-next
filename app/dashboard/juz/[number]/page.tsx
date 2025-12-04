@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { connectDB, Juz, Surah, Puzzle, UserProgress, User } from '@/lib/db';
 import mongoose from 'mongoose';
 import JuzContent from './JuzContent';
+import DashboardI18nProvider from '../../DashboardI18nProvider';
 
 export default async function JuzPage({
   params,
@@ -32,6 +33,7 @@ export default async function JuzPage({
     });
   }
 
+  const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
   const juz = await Juz.findOne({ number: juzNumber }).lean() as any;
 
   if (!juz) {
@@ -96,11 +98,12 @@ export default async function JuzPage({
   }));
 
   return (
-    <JuzContent
-      juzName={juz.name}
-      surahs={serializedSurahs}
-      juzNumber={juz.number}
-    />
+    <DashboardI18nProvider translationCode={selectedTranslation}>
+      <JuzContent
+        juzName={juz.name}
+        surahs={serializedSurahs}
+        juzNumber={juz.number}
+      />
+    </DashboardI18nProvider>
   );
 }
-

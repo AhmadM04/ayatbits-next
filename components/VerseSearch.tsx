@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Search, X, Sparkles, Loader2, BookOpen } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useI18n } from '@/lib/i18n';
+import { useI18nSafe } from '@/lib/i18n';
 
 // Complete mapping of all 114 surahs to their primary juz
 const SURAH_TO_JUZ: { [key: number]: number } = {
@@ -131,7 +131,7 @@ export default function VerseSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const { t } = useI18n();
+  const { t } = useI18nSafe(); // Use safe version
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
