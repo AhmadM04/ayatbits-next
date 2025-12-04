@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Heart, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
-import { useI18n } from '@/lib/i18n';
+import { I18nProvider, useI18n } from '@/lib/i18n';
 
 interface LikedAyah {
   id: string;
@@ -19,7 +19,7 @@ interface LikedAyah {
   likedAt: string;
 }
 
-export default function LikedAyahsPage() {
+function LikedAyahsContent() {
   const { t } = useI18n();
   const [likedAyahs, setLikedAyahs] = useState<LikedAyah[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -161,5 +161,13 @@ export default function LikedAyahsPage() {
 
       <BottomNav />
     </div>
+  );
+}
+
+export default function LikedAyahsPage() {
+  return (
+    <I18nProvider>
+      <LikedAyahsContent />
+    </I18nProvider>
   );
 }

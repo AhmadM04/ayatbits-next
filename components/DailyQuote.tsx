@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ExternalLink, RefreshCw, Volume2 } from 'lucide-react';
+import { Sparkles, ExternalLink, RefreshCw, Volume2, WifiOff } from 'lucide-react';
+import { apiGet, NetworkError } from '@/lib/api-client';
 
 interface DailyQuoteData {
   arabicText: string;
@@ -24,27 +25,35 @@ interface DailyQuoteProps {
 export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuoteProps) {
   const [quote, setQuote] = useState<DailyQuoteData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    fetchDailyQuote();
-  }, [translationEdition]);
-
-  const fetchDailyQuote = async () => {
+  const fetchDailyQuote = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     try {
-      const response = await fetch(`/api/daily-quote?translation=${translationEdition}`);
-      const data = await response.json();
+      const data = await apiGet<{ success: boolean; data: DailyQuoteData }>(
+        `/api/daily-quote?translation=${translationEdition}`
+      );
       if (data.success) {
         setQuote(data.data);
       }
-    } catch (error) {
-      console.error('Failed to fetch daily quote:', error);
+    } catch (err) {
+      if (err instanceof NetworkError) {
+        setError('Unable to load verse. Check your connection.');
+      } else {
+        console.error('Failed to fetch daily quote:', err);
+        setError('Failed to load verse.');
+      }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [translationEdition]);
+
+  useEffect(() => {
+    fetchDailyQuote();
+  }, [fetchDailyQuote]);
 
   const playAudio = async () => {
     if (!quote) return;
@@ -98,6 +107,24 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
           <div className="h-16 bg-white/5 rounded-lg" />
           <div className="h-12 bg-white/5 rounded-lg" />
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-gradient-to-br from-orange-900/20 to-red-900/10 border border-orange-500/20 rounded-2xl p-6">
+        <div className="flex items-center gap-3 text-orange-400">
+          <WifiOff className="w-5 h-5" />
+          <span className="text-sm">{error}</span>
+        </div>
+        <button
+          onClick={fetchDailyQuote}
+          className="mt-3 flex items-center gap-2 text-sm text-orange-400 hover:text-orange-300 transition-colors"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Retry
+        </button>
       </div>
     );
   }

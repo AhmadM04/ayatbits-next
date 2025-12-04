@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Lock, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
-import { useI18n } from '@/lib/i18n';
+import { I18nProvider, useI18n } from '@/lib/i18n';
 
 interface Achievement {
   id: string;
@@ -30,7 +30,7 @@ interface Stats {
   completedJuz: number;
 }
 
-export default function AchievementsPage() {
+function AchievementsContent() {
   const { t } = useI18n();
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -200,5 +200,13 @@ export default function AchievementsPage() {
 
       <BottomNav />
     </div>
+  );
+}
+
+export default function AchievementsPage() {
+  return (
+    <I18nProvider>
+      <AchievementsContent />
+    </I18nProvider>
   );
 }

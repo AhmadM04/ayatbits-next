@@ -1,8 +1,8 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { connectDB, Puzzle, LikedAyat, User } from '@/lib/db';
-import PuzzleClient from './PuzzleClient';
+import { connectDB, Puzzle, LikedAyat, User, Surah, Juz } from '@/lib/db';
 import mongoose from 'mongoose';
+import PuzzleClient from './PuzzleClient';
 
 export default async function PuzzlePage({
   params,
@@ -14,6 +14,20 @@ export default async function PuzzlePage({
 
   if (!user) {
     redirect('/sign-in');
+  }
+
+  // Validate MongoDB ObjectId
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white mb-2">Invalid puzzle ID</h1>
+          <a href="/dashboard" className="text-green-500 hover:underline">
+            Go back to dashboard
+          </a>
+        </div>
+      </div>
+    );
   }
 
   await connectDB();
@@ -38,10 +52,10 @@ export default async function PuzzlePage({
 
   if (!puzzle) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Puzzle not found</h1>
-          <a href="/dashboard" className="text-green-600 hover:underline">
+          <h1 className="text-2xl font-bold text-white mb-2">Puzzle not found</h1>
+          <a href="/dashboard" className="text-green-500 hover:underline">
             Go back to dashboard
           </a>
         </div>
@@ -49,58 +63,31 @@ export default async function PuzzlePage({
     );
   }
 
-  const content = puzzle.content as { ayahText: string; ayahNumber?: number };
+  const content = puzzle.content as { ayahText: string };
   const ayahText = content.ayahText || '';
-  const currentAyahNumber = content.ayahNumber || 1;
 
   // Check if liked
   const likedAyat = await LikedAyat.findOne({
     userId: dbUser._id,
-    puzzleId: new mongoose.Types.ObjectId(id),
-  }).lean();
+    puzzleId: puzzle._id,
+  });
 
-  // Find next puzzle in the same surah and juz
-  let nextPuzzle = null;
-  if (puzzle.surahId && puzzle.juzId) {
-    const nextPuzzles = await Puzzle.find({
-      juzId: puzzle.juzId,
-      surahId: puzzle.surahId,
-    })
-      .sort({ 'content.ayahNumber': 1 })
-      .lean() as any;
-    
-    const currentIndex = nextPuzzles.findIndex(
-      (p: any) => p._id.toString() === id
-    );
-    
-    if (currentIndex >= 0 && currentIndex < nextPuzzles.length - 1) {
-      nextPuzzle = nextPuzzles[currentIndex + 1];
-    }
-  }
-
-  // Serialize puzzle for client component - convert ObjectIds to strings and map fields
+  // Serialize the puzzle for the client component
   const serializedPuzzle = {
     id: puzzle._id.toString(),
+    type: puzzle.type,
+    content: puzzle.content,
+    difficulty: puzzle.difficulty,
     surah: puzzle.surahId ? {
-      nameEnglish: (puzzle.surahId as any).nameEnglish || '',
-      nameArabic: (puzzle.surahId as any).nameArabic || '',
-      number: (puzzle.surahId as any).number || 0,
+      number: puzzle.surahId.number,
+      nameEnglish: puzzle.surahId.nameEnglish,
+      nameArabic: puzzle.surahId.nameArabic,
     } : null,
     juz: puzzle.juzId ? {
-      number: (puzzle.juzId as any).number || 0,
+      number: puzzle.juzId.number,
+      name: puzzle.juzId.name,
     } : null,
-    content: {
-      ayahNumber: currentAyahNumber,
-    },
-    nextAyahUrl: nextPuzzle && puzzle.surahId && puzzle.juzId
-      ? `/dashboard/juz/${(puzzle.juzId as any).number}/surah/${(puzzle.surahId as any).number}?ayah=${nextPuzzle.content.ayahNumber}`
-      : null,
-    ayahViewUrl: puzzle.surahId && puzzle.juzId && currentAyahNumber
-      ? `/dashboard/juz/${(puzzle.juzId as any).number}/surah/${(puzzle.surahId as any).number}?ayah=${currentAyahNumber}`
-      : null,
   };
-
-  const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
 
   return (
     <PuzzleClient
@@ -108,8 +95,6 @@ export default async function PuzzlePage({
       ayahText={ayahText}
       userId={user.id}
       isLiked={!!likedAyat}
-      translationCode={selectedTranslation}
     />
   );
 }
-

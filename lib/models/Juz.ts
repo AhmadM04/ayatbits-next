@@ -21,3 +21,4 @@ export default mongoose.models.Juz || mongoose.model<IJuz>('Juz', JuzSchema);
 
 
 
+

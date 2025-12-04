@@ -1,8 +1,8 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { connectDB, Juz, UserProgress, User, Puzzle } from '@/lib/db';
+import { connectDB, Juz, Puzzle, UserProgress, User } from '@/lib/db';
 import DashboardContent from './DashboardContent';
-import { getTrialDaysRemaining } from '@/lib/subscription';
+import DashboardI18nProvider from './DashboardI18nProvider';
 
 export default async function DashboardPage() {
   const user = await currentUser();
@@ -11,104 +11,96 @@ export default async function DashboardPage() {
     redirect('/sign-in');
   }
 
-  // Parallelize DB connection and user lookup
-  const [dbConnection, dbUser] = await Promise.all([
-    connectDB().catch(() => null), // Don't block if DB fails
-    User.findOne({ clerkId: user.id }).lean() as Promise<any>,
-  ]);
-  
+  await connectDB();
+
+  // Find or create user
+  let dbUser = await User.findOne({ clerkId: user.id });
   if (!dbUser) {
-    // User should exist from layout, but handle edge case
-    redirect('/pricing?trial=true');
+    dbUser = await User.create({
+      clerkId: user.id,
+      email: user.emailAddresses[0]?.emailAddress || '',
+      firstName: user.firstName,
+      lastName: user.lastName,
+      name: user.fullName,
+      imageUrl: user.imageUrl,
+    });
   }
 
-  // Optimized: Get Juzs with puzzle counts using aggregation (single query instead of 30+)
-  const juzsWithCounts = await Juz.aggregate([
-    { $sort: { number: 1 } },
-    {
-      $lookup: {
-        from: 'puzzles',
-        localField: '_id',
-        foreignField: 'juzId',
-        as: 'puzzles',
-      },
-    },
-    {
-      $project: {
-        _id: 1,
-        number: 1,
-        name: 1,
-        nameTransliterated: 1,
-        nameTranslated: 1,
-        createdAt: 1,
-        updatedAt: 1,
-        _count: { puzzles: { $size: '$puzzles' } },
-      },
-    },
-  ]);
+  // Fetch all Juzs
+  const juzs = await Juz.find().sort({ number: 1 }).lean() as any[];
 
-  // Optimized: Get user progress with minimal data (no populate needed)
-  const userProgress = await UserProgress.find({
+  // Get puzzle counts for each juz
+  const juzsWithData = await Promise.all(
+    juzs.map(async (juz: any) => {
+      const puzzleCount = await Puzzle.countDocuments({ juzId: juz._id });
+      const puzzles = await Puzzle.find({ juzId: juz._id }).select('_id').lean() as any[];
+      const puzzleIds = puzzles.map((p: any) => p._id);
+      
+      const completedCount = await UserProgress.countDocuments({
+        userId: dbUser._id,
+        puzzleId: { $in: puzzleIds },
+        status: 'COMPLETED',
+      });
+
+      const progress = puzzleCount > 0 ? Math.round((completedCount / puzzleCount) * 100) : 0;
+
+      return {
+        _id: juz._id.toString(),
+        number: juz.number,
+        name: juz.name,
+        _count: { puzzles: puzzleCount },
+        completedPuzzles: completedCount,
+        progress,
+      };
+    })
+  );
+
+  // Get user progress stats
+  const totalCompletedPuzzles = await UserProgress.countDocuments({
+    userId: dbUser._id,
+    status: 'COMPLETED',
+  });
+
+  // Get unique juzs explored
+  const completedProgress = await UserProgress.find({
     userId: dbUser._id,
     status: 'COMPLETED',
   })
-    .select('puzzleId')
-    .lean();
-  
-  // Get puzzle IDs for lookup
-  const puzzleIds = userProgress.map((p: any) => p.puzzleId);
-  
-  // Get puzzle details in one query
-  const puzzles = await Puzzle.find({
-    _id: { $in: puzzleIds },
-  })
-    .select('juzId surahId')
-    .lean();
-  
-  // Create lookup map
-  const puzzleMap = new Map(puzzles.map((p: any) => [p._id.toString(), p]));
+    .populate({
+      path: 'puzzleId',
+      select: 'juzId',
+    })
+    .lean() as any[];
 
-  // Calculate juzs explored and progress efficiently
-  const juzProgressMap = new Map<string, number>();
-  userProgress.forEach((p: any) => {
-    const puzzle = puzzleMap.get(p.puzzleId?.toString());
-    if (puzzle?.juzId) {
-      const juzId = puzzle.juzId.toString();
-      juzProgressMap.set(juzId, (juzProgressMap.get(juzId) || 0) + 1);
-    }
-  });
-  
-  const juzsExplored = juzProgressMap.size;
-  
-  const serializedJuzs = juzsWithCounts.map((juz: any) => {
-    const juzId = juz._id.toString();
-    const completedPuzzles = juzProgressMap.get(juzId) || 0;
-    const totalPuzzles = juz._count?.puzzles || 0;
-    const progress = totalPuzzles > 0 ? (completedPuzzles / totalPuzzles) * 100 : 0;
+  const juzsExplored = new Set(
+    completedProgress
+      .map((p: any) => p.puzzleId?.juzId?.toString())
+      .filter(Boolean)
+  ).size;
 
-    return {
-      _id: juzId,
-      number: juz.number,
-      name: juz.name,
-      _count: { puzzles: totalPuzzles },
-      progress,
-      completedPuzzles,
-    };
-  });
+  // Get user settings
+  const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
+  
+  // Calculate streak (simplified - you may want more complex logic)
+  const currentStreak = dbUser.currentStreak || 0;
 
-  const trialDaysLeft = getTrialDaysRemaining(dbUser.trialEndsAt);
+  // Trial and subscription info
+  const trialDaysLeft = dbUser.trialEndDate 
+    ? Math.max(0, Math.ceil((new Date(dbUser.trialEndDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0;
 
   return (
-    <DashboardContent
-      userFirstName={user.firstName}
-      currentStreak={dbUser.currentStreak || 0}
-      completedPuzzles={userProgress.length}
-      juzsExplored={juzsExplored}
-      selectedTranslation={dbUser.selectedTranslation || 'en.sahih'}
-      trialDaysLeft={trialDaysLeft}
-      subscriptionStatus={dbUser.subscriptionStatus}
-      juzs={serializedJuzs}
-    />
+    <DashboardI18nProvider translationCode={selectedTranslation}>
+      <DashboardContent
+        userFirstName={user.firstName}
+        currentStreak={currentStreak}
+        completedPuzzles={totalCompletedPuzzles}
+        juzsExplored={juzsExplored}
+        selectedTranslation={selectedTranslation}
+        trialDaysLeft={trialDaysLeft}
+        subscriptionStatus={dbUser.subscriptionStatus}
+        juzs={juzsWithData}
+      />
+    </DashboardI18nProvider>
   );
 }
-

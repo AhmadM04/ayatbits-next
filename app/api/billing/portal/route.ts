@@ -1,27 +1,13 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { connectDB } from '@/lib/db';
-import User from '@/lib/models/User';
-import { getAppUrl } from '@/lib/get-app-url';
+import { connectDB, User } from '@/lib/db';
 
-const stripe = process.env.STRIPE_SECRET_KEY
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2025-11-17.clover',
-    })
-  : null;
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST() {
   try {
-    if (!stripe) {
-      return NextResponse.json(
-        { error: 'Stripe not configured' },
-        { status: 500 }
-      );
-    }
-
     const user = await currentUser();
-
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -29,23 +15,19 @@ export async function POST() {
     await connectDB();
 
     const dbUser = await User.findOne({ clerkId: user.id });
-
     if (!dbUser?.stripeCustomerId) {
       return NextResponse.json(
         { error: 'No billing account found. Please subscribe first.' },
-        { status: 404 }
+        { status: 400 }
       );
     }
 
-    const appUrl = await getAppUrl();
-
-    // Create Stripe Billing Portal session
-    const session = await stripe.billingPortal.sessions.create({
+    const portalSession = await stripe.billingPortal.sessions.create({
       customer: dbUser.stripeCustomerId,
-      return_url: `${appUrl}/dashboard/profile`,
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/profile`,
     });
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: portalSession.url });
   } catch (error: any) {
     console.error('Billing portal error:', error);
     return NextResponse.json(
@@ -54,5 +36,3 @@ export async function POST() {
     );
   }
 }
-
-

@@ -4,15 +4,15 @@ import { useState, useEffect } from 'react';
 import AyahSelectorModal from './AyahSelectorModal';
 
 interface AyahSelectorClientProps {
-  puzzles: Array<{ _id: string; content: { ayahNumber?: number } }>;
-  currentAyahNumber: number;
+  puzzles: Array<{ id: string; ayahNumber: number; isCompleted: boolean; isLiked: boolean }>;
+  currentAyah: number;
   juzNumber: number;
   surahNumber: number;
 }
 
 export default function AyahSelectorClient({
   puzzles,
-  currentAyahNumber,
+  currentAyah,
   juzNumber,
   surahNumber,
 }: AyahSelectorClientProps) {
@@ -53,12 +53,18 @@ export default function AyahSelectorClient({
     };
   }, []);
 
+  // Transform puzzles to format expected by modal
+  const modalPuzzles = puzzles.map(p => ({
+    _id: p.id,
+    content: { ayahNumber: p.ayahNumber },
+  }));
+
   return (
     <AyahSelectorModal
       isOpen={isModalOpen}
       onClose={() => setIsModalOpen(false)}
-      puzzles={puzzles}
-      currentAyahNumber={currentAyahNumber}
+      puzzles={modalPuzzles}
+      currentAyahNumber={currentAyah}
       juzNumber={juzNumber}
       surahNumber={surahNumber}
     />

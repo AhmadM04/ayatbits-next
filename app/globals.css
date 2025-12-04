@@ -101,11 +101,24 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-/* Smooth animations */
-* {
+/* 
+ * Smooth animations - applied only to interactive elements for better mobile performance
+ * Removed global * selector to prevent layout thrashing on mobile devices
+ */
+a, button, [role="button"], input, select, textarea,
+.transition-colors, .transition-all, .transition-transform {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Page transition animations */

@@ -1,89 +1,66 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export enum SubscriptionPlan {
-  MONTHLY = 'monthly',
-  YEARLY = 'yearly',
-}
-
 export enum SubscriptionStatusEnum {
   INACTIVE = 'inactive',
   TRIALING = 'trialing',
   ACTIVE = 'active',
-  PAST_DUE = 'past_due',
   CANCELED = 'canceled',
+  PAST_DUE = 'past_due',
+  LIFETIME = 'lifetime',
+}
+
+export enum SubscriptionPlan {
+  FREE = 'free',
+  MONTHLY = 'monthly',
+  YEARLY = 'yearly',
+  LIFETIME = 'lifetime',
 }
 
 export interface IUser extends Document {
   clerkId: string;
   email: string;
-  name?: string;
   firstName?: string;
   lastName?: string;
-  username?: string;
+  name?: string;
   imageUrl?: string;
-  selectedTranslation?: string;
-  // Subscription fields
-  subscriptionStatus: string;
-  subscriptionPlan?: string;
+  subscriptionStatus: SubscriptionStatusEnum;
+  subscriptionPlan?: SubscriptionPlan;
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
-  trialEndsAt?: Date;
-  currentPeriodEnd?: Date;
-  // Admin access
-  isAdmin?: boolean;
-  // Admin bypass - users with lifetime access
-  hasBypass?: boolean;
-  bypassReason?: string;
-  // Activity & Progress
+  trialEndDate?: Date;
+  selectedTranslation: string;
   currentStreak: number;
   longestStreak: number;
-  lastActivityDate?: Date;
-  lastPuzzleId?: mongoose.Types.ObjectId;
-  totalPuzzlesCompleted: number;
-  totalTimeSpent: number; // in seconds
+  lastActiveDate?: Date;
   createdAt: Date;
   updatedAt: Date;
-  lastActiveAt: Date;
 }
 
 const UserSchema = new Schema<IUser>(
   {
-    clerkId: { type: String, required: false, unique: true, sparse: true, index: true },
-    email: { type: String, required: true, unique: true, index: true },
-    name: String,
+    clerkId: { type: String, required: true, unique: true, index: true },
+    email: { type: String, required: true, index: true },
     firstName: String,
     lastName: String,
-    username: String,
+    name: String,
     imageUrl: String,
-    selectedTranslation: { type: String, default: 'en.sahih' },
-    // Subscription fields
     subscriptionStatus: {
       type: String,
       enum: Object.values(SubscriptionStatusEnum),
-      default: SubscriptionStatusEnum.INACTIVE,
+      default: SubscriptionStatusEnum.TRIALING,
     },
     subscriptionPlan: {
       type: String,
-      enum: [...Object.values(SubscriptionPlan), null],
-      default: null,
+      enum: Object.values(SubscriptionPlan),
+      default: SubscriptionPlan.FREE,
     },
-    stripeCustomerId: String,
+    stripeCustomerId: { type: String, index: true },
     stripeSubscriptionId: String,
-    trialEndsAt: Date,
-    currentPeriodEnd: Date,
-    // Admin access
-    isAdmin: { type: Boolean, default: false },
-    // Admin bypass - users with lifetime access
-    hasBypass: { type: Boolean, default: false },
-    bypassReason: String,
-    // Activity & Progress
+    trialEndDate: { type: Date, default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) }, // 7 days trial
+    selectedTranslation: { type: String, default: 'en.sahih' },
     currentStreak: { type: Number, default: 0 },
     longestStreak: { type: Number, default: 0 },
-    lastActivityDate: Date,
-    lastPuzzleId: { type: Schema.Types.ObjectId, ref: 'Puzzle' },
-    totalPuzzlesCompleted: { type: Number, default: 0 },
-    totalTimeSpent: { type: Number, default: 0 },
-    lastActiveAt: { type: Date, default: Date.now },
+    lastActiveDate: Date,
   },
   {
     timestamps: true,

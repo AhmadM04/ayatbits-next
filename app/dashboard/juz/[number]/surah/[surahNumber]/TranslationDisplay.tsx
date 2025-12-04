@@ -8,7 +8,7 @@ interface TranslationDisplayProps {
   surahNumber: number;
   ayahNumber: number;
   selectedTranslation: string;
-  initialTranslation: string;
+  initialTranslation?: string;
 }
 
 const translationNames: Record<string, string> = {

@@ -1,165 +1,169 @@
 'use client';
 
-import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { getLocaleFromTranslation } from './i18n-config';
-// Dynamically import English to avoid blocking initial render
-// This allows the page to render immediately, then load translations
-import type enMessagesType from '../messages/en.json';
-type Messages = typeof enMessagesType;
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from 'react';
+import { getLocaleFromTranslation, Locale, DEFAULT_LOCALE } from './i18n-config';
 
-let enMessagesPromise: Promise<Messages> | null = null;
-const loadEnMessages = async (): Promise<Messages> => {
-  if (!enMessagesPromise) {
-    enMessagesPromise = import('../messages/en.json').then(m => m.default);
-  }
-  return enMessagesPromise;
-};
-// Preload English immediately but don't block
-loadEnMessages();
+// Import all message files
+import en from '@/messages/en.json';
+import ar from '@/messages/ar.json';
+import fr from '@/messages/fr.json';
+import es from '@/messages/es.json';
+import de from '@/messages/de.json';
+import tr from '@/messages/tr.json';
+import ur from '@/messages/ur.json';
+import id from '@/messages/id.json';
+import ms from '@/messages/ms.json';
+import bn from '@/messages/bn.json';
+import hi from '@/messages/hi.json';
+import ru from '@/messages/ru.json';
+import zh from '@/messages/zh.json';
+import ja from '@/messages/ja.json';
+import nl from '@/messages/nl.json';
 
-// Lazy-loaded messages cache
-const messagesCache: Record<string, Messages> = {};
+type Messages = typeof en;
+type MessagePath = string;
 
-// Lazy load translations (including English)
-const loadMessages = async (locale: string): Promise<Messages> => {
-  if (messagesCache[locale]) {
-    return messagesCache[locale];
-  }
-
-  try {
-    let messages: Messages;
-    switch (locale) {
-      case 'en':
-        messages = await loadEnMessages();
-        break;
-      case 'zh':
-        messages = (await import('../messages/zh.json')).default;
-        break;
-      case 'ar':
-        messages = (await import('../messages/ar.json')).default;
-        break;
-      case 'ru':
-        messages = (await import('../messages/ru.json')).default;
-        break;
-      case 'fr':
-        messages = (await import('../messages/fr.json')).default;
-        break;
-      case 'es':
-        messages = (await import('../messages/es.json')).default;
-        break;
-      case 'de':
-        messages = (await import('../messages/de.json')).default;
-        break;
-      case 'tr':
-        messages = (await import('../messages/tr.json')).default;
-        break;
-      case 'ur':
-        messages = (await import('../messages/ur.json')).default;
-        break;
-      case 'id':
-        messages = (await import('../messages/id.json')).default;
-        break;
-      case 'ms':
-        messages = (await import('../messages/ms.json')).default;
-        break;
-      case 'bn':
-        messages = (await import('../messages/bn.json')).default;
-        break;
-      case 'hi':
-        messages = (await import('../messages/hi.json')).default;
-        break;
-      case 'ja':
-        messages = (await import('../messages/ja.json')).default;
-        break;
-      case 'nl':
-        messages = (await import('../messages/nl.json')).default;
-        break;
-      default:
-        messages = await loadEnMessages();
-    }
-    messagesCache[locale] = messages;
-    return messages;
-  } catch (error) {
-    console.warn(`Failed to load messages for locale: ${locale}`, error);
-    return await loadEnMessages(); // Fallback to English
-  }
+const messages: Record<Locale, Messages> = {
+  en,
+  ar,
+  fr,
+  es,
+  de,
+  tr,
+  ur,
+  id,
+  ms,
+  bn,
+  hi,
+  ru,
+  zh,
+  ja,
+  nl,
 };
 
 interface I18nContextType {
-  locale: string;
-  t: (key: string, params?: Record<string, string | number>) => string;
+  locale: Locale;
+  t: (key: MessagePath, params?: Record<string, string | number>) => string;
+  setLocale: (locale: Locale) => void;
 }
 
-const I18nContext = createContext<I18nContextType>({
-  locale: 'en',
-  t: (key: string) => key,
-});
+const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
-export function useI18n() {
-  return useContext(I18nContext);
-}
-
-export function I18nProvider({
-  children,
-  translationCode,
-}: {
-  children: ReactNode;
-  translationCode: string;
-}) {
-  const locale = getLocaleFromTranslation(translationCode);
-  const [messages, setMessages] = useState<Messages | null>(messagesCache[locale] || null);
+/**
+ * Get a nested value from an object using a dot-separated path
+ */
+function getNestedValue(obj: Record<string, unknown>, path: string): string | undefined {
+  const keys = path.split('.');
+  let current: unknown = obj;
   
-  // Load messages asynchronously (non-blocking)
-  useEffect(() => {
-    if (!messagesCache[locale]) {
-      loadMessages(locale).then((loadedMessages) => {
-        setMessages(loadedMessages);
-      }).catch(() => {
-        // Fallback handled in loadMessages
-      });
+  for (const key of keys) {
+    if (current && typeof current === 'object' && key in current) {
+      current = (current as Record<string, unknown>)[key];
+    } else {
+      return undefined;
     }
-  }, [locale]);
+  }
   
-  // Use cached messages or fallback to key
-  const localeMessages = messages || messagesCache[locale] || {};
+  return typeof current === 'string' ? current : undefined;
+}
+
+/**
+ * Replace template placeholders with values
+ * Supports {name} and {count} style placeholders
+ */
+function interpolate(template: string, params?: Record<string, string | number>): string {
+  if (!params) return template;
   
-  const t = (key: string, params?: Record<string, string | number>): string => {
-    const keys = key.split('.');
-    let value: any = localeMessages;
-    
-    for (const k of keys) {
-      value = value?.[k];
-      if (value === undefined) {
-        // Fallback to English if available
-        let fallbackValue: any = messagesCache.en;
-        if (fallbackValue) {
-          for (const fk of keys) {
-            fallbackValue = fallbackValue?.[fk];
-          }
-        }
-        if (fallbackValue === undefined) {
-          // Return key if no translation found (don't log in production)
-          if (process.env.NODE_ENV === 'development') {
-            console.warn('Translation not found:', key);
-          }
-        }
-        value = fallbackValue || key;
-        break;
+  return template.replace(/\{(\w+)\}/g, (match, key) => {
+    return params[key]?.toString() ?? match;
+  });
+}
+
+interface I18nProviderProps {
+  children: ReactNode;
+  translationCode?: string;
+}
+
+export function I18nProvider({ children, translationCode }: I18nProviderProps) {
+  const [locale, setLocaleState] = useState<Locale>(() => {
+    // Initialize from translation code if provided
+    if (translationCode) {
+      return getLocaleFromTranslation(translationCode);
+    }
+    return DEFAULT_LOCALE;
+  });
+
+  // Update locale when translationCode changes
+  useEffect(() => {
+    if (translationCode) {
+      const newLocale = getLocaleFromTranslation(translationCode);
+      setLocaleState(newLocale);
+    }
+  }, [translationCode]);
+
+  // Also check localStorage on mount (client-side only)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !translationCode) {
+      const stored = localStorage.getItem('selectedTranslation');
+      if (stored) {
+        setLocaleState(getLocaleFromTranslation(stored));
       }
     }
+  }, [translationCode]);
 
-    if (typeof value === 'string' && params) {
-      return value.replace(/\{(\w+)\}/g, (match, paramKey) => {
-        return params[paramKey]?.toString() || match;
-      });
+  const setLocale = useCallback((newLocale: Locale) => {
+    setLocaleState(newLocale);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('appLocale', newLocale);
     }
+  }, []);
 
-    return typeof value === 'string' ? value : key;
-  };
+  const t = useCallback((key: MessagePath, params?: Record<string, string | number>): string => {
+    const localeMessages = messages[locale] || messages[DEFAULT_LOCALE];
+    const value = getNestedValue(localeMessages as Record<string, unknown>, key);
+    
+    if (!value) {
+      // Fallback to English if translation not found
+      const fallback = getNestedValue(messages[DEFAULT_LOCALE] as Record<string, unknown>, key);
+      if (!fallback) {
+        console.warn(`Translation missing for key: ${key}`);
+        return key;
+      }
+      return interpolate(fallback, params);
+    }
+    
+    return interpolate(value, params);
+  }, [locale]);
+
+  const value = useMemo(() => ({
+    locale,
+    t,
+    setLocale,
+  }), [locale, t, setLocale]);
 
   return (
-    <I18nContext.Provider value={{ locale, t }}>
+    <I18nContext.Provider value={value}>
       {children}
     </I18nContext.Provider>
   );
 }
+
+/**
+ * Hook to access i18n context
+ */
+export function useI18n() {
+  const context = useContext(I18nContext);
+  if (!context) {
+    throw new Error('useI18n must be used within an I18nProvider');
+  }
+  return context;
+}
+
+/**
+ * Get messages for a specific locale (useful for server-side)
+ */
+export function getMessages(locale: Locale): Messages {
+  return messages[locale] || messages[DEFAULT_LOCALE];
+}
+
+export type { Locale, Messages };

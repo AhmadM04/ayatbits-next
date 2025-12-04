@@ -8,9 +8,9 @@ export type SubscriptionAccess = {
 };
 
 export function checkSubscriptionAccess(user: IUser): SubscriptionAccess {
-  // Check for admin bypass first
-  if (user.hasBypass) {
-    return { hasAccess: true, status: 'bypass' };
+  // Check for lifetime plan
+  if (user.subscriptionPlan === 'lifetime' || user.subscriptionStatus === 'lifetime') {
+    return { hasAccess: true, status: 'active' };
   }
 
   const now = new Date();
@@ -23,7 +23,7 @@ export function checkSubscriptionAccess(user: IUser): SubscriptionAccess {
 
   // Trialing (with payment method on file)
   if (status === 'trialing') {
-    const trialEndsAt = user.trialEndsAt;
+    const trialEndsAt = user.trialEndDate;
     if (trialEndsAt && new Date(trialEndsAt) > now) {
       const daysLeft = Math.ceil((new Date(trialEndsAt).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
       return { 
@@ -50,16 +50,8 @@ export function checkSubscriptionAccess(user: IUser): SubscriptionAccess {
     };
   }
 
-  // Canceled but still in period
+  // Canceled
   if (status === 'canceled') {
-    if (user.currentPeriodEnd && new Date(user.currentPeriodEnd) > now) {
-      const daysLeft = Math.ceil((new Date(user.currentPeriodEnd).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      return { 
-        hasAccess: true, 
-        status: 'canceled',
-        trialDaysLeft: daysLeft,
-      };
-    }
     return { 
       hasAccess: false, 
       status: 'canceled',
