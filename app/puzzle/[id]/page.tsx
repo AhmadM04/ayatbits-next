@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { connectDB, Puzzle, LikedAyat, User, Surah, Juz } from '@/lib/db';
 import mongoose from 'mongoose';
 import PuzzleClient from './PuzzleClient';
+import { cleanAyahText } from '@/lib/ayah-utils';
 
 export default async function PuzzlePage({
   params,
@@ -75,8 +76,13 @@ export default async function PuzzlePage({
   const previousPuzzle = currentIndex > 0 ? puzzles[currentIndex - 1] : null;
   const nextPuzzle = currentIndex < puzzles.length - 1 ? puzzles[currentIndex + 1] : null;
 
-  const content = puzzle.content as { ayahText: string };
-  const ayahText = content.ayahText || '';
+  const content = puzzle.content as { ayahText: string; ayahNumber?: number; surahNumber?: number };
+  const rawAyahText = content.ayahText || '';
+  const surahNum = puzzle.surahId?.number || content.surahNumber || 1;
+  const ayahNum = content.ayahNumber || 1;
+  
+  // Remove bismillah from first ayah of surahs (except Al-Fatiha)
+  const ayahText = cleanAyahText(rawAyahText, surahNum, ayahNum);
 
   // Check if liked
   const likedAyat = await LikedAyat.findOne({
@@ -101,6 +107,11 @@ export default async function PuzzlePage({
     } : null,
   };
 
+  // Build verse page URL
+  const versePageUrl = puzzle.surahId && puzzle.juzId && puzzle.content?.ayahNumber
+    ? `/dashboard/juz/${puzzle.juzId.number}/surah/${puzzle.surahId.number}?ayah=${puzzle.content.ayahNumber}`
+    : undefined;
+
   return (
     <PuzzleClient
       puzzle={serializedPuzzle}
@@ -109,6 +120,7 @@ export default async function PuzzlePage({
       isLiked={!!likedAyat}
       previousPuzzleId={previousPuzzle?._id.toString() || null}
       nextPuzzleId={nextPuzzle?._id.toString() || null}
+      versePageUrl={versePageUrl}
     />
   );
 }

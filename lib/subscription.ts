@@ -26,23 +26,38 @@ export function checkSubscriptionAccess(user: IUser): SubscriptionAccess {
     return { hasAccess: true, status: 'active' };
   }
 
-  // Trialing (with payment method on file)
+  // Trialing (free trial - may or may not have payment method)
   if (status === 'trialing') {
     const trialEndsAt = user.trialEndDate;
     if (trialEndsAt && new Date(trialEndsAt) > now) {
       const daysLeft = Math.ceil((new Date(trialEndsAt).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      // Check if user has payment method (Stripe customer ID) - if not, it's a limited trial
+      const hasPaymentMethod = !!user.stripeCustomerId;
       return { 
         hasAccess: true, 
         status: 'trialing',
         trialDaysLeft: daysLeft,
+        message: hasPaymentMethod 
+          ? undefined 
+          : 'Your free trial is active. Add a payment method to continue after the trial ends.',
       };
     } else {
-      // Trial expired - this shouldn't happen if Stripe auto-bills, but handle it
-      return { 
-        hasAccess: false, 
-        status: 'expired',
-        message: 'Your trial has ended. Please check your subscription status.',
-      };
+      // Trial expired
+      if (user.stripeCustomerId) {
+        // Had payment method but trial expired - should have been converted to active by Stripe
+        return { 
+          hasAccess: false, 
+          status: 'expired',
+          message: 'Your trial has ended. Please check your subscription status.',
+        };
+      } else {
+        // No payment method and trial expired - needs to subscribe
+        return { 
+          hasAccess: false, 
+          status: 'needs_subscription',
+          message: 'Your free trial has ended. Start your 7-day free trial with a payment method to continue.',
+        };
+      }
     }
   }
 

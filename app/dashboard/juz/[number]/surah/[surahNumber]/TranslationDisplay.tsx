@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Globe } from 'lucide-react';
-import { useI18n } from '@/lib/i18n';
+import { useI18nSafe } from '@/lib/i18n';
 
 interface TranslationDisplayProps {
   surahNumber: number;
@@ -38,7 +38,7 @@ export default function TranslationDisplay({
   selectedTranslation,
   initialTranslation,
 }: TranslationDisplayProps) {
-  const { t } = useI18n();
+  const { t } = useI18nSafe();
   const [translation, setTranslation] = useState<string | undefined>(initialTranslation);
   const [isLoading, setIsLoading] = useState(!initialTranslation);
 

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2 } from 'lucide-react';
-import { useI18n } from '@/lib/i18n';
+import { useI18nSafe } from '@/lib/i18n';
 
 interface AudioPlayerProps {
   surahNumber: number;
@@ -11,7 +11,7 @@ interface AudioPlayerProps {
 }
 
 export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }: AudioPlayerProps) {
-  const { t } = useI18n();
+  const { t } = useI18nSafe();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);

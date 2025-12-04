@@ -7,6 +7,7 @@ import VersePageClient from './VersePageClient';
 import TranslationDisplay from './TranslationDisplay';
 import AudioPlayer from './AudioPlayer';
 import AyahSelectorClient from './AyahSelectorClient';
+import { cleanAyahText } from '@/lib/ayah-utils';
 
 export default async function SurahVersePage({
   params,
@@ -180,7 +181,11 @@ export default async function SurahVersePage({
                   dir="rtl"
                   style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
                 >
-                  {currentPuzzle.content?.ayahText}
+                  {cleanAyahText(
+                    currentPuzzle.content?.ayahText || '',
+                    parseInt(surahNumber),
+                    selectedAyah
+                  )}
                 </p>
               </div>
 

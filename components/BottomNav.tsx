@@ -23,6 +23,11 @@ export default function BottomNav() {
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
 
+  // Hide BottomNav on puzzle pages
+  if (pathname?.startsWith('/puzzle/')) {
+    return null;
+  }
+
   useEffect(() => {
     setIsMounted(true);
   }, []);

@@ -19,6 +19,7 @@ export default async function DashboardPage() {
   // Find or create user
   let dbUser = await User.findOne({ clerkId: user.id });
   if (!dbUser) {
+    // New users get a 3-day free trial automatically
     dbUser = await User.create({
       clerkId: user.id,
       email: user.emailAddresses[0]?.emailAddress || '',
@@ -26,6 +27,8 @@ export default async function DashboardPage() {
       lastName: user.lastName,
       name: user.fullName,
       imageUrl: user.imageUrl,
+      subscriptionStatus: 'trialing',
+      trialEndDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days free trial
     });
   }
 

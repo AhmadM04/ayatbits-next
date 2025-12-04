@@ -221,26 +221,38 @@ export default function WordPuzzle({
 }: WordPuzzleProps) {
   const { showToast } = useToast();
   const originalTokens = useMemo(() => tokenizeAyah(ayahText), [ayahText]);
-  const [bank, setBank] = useState<WordToken[]>(() => shuffleArray(originalTokens));
+  const [bank, setBank] = useState<WordToken[]>([]);
   const [answer, setAnswer] = useState<WordToken[]>([]);
   const [mistakeCount, setMistakeCount] = useState(0);
   const [hasExceededMistakeLimit, setHasExceededMistakeLimit] = useState(false);
   const [incorrectTokenId, setIncorrectTokenId] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px of movement before drag starts
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
+  // Initialize on client side only to avoid hydration mismatch
   useEffect(() => {
+    setIsMounted(true);
+    setBank(shuffleArray(originalTokens));
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
     setAnswer([]);
     setBank(shuffleArray(originalTokens));
     setMistakeCount(0);
     setHasExceededMistakeLimit(false);
     setIncorrectTokenId(null);
-  }, [ayahText, originalTokens]);
+  }, [ayahText, originalTokens, isMounted]);
 
   // Calculate which words are correct at their current position
   const correctIds = useMemo(() => {
@@ -315,22 +327,31 @@ export default function WordPuzzle({
   const moveFromBankToAnswer = (token: WordToken, position: number) => {
     if (hasExceededMistakeLimit) return;
 
+    // Calculate what the new answer will be
+    const newAnswer = [...answer];
+    newAnswer.splice(position, 0, token);
+    
     // Check if this word is correct at this position
     const isCorrect = isWordCorrectAtPosition(token, position, originalTokens);
-
+    
+    // Also check if all words before this position are correct
+    let allBeforeCorrect = true;
+    for (let i = 0; i < position; i++) {
+      if (!isWordCorrectAtPosition(newAnswer[i], i, originalTokens)) {
+        allBeforeCorrect = false;
+        break;
+      }
+    }
+    
     // Insert at position
-    setAnswer((prev) => {
-      const newAnswer = [...prev];
-      newAnswer.splice(position, 0, token);
-      return newAnswer;
-    });
-
+    setAnswer(newAnswer);
     setBank((prev) => prev.filter((t) => t.id !== token.id));
 
-    if (isCorrect) {
+    // Handle correctness after state update
+    if (isCorrect && allBeforeCorrect) {
       onWordCorrect?.(position, token.text);
     } else {
-      // Wrong word at this position - count as mistake
+      // Wrong word at this position OR words before are wrong - count as mistake
       handleMistake(token.id);
     }
   };
@@ -351,8 +372,12 @@ export default function WordPuzzle({
 
     if (newMistakeCount >= 3 && !hasExceededMistakeLimit) {
       setHasExceededMistakeLimit(true);
-      showToast('Too many mistakes! Please try again.', 'error', 3000);
-      setTimeout(() => onMistakeLimitExceeded?.(), 1000);
+      showToast('Too many mistakes! Redirecting to verse view...', 'error', 3000);
+      setTimeout(() => {
+        onMistakeLimitExceeded?.();
+      }, 2000);
+    } else if (newMistakeCount === 2) {
+      showToast('Warning: One more mistake and you will be redirected!', 'warning', 2000);
     }
   };
 
@@ -366,6 +391,34 @@ export default function WordPuzzle({
       moveFromAnswerToBank(token);
     }
   };
+
+  // Show loading state until mounted to prevent hydration mismatch
+  if (!isMounted) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-semibold text-white">Build the Ayah</h3>
+          {onToggleLike && (
+            <button
+              onClick={onToggleLike}
+              className={`p-2 rounded-lg transition-colors ${
+                isLiked 
+                  ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' 
+                  : 'bg-white/5 text-gray-400 hover:bg-white/10'
+              }`}
+            >
+              <Heart
+                className={`w-6 h-6 ${isLiked ? 'fill-red-400 text-red-400' : ''}`}
+              />
+            </button>
+          )}
+        </div>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -421,19 +474,23 @@ export default function WordPuzzle({
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <AnswerDroppable
-          answer={answer}
-          correctIds={correctIds}
-          incorrectIds={incorrectIds}
-          onWordClick={(token) => handleWordClick(token, false)}
-        />
+        {isMounted && (
+          <AnswerDroppable
+            answer={answer}
+            correctIds={correctIds}
+            incorrectIds={incorrectIds}
+            onWordClick={(token) => handleWordClick(token, false)}
+          />
+        )}
 
         {/* Word Bank */}
-        <WordBankDroppable
-          bank={bank}
-          incorrectTokenId={incorrectTokenId}
-          onWordClick={(token) => handleWordClick(token, true)}
-        />
+        {isMounted && (
+          <WordBankDroppable
+            bank={bank}
+            incorrectTokenId={incorrectTokenId}
+            onWordClick={(token) => handleWordClick(token, true)}
+          />
+        )}
       </DndContext>
     </div>
   );

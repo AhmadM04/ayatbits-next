@@ -4,7 +4,7 @@ import { useState } from 'react';
 import WordPuzzle from '@/components/WordPuzzle';
 import { useToast } from '@/components/Toast';
 import { apiPost, apiDelete, getErrorMessage, NetworkError } from '@/lib/api-client';
-import { ArrowLeft, Heart, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Heart } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -20,6 +20,7 @@ interface PuzzleClientProps {
   isLiked: boolean;
   previousPuzzleId?: string | null;
   nextPuzzleId?: string | null;
+  versePageUrl?: string;
 }
 
 export default function PuzzleClient({
@@ -28,9 +29,11 @@ export default function PuzzleClient({
   isLiked: initialIsLiked,
   previousPuzzleId,
   nextPuzzleId,
+  versePageUrl,
 }: PuzzleClientProps) {
   const [isLiked, setIsLiked] = useState(initialIsLiked);
   const [isReset, setIsReset] = useState(false);
+  const [hasSavedProgress, setHasSavedProgress] = useState(false);
   const { showToast } = useToast();
   const router = useRouter();
 
@@ -53,7 +56,8 @@ export default function PuzzleClient({
   };
 
   const handleSolved = async (isCorrect: boolean) => {
-    if (isCorrect) {
+    if (isCorrect && !hasSavedProgress) {
+      setHasSavedProgress(true);
       try {
         await apiPost(`/api/puzzles/${puzzle.id}/progress`, {
           status: 'COMPLETED',
@@ -73,20 +77,6 @@ export default function PuzzleClient({
   const handleReset = () => {
     setIsReset(true);
     setTimeout(() => setIsReset(false), 100);
-  };
-
-  const handlePrevious = () => {
-    if (previousPuzzleId) {
-      router.push(`/puzzle/${previousPuzzleId}`);
-    }
-  };
-
-  const handleNext = () => {
-    if (nextPuzzleId) {
-      router.push(`/puzzle/${nextPuzzleId}`);
-    } else {
-      router.push('/dashboard');
-    }
   };
 
   return (
@@ -141,50 +131,19 @@ export default function PuzzleClient({
               isLiked={isLiked}
               onToggleLike={handleToggleLike}
               onSolved={handleSolved}
+              onMistakeLimitExceeded={() => {
+                if (versePageUrl) {
+                  router.push(versePageUrl);
+                } else if (puzzle.surah?.number && puzzle.juz?.number) {
+                  router.push(`/dashboard/juz/${puzzle.juz.number}/surah/${puzzle.surah.number}`);
+                } else {
+                  router.push('/dashboard');
+                }
+              }}
             />
           </div>
         </motion.div>
       </main>
-
-      {/* Bottom Navigation Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#111]/95 backdrop-blur-md border-t border-white/5 safe-area-bottom">
-        <div className="max-w-4xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-3">
-            <button
-              onClick={handlePrevious}
-              disabled={!previousPuzzleId}
-              className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
-                previousPuzzleId
-                  ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
-                  : 'bg-white/5 text-gray-600 cursor-not-allowed border border-white/10'
-              }`}
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Previous</span>
-            </button>
-
-            <button
-              onClick={handleReset}
-              className="group flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all"
-            >
-              <RotateCcw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
-              <span className="hidden sm:inline">Reset</span>
-            </button>
-
-            <button
-              onClick={handleNext}
-              className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
-                nextPuzzleId
-                  ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white'
-                  : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
-              }`}
-            >
-              <span className="hidden sm:inline">{nextPuzzleId ? 'Next' : 'Finish'}</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
