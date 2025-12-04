@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Heart, Trophy, Play, Home, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useI18n } from '@/lib/i18n';
 
 interface ResumeData {
   resumeUrl: string | null;
@@ -24,26 +25,21 @@ const FALLBACK_LABELS: Record<string, string> = {
   'common.profile': 'Profile',
 };
 
-// Safe hook that doesn't throw when outside provider
-function useSafeI18n() {
-  try {
-    // Dynamic import to avoid issues during SSR
-    const { useI18n } = require('@/lib/i18n');
-    return useI18n();
-  } catch {
-    // Return fallback when context is not available
-    return {
-      t: (key: string) => FALLBACK_LABELS[key] || key.split('.').pop() || key,
-    };
-  }
-}
-
 export default function BottomNav() {
   const pathname = usePathname();
-  const { t } = useSafeI18n();
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
+  
+  // Try to use i18n, but don't crash if not available
+  let t: (key: string) => string;
+  try {
+    const i18n = useI18n();
+    t = i18n.t;
+  } catch {
+    // Fallback when not in provider
+    t = (key: string) => FALLBACK_LABELS[key] || key.split('.').pop() || key;
+  }
 
   useEffect(() => {
     setIsMounted(true);

@@ -1,10 +1,10 @@
 'use client';
 
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { BookOpen, Puzzle, Trophy, Flame, Star, Sparkles } from "lucide-react";
+import { BookOpen, Puzzle, Trophy, Flame, Star, Sparkles, User } from "lucide-react";
 
 // Floating Arabic letters/words for the background
 const floatingArabicWords = [
@@ -20,6 +20,39 @@ const floatingArabicWords = [
   { text: 'ٱلدِّينِ', x: '20%', y: '40%', delay: 2.2, duration: 10 },
 ];
 
+function UserProfileSection() {
+  const { user } = useUser();
+  
+  if (!user) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 border border-white/10"
+    >
+      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+        {user.imageUrl ? (
+          <img src={user.imageUrl} alt={user.firstName || 'User'} className="w-full h-full rounded-full object-cover" />
+        ) : (
+          <span className="text-white font-semibold text-sm">
+            {user.firstName?.[0] || user.emailAddresses[0]?.emailAddress[0].toUpperCase() || 'U'}
+          </span>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-medium text-white truncate">
+          {user.firstName || user.emailAddresses[0]?.emailAddress || 'User'}
+        </div>
+        <div className="text-xs text-gray-400 truncate">
+          {user.emailAddresses[0]?.emailAddress}
+        </div>
+      </div>
+      <UserButton afterSignOutUrl="/" />
+    </motion.div>
+  );
+}
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white overflow-hidden">
@@ -30,15 +63,15 @@ export default function Home() {
         <div className="absolute top-1/2 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
         <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-green-600/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '0.5s' }} />
         
-        {/* Floating Arabic words */}
+        {/* Floating Arabic words - increased opacity for visibility */}
         {floatingArabicWords.map((word, index) => (
           <motion.div
             key={index}
-            className="absolute text-2xl sm:text-3xl md:text-4xl font-arabic text-green-500/[0.07] select-none"
+            className="absolute text-3xl sm:text-4xl md:text-5xl font-arabic text-green-500/15 select-none pointer-events-none"
             style={{ left: word.x, top: word.y }}
             animate={{
               y: [0, -30, 0],
-              opacity: [0.07, 0.12, 0.07],
+              opacity: [0.15, 0.25, 0.15],
               rotate: [0, 5, 0],
             }}
             transition={{
@@ -80,11 +113,7 @@ export default function Home() {
                   </SignUpButton>
                 </SignedOut>
                 <SignedIn>
-                  <Link href="/dashboard">
-                    <Button className="bg-green-600 hover:bg-green-700 text-white">
-                      Go to Dashboard
-                    </Button>
-                  </Link>
+                  <UserProfileSection />
                 </SignedIn>
               </div>
             </div>
@@ -119,17 +148,17 @@ export default function Home() {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <SignedOut>
+                  <SignInButton mode="modal">
+                    <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-6 text-lg rounded-xl">
+                      Sign In
+                    </Button>
+                  </SignInButton>
                   <SignUpButton mode="modal">
                     <Button size="lg" className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-green-600/25">
                       Start Free Trial
                       <Flame className="w-5 h-5 ml-2" />
                     </Button>
                   </SignUpButton>
-                  <Link href="#features">
-                    <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-6 text-lg rounded-xl">
-                      See How It Works
-                    </Button>
-                  </Link>
                 </SignedOut>
                 <SignedIn>
                   <Link href="/dashboard">
@@ -243,20 +272,27 @@ export default function Home() {
               <p className="text-gray-400 max-w-lg mx-auto mb-8">
                 Join thousands of learners who are mastering the Quran through interactive puzzles.
               </p>
-              <SignedOut>
-                <SignUpButton mode="modal">
-                  <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg rounded-xl">
-                    Start Your Free Trial
-                  </Button>
-                </SignUpButton>
-              </SignedOut>
-              <SignedIn>
-                <Link href="/dashboard">
-                  <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg rounded-xl">
-                    Go to Dashboard
-                  </Button>
-                </Link>
-              </SignedIn>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-6 text-lg rounded-xl">
+                      Sign In
+                    </Button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg rounded-xl">
+                      Start Your Free Trial
+                    </Button>
+                  </SignUpButton>
+                </SignedOut>
+                <SignedIn>
+                  <Link href="/dashboard">
+                    <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg rounded-xl">
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                </SignedIn>
+              </div>
             </motion.div>
           </section>
         </main>
