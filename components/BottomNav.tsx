@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Heart, Trophy, Play, Home, User } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useI18n } from '@/lib/i18n';
+import { useI18nSafe } from '@/lib/i18n';
 
 interface ResumeData {
   resumeUrl: string | null;
@@ -16,30 +16,12 @@ interface ResumeData {
 // Default resume URL if user hasn't started yet
 const DEFAULT_RESUME_URL = '/dashboard/juz/1/surah/1?ayah=1';
 
-// Fallback labels when i18n is not available
-const FALLBACK_LABELS: Record<string, string> = {
-  'common.home': 'Home',
-  'common.liked': 'Liked',
-  'common.resume': 'Resume',
-  'common.awards': 'Awards',
-  'common.profile': 'Profile',
-};
-
 export default function BottomNav() {
   const pathname = usePathname();
+  const { t } = useI18nSafe(); // Use safe version that won't crash
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
-  
-  // Try to use i18n, but don't crash if not available
-  let t: (key: string) => string;
-  try {
-    const i18n = useI18n();
-    t = i18n.t;
-  } catch {
-    // Fallback when not in provider
-    t = (key: string) => FALLBACK_LABELS[key] || key.split('.').pop() || key;
-  }
 
   useEffect(() => {
     setIsMounted(true);

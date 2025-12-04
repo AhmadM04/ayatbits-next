@@ -149,13 +149,35 @@ export function I18nProvider({ children, translationCode }: I18nProviderProps) {
 }
 
 /**
- * Hook to access i18n context
+ * Hook to access i18n context - throws error if not in provider
  */
 export function useI18n() {
   const context = useContext(I18nContext);
   if (!context) {
     throw new Error('useI18n must be used within an I18nProvider');
   }
+  return context;
+}
+
+/**
+ * Safe hook that returns fallback if not in provider (for components that might render outside provider)
+ */
+export function useI18nSafe() {
+  const context = useContext(I18nContext);
+  
+  if (!context) {
+    // Return fallback implementation
+    return {
+      locale: DEFAULT_LOCALE as Locale,
+      t: (key: string, params?: Record<string, string | number>): string => {
+        const fallback = getNestedValue(messages[DEFAULT_LOCALE] as Record<string, unknown>, key);
+        if (!fallback) return key;
+        return interpolate(fallback, params);
+      },
+      setLocale: () => {},
+    };
+  }
+  
   return context;
 }
 
