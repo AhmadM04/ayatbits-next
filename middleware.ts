@@ -7,6 +7,8 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/pricing',
+  '/manifest.json',
+  '/manifest',
   '/api/webhook/(.*)', // Webhooks should be publicly accessible
   '/api/daily-quote', // Public API for daily quote
 ]);

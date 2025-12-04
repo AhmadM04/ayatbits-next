@@ -101,6 +101,16 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  // Rewrites for manifest.json
+  async rewrites() {
+    return [
+      {
+        source: '/manifest.json',
+        destination: '/manifest',
+      },
+    ];
+  },
+
   // Image optimization configuration
   images: {
     formats: ['image/avif', 'image/webp'],
