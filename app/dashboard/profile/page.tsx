@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { connectDB, User, UserProgress, Puzzle } from '@/lib/db';
 import ProfileContent from './ProfileContent';
 import { getTrialDaysRemaining } from '@/lib/subscription';
+import DashboardI18nProvider from '../DashboardI18nProvider';
 
 export default async function ProfilePage() {
   const user = await currentUser();
@@ -83,25 +84,25 @@ export default async function ProfilePage() {
   const hasStripeCustomer = !!dbUser.stripeCustomerId;
 
   return (
-    <ProfileContent
-      userName={userName}
-      userEmail={userEmail}
-      userInitial={userInitial}
-      currentStreak={currentStreak}
-      longestStreak={longestStreak}
-      lastActivityDate={lastActivityDate}
-      completedPuzzles={completedPuzzles}
-      completionPercentage={completionPercentage}
-      uniqueJuzs={uniqueJuzs}
-      uniqueSurahs={uniqueSurahs}
-      selectedTranslation={selectedTranslation}
-      subscriptionStatus={subscriptionStatus}
-      subscriptionPlan={subscriptionPlan}
-      trialDaysLeft={trialDaysLeft}
-      hasBypass={hasBypass}
-      hasStripeCustomer={hasStripeCustomer}
-    />
+    <DashboardI18nProvider translationCode={selectedTranslation}>
+      <ProfileContent
+        userName={userName}
+        userEmail={userEmail}
+        userInitial={userInitial}
+        currentStreak={currentStreak}
+        longestStreak={longestStreak}
+        lastActivityDate={lastActivityDate}
+        completedPuzzles={completedPuzzles}
+        completionPercentage={completionPercentage}
+        uniqueJuzs={uniqueJuzs}
+        uniqueSurahs={uniqueSurahs}
+        selectedTranslation={selectedTranslation}
+        subscriptionStatus={subscriptionStatus}
+        subscriptionPlan={subscriptionPlan}
+        trialDaysLeft={trialDaysLeft}
+        hasBypass={hasBypass}
+        hasStripeCustomer={hasStripeCustomer}
+      />
+    </DashboardI18nProvider>
   );
 }
-
-
