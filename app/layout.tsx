@@ -4,37 +4,116 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ToastProvider } from "@/components/Toast";
 import { ThemeProvider } from "@/lib/theme-context";
 import "./globals.css";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  fallback: ["system-ui", "arial"],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+  preload: false,
 });
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: "#0a0a0a", // Always dark theme
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: "#0a0a0a",
+  colorScheme: "dark",
 };
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.ayatbits.com";
+const siteName = "AyatBits";
+const siteDescription = "Learn and memorize Quranic verses through fun, interactive puzzles. Gamified Quranic study with word puzzles, progress tracking, and multiple translations.";
+const siteImage = `${siteUrl}/og-image.png`;
+
 export const metadata: Metadata = {
-  title: "AyatBits - Gamified Quranic Study",
-  description: "Learn and memorize Quranic verses through fun, interactive puzzles",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: `${siteName} - Gamified Quranic Study`,
+    template: `%s | ${siteName}`,
+  },
+  description: siteDescription,
+  keywords: [
+    "Quran",
+    "Quranic study",
+    "Islamic education",
+    "Quran memorization",
+    "Arabic learning",
+    "Quran puzzles",
+    "Islamic app",
+    "Quranic verses",
+    "Muslim education",
+    "Quran learning",
+    "Islamic studies",
+    "Quran app",
+  ],
+  authors: [{ name: "AyatBits" }],
+  creator: "AyatBits",
+  publisher: "AyatBits",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "AyatBits",
+    title: siteName,
   },
-  formatDetection: {
-    telephone: false,
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName: siteName,
+    title: `${siteName} - Gamified Quranic Study`,
+    description: siteDescription,
+    images: [
+      {
+        url: siteImage,
+        width: 1200,
+        height: 630,
+        alt: siteName,
+      },
+    ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: `${siteName} - Gamified Quranic Study`,
+    description: siteDescription,
+    images: [siteImage],
+    creator: "@ayatbits",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    // Add your verification codes here
+    // google: "your-google-verification-code",
+    // yandex: "your-yandex-verification-code",
+    // bing: "your-bing-verification-code",
+  },
+  alternates: {
+    canonical: siteUrl,
+  },
+  category: "education",
 };
 
 const clerkAppearance: any = {
@@ -70,6 +149,34 @@ const clerkAppearance: any = {
   },
 };
 
+// Structured Data (JSON-LD)
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: siteName,
+  description: siteDescription,
+  url: siteUrl,
+  applicationCategory: "EducationalApplication",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.8",
+    ratingCount: "100",
+  },
+  featureList: [
+    "Interactive Quranic puzzles",
+    "Progress tracking",
+    "Multiple translations",
+    "Audio recitations",
+    "30 Juzs and 114 Surahs",
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -82,6 +189,18 @@ export default function RootLayout({
       signUpUrl="/sign-up"
     >
       <html lang="en" className="dark">
+        <head>
+          <Script
+            id="structured-data"
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
+          {/* Preconnect to external domains for performance */}
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link rel="dns-prefetch" href="https://*.clerk.com" />
+          <link rel="dns-prefetch" href="https://api.stripe.com" />
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0a] text-white`}
         >

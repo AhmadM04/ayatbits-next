@@ -219,11 +219,13 @@ export default function PricingContent() {
                 <SignedOut>
                   <SignUpButton mode="modal">
                     <button
-                      className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all ${
+                      type="button"
+                      className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all visible ${
                         plan.popular
                           ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white'
                           : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
                       }`}
+                      style={{ display: 'block', visibility: 'visible' }}
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-100%] group-hover:translate-x-[100%] animate-shimmer" />
                       <span className="relative z-10 flex items-center justify-center gap-2">
@@ -235,13 +237,15 @@ export default function PricingContent() {
                 </SignedOut>
                 <SignedIn>
                   <button
+                    type="button"
                     onClick={() => handleSubscribe(plan.priceId)}
                     disabled={loadingPlan !== null}
-                    className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                    className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed visible ${
                       plan.popular
                         ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white'
                         : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
                     }`}
+                    style={{ display: 'block', visibility: 'visible' }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-100%] group-hover:translate-x-[100%] animate-shimmer" />
                     <span className="relative z-10 flex items-center justify-center gap-2">
