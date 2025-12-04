@@ -32,6 +32,7 @@ export interface IUser extends Document {
   currentStreak: number;
   longestStreak: number;
   lastActiveDate?: Date;
+  hasBypass?: boolean; // Admin bypass for premium features
   createdAt: Date;
   updatedAt: Date;
 }
@@ -47,7 +48,7 @@ const UserSchema = new Schema<IUser>(
     subscriptionStatus: {
       type: String,
       enum: Object.values(SubscriptionStatusEnum),
-      default: SubscriptionStatusEnum.TRIALING,
+      default: SubscriptionStatusEnum.INACTIVE, // New users start as INACTIVE - must go through trial/payment flow
     },
     subscriptionPlan: {
       type: String,
@@ -56,11 +57,12 @@ const UserSchema = new Schema<IUser>(
     },
     stripeCustomerId: { type: String, index: true },
     stripeSubscriptionId: String,
-    trialEndDate: { type: Date, default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) }, // 7 days trial
+    trialEndDate: Date, // Only set when user starts a trial through Stripe
     selectedTranslation: { type: String, default: 'en.sahih' },
     currentStreak: { type: Number, default: 0 },
     longestStreak: { type: Number, default: 0 },
     lastActiveDate: Date,
+    hasBypass: { type: Boolean, default: false },
   },
   {
     timestamps: true,

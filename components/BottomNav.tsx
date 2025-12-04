@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Heart, Trophy, Play, Home, User } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useI18n } from '@/lib/i18n';
 
 interface ResumeData {
   resumeUrl: string | null;
@@ -16,11 +15,39 @@ interface ResumeData {
 // Default resume URL if user hasn't started yet
 const DEFAULT_RESUME_URL = '/dashboard/juz/1/surah/1?ayah=1';
 
+// Fallback labels when i18n is not available
+const FALLBACK_LABELS: Record<string, string> = {
+  'common.home': 'Home',
+  'common.liked': 'Liked',
+  'common.resume': 'Resume',
+  'common.awards': 'Awards',
+  'common.profile': 'Profile',
+};
+
+// Safe hook that doesn't throw when outside provider
+function useSafeI18n() {
+  try {
+    // Dynamic import to avoid issues during SSR
+    const { useI18n } = require('@/lib/i18n');
+    return useI18n();
+  } catch {
+    // Return fallback when context is not available
+    return {
+      t: (key: string) => FALLBACK_LABELS[key] || key.split('.').pop() || key,
+    };
+  }
+}
+
 export default function BottomNav() {
   const pathname = usePathname();
-  const { t } = useI18n();
+  const { t } = useSafeI18n();
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const fetchResumeData = async () => {
     try {
@@ -35,15 +62,17 @@ export default function BottomNav() {
   };
 
   useEffect(() => {
-    fetchResumeData();
-  }, []);
+    if (isMounted) {
+      fetchResumeData();
+    }
+  }, [isMounted]);
 
   // Refresh resume data when navigating away from verse pages
   useEffect(() => {
-    if (pathname === '/dashboard') {
+    if (pathname === '/dashboard' && isMounted) {
       fetchResumeData();
     }
-  }, [pathname]);
+  }, [pathname, isMounted]);
 
   const navItems = [
     { href: '/dashboard', icon: Home, labelKey: 'common.home' },
@@ -75,7 +104,7 @@ export default function BottomNav() {
                     whileTap={{ scale: 0.95 }}
                     className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-green-600 flex items-center justify-center shadow-lg shadow-green-600/30"
                   >
-                    {isLoading ? (
+                    {isLoading && !isMounted ? (
                       <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
                       <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white ml-0.5" />

@@ -8,6 +8,11 @@ export type SubscriptionAccess = {
 };
 
 export function checkSubscriptionAccess(user: IUser): SubscriptionAccess {
+  // Check for admin bypass first
+  if (user.hasBypass) {
+    return { hasAccess: true, status: 'bypass' };
+  }
+
   // Check for lifetime plan
   if (user.subscriptionPlan === 'lifetime' || user.subscriptionStatus === 'lifetime') {
     return { hasAccess: true, status: 'active' };

@@ -1,6 +1,7 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { connectDB, Juz, Puzzle, UserProgress, User } from '@/lib/db';
+import { checkSubscriptionAccess } from '@/lib/subscription';
 import DashboardContent from './DashboardContent';
 import DashboardI18nProvider from './DashboardI18nProvider';
 
@@ -16,6 +17,7 @@ export default async function DashboardPage() {
   // Find or create user
   let dbUser = await User.findOne({ clerkId: user.id });
   if (!dbUser) {
+    // New user - create with inactive subscription status
     dbUser = await User.create({
       clerkId: user.id,
       email: user.emailAddresses[0]?.emailAddress || '',
@@ -23,7 +25,16 @@ export default async function DashboardPage() {
       lastName: user.lastName,
       name: user.fullName,
       imageUrl: user.imageUrl,
+      subscriptionStatus: 'inactive', // New users start as inactive
     });
+  }
+
+  // Check subscription access
+  const accessCheck = checkSubscriptionAccess(dbUser);
+  
+  // If user doesn't have access, redirect to pricing page
+  if (!accessCheck.hasAccess && !dbUser.hasBypass) {
+    redirect('/pricing?reason=subscription_required');
   }
 
   // Fetch all Juzs
@@ -87,7 +98,7 @@ export default async function DashboardPage() {
   // Trial and subscription info
   const trialDaysLeft = dbUser.trialEndDate 
     ? Math.max(0, Math.ceil((new Date(dbUser.trialEndDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-    : 0;
+    : accessCheck.trialDaysLeft || 0;
 
   return (
     <DashboardI18nProvider translationCode={selectedTranslation}>
@@ -98,7 +109,7 @@ export default async function DashboardPage() {
         juzsExplored={juzsExplored}
         selectedTranslation={selectedTranslation}
         trialDaysLeft={trialDaysLeft}
-        subscriptionStatus={dbUser.subscriptionStatus}
+        subscriptionStatus={dbUser.subscriptionStatus || accessCheck.status}
         juzs={juzsWithData}
       />
     </DashboardI18nProvider>
