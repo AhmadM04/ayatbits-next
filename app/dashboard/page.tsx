@@ -4,8 +4,8 @@ import { connectDB, Juz, Puzzle, UserProgress, User } from '@/lib/db';
 import mongoose from 'mongoose';
 import DashboardContent from './DashboardContent';
 import DashboardI18nProvider from './DashboardI18nProvider';
-import { checkSubscriptionAccess } from '@/lib/subscription';
 import { getTrialDaysRemaining } from '@/lib/subscription';
+import { requireDashboardAccess } from '@/lib/dashboard-access';
 
 export default async function DashboardPage() {
   const user = await currentUser();
@@ -14,27 +14,8 @@ export default async function DashboardPage() {
     redirect('/sign-in');
   }
 
-  await connectDB();
-
-  // Find or create user
-  let dbUser = await User.findOne({ clerkId: user.id });
-  if (!dbUser) {
-    // New users get a 3-day free trial automatically
-    dbUser = await User.create({
-      clerkId: user.id,
-      email: user.emailAddresses[0]?.emailAddress || '',
-      firstName: user.firstName,
-      lastName: user.lastName,
-      name: user.fullName,
-      imageUrl: user.imageUrl,
-      subscriptionStatus: 'trialing',
-      trialEndDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days free trial
-    });
-  }
-
-  // Check subscription access - allow inactive users to see dashboard but show pricing prompts
-  const access = checkSubscriptionAccess(dbUser);
-  // Don't redirect - let them see the dashboard but they'll need to subscribe to use features
+  // Check dashboard access (redirects if no access, except admin bypass)
+  const dbUser = await requireDashboardAccess(user.id);
 
   const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
 

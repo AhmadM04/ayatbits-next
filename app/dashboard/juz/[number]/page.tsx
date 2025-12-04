@@ -4,6 +4,7 @@ import { connectDB, Juz, Surah, Puzzle, UserProgress, User } from '@/lib/db';
 import mongoose from 'mongoose';
 import JuzContent from './JuzContent';
 import DashboardI18nProvider from '../../DashboardI18nProvider';
+import { requireDashboardAccess } from '@/lib/dashboard-access';
 
 export default async function JuzPage({
   params,
@@ -18,20 +19,8 @@ export default async function JuzPage({
     redirect('/sign-in');
   }
 
-  await connectDB();
-
-  // Find or create user
-  let dbUser = await User.findOne({ clerkId: user.id });
-  if (!dbUser) {
-    dbUser = await User.create({
-      clerkId: user.id,
-      email: user.emailAddresses[0]?.emailAddress || '',
-      firstName: user.firstName,
-      lastName: user.lastName,
-      name: user.fullName,
-      imageUrl: user.imageUrl,
-    });
-  }
+  // Check dashboard access (redirects if no access, except admin bypass)
+  const dbUser = await requireDashboardAccess(user.id);
 
   const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
   const juz = await Juz.findOne({ number: juzNumber }).lean() as any;

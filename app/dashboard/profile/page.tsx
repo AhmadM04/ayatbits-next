@@ -4,6 +4,7 @@ import { connectDB, User, UserProgress, Puzzle } from '@/lib/db';
 import ProfileContent from './ProfileContent';
 import { getTrialDaysRemaining } from '@/lib/subscription';
 import DashboardI18nProvider from '../DashboardI18nProvider';
+import { requireDashboardAccess } from '@/lib/dashboard-access';
 
 export default async function ProfilePage() {
   const user = await currentUser();
@@ -12,20 +13,8 @@ export default async function ProfilePage() {
     redirect('/sign-in');
   }
 
-  await connectDB();
-
-  // Find or create user
-  let dbUser = await User.findOne({ clerkId: user.id });
-  if (!dbUser) {
-    dbUser = await User.create({
-      clerkId: user.id,
-      email: user.emailAddresses[0]?.emailAddress || '',
-      firstName: user.firstName,
-      lastName: user.lastName,
-      name: user.fullName,
-      imageUrl: user.imageUrl,
-    });
-  }
+  // Check dashboard access (redirects if no access, except admin bypass)
+  const dbUser = await requireDashboardAccess(user.id);
 
   // Get user stats
   const completedPuzzles = await UserProgress.countDocuments({

@@ -8,6 +8,7 @@ import TranslationDisplay from './TranslationDisplay';
 import AudioPlayer from './AudioPlayer';
 import AyahSelectorClient from './AyahSelectorClient';
 import { cleanAyahText } from '@/lib/ayah-utils';
+import { requireDashboardAccess } from '@/lib/dashboard-access';
 
 export default async function SurahVersePage({
   params,
@@ -24,20 +25,8 @@ export default async function SurahVersePage({
     redirect('/sign-in');
   }
 
-  await connectDB();
-
-  // Find or create user
-  let dbUser = await User.findOne({ clerkId: user.id });
-  if (!dbUser) {
-    dbUser = await User.create({
-      clerkId: user.id,
-      email: user.emailAddresses[0]?.emailAddress || '',
-      firstName: user.firstName,
-      lastName: user.lastName,
-      name: user.fullName,
-      imageUrl: user.imageUrl,
-    });
-  }
+  // Check dashboard access (redirects if no access, except admin bypass)
+  const dbUser = await requireDashboardAccess(user.id);
 
   const juz = await Juz.findOne({ number: parseInt(juzNumber) }).lean() as any;
   const surah = await Surah.findOne({ number: parseInt(surahNumber) }).lean() as any;

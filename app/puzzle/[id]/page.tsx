@@ -4,6 +4,7 @@ import { connectDB, Puzzle, LikedAyat, User, Surah, Juz } from '@/lib/db';
 import mongoose from 'mongoose';
 import PuzzleClient from './PuzzleClient';
 import { cleanAyahText } from '@/lib/ayah-utils';
+import { requireDashboardAccess } from '@/lib/dashboard-access';
 
 export default async function PuzzlePage({
   params,
@@ -16,6 +17,9 @@ export default async function PuzzlePage({
   if (!user) {
     redirect('/sign-in');
   }
+
+  // Check dashboard access (redirects if no access, except admin bypass)
+  await requireDashboardAccess(user.id);
 
   // Validate MongoDB ObjectId
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -33,17 +37,10 @@ export default async function PuzzlePage({
 
   await connectDB();
 
-  // Find or create user
-  let dbUser = await User.findOne({ clerkId: user.id });
+  // Get user (already checked access above)
+  const dbUser = await User.findOne({ clerkId: user.id });
   if (!dbUser) {
-    dbUser = await User.create({
-      clerkId: user.id,
-      email: user.emailAddresses[0]?.emailAddress || '',
-      firstName: user.firstName,
-      lastName: user.lastName,
-      name: user.fullName,
-      imageUrl: user.imageUrl,
-    });
+    redirect('/sign-in');
   }
 
   const puzzle = await Puzzle.findById(id)

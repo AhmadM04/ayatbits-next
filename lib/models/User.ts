@@ -48,11 +48,7 @@ const UserSchema = new Schema<IUser>(
     subscriptionStatus: {
       type: String,
       enum: Object.values(SubscriptionStatusEnum),
-      default: SubscriptionStatusEnum.TRIALING, // New users get a free trial automatically
-    },
-    trialEndDate: { 
-      type: Date, 
-      default: () => new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 days free trial for new users
+      default: SubscriptionStatusEnum.INACTIVE, // New users start as INACTIVE - must go through trial/payment flow
     },
     subscriptionPlan: {
       type: String,
@@ -61,7 +57,7 @@ const UserSchema = new Schema<IUser>(
     },
     stripeCustomerId: { type: String, index: true },
     stripeSubscriptionId: String,
-    // trialEndDate: Moved above to have default value for new users
+    trialEndDate: Date, // Only set when user starts a trial through Stripe
     selectedTranslation: { type: String, default: 'en.sahih' },
     currentStreak: { type: Number, default: 0 },
     longestStreak: { type: Number, default: 0 },
