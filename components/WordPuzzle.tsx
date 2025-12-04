@@ -9,6 +9,8 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  useDroppable,
+  useDraggable,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -18,14 +20,15 @@ import {
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import {
   tokenizeAyah,
   shuffleArray,
   validatePuzzleAnswer,
+  isWordCorrectAtPosition,
   type WordToken,
 } from '@/lib/puzzle-logic';
+import { useToast } from '@/components/Toast';
 
 interface WordPuzzleProps {
   ayahText: string;
@@ -40,13 +43,11 @@ function SortableWord({
   token,
   isCorrect,
   isIncorrect,
-  isRecentlyCorrect,
   onClick,
 }: {
   token: WordToken;
   isCorrect: boolean;
   isIncorrect: boolean;
-  isRecentlyCorrect: boolean;
   onClick: () => void;
 }) {
   const {
@@ -65,38 +66,148 @@ function SortableWord({
   };
 
   return (
-    <motion.div
+    <div
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
       onClick={onClick}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      animate={
-        isRecentlyCorrect
-          ? {
-              scale: [1, 1.1, 1],
-              rotate: [0, 5, -5, 0],
-            }
-          : isIncorrect
-          ? {
-              x: [0, -10, 10, -10, 10, 0],
-            }
-          : {}
-      }
-      transition={{ duration: 0.3 }}
       className={`
-        px-4 py-2 rounded-xl cursor-grab active:cursor-grabbing
+        px-4 py-2 rounded-xl cursor-grab active:cursor-grabbing transition-all
         ${isCorrect ? 'bg-green-500/20 border-2 border-green-500 text-green-400' : ''}
         ${isIncorrect ? 'bg-red-500/20 border-2 border-red-500 text-red-400' : ''}
         ${!isCorrect && !isIncorrect ? 'bg-white/5 border border-white/10 text-white hover:bg-white/10' : ''}
-        shadow-sm hover:shadow-md transition-all
         text-right font-medium text-lg font-arabic
       `}
     >
       {token.text}
-    </motion.div>
+    </div>
+  );
+}
+
+function AnswerDroppable({
+  answer,
+  correctIds,
+  incorrectIds,
+  onWordClick,
+}: {
+  answer: WordToken[];
+  correctIds: Set<string>;
+  incorrectIds: Set<string>;
+  onWordClick: (token: WordToken) => void;
+}) {
+  const { setNodeRef } = useDroppable({ id: 'answer-area' });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className="min-h-[120px] bg-green-500/10 border-2 border-dashed border-green-500/30 rounded-xl p-6 transition-colors"
+    >
+      {answer.length === 0 ? (
+        <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+          Drag or click words from below to build the ayah
+        </div>
+      ) : (
+        <SortableContext
+          items={answer.map((t) => t.id)}
+          strategy={horizontalListSortingStrategy}
+        >
+          <div className="flex flex-wrap gap-3 justify-center">
+            {answer.map((token) => (
+              <SortableWord
+                key={token.id}
+                token={token}
+                isCorrect={correctIds.has(token.id)}
+                isIncorrect={incorrectIds.has(token.id)}
+                onClick={() => onWordClick(token)}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      )}
+    </div>
+  );
+}
+
+function DraggableWord({
+  token,
+  incorrectTokenId,
+  onClick,
+}: {
+  token: WordToken;
+  incorrectTokenId: string | null;
+  onClick: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+  } = useDraggable({ id: token.id });
+
+  const style = {
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+    opacity: isDragging ? 0.5 : 1,
+    transition: isDragging ? 'none' : 'opacity 0.2s',
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      onClick={onClick}
+      className={`
+        px-4 py-2 rounded-xl cursor-grab active:cursor-grabbing transition-all
+        ${
+          incorrectTokenId === token.id
+            ? 'bg-red-500/20 border-2 border-red-500 text-red-400'
+            : 'bg-white/10 border border-white/20 hover:bg-white/15 text-white'
+        }
+        text-right font-medium text-lg font-arabic
+      `}
+    >
+      {token.text}
+    </div>
+  );
+}
+
+function WordBankDroppable({
+  bank,
+  incorrectTokenId,
+  onWordClick,
+}: {
+  bank: WordToken[];
+  incorrectTokenId: string | null;
+  onWordClick: (token: WordToken) => void;
+}) {
+  const { setNodeRef } = useDroppable({ id: 'word-bank' });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className="min-h-[200px] bg-white/5 border-2 border-white/10 rounded-xl p-6 transition-colors"
+    >
+      <h4 className="text-lg font-semibold text-white mb-4">Word Bank</h4>
+      {bank.length === 0 ? (
+        <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+          All words used. Click words above to remove them.
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-3">
+          {bank.map((token) => (
+            <DraggableWord
+              key={token.id}
+              token={token}
+              incorrectTokenId={incorrectTokenId}
+              onClick={() => onWordClick(token)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -108,12 +219,12 @@ export default function WordPuzzle({
   isLiked = false,
   onToggleLike,
 }: WordPuzzleProps) {
+  const { showToast } = useToast();
   const originalTokens = useMemo(() => tokenizeAyah(ayahText), [ayahText]);
   const [bank, setBank] = useState<WordToken[]>(() => shuffleArray(originalTokens));
   const [answer, setAnswer] = useState<WordToken[]>([]);
   const [mistakeCount, setMistakeCount] = useState(0);
   const [hasExceededMistakeLimit, setHasExceededMistakeLimit] = useState(false);
-  const [recentlyCorrectId, setRecentlyCorrectId] = useState<string | null>(null);
   const [incorrectTokenId, setIncorrectTokenId] = useState<string | null>(null);
 
   const sensors = useSensors(
@@ -128,14 +239,25 @@ export default function WordPuzzle({
     setBank(shuffleArray(originalTokens));
     setMistakeCount(0);
     setHasExceededMistakeLimit(false);
-    setRecentlyCorrectId(null);
     setIncorrectTokenId(null);
   }, [ayahText, originalTokens]);
 
+  // Calculate which words are correct at their current position
   const correctIds = useMemo(() => {
     const ids = new Set<string>();
     for (let i = 0; i < answer.length; i += 1) {
-      if (answer[i].norm === originalTokens[i]?.norm) {
+      if (isWordCorrectAtPosition(answer[i], i, originalTokens)) {
+        ids.add(answer[i].id);
+      }
+    }
+    return ids;
+  }, [answer, originalTokens]);
+
+  // Calculate which words are incorrect (wrong word at position)
+  const incorrectIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (let i = 0; i < answer.length; i += 1) {
+      if (!isWordCorrectAtPosition(answer[i], i, originalTokens)) {
         ids.add(answer[i].id);
       }
     }
@@ -151,12 +273,12 @@ export default function WordPuzzle({
 
   useEffect(() => {
     if (isComplete) {
-      const timer = setTimeout(() => {
+      showToast('Perfect! You completed the puzzle correctly.', 'success', 3000);
+      setTimeout(() => {
         onSolved?.(true);
       }, 500);
-      return () => clearTimeout(timer);
     }
-  }, [isComplete, onSolved]);
+  }, [isComplete, onSolved, showToast]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -166,13 +288,21 @@ export default function WordPuzzle({
     const activeToken = [...bank, ...answer].find((t) => t.id === active.id);
     if (!activeToken) return;
 
-    // Check if dragging from bank to answer
     const isFromBank = bank.some((t) => t.id === active.id);
-    const isToAnswer = answer.some((t) => t.id === over.id) || over.id === 'answer-area';
+    const isToAnswer = over.id === 'answer-area' || answer.some((t) => t.id === over.id);
+    const isToBank = over.id === 'word-bank' || bank.some((t) => t.id === over.id);
 
-    if (isFromBank && (isToAnswer || over.id === 'answer-area')) {
-      moveFromBankToAnswer(activeToken);
-    } else if (answer.some((t) => t.id === active.id) && bank.some((t) => t.id === over.id)) {
+    if (isFromBank && isToAnswer) {
+      // Determine insertion position
+      let insertIndex = answer.length;
+      if (over.id !== 'answer-area') {
+        const overIndex = answer.findIndex((t) => t.id === over.id);
+        if (overIndex !== -1) {
+          insertIndex = overIndex;
+        }
+      }
+      moveFromBankToAnswer(activeToken, insertIndex);
+    } else if (answer.some((t) => t.id === active.id) && isToBank) {
       moveFromAnswerToBank(activeToken);
     } else if (answer.some((t) => t.id === active.id) && answer.some((t) => t.id === over.id)) {
       // Reordering within answer
@@ -182,30 +312,27 @@ export default function WordPuzzle({
     }
   };
 
-  const moveFromBankToAnswer = (token: WordToken) => {
+  const moveFromBankToAnswer = (token: WordToken, position: number) => {
     if (hasExceededMistakeLimit) return;
 
-    const usedIds = new Set(answer.map((w) => w.id));
-    const remainingTokens = originalTokens.filter((w) => !usedIds.has(w.id));
-    const isValidToken = remainingTokens.some((w) => w.id === token.id);
+    // Check if this word is correct at this position
+    const isCorrect = isWordCorrectAtPosition(token, position, originalTokens);
 
-    if (!isValidToken) {
-      handleMistake(token.id);
-      return;
-    }
-
-    setBank((prev) => prev.filter((t) => t.id !== token.id));
+    // Insert at position
     setAnswer((prev) => {
-      const next = [...prev, token];
-      next.sort((a, b) => a.position - b.position);
-      return next;
+      const newAnswer = [...prev];
+      newAnswer.splice(position, 0, token);
+      return newAnswer;
     });
 
-    const wordIndex = answer.length;
-    onWordCorrect?.(wordIndex, token.text);
+    setBank((prev) => prev.filter((t) => t.id !== token.id));
 
-    setRecentlyCorrectId(token.id);
-    setTimeout(() => setRecentlyCorrectId(null), 500);
+    if (isCorrect) {
+      onWordCorrect?.(position, token.text);
+    } else {
+      // Wrong word at this position - count as mistake
+      handleMistake(token.id);
+    }
   };
 
   const moveFromAnswerToBank = (token: WordToken) => {
@@ -220,10 +347,11 @@ export default function WordPuzzle({
 
     setTimeout(() => {
       setIncorrectTokenId(null);
-    }, 600);
+    }, 1000);
 
     if (newMistakeCount >= 3 && !hasExceededMistakeLimit) {
       setHasExceededMistakeLimit(true);
+      showToast('Too many mistakes! Please try again.', 'error', 3000);
       setTimeout(() => onMistakeLimitExceeded?.(), 1000);
     }
   };
@@ -232,7 +360,8 @@ export default function WordPuzzle({
     if (hasExceededMistakeLimit) return;
 
     if (isInBank) {
-      moveFromBankToAnswer(token);
+      // Add to end of answer
+      moveFromBankToAnswer(token, answer.length);
     } else {
       moveFromAnswerToBank(token);
     }
@@ -253,9 +382,7 @@ export default function WordPuzzle({
             }`}
           >
             <Heart
-              className={`w-6 h-6 ${
-                isLiked ? 'fill-red-400 text-red-400' : ''
-              }`}
+              className={`w-6 h-6 ${isLiked ? 'fill-red-400 text-red-400' : ''}`}
             />
           </button>
         )}
@@ -263,14 +390,14 @@ export default function WordPuzzle({
 
       {/* Mistake Counter */}
       <div
-        className={`flex items-center justify-between p-4 rounded-xl ${
+        className={`flex items-center justify-between p-4 rounded-xl transition-colors ${
           hasExceededMistakeLimit
             ? 'bg-red-500/10 border-2 border-red-500/30'
             : 'bg-white/5 border border-white/10'
         }`}
       >
         <span
-          className={`font-semibold ${
+          className={`font-semibold transition-colors ${
             hasExceededMistakeLimit ? 'text-red-400' : 'text-gray-300'
           }`}
         >
@@ -294,105 +421,20 @@ export default function WordPuzzle({
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <div className="min-h-[120px] bg-green-500/10 border-2 border-dashed border-green-500/30 rounded-xl p-6">
-          {answer.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-gray-500 text-sm">
-              Drag or click words from below to build the ayah
-            </div>
-          ) : (
-            <SortableContext
-              items={answer.map((t) => t.id)}
-              strategy={horizontalListSortingStrategy}
-            >
-              <div className="flex flex-wrap gap-3 justify-center">
-                {answer.map((token, index) => (
-                  <SortableWord
-                    key={token.id}
-                    token={token}
-                    isCorrect={correctIds.has(token.id)}
-                    isIncorrect={false}
-                    isRecentlyCorrect={recentlyCorrectId === token.id}
-                    onClick={() => handleWordClick(token, false)}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          )}
-        </div>
+        <AnswerDroppable
+          answer={answer}
+          correctIds={correctIds}
+          incorrectIds={incorrectIds}
+          onWordClick={(token) => handleWordClick(token, false)}
+        />
 
         {/* Word Bank */}
-        <div className="min-h-[200px] bg-white/5 border-2 border-white/10 rounded-xl p-6">
-          <h4 className="text-lg font-semibold text-white mb-4">Word Bank</h4>
-          {bank.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-gray-500 text-sm">
-              All words used. Click words above to remove them.
-            </div>
-          ) : (
-            <div className="flex flex-wrap gap-3">
-              {bank.map((token) => (
-                <motion.div
-                  key={token.id}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  animate={
-                    incorrectTokenId === token.id
-                      ? {
-                          x: [0, -10, 10, -10, 10, 0],
-                        }
-                      : {}
-                  }
-                  onClick={() => handleWordClick(token, true)}
-                  className={`
-                    px-4 py-2 rounded-xl cursor-pointer
-                    ${
-                      incorrectTokenId === token.id
-                        ? 'bg-red-500/20 border-2 border-red-500 text-red-400'
-                        : 'bg-white/10 border border-white/20 hover:bg-white/15 text-white'
-                    }
-                    shadow-sm hover:shadow-md transition-all
-                    text-right font-medium text-lg font-arabic
-                  `}
-                >
-                  {token.text}
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
+        <WordBankDroppable
+          bank={bank}
+          incorrectTokenId={incorrectTokenId}
+          onWordClick={(token) => handleWordClick(token, true)}
+        />
       </DndContext>
-
-      {/* Success Animation */}
-      <AnimatePresence>
-        {isComplete && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: [0, 1.2, 1] }}
-              className="bg-[#111] border border-white/10 rounded-2xl p-8 text-center shadow-2xl relative overflow-hidden"
-            >
-              {/* Animated border glow */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-500/30 via-emerald-500/30 to-green-500/30 animate-pulse" />
-              <div className="relative z-10">
-                <motion.div
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 0.5 }}
-                  className="text-6xl mb-4"
-                >
-                  🎉
-                </motion.div>
-                <h3 className="text-2xl font-bold text-green-400 mb-2">Excellent!</h3>
-                <p className="text-gray-300">You've completed this puzzle correctly!</p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
-

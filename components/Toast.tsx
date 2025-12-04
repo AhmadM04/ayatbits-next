@@ -49,12 +49,8 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
   const Icon = icons[toast.type];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -20, scale: 0.95 }}
-      transition={{ duration: 0.2 }}
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl border backdrop-blur-sm ${colors[toast.type]}`}
+    <div
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl border backdrop-blur-sm transition-all duration-200 ${colors[toast.type]}`}
     >
       <Icon className="w-5 h-5 flex-shrink-0" />
       <p className="text-sm font-medium text-white flex-1">{toast.message}</p>
@@ -64,7 +60,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
       >
         <X className="w-4 h-4 text-gray-400" />
       </button>
-    </motion.div>
+    </div>
   );
 }
 
@@ -98,13 +94,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={{ showToast, showNetworkError, hideToast }}>
       {children}
       <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none">
-        <AnimatePresence mode="popLayout">
-          {toasts.map((toast) => (
-            <div key={toast.id} className="pointer-events-auto">
-              <ToastItem toast={toast} onClose={() => hideToast(toast.id)} />
-            </div>
-          ))}
-        </AnimatePresence>
+        {toasts.map((toast) => (
+          <div key={toast.id} className="pointer-events-auto">
+            <ToastItem toast={toast} onClose={() => hideToast(toast.id)} />
+          </div>
+        ))}
       </div>
     </ToastContext.Provider>
   );
