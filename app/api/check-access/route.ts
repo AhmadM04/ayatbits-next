@@ -1,41 +1,51 @@
-import { currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import { connectDB, User } from '@/lib/db';
-
-export const dynamic = 'force-dynamic';
+import { auth } from '@clerk/nextjs/server';
+import { connectDB, User, SubscriptionStatusEnum } from '@/lib/db';
 
 export async function GET() {
   try {
-    const user = await currentUser();
-    if (!user) {
-      return NextResponse.json({ hasAccess: false, reason: 'Not authenticated' });
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ hasAccess: false }, { status: 401 });
     }
 
     await connectDB();
+    const user = await User.findOne({ clerkId: userId });
 
-    const dbUser = await User.findOne({ clerkId: user.id });
-    if (!dbUser) {
-      return NextResponse.json({ hasAccess: true, reason: 'New user - trial active' });
+    if (!user) {
+      return NextResponse.json({ hasAccess: false });
     }
 
-    // Check subscription status
-    const status = dbUser.subscriptionStatus;
-    
-    if (status === 'active' || status === 'lifetime') {
-      return NextResponse.json({ hasAccess: true, reason: 'Active subscription' });
+    // Check for lifetime access
+    // Fix: Check subscriptionPlan, not subscriptionStatus, for 'lifetime' string
+    if (
+      user.subscriptionPlan === 'lifetime' && 
+      user.subscriptionStatus === SubscriptionStatusEnum.ACTIVE
+    ) {
+      return NextResponse.json({ hasAccess: true, plan: 'lifetime' });
     }
 
-    if (status === 'trialing') {
-      const trialEnd = dbUser.trialEndDate;
-      if (trialEnd && new Date(trialEnd) > new Date()) {
-        const daysLeft = Math.ceil((new Date(trialEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-        return NextResponse.json({ hasAccess: true, reason: 'Trial active', daysLeft });
-      }
+    // Check active subscription
+    if (
+      user.subscriptionStatus === SubscriptionStatusEnum.ACTIVE &&
+      user.subscriptionEndDate &&
+      new Date(user.subscriptionEndDate) > new Date()
+    ) {
+      return NextResponse.json({ hasAccess: true, plan: user.subscriptionPlan });
     }
 
-    return NextResponse.json({ hasAccess: false, reason: 'Subscription required' });
+    // Check trial
+    // Fix: Use trialEndsAt instead of trialEndDate
+    if (
+      user.trialEndsAt &&
+      new Date(user.trialEndsAt) > new Date()
+    ) {
+      return NextResponse.json({ hasAccess: true, plan: 'trial' });
+    }
+
+    return NextResponse.json({ hasAccess: false });
   } catch (error) {
     console.error('Check access error:', error);
-    return NextResponse.json({ hasAccess: false, reason: 'Error checking access' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

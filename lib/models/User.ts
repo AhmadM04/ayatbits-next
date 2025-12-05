@@ -1,72 +1,53 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
 
 export enum SubscriptionStatusEnum {
-  INACTIVE = 'inactive',
-  TRIALING = 'trialing',
   ACTIVE = 'active',
-  CANCELED = 'canceled',
+  INACTIVE = 'inactive',
+  TRIALING = 'trialing', // Added for the 7-day trial period
   PAST_DUE = 'past_due',
-  LIFETIME = 'lifetime',
+  CANCELED = 'canceled',
+  UNPAID = 'unpaid',
 }
 
-export enum SubscriptionPlan {
-  FREE = 'free',
-  MONTHLY = 'monthly',
-  YEARLY = 'yearly',
-  LIFETIME = 'lifetime',
-}
+export type SubscriptionPlan = 'monthly' | 'yearly' | 'lifetime'; // Removed 'free'
 
 export interface IUser extends Document {
   clerkId: string;
   email: string;
   firstName?: string;
   lastName?: string;
-  name?: string;
-  imageUrl?: string;
-  subscriptionStatus: SubscriptionStatusEnum;
-  subscriptionPlan?: SubscriptionPlan;
   stripeCustomerId?: string;
-  stripeSubscriptionId?: string;
-  trialEndDate?: Date;
-  selectedTranslation: string;
-  currentStreak: number;
-  longestStreak: number;
-  lastActiveDate?: Date;
-  hasBypass?: boolean; // Admin bypass for premium features
+  subscriptionStatus: SubscriptionStatusEnum;
+  subscriptionPlan?: SubscriptionPlan; // Optional: Undefined if no plan selected
+  subscriptionEndDate?: Date;
+  trialEndsAt?: Date; // Specific field for the 7-day trial
   createdAt: Date;
   updatedAt: Date;
 }
 
-const UserSchema = new Schema<IUser>(
+const userSchema = new mongoose.Schema<IUser>(
   {
     clerkId: { type: String, required: true, unique: true, index: true },
-    email: { type: String, required: true, index: true },
-    firstName: String,
-    lastName: String,
-    name: String,
-    imageUrl: String,
+    email: { type: String, required: true, unique: true },
+    firstName: { type: String },
+    lastName: { type: String },
+    stripeCustomerId: { type: String },
     subscriptionStatus: {
       type: String,
       enum: Object.values(SubscriptionStatusEnum),
-      default: SubscriptionStatusEnum.INACTIVE, // New users start as INACTIVE - must go through trial/payment flow
+      default: SubscriptionStatusEnum.INACTIVE,
     },
     subscriptionPlan: {
       type: String,
-      enum: Object.values(SubscriptionPlan),
-      default: SubscriptionPlan.FREE,
+      enum: ['monthly', 'yearly', 'lifetime'],
+      // No default value - user has no plan until they select one
     },
-    stripeCustomerId: { type: String, index: true },
-    stripeSubscriptionId: String,
-    trialEndDate: Date, // Only set when user starts a trial through Stripe
-    selectedTranslation: { type: String, default: 'en.sahih' },
-    currentStreak: { type: Number, default: 0 },
-    longestStreak: { type: Number, default: 0 },
-    lastActiveDate: Date,
-    hasBypass: { type: Boolean, default: false },
+    subscriptionEndDate: { type: Date },
+    trialEndsAt: { type: Date },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
+
+export default User;

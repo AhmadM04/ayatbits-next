@@ -1,101 +1,55 @@
-import { IUser } from './models/User';
+import { SubscriptionStatusEnum, type IUser } from '@/lib/models/User';
 
-export type SubscriptionAccess = {
-  hasAccess: boolean;
-  status: 'trialing' | 'active' | 'expired' | 'past_due' | 'canceled' | 'inactive' | 'needs_subscription' | 'bypass';
-  trialDaysLeft?: number;
-  message?: string;
+const DAY_IN_MS = 86_400_000;
+
+export const checkSubscription = (user: IUser) => {
+  // Admin/Lifetime Access
+  // We check if the plan is 'lifetime' AND status is active.
+  if (
+    user.subscriptionPlan === 'lifetime' && 
+    user.subscriptionStatus === SubscriptionStatusEnum.ACTIVE
+  ) {
+    return true;
+  }
+
+  // Active Subscription (Monthly/Yearly)
+  if (
+    user.subscriptionStatus === SubscriptionStatusEnum.ACTIVE &&
+    user.subscriptionEndDate &&
+    new Date(user.subscriptionEndDate).getTime() + DAY_IN_MS > Date.now()
+  ) {
+    return true;
+  }
+
+  // Trial Period
+  // Check if status is TRIALING or if we are just checking the trialEndsAt date
+  if (
+    user.trialEndsAt &&
+    new Date(user.trialEndsAt).getTime() + DAY_IN_MS > Date.now()
+  ) {
+    return true;
+  }
+
+  return false;
 };
 
-export function checkSubscriptionAccess(user: IUser): SubscriptionAccess {
-  // Check for admin bypass first
-  if (user.hasBypass) {
-    return { hasAccess: true, status: 'bypass' };
+export const getDaysLeft = (user: IUser) => {
+  if (
+    user.subscriptionPlan === 'lifetime' && 
+    user.subscriptionStatus === SubscriptionStatusEnum.ACTIVE
+  ) {
+    return Infinity;
   }
 
-  // Check for lifetime plan
-  if (user.subscriptionPlan === 'lifetime' || user.subscriptionStatus === 'lifetime') {
-    return { hasAccess: true, status: 'active' };
+  if (user.subscriptionEndDate) {
+    const diff = new Date(user.subscriptionEndDate).getTime() - Date.now();
+    return Math.ceil(diff / DAY_IN_MS);
   }
 
-  const now = new Date();
-  const status = user.subscriptionStatus || 'inactive';
-
-  // Active subscription
-  if (status === 'active') {
-    return { hasAccess: true, status: 'active' };
+  if (user.trialEndsAt) {
+    const diff = new Date(user.trialEndsAt).getTime() - Date.now();
+    return Math.ceil(diff / DAY_IN_MS);
   }
 
-  // Trialing (free trial - may or may not have payment method)
-  if (status === 'trialing') {
-    const trialEndsAt = user.trialEndDate;
-    if (trialEndsAt && new Date(trialEndsAt) > now) {
-      const daysLeft = Math.ceil((new Date(trialEndsAt).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      // Check if user has payment method (Stripe customer ID) - if not, it's a limited trial
-      const hasPaymentMethod = !!user.stripeCustomerId;
-      return { 
-        hasAccess: true, 
-        status: 'trialing',
-        trialDaysLeft: daysLeft,
-        message: hasPaymentMethod 
-          ? undefined 
-          : 'Your free trial is active. Add a payment method to continue after the trial ends.',
-      };
-    } else {
-      // Trial expired
-      if (user.stripeCustomerId) {
-        // Had payment method but trial expired - should have been converted to active by Stripe
-        return { 
-          hasAccess: false, 
-          status: 'expired',
-          message: 'Your trial has ended. Please check your subscription status.',
-        };
-      } else {
-        // No payment method and trial expired - needs to subscribe
-        return { 
-          hasAccess: false, 
-          status: 'needs_subscription',
-          message: 'Your free trial has ended. Start your 7-day free trial with a payment method to continue.',
-        };
-      }
-    }
-  }
-
-  // Past due - payment failed
-  if (status === 'past_due') {
-    return { 
-      hasAccess: false, 
-      status: 'past_due',
-      message: 'Your payment failed. Please update your payment method to continue.',
-    };
-  }
-
-  // Canceled
-  if (status === 'canceled') {
-    return { 
-      hasAccess: false, 
-      status: 'canceled',
-      message: 'Your subscription has ended. Subscribe again to continue learning.',
-    };
-  }
-
-  // Inactive - needs to subscribe and add payment method
-  return { 
-    hasAccess: false, 
-    status: 'needs_subscription',
-    message: 'Start your 7-day free trial to access all features.',
-  };
-}
-
-export function getTrialDaysRemaining(trialEndsAt: Date | string | undefined | null): number {
-  if (!trialEndsAt) return 0;
-  try {
-    const now = new Date();
-    const endDate = new Date(trialEndsAt);
-    if (isNaN(endDate.getTime())) return 0;
-    const diff = endDate.getTime() - now.getTime();
-    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-  } catch {
-    return 0;
-  }
-}
+  return 0;
+};

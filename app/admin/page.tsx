@@ -1,108 +1,118 @@
-'use client';
+'use server';
 
-import { useState } from 'react';
-import { grantPremiumAccess, revokePremiumAccess } from '@/app/actions/admin';
+import connectDB from '@/lib/mongodb';
+import User, { SubscriptionStatusEnum } from '@/lib/models/User';
 import { currentUser } from '@clerk/nextjs/server';
+import { revalidatePath } from 'next/cache';
 
-export default function AdminPage() {
-  const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<{msg: string, type: 'success'|'error'} | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [action, setAction] = useState<'grant' | 'revoke'>('grant');
+export type GrantDuration = 'lifetime' | '1_month' | '1_year' | 'revoke';
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setStatus(null);
+export async function grantPremiumAccess(email: string, duration: GrantDuration) {
+  // 1. Security Check
+  const user = await currentUser();
+  if (!user) {
+    return { success: false, error: 'Unauthorized' };
+  }
 
-    const result = action === 'grant' 
-      ? await grantPremiumAccess(email)
-      : await revokePremiumAccess(email);
+  // Replace with your actual admin emails or env variable
+  const ADMIN_EMAILS = [
+    'ahmad@ayatbits.com', 
+    'admin@ayatbits.com',
+    process.env.ADMIN_EMAIL // Ensure this is set in your .env.local
+  ].filter(Boolean); // Remove undefined if env var is missing
 
-    if (result.success) {
-      setStatus({ msg: result.message!, type: 'success' });
-      setEmail('');
-    } else {
-      setStatus({ msg: result.error!, type: 'error' });
-    }
-    setLoading(false);
-  };
+  const userEmail = user.emailAddresses[0]?.emailAddress;
 
-  return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white p-8">
-      <div className="max-w-xl mx-auto border border-white/10 rounded-xl p-6 bg-[#111]">
-        <h1 className="text-2xl font-bold mb-2">👑 Admin: Grant/Revoke Access</h1>
-        <p className="text-sm text-gray-400 mb-6">
-          Grant or revoke premium access to users by email
-        </p>
+  if (!userEmail || !ADMIN_EMAILS.includes(userEmail)) {
+    console.warn(`Unauthorized admin attempt by ${userEmail}`);
+    return { success: false, error: 'Forbidden: You are not an admin.' };
+  }
+
+  if (!email) return { success: false, error: 'User email is required' };
+
+  try {
+    await connectDB();
+
+    // 2. Determine update fields based on duration
+    let updateData: any = {};
+    const now = new Date();
+
+    switch (duration) {
+      case 'lifetime':
+        // Lifetime access: Active status, Lifetime plan, No end date
+        updateData = {
+          $set: {
+            subscriptionStatus: SubscriptionStatusEnum.ACTIVE,
+            subscriptionPlan: 'lifetime',
+            subscriptionEndDate: null, 
+            trialEndsAt: null, // Clear any trial data
+          }
+        };
+        break;
+
+      case '1_month':
+        // 1 Month access: Active status, Monthly plan, End date = Now + 1 Month
+        const nextMonth = new Date(now);
+        nextMonth.setMonth(now.getMonth() + 1);
         
-        <div className="flex gap-2 mb-6">
-          <button
-            type="button"
-            onClick={() => setAction('grant')}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
-              action === 'grant'
-                ? 'bg-green-600 text-white'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10'
-            }`}
-          >
-            Grant Access
-          </button>
-          <button
-            type="button"
-            onClick={() => setAction('revoke')}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
-              action === 'revoke'
-                ? 'bg-red-600 text-white'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10'
-            }`}
-          >
-            Revoke Access
-          </button>
-        </div>
+        updateData = {
+          $set: {
+            subscriptionStatus: SubscriptionStatusEnum.ACTIVE,
+            subscriptionPlan: 'monthly',
+            subscriptionEndDate: nextMonth,
+            trialEndsAt: null,
+          }
+        };
+        break;
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">User Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-black/50 border border-white/20 rounded-lg p-3 text-white focus:border-green-500 outline-none"
-              placeholder="user@example.com"
-              required
-            />
-          </div>
+      case '1_year':
+        // 1 Year access: Active status, Yearly plan, End date = Now + 1 Year
+        const nextYear = new Date(now);
+        nextYear.setFullYear(now.getFullYear() + 1);
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full font-bold py-3 rounded-lg disabled:opacity-50 transition-colors ${
-              action === 'grant'
-                ? 'bg-green-600 hover:bg-green-700 text-white'
-                : 'bg-red-600 hover:bg-red-700 text-white'
-            }`}
-          >
-            {loading ? 'Processing...' : action === 'grant' ? 'Grant Lifetime Premium' : 'Revoke Premium Access'}
-          </button>
-        </form>
+        updateData = {
+          $set: {
+            subscriptionStatus: SubscriptionStatusEnum.ACTIVE,
+            subscriptionPlan: 'yearly',
+            subscriptionEndDate: nextYear,
+            trialEndsAt: null,
+          }
+        };
+        break;
 
-        {status && (
-          <div className={`mt-4 p-4 rounded-lg ${
-            status.type === 'success' 
-              ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-              : 'bg-red-500/20 text-red-400 border border-red-500/30'
-          }`}>
-            {status.msg}
-          </div>
-        )}
+      case 'revoke':
+        // Revoke access: Inactive status, Remove Plan, Remove End Date
+        // This forces the user to the "Select a Plan" state in your app logic
+        updateData = {
+          $set: {
+            subscriptionStatus: SubscriptionStatusEnum.INACTIVE,
+            subscriptionEndDate: null,
+            trialEndsAt: null,
+          },
+          $unset: { subscriptionPlan: 1 } // Remove the plan field entirely
+        };
+        break;
+    }
 
-        <div className="mt-6 pt-6 border-t border-white/10">
-          <p className="text-xs text-gray-500">
-            Note: Only users with admin email configured in ADMIN_EMAILS environment variable can use this page.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+    // 3. Find and update the user
+    // Case-insensitive email search to be safe
+    const updatedUser = await User.findOneAndUpdate(
+      { email: { $regex: new RegExp(`^${email}$`, 'i') } },
+      updateData,
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return { success: false, error: 'User not found. Ask them to sign up first.' };
+    }
+
+    revalidatePath('/admin');
+    
+    const action = duration === 'revoke' ? 'Revoked access for' : `Granted ${duration} access to`;
+    return { success: true, message: `Successfully ${action} ${updatedUser.email}` };
+
+  } catch (error) {
+    console.error('Admin grant error:', error);
+    return { success: false, error: 'Database connection failed' };
+  }
 }
