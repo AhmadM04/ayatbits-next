@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ToastProvider } from "@/components/Toast";
 import { ThemeProvider } from "@/lib/theme-context";
+import { I18nProvider } from "@/lib/i18n";
+import { getMessages } from "@/lib/i18n-server";
+import { DEFAULT_LOCALE } from "@/lib/i18n-config";
 import "./globals.css";
 import Script from "next/script";
 
@@ -177,11 +180,16 @@ const jsonLd = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Load messages on server side (default to English for now)
+  // You can detect locale from cookies, headers, or user preferences
+  const locale = DEFAULT_LOCALE;
+  const messages = await getMessages(locale);
+
   return (
     <ClerkProvider
       appearance={clerkAppearance}
@@ -206,7 +214,9 @@ export default function RootLayout({
         >
           <ThemeProvider>
             <ToastProvider>
-              {children}
+              <I18nProvider locale={locale} messages={messages}>
+                {children}
+              </I18nProvider>
             </ToastProvider>
           </ThemeProvider>
         </body>

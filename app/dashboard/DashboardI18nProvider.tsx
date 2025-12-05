@@ -1,31 +1,23 @@
-'use client';
-
 import { I18nProvider } from '@/lib/i18n';
-import { ReactNode, useLayoutEffect } from 'react';
+import { ReactNode } from 'react';
+import { getMessages, getLocaleFromTranslationCode } from '@/lib/i18n-server';
+import { DEFAULT_LOCALE } from '@/lib/i18n-config';
 
 interface DashboardI18nProviderProps {
   children: ReactNode;
   translationCode: string;
 }
 
-export default function DashboardI18nProvider({
+export default async function DashboardI18nProvider({
   children,
   translationCode,
 }: DashboardI18nProviderProps) {
-  // Use useLayoutEffect to sync BEFORE paint, so it's available immediately
-  useLayoutEffect(() => {
-    if (translationCode && typeof window !== 'undefined') {
-      localStorage.setItem('selectedTranslation', translationCode);
-    }
-  }, [translationCode]);
-
-  // Also sync immediately on first render (for SSR hydration)
-  if (typeof window !== 'undefined' && translationCode) {
-    localStorage.setItem('selectedTranslation', translationCode);
-  }
+  // Load messages on server side based on translation code
+  const locale = getLocaleFromTranslationCode(translationCode);
+  const messages = await getMessages(locale);
 
   return (
-    <I18nProvider translationCode={translationCode}>
+    <I18nProvider locale={locale} messages={messages} translationCode={translationCode}>
       {children}
     </I18nProvider>
   );

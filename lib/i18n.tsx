@@ -3,43 +3,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from 'react';
 import { getLocaleFromTranslation, Locale, DEFAULT_LOCALE } from './i18n-config';
 
-// Import all message files
-import en from '@/messages/en.json';
-import ar from '@/messages/ar.json';
-import fr from '@/messages/fr.json';
-import es from '@/messages/es.json';
-import de from '@/messages/de.json';
-import tr from '@/messages/tr.json';
-import ur from '@/messages/ur.json';
-import id from '@/messages/id.json';
-import ms from '@/messages/ms.json';
-import bn from '@/messages/bn.json';
-import hi from '@/messages/hi.json';
-import ru from '@/messages/ru.json';
-import zh from '@/messages/zh.json';
-import ja from '@/messages/ja.json';
-import nl from '@/messages/nl.json';
-
-type Messages = typeof en;
+type Messages = Record<string, any>;
 type MessagePath = string;
-
-const messages: Record<Locale, Messages> = {
-  en,
-  ar,
-  fr,
-  es,
-  de,
-  tr,
-  ur,
-  id,
-  ms,
-  bn,
-  hi,
-  ru,
-  zh,
-  ja,
-  nl,
-};
 
 interface I18nContextType {
   locale: Locale;
@@ -81,17 +46,22 @@ function interpolate(template: string, params?: Record<string, string | number>)
 
 interface I18nProviderProps {
   children: ReactNode;
-  translationCode?: string;
+  locale: Locale;
+  messages: Messages; // Passed from server
+  translationCode?: string; // Optional, for backward compatibility
 }
 
-export function I18nProvider({ children, translationCode }: I18nProviderProps) {
+export function I18nProvider({ children, locale: initialLocale, messages: initialMessages, translationCode }: I18nProviderProps) {
   const [locale, setLocaleState] = useState<Locale>(() => {
     // Initialize from translation code if provided
     if (translationCode) {
       return getLocaleFromTranslation(translationCode);
     }
-    return DEFAULT_LOCALE;
+    return initialLocale || DEFAULT_LOCALE;
   });
+
+  // Store messages in state (they come from server)
+  const [messages, setMessages] = useState<Messages>(initialMessages);
 
   // Update locale when translationCode changes
   useEffect(() => {
@@ -119,21 +89,16 @@ export function I18nProvider({ children, translationCode }: I18nProviderProps) {
   }, []);
 
   const t = useCallback((key: MessagePath, params?: Record<string, string | number>): string => {
-    const localeMessages = messages[locale] || messages[DEFAULT_LOCALE];
+    const localeMessages = messages || {};
     const value = getNestedValue(localeMessages as Record<string, unknown>, key);
     
     if (!value) {
-      // Fallback to English if translation not found
-      const fallback = getNestedValue(messages[DEFAULT_LOCALE] as Record<string, unknown>, key);
-      if (!fallback) {
-        console.warn(`Translation missing for key: ${key}`);
-        return key;
-      }
-      return interpolate(fallback, params);
+      console.warn(`Translation missing for key: ${key} in locale: ${locale}`);
+      return key;
     }
     
     return interpolate(value, params);
-  }, [locale]);
+  }, [locale, messages]);
 
   const value = useMemo(() => ({
     locale,
@@ -170,22 +135,14 @@ export function useI18nSafe() {
     return {
       locale: DEFAULT_LOCALE as Locale,
       t: (key: string, params?: Record<string, string | number>): string => {
-        const fallback = getNestedValue(messages[DEFAULT_LOCALE] as Record<string, unknown>, key);
-        if (!fallback) return key;
-        return interpolate(fallback, params);
+        // No access to messages, just return key
+        return key;
       },
       setLocale: () => {},
     };
   }
   
   return context;
-}
-
-/**
- * Get messages for a specific locale (useful for server-side)
- */
-export function getMessages(locale: Locale): Messages {
-  return messages[locale] || messages[DEFAULT_LOCALE];
 }
 
 export type { Locale, Messages };
