@@ -1,6 +1,7 @@
+// components/WordPuzzle.tsx
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -13,6 +14,7 @@ import {
   useDraggable,
   DragStartEvent,
   DragOverlay,
+  DragOverEvent,
   defaultDropAnimationSideEffects,
   DropAnimation,
 } from '@dnd-kit/core';
@@ -44,7 +46,13 @@ interface WordPuzzleProps {
 }
 
 // --- Draggable Word (in Bank) ---
-function DraggableWord({ token, isOverlay = false }: { token: WordToken; isOverlay?: boolean }) {
+function DraggableWord({ 
+  token, 
+  isOverlay = false 
+}: { 
+  token: WordToken; 
+  isOverlay?: boolean;
+}) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: token.id,
     data: { type: 'bank-item', token },
@@ -55,6 +63,7 @@ function DraggableWord({ token, isOverlay = false }: { token: WordToken; isOverl
       ref={setNodeRef}
       {...attributes}
       {...listeners}
+      dir="rtl"
       className={`
         touch-none relative
         px-5 py-3 rounded-2xl cursor-grab active:cursor-grabbing
@@ -104,13 +113,14 @@ function SortableAnswerWord({
       style={style}
       {...attributes}
       {...listeners}
+      dir="rtl"
       className={`
         touch-none
         px-4 py-2 rounded-xl cursor-grab active:cursor-grabbing
         text-lg font-medium font-arabic text-center select-none
         transition-all duration-300
         ${isCorrect ? 'bg-green-500/20 border-2 border-green-500 text-green-400' : ''}
-        ${isIncorrect ? 'bg-red-500/20 border-2 border-red-500 text-red-400 animate-pulse' : ''}
+        ${isIncorrect ? 'bg-red-500/20 border-2 border-red-500 text-red-400 animate-shake' : ''}
         ${!isCorrect && !isIncorrect ? 'bg-[#1a1a1a] border border-white/10 text-white' : ''}
       `}
     >
@@ -119,9 +129,7 @@ function SortableAnswerWord({
   );
 }
 
-// --- Components ---
-
-// 1. The Answer Area (Drop Zone)
+// --- Answer Area (Drop Zone) ---
 function AnswerArea({
   answer,
   correctIds,
@@ -136,6 +144,7 @@ function AnswerArea({
   return (
     <div
       ref={setNodeRef}
+      dir="rtl"
       className={`
         min-h-[140px] w-full rounded-2xl border-2 border-dashed
         flex flex-wrap items-center justify-center content-center gap-3 p-6
@@ -149,7 +158,7 @@ function AnswerArea({
     >
       {answer.length === 0 && !isOver ? (
         <div className="text-center pointer-events-none">
-          <p className="text-gray-500 text-sm font-medium">Drag words here to build the verse</p>
+          <p className="text-gray-500 text-sm font-medium">اسحب الكلمات هنا لبناء الآية</p>
         </div>
       ) : (
         <SortableContext items={answer.map((t) => t.id)} strategy={horizontalListSortingStrategy}>
@@ -168,12 +177,12 @@ function AnswerArea({
   );
 }
 
-// 2. The Word Bank
+// --- Word Bank ---
 function WordBank({ bank }: { bank: WordToken[] }) {
   const { setNodeRef } = useDroppable({ id: 'word-bank' });
 
   return (
-    <div ref={setNodeRef} className="mt-8">
+    <div ref={setNodeRef} className="mt-8" dir="rtl">
       <div className="flex flex-wrap justify-center gap-3">
         {bank.map((token) => (
           <DraggableWord key={token.id} token={token} />
@@ -208,7 +217,7 @@ export default function WordPuzzle({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // Prevent accidental drags on tap
+        distance: 8,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -220,11 +229,10 @@ export default function WordPuzzle({
   useEffect(() => {
     setIsMounted(true);
     setBank(shuffleArray(originalTokens));
-  }, []); // Run once on mount
+  }, []);
 
   useEffect(() => {
     if (!isMounted) return;
-    // Reset when verse changes
     setAnswer([]);
     setBank(shuffleArray(originalTokens));
     setMistakeCount(0);
@@ -251,7 +259,7 @@ export default function WordPuzzle({
   // Handle Completion
   useEffect(() => {
     if (isComplete) {
-      showToast('Mashallah! Perfect!', 'success', 2000);
+      showToast('ماشاء الله! Perfect!', 'success', 2000);
       const timer = setTimeout(() => {
         onSolved?.(true);
       }, 800);
@@ -260,88 +268,84 @@ export default function WordPuzzle({
   }, [isComplete, onSolved, showToast]);
 
   // Handle Drag Start
-  const handleDragStart = (event: DragStartEvent) => {
+  const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
     setActiveId(active.id as string);
     
-    // Find the token data whether it's in bank or answer
     const token = 
       bank.find(t => t.id === active.id) || 
       answer.find(t => t.id === active.id);
-      
+    
     if (token) setActiveToken(token);
-  };
+  }, [bank, answer]);
 
-  // Handle Drag End (The Core Logic)
-  const handleDragEnd = (event: DragEndEvent) => {
+  // Handle Drag Over (allows cross-container movement)
+  const handleDragOver = useCallback((event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    const isFromBank = bank.some(t => t.id === activeId);
+    const isFromAnswer = answer.some(t => t.id === activeId);
+    const isOverAnswerArea = overId === 'answer-area' || answer.some(t => t.id === overId);
+    const isOverBank = overId === 'word-bank';
+
+    // Bank -> Answer
+    if (isFromBank && isOverAnswerArea) {
+      const token = bank.find(t => t.id === activeId)!;
+      let newIndex = answer.length;
+      
+      if (overId !== 'answer-area') {
+        const overIndex = answer.findIndex(t => t.id === overId);
+        if (overIndex !== -1) newIndex = overIndex;
+      }
+
+      setBank(prev => prev.filter(t => t.id !== activeId));
+      setAnswer(prev => {
+        const newAnswer = [...prev];
+        newAnswer.splice(newIndex, 0, token);
+        return newAnswer;
+      });
+    }
+    // Answer -> Bank
+    else if (isFromAnswer && isOverBank) {
+      const token = answer.find(t => t.id === activeId)!;
+      setAnswer(prev => prev.filter(t => t.id !== activeId));
+      setBank(prev => [...prev, token]);
+    }
+  }, [bank, answer]);
+
+  // Handle Drag End
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
     setActiveToken(null);
 
-    // 1. Dropped outside any valid drop zone?
-    if (!over) {
-      // If it was in the answer area, remove it and put it back in bank
-      if (answer.some(t => t.id === active.id)) {
-        const token = answer.find(t => t.id === active.id)!;
-        setAnswer(prev => prev.filter(t => t.id !== active.id));
-        setBank(prev => [...prev, token]);
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    // Reorder within answer area
+    if (answer.some(t => t.id === activeId) && answer.some(t => t.id === overId)) {
+      const oldIndex = answer.findIndex(t => t.id === activeId);
+      const newIndex = answer.findIndex(t => t.id === overId);
+      
+      if (oldIndex !== newIndex) {
+        const newAnswer = arrayMove(answer, oldIndex, newIndex);
+        setAnswer(newAnswer);
+        validateMove(newAnswer[newIndex], newIndex);
       }
-      return; // Snap back happens automatically via dnd-kit visual
     }
+  }, [answer]);
 
-    const activeTokenId = active.id as string;
-    const isFromBank = bank.some(t => t.id === activeTokenId);
-    const isFromAnswer = answer.some(t => t.id === activeTokenId);
-    const isOverAnswerArea = over.id === 'answer-area' || answer.some(t => t.id === over.id);
-    const isOverBank = over.id === 'word-bank';
-
-    // A. Bank -> Answer Area
-    if (isFromBank && isOverAnswerArea) {
-      const token = bank.find(t => t.id === activeTokenId)!;
-      
-      // Determine insertion index
-      let newIndex = answer.length;
-      if (over.id !== 'answer-area') {
-        const overIndex = answer.findIndex(t => t.id === over.id);
-        if (overIndex !== -1) newIndex = overIndex;
-      }
-
-      const newAnswer = [...answer];
-      newAnswer.splice(newIndex, 0, token);
-      
-      setAnswer(newAnswer);
-      setBank(prev => prev.filter(t => t.id !== activeTokenId));
-      
-      validateMove(token, newIndex);
-    }
-
-    // B. Answer -> Bank (Removing word)
-    else if (isFromAnswer && isOverBank) {
-      const token = answer.find(t => t.id === activeTokenId)!;
-      setAnswer(prev => prev.filter(t => t.id !== activeTokenId));
-      setBank(prev => [...prev, token]);
-    }
-
-    // C. Reordering inside Answer Area
-    else if (isFromAnswer && isOverAnswerArea && active.id !== over.id) {
-      const oldIndex = answer.findIndex(t => t.id === active.id);
-      const newIndex = answer.findIndex(t => t.id === over.id);
-      
-      const newAnswer = arrayMove(answer, oldIndex, newIndex);
-      setAnswer(newAnswer);
-      
-      // Check validation for the moved item at new position
-      validateMove(newAnswer[newIndex], newIndex);
-    }
-  };
-
-  const validateMove = (token: WordToken, index: number) => {
-    // Only check mistakes if we aren't already locked out
+  const validateMove = useCallback((token: WordToken, index: number) => {
     if (hasExceededMistakeLimit) return;
 
-    // Check if the word at this position matches the original text
     const isCorrect = isWordCorrectAtPosition(token, index, originalTokens);
-
+    
     if (isCorrect) {
       onWordCorrect?.(index, token.text);
     } else {
@@ -352,20 +356,17 @@ export default function WordPuzzle({
         setHasExceededMistakeLimit(true);
         showToast('Too many mistakes! Redirecting...', 'error', 3000);
         setTimeout(() => onMistakeLimitExceeded?.(), 2000);
-      } else {
-        // Optional: Shake effect or sound could trigger here
       }
     }
-  };
+  }, [hasExceededMistakeLimit, mistakeCount, originalTokens, onWordCorrect, onMistakeLimitExceeded, showToast]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setAnswer([]);
     setBank(shuffleArray(originalTokens));
     setMistakeCount(0);
     setHasExceededMistakeLimit(false);
-  };
+  }, [originalTokens]);
 
-  // Drop animation config
   const dropAnimation: DropAnimation = {
     sideEffects: defaultDropAnimationSideEffects({
       styles: {
@@ -385,13 +386,13 @@ export default function WordPuzzle({
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4">
+    <div className="max-w-3xl mx-auto px-4" dir="rtl">
       {/* Header Stats */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="px-4 py-1.5 rounded-full bg-[#1a1a1a] border border-white/10 flex items-center gap-2">
             <span className={`text-sm font-medium ${hasExceededMistakeLimit ? 'text-red-400' : 'text-gray-400'}`}>
-              Mistakes
+              أخطاء
             </span>
             <div className="flex gap-1">
               {[...Array(3)].map((_, i) => (
@@ -401,55 +402,14 @@ export default function WordPuzzle({
                     i < mistakeCount ? 'bg-red-500' : 'bg-white/10'
                   }`}
                 />
-              ))}
-            </div>
+              )
+            )
+            }
           </div>
-          <button 
-            onClick={handleReset}
-            className="p-2 rounded-full bg-[#1a1a1a] border border-white/10 text-gray-400 hover:text-white hover:border-white/30 transition-colors"
-            title="Reset Puzzle"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
         </div>
-
-        {onToggleLike && (
-          <button
-            onClick={onToggleLike}
-            className={`
-              p-2.5 rounded-xl transition-all duration-300
-              ${isLiked 
-                ? 'bg-red-500/10 text-red-500 border border-red-500/50' 
-                : 'bg-[#1a1a1a] text-gray-400 border border-white/10 hover:border-white/30'}
-            `}
-          >
-            <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-          </button>
-        )}
       </div>
-
-      {/* DND Context */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <AnswerArea 
-          answer={answer} 
-          correctIds={correctIds} 
-          incorrectIds={incorrectIds} 
-        />
-        
-        <WordBank bank={bank} />
-
-        {/* Floating Item Overlay */}
-        <DragOverlay dropAnimation={dropAnimation}>
-          {activeToken ? (
-            <DraggableWord token={activeToken} isOverlay />
-          ) : null}
-        </DragOverlay>
-      </DndContext>
-    </div>
-  );
+      </div>
+      </div>
+  )
 }
+

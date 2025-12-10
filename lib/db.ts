@@ -22,7 +22,8 @@ export type { IUserProgress } from './models/UserProgress';
 export type { ILikedAyat } from './models/LikedAyat';
 export type { ITrophy } from './models/Trophy';
 export type { IUserAchievement } from './models/Achievement';
-export { SubscriptionStatusEnum, SubscriptionPlan } from './models/User';
+export { SubscriptionStatusEnum } from './models/User';
+export type { SubscriptionPlan } from './models/User';
 export { PuzzleType } from './models/Puzzle';
 export { ProgressStatus } from './models/UserProgress';
 

@@ -54,3 +54,4 @@ export function getLocaleFromTranslationCode(translationCode: string): Locale {
   return (localeMap[langCode] || DEFAULT_LOCALE) as Locale;
 }
 
+

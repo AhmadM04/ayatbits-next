@@ -16,11 +16,22 @@ export interface IUser extends Document {
   email: string;
   firstName?: string;
   lastName?: string;
+  name?: string;
+  imageUrl?: string;
   stripeCustomerId?: string;
-  subscriptionStatus: SubscriptionStatusEnum;
+  subscriptionStatus?: SubscriptionStatusEnum;
   subscriptionPlan?: SubscriptionPlan; // Optional: Undefined if no plan selected
   subscriptionEndDate?: Date;
   trialEndsAt?: Date; // Specific field for the 7-day trial
+  preferredLanguage?: string;
+  preferredTranslation?: string;
+  selectedTranslation?: string;
+  isAdmin?: boolean;
+  lastActivityDate?: Date;
+  currentStreak?: number;
+  longestStreak?: number;
+  lastPuzzleId?: mongoose.Types.ObjectId;
+  totalPuzzlesCompleted?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,6 +42,8 @@ const userSchema = new mongoose.Schema<IUser>(
     email: { type: String, required: true, unique: true },
     firstName: { type: String },
     lastName: { type: String },
+    name: { type: String },
+    imageUrl: { type: String },
     stripeCustomerId: { type: String },
     subscriptionStatus: {
       type: String,
@@ -42,8 +55,17 @@ const userSchema = new mongoose.Schema<IUser>(
       enum: ['monthly', 'yearly', 'lifetime'],
       // No default value - user has no plan until they select one
     },
+    preferredLanguage: { type: String, default: 'en' },
+    preferredTranslation: { type: String },
+    selectedTranslation: { type: String, default: 'en.sahih' },
+    isAdmin: { type: Boolean, default: false },
     subscriptionEndDate: { type: Date },
     trialEndsAt: { type: Date },
+    lastActivityDate: { type: Date },
+    currentStreak: { type: Number, default: 0 },
+    longestStreak: { type: Number, default: 0 },
+    lastPuzzleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Puzzle' },
+    totalPuzzlesCompleted: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

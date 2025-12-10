@@ -1,20 +1,19 @@
 import { I18nProvider } from '@/lib/i18n';
 import { ReactNode } from 'react';
-import { getMessages, getLocaleFromTranslationCode } from '@/lib/i18n-server';
-import { DEFAULT_LOCALE } from '@/lib/i18n-config';
+import { getLocaleFromTranslationCode } from '@/lib/i18n-server';
 
 interface DashboardI18nProviderProps {
   children: ReactNode;
   translationCode: string;
+  messages: Record<string, any>;
 }
 
 export default async function DashboardI18nProvider({
   children,
   translationCode,
+  messages,
 }: DashboardI18nProviderProps) {
-  // Load messages on server side based on translation code
   const locale = getLocaleFromTranslationCode(translationCode);
-  const messages = await getMessages(locale);
 
   return (
     <I18nProvider locale={locale} messages={messages} translationCode={translationCode}>

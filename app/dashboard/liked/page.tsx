@@ -14,7 +14,7 @@ export default async function LikedAyahsPage() {
   }
 
   // Check dashboard access (redirects if no access, except admin bypass)
-  await requireDashboardAccess(user.id);
+  await requireDashboardAccess();
 
   // Load messages on server side
   const messages = await getMessages(DEFAULT_LOCALE);

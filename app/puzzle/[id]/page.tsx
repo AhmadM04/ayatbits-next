@@ -19,7 +19,7 @@ export default async function PuzzlePage({
   }
 
   // Check dashboard access (redirects if no access, except admin bypass)
-  await requireDashboardAccess(user.id);
+  await requireDashboardAccess();
 
   // Validate MongoDB ObjectId
   if (!mongoose.Types.ObjectId.isValid(id)) {

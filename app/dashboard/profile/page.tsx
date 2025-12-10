@@ -1,97 +1,68 @@
-import { currentUser } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
-import { connectDB, User, UserProgress, Puzzle } from '@/lib/db';
+import { UserProgress, Puzzle } from '@/lib/db';
 import ProfileContent from './ProfileContent';
 import { getTrialDaysRemaining } from '@/lib/subscription';
 import DashboardI18nProvider from '../DashboardI18nProvider';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
+import { UserProfile } from '@clerk/nextjs';
+import { getMessages, getLocaleFromTranslationCode } from '@/lib/i18n-server';
 
 export default async function ProfilePage() {
-  const user = await currentUser();
+  const user = await requireDashboardAccess();
+  const trialDaysLeft = getTrialDaysRemaining(user);
 
-  if (!user) {
-    redirect('/sign-in');
-  }
-
-  // Check dashboard access (redirects if no access, except admin bypass)
-  const dbUser = await requireDashboardAccess(user.id);
-
-  // Get user stats
-  const completedPuzzles = await UserProgress.countDocuments({
-    userId: dbUser._id,
-    status: 'COMPLETED',
-  });
-
-  const totalPuzzles = await Puzzle.countDocuments();
-  const completionPercentage = totalPuzzles > 0 
-    ? Math.round((completedPuzzles / totalPuzzles) * 100) 
+  // Fetch user stats
+  const progress = await UserProgress.find({ userId: user._id });
+  
+  // Calculate completed puzzles safely
+  const completedPuzzleIds = progress.flatMap(p => p.completedPuzzles || []);
+  const completedPuzzles = completedPuzzleIds.length > 0 
+    ? await Puzzle.countDocuments({ _id: { $in: completedPuzzleIds } })
     : 0;
 
-  // Get unique juzs and surahs completed
-  const userProgress = await UserProgress.find({
-    userId: dbUser._id,
-    status: 'COMPLETED',
-  })
-    .populate({
-      path: 'puzzleId',
-      select: 'juzId surahId',
-    })
-    .lean() as any;
+  const stats = {
+    joinedDate: user.createdAt,
+    // fallback to 'trial' if plan is undefined, since 'free' is removed
+    planType: user.subscriptionPlan || 'trial', 
+    surahsCompleted: progress.filter(p => p.progress === 100).length,
+    puzzlesSolved: completedPuzzles,
+  };
 
-  const uniqueJuzs = new Set(
-    userProgress
-      .map((p: any) => p.puzzleId?.juzId?.toString())
-      .filter(Boolean)
-  ).size;
-
-  const uniqueSurahs = new Set(
-    userProgress
-      .map((p: any) => p.puzzleId?.surahId?.toString())
-      .filter(Boolean)
-  ).size;
-
-  // Calculate streak
-  const currentStreak = dbUser.currentStreak || 0;
-  const longestStreak = dbUser.longestStreak || 0;
-  const lastActivityDate = dbUser.lastActivityDate 
-    ? new Date(dbUser.lastActivityDate).toLocaleDateString()
-    : 'Never';
-
-  const userName = user.firstName && user.lastName
-    ? `${user.firstName} ${user.lastName}`
-    : user.firstName || user.emailAddresses[0]?.emailAddress || 'User';
-  
-  const userEmail = user.emailAddresses[0]?.emailAddress || '';
-  const userInitial = user.firstName?.[0] || userEmail[0]?.toUpperCase() || 'U';
-  const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
-  
-  // Subscription info
-  const subscriptionStatus = dbUser.subscriptionStatus || 'inactive';
-  const subscriptionPlan = dbUser.subscriptionPlan || undefined;
-  const trialDaysLeft = getTrialDaysRemaining(dbUser.trialEndsAt);
-  const hasBypass = dbUser.hasBypass || false;
-  const hasStripeCustomer = !!dbUser.stripeCustomerId;
+  const translationCode = user.selectedTranslation || 'en.sahih';
+  const locale = getLocaleFromTranslationCode(translationCode);
+  const messages = await getMessages(locale);
 
   return (
-    <DashboardI18nProvider translationCode={selectedTranslation}>
-      <ProfileContent
-        userName={userName}
-        userEmail={userEmail}
-        userInitial={userInitial}
-        currentStreak={currentStreak}
-        longestStreak={longestStreak}
-        lastActivityDate={lastActivityDate}
-        completedPuzzles={completedPuzzles}
-        completionPercentage={completionPercentage}
-        uniqueJuzs={uniqueJuzs}
-        uniqueSurahs={uniqueSurahs}
-        selectedTranslation={selectedTranslation}
-        subscriptionStatus={subscriptionStatus}
-        subscriptionPlan={subscriptionPlan}
-        trialDaysLeft={trialDaysLeft}
-        hasBypass={hasBypass}
-        hasStripeCustomer={hasStripeCustomer}
-      />
+    <DashboardI18nProvider translationCode={translationCode} messages={messages}>
+      <div className="space-y-8">
+        {/* Custom AyatBits Profile Stats */}
+        <ProfileContent 
+          user={JSON.parse(JSON.stringify(user))}
+          stats={JSON.parse(JSON.stringify(stats))}
+          trialDaysLeft={trialDaysLeft}
+        />
+
+        {/* Clerk Account Management */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-white mb-6">Account Settings</h2>
+          <div className="flex justify-center bg-[#111] p-6 rounded-2xl border border-white/10">
+            <UserProfile 
+              appearance={{
+                elements: {
+                  rootBox: "w-full",
+                  card: "bg-transparent shadow-none w-full",
+                  navbar: "hidden", // Hide navbar if you just want the main details, or remove this line to show sidebar
+                  headerTitle: "text-white",
+                  headerSubtitle: "text-gray-400",
+                  profileSectionTitleText: "text-white",
+                  userPreviewMainIdentifier: "text-white",
+                  userPreviewSecondaryIdentifier: "text-gray-400",
+                }
+              }}
+              routing="hash" 
+            />
+          </div>
+        </div>
+      </div>
     </DashboardI18nProvider>
   );
 }

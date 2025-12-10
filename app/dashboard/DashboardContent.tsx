@@ -25,6 +25,11 @@ interface DashboardContentProps {
     progress: number;
     completedPuzzles: number;
   }>;
+  stats: {
+    surahsCompleted: number;
+    totalAyahs: number;
+    currentStreak: number;
+  };
 }
 
 export default function DashboardContent({

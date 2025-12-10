@@ -26,7 +26,7 @@ export default async function SurahVersePage({
   }
 
   // Check dashboard access (redirects if no access, except admin bypass)
-  const dbUser = await requireDashboardAccess(user.id);
+  const dbUser = await requireDashboardAccess();
 
   const juz = await Juz.findOne({ number: parseInt(juzNumber) }).lean() as any;
   const surah = await Surah.findOne({ number: parseInt(surahNumber) }).lean() as any;
