@@ -1,8 +1,7 @@
 'use client';
 
-import { useI18n } from '@/lib/i18n';
 import Link from 'next/link';
-import { Flame, BookOpen } from 'lucide-react';
+import { Flame, BookOpen, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import DailyQuote from '@/components/DailyQuote';
@@ -17,6 +16,7 @@ interface DashboardContentProps {
   selectedTranslation: string;
   trialDaysLeft?: number;
   subscriptionStatus?: string;
+  subscriptionEndDate?: string;
   juzs: Array<{
     _id: string;
     number: number;
@@ -40,16 +40,47 @@ export default function DashboardContent({
   selectedTranslation,
   trialDaysLeft,
   subscriptionStatus,
+  subscriptionEndDate,
   juzs,
 }: DashboardContentProps) {
-  const { t } = useI18n();
   const showTrialBanner = subscriptionStatus === 'trialing' && trialDaysLeft && trialDaysLeft > 0;
   const needsSubscription = !subscriptionStatus || subscriptionStatus === 'inactive' || subscriptionStatus === 'INACTIVE';
+  
+  // Calculate subscription days left if applicable
+  let subscriptionDaysLeft: number | null = null;
+  if (subscriptionEndDate && (subscriptionStatus === 'active' || subscriptionStatus === 'ACTIVE')) {
+    const endDate = new Date(subscriptionEndDate);
+    const now = new Date();
+    const diffTime = endDate.getTime() - now.getTime();
+    subscriptionDaysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+  
+  const showSubscriptionWarning = subscriptionDaysLeft !== null && subscriptionDaysLeft > 0 && subscriptionDaysLeft <= 7;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
       {/* Trial Banner */}
       {showTrialBanner && <TrialBanner daysLeft={trialDaysLeft} />}
+      
+      {/* Subscription Expiry Warning */}
+      {showSubscriptionWarning && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full px-4 py-2 flex items-center justify-center gap-3 text-sm bg-gradient-to-r from-orange-600/20 to-red-600/20 border-b border-orange-500/20"
+        >
+          <AlertTriangle className="w-4 h-4 text-orange-400" />
+          <span className="text-white">
+            Your subscription expires in <span className="font-semibold">{subscriptionDaysLeft === 1 ? '1 day' : `${subscriptionDaysLeft} days`}</span>
+          </span>
+          <Link 
+            href="/pricing"
+            className="inline-flex items-center gap-1 font-medium hover:underline text-orange-400"
+          >
+            Renew now
+          </Link>
+        </motion.div>
+      )}
       
       {/* Header */}
       <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
@@ -93,10 +124,10 @@ export default function DashboardContent({
         {/* Welcome Section */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold mb-1">
-            {t('dashboard.welcome', { name: userFirstName || t('dashboard.learner') })}
+            Welcome back, {userFirstName || 'Learner'}!
           </h1>
           <p className="text-gray-500 text-sm">
-            {t('dashboard.continueJourney')}
+            Continue your Quranic journey
           </p>
         </div>
 
@@ -124,12 +155,12 @@ export default function DashboardContent({
         <section>
           <div className="flex items-center gap-2 mb-4">
             <BookOpen className="w-5 h-5 text-green-500" />
-            <h2 className="text-lg font-semibold">{t('dashboard.selectJuz')}</h2>
+            <h2 className="text-lg font-semibold">Select a Juz</h2>
           </div>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
             {juzs.length === 0 ? (
               <div className="col-span-full text-center py-8 text-gray-500">
-                <p className="text-sm">{t('dashboard.noJuzsFound')}</p>
+                <p className="text-sm">No Juz available</p>
               </div>
             ) : (
               juzs.map((juz) => (

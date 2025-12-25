@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AyahSelectorModal from './AyahSelectorModal';
 
 interface AyahSelectorClientProps {
@@ -18,40 +18,43 @@ export default function AyahSelectorClient({
 }: AyahSelectorClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Handle search button click (both desktop and mobile)
-  useEffect(() => {
-    const handleSearchClick = (e: Event) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setIsModalOpen(true);
-    };
+  const openModal = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
 
-    // Use a small delay to ensure buttons are in the DOM
-    const timeoutId = setTimeout(() => {
+  // Expose openModal globally for the button to call
+  useEffect(() => {
+    // Create a global function that the button can call
+    (window as any).__openAyahSelector = openModal;
+    
+    // Also attach click handlers to buttons with specific IDs
+    const attachHandler = () => {
       const searchButton = document.getElementById('search-ayah-button');
       const searchButtonMobile = document.getElementById('search-ayah-button-mobile');
       
+      const handleClick = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openModal();
+      };
+      
       if (searchButton) {
-        searchButton.addEventListener('click', handleSearchClick);
+        searchButton.onclick = handleClick;
       }
       if (searchButtonMobile) {
-        searchButtonMobile.addEventListener('click', handleSearchClick);
+        searchButtonMobile.onclick = handleClick;
       }
+    };
 
-      return () => {
-        if (searchButton) {
-          searchButton.removeEventListener('click', handleSearchClick);
-        }
-        if (searchButtonMobile) {
-          searchButtonMobile.removeEventListener('click', handleSearchClick);
-        }
-      };
-    }, 100);
+    // Attach immediately and also after a delay (for dynamic content)
+    attachHandler();
+    const timeoutId = setTimeout(attachHandler, 100);
 
     return () => {
       clearTimeout(timeoutId);
+      delete (window as any).__openAyahSelector;
     };
-  }, []);
+  }, [openModal]);
 
   // Transform puzzles to format expected by modal
   const modalPuzzles = puzzles.map(p => ({
@@ -70,4 +73,3 @@ export default function AyahSelectorClient({
     />
   );
 }
-

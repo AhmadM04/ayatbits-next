@@ -1,7 +1,7 @@
 /* Client component for admin grant form */
 'use client';
 
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 
 type GrantFormState = {
   message?: string;
@@ -13,7 +13,7 @@ type Props = {
 };
 
 export default function AdminForm({ action }: Props) {
-  const [state, formAction] = useFormState(action, { message: '', error: '' });
+  const [state, formAction] = useActionState(action, { message: '', error: '' });
 
   return (
     <form action={formAction} className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 space-y-4">

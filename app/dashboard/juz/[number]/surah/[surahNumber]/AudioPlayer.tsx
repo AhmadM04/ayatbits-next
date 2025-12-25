@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2 } from 'lucide-react';
-import { useI18nSafe } from '@/lib/i18n';
 
 interface AudioPlayerProps {
   surahNumber: number;
@@ -11,19 +10,14 @@ interface AudioPlayerProps {
 }
 
 export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }: AudioPlayerProps) {
-  const { t } = useI18nSafe();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Get audio URL from Al-Quran Cloud API
-  // Format: https://api.alquran.cloud/v1/ayah/{surah}:{ayah}/{reciter}
-  // The API returns: { data: { audio: "https://..." } }
   const getAudioUrl = async () => {
     try {
-      // Try Al-Quran Cloud API
       const response = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/alafasy`);
       if (response.ok) {
         const data = await response.json();
@@ -35,15 +29,12 @@ export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }
       console.error('API fetch failed:', error);
     }
     
-    // Fallback: Use EveryAyah CDN (more reliable)
-    // Format: https://everyayah.com/data/Alafasy_128kbps/{surah}{ayah}.mp3
     const paddedSurah = surahNumber.toString().padStart(3, '0');
     const paddedAyah = ayahNumber.toString().padStart(3, '0');
     return `https://everyayah.com/data/Alafasy_128kbps/${paddedSurah}${paddedAyah}.mp3`;
   };
 
   useEffect(() => {
-    // Reset audio when surah or ayah changes
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
@@ -52,7 +43,6 @@ export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }
   }, [surahNumber, ayahNumber]);
 
   useEffect(() => {
-    // Cleanup on unmount
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -67,14 +57,12 @@ export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }
         setIsLoading(true);
         setError(null);
         
-        // Get audio URL
         const actualAudioUrl = await getAudioUrl();
         
         if (!actualAudioUrl) {
           throw new Error('No audio URL available');
         }
         
-        // Create audio element
         const audio = new Audio(actualAudioUrl);
         audio.playbackRate = playbackRate;
         
@@ -90,6 +78,7 @@ export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }
         
         audio.addEventListener('ended', () => {
           setIsPlaying(false);
+          onPlayingChange?.(false);
         });
         
         audio.addEventListener('play', () => {
@@ -99,10 +88,6 @@ export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }
         
         audio.addEventListener('pause', () => {
           setIsPlaying(false);
-          onPlayingChange?.(false);
-        });
-        
-        audio.addEventListener('ended', () => {
           onPlayingChange?.(false);
         });
         
@@ -124,53 +109,70 @@ export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }
   const handleSpeedChange = (speed: number) => {
     setPlaybackRate(speed);
     if (audioRef.current) {
-      // Save current time before changing speed
       const currentTime = audioRef.current.currentTime;
       audioRef.current.playbackRate = speed;
-      // Restore position after speed change
       audioRef.current.currentTime = currentTime;
     }
   };
 
   return (
-    <div className="flex items-center justify-center gap-2 sm:gap-3">
-      {/* Speed buttons */}
-      <div className="flex items-center rounded-lg overflow-hidden border border-white/10">
-        {[1, 0.5].map((speed) => (
-          <button
-            key={speed}
-            onClick={() => handleSpeedChange(speed)}
-            className={`px-3 sm:px-4 py-2 text-sm sm:text-base font-medium transition-colors ${
-              playbackRate === speed
-                ? 'bg-green-600 text-white'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10'
-            }`}
-          >
-            {speed}x
-          </button>
-        ))}
+    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-3">
+      <div className="flex items-center justify-between gap-3">
+        {/* Play button */}
+        <button
+          onClick={handlePlayPause}
+          disabled={isLoading}
+          className={`
+            flex items-center justify-center w-12 h-12 rounded-full transition-all
+            ${isPlaying 
+              ? 'bg-green-500 text-white shadow-lg shadow-green-500/30' 
+              : 'bg-white/10 text-white hover:bg-white/20'
+            }
+            ${isLoading ? 'opacity-50' : ''}
+          `}
+        >
+          {isLoading ? (
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : isPlaying ? (
+            <Pause className="w-5 h-5 fill-current" />
+          ) : (
+            <Play className="w-5 h-5 fill-current ml-0.5" />
+          )}
+        </button>
+
+        {/* Label */}
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <Volume2 className="w-4 h-4 text-gray-500" />
+            <span className="text-sm text-gray-400">
+              {isLoading ? 'Loading...' : isPlaying ? 'Playing' : 'Listen'}
+            </span>
+          </div>
+        </div>
+
+        {/* Speed controls */}
+        <div className="flex items-center gap-1">
+          {[0.5, 1].map((speed) => (
+            <button
+              key={speed}
+              onClick={() => handleSpeedChange(speed)}
+              className={`
+                px-3 py-1.5 rounded-lg text-sm font-medium transition-all
+                ${playbackRate === speed
+                  ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                  : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-transparent'
+                }
+              `}
+            >
+              {speed}x
+            </button>
+          ))}
+        </div>
       </div>
       
-      {/* Play button */}
-      <button
-        onClick={handlePlayPause}
-        disabled={isLoading}
-        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white px-4 sm:px-6 py-2 rounded-lg transition-colors text-sm sm:text-base"
-      >
-        {isLoading ? (
-          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-        ) : isPlaying ? (
-          <Pause className="w-4 h-4" />
-        ) : (
-          <Play className="w-4 h-4" />
-        )}
-        <span className="hidden sm:inline">{isLoading ? t('common.loading') : isPlaying ? t('common.pause') : t('common.play')}</span>
-      </button>
-      
       {error && (
-        <p className="text-xs sm:text-sm text-red-500">{error}</p>
+        <p className="text-xs text-red-400 mt-2">{error}</p>
       )}
     </div>
   );
 }
-

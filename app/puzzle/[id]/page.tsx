@@ -72,6 +72,7 @@ export default async function PuzzlePage({
   const currentIndex = puzzles.findIndex((p: any) => p._id.toString() === id);
   const previousPuzzle = currentIndex > 0 ? puzzles[currentIndex - 1] : null;
   const nextPuzzle = currentIndex < puzzles.length - 1 ? puzzles[currentIndex + 1] : null;
+  const isLastAyahInSurah = currentIndex === puzzles.length - 1;
 
   const content = puzzle.content as { ayahText: string; ayahNumber?: number; surahNumber?: number };
   const rawAyahText = content.ayahText || '';
@@ -91,7 +92,10 @@ export default async function PuzzlePage({
   const serializedPuzzle = {
     id: puzzle._id.toString(),
     type: puzzle.type,
-    content: puzzle.content,
+    content: {
+      ...puzzle.content,
+      ayahNumber: content.ayahNumber,
+    },
     difficulty: puzzle.difficulty,
     surah: puzzle.surahId ? {
       number: puzzle.surahId.number,
@@ -104,10 +108,10 @@ export default async function PuzzlePage({
     } : null,
   };
 
-  // Build verse page URL
+  // Build verse page URL - always provide a valid URL for consistent hydration
   const versePageUrl = puzzle.surahId && puzzle.juzId && puzzle.content?.ayahNumber
     ? `/dashboard/juz/${puzzle.juzId.number}/surah/${puzzle.surahId.number}?ayah=${puzzle.content.ayahNumber}`
-    : undefined;
+    : '/dashboard';
 
   return (
     <PuzzleClient
@@ -118,6 +122,7 @@ export default async function PuzzlePage({
       previousPuzzleId={previousPuzzle?._id.toString() || null}
       nextPuzzleId={nextPuzzle?._id.toString() || null}
       versePageUrl={versePageUrl}
+      isLastAyahInSurah={isLastAyahInSurah}
     />
   );
 }

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Globe } from 'lucide-react';
-import { useI18nSafe } from '@/lib/i18n';
 
 interface TranslationDisplayProps {
   surahNumber: number;
@@ -15,21 +14,21 @@ const translationNames: Record<string, string> = {
   'en.sahih': 'Sahih International',
   'en.pickthall': 'Pickthall',
   'en.yusufali': 'Yusuf Ali',
-  'ar.jalalayn': 'تفسير الجلالين',
-  'ar.tafseer': 'تفسير الميسر',
-  'fr.hamidullah': 'Hamidullah',
-  'es.cortes': 'Cortes',
-  'de.bubenheim': 'Bubenheim',
-  'tr.yazir': 'Yazır',
-  'ur.maududi': 'مولانا مودودی',
-  'id.muntakhab': 'Muntakhab',
-  'ms.basmeih': 'Basmeih',
-  'bn.hoque': 'Hoque',
-  'hi.hindi': 'हिंदी',
-  'ru.kuliev': 'Кулиев',
-  'zh.chinese': '中文',
-  'ja.japanese': '日本語',
-  'nl.dutch': 'Nederlands',
+  'ar.jalalayn': 'Tafsir Al-Jalalayn',
+  'ar.tafseer': 'Tafsir Al-Muyassar',
+  'fr.hamidullah': 'Hamidullah (French)',
+  'es.cortes': 'Cortes (Spanish)',
+  'de.bubenheim': 'Bubenheim (German)',
+  'tr.yazir': 'Yazır (Turkish)',
+  'ur.maududi': 'Maududi (Urdu)',
+  'id.muntakhab': 'Muntakhab (Indonesian)',
+  'ms.basmeih': 'Basmeih (Malay)',
+  'bn.hoque': 'Hoque (Bengali)',
+  'hi.hindi': 'Hindi',
+  'ru.kuliev': 'Kuliev (Russian)',
+  'zh.chinese': 'Chinese',
+  'ja.japanese': 'Japanese',
+  'nl.dutch': 'Dutch',
 };
 
 export default function TranslationDisplay({
@@ -38,7 +37,6 @@ export default function TranslationDisplay({
   selectedTranslation,
   initialTranslation,
 }: TranslationDisplayProps) {
-  const { t } = useI18nSafe();
   const [translation, setTranslation] = useState<string | undefined>(initialTranslation);
   const [isLoading, setIsLoading] = useState(!initialTranslation);
 
@@ -52,7 +50,6 @@ export default function TranslationDisplay({
 
       setIsLoading(true);
       try {
-        // Use our API route which caches server-side - much faster!
         const response = await fetch(
           `/api/verse/translation?surah=${surahNumber}&ayah=${ayahNumber}&translation=${selectedTranslation}`
         );
@@ -80,19 +77,16 @@ export default function TranslationDisplay({
   const translationName = translationNames[selectedTranslation] || 'Translation';
 
   return (
-    <div className="bg-white/[0.02] rounded-2xl p-6 mb-6 border border-white/5">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Globe className="w-4 h-4 text-gray-500" />
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            {translationName}
-          </span>
-        </div>
+    <div className="bg-white/[0.02] rounded-xl p-4 border border-white/5">
+      <div className="flex items-center gap-2 mb-3">
+        <Globe className="w-3.5 h-3.5 text-gray-500" />
+        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+          {translationName}
+        </span>
       </div>
-      <p className="text-gray-300 leading-relaxed">
-        {isLoading ? t('common.loading') : translation || t('common.error')}
+      <p className="text-gray-300 text-sm leading-relaxed">
+        {isLoading ? 'Loading translation...' : translation || 'Translation not available'}
       </p>
     </div>
   );
 }
-

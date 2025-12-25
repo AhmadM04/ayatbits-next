@@ -35,13 +35,25 @@ export async function POST(
       });
     }
 
-    await LikedAyat.create({
-      userId: dbUser._id,
-      puzzleId: new mongoose.Types.ObjectId(id),
-    });
+    // Use findOneAndUpdate with upsert to handle duplicates gracefully
+    await LikedAyat.findOneAndUpdate(
+      {
+        userId: dbUser._id,
+        puzzleId: new mongoose.Types.ObjectId(id),
+      },
+      {
+        userId: dbUser._id,
+        puzzleId: new mongoose.Types.ObjectId(id),
+      },
+      { upsert: true, new: true }
+    );
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
+    // Handle duplicate key error gracefully
+    if (error.code === 11000) {
+      return NextResponse.json({ success: true, alreadyLiked: true });
+    }
     console.error('Like error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to like puzzle' },
@@ -89,4 +101,3 @@ export async function DELETE(
     );
   }
 }
-

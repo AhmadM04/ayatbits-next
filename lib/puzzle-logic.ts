@@ -59,101 +59,185 @@ export function normalizeArabic(input: string): string {
 }
 
 /**
- * Check if a word should be separated into individual letters
+ * Known Muqatta'at (Huruf al-Muqatta'at) - isolated letters that start some surahs
+ * These should be separated letter by letter in the puzzle
  */
-function shouldSeparateLetters(word: string): boolean {
-  const isolatedLetterWords = [
-    'الْم', 'الر', 'المر', 'كهيعص', 'طه', 'طس', 'طسم', 'يس', 'ص', 'ق', 'ن', 'حم', 'عسق'
-  ];
+const MUQATTAAT_PATTERNS = [
+  // Exact matches for the known Muqatta'at
+  'الم', 'المص', 'الر', 'المر', 'كهيعص', 'طه', 'طسم', 'طس', 'يس', 'ص', 'حم', 'حم عسق', 'عسق', 'ق', 'ن',
+  // With diacritics variations
+  'الٓمٓ', 'الٓمٓصٓ', 'الٓرٰ', 'الٓمٓرٰ', 'كٓهيعٓصٓ', 'طٰهٰ', 'طٰسٓمٓ', 'طٰسٓ', 'يٰسٓ', 'صٓ', 'حٰمٓ', 'قٓ', 'نٓ',
+  // Additional variations
+  'الۤمۤ', 'الۤمۤصۤ', 'الۤرٰ', 'الۤمۤرٰ',
+];
 
-  if (isolatedLetterWords.includes(word)) {
-    return true;
-  }
-
-  if (word.length <= 4 && word.length > 1) {
-    const isAllArabic = /^[\u0600-\u06FF]+$/.test(word);
-    if (isAllArabic) {
-      const isolatedLetters = ['ا', 'ل', 'م', 'ر', 'ح', 'ط', 'س', 'ي', 'ص', 'ق', 'ن', 'ع', 'ك', 'ه'];
-      const hasIsolatedLetters = isolatedLetters.some(letter => word.includes(letter));
-      return hasIsolatedLetters;
+/**
+ * Check if a word is a Muqatta'at (isolated letter pattern)
+ */
+function isMuqattaat(word: string): boolean {
+  const normalized = normalizeArabic(word);
+  
+  // Check exact matches
+  for (const pattern of MUQATTAAT_PATTERNS) {
+    if (normalizeArabic(pattern) === normalized) {
+      return true;
     }
   }
-
+  
+  // Check if it matches common Muqatta'at patterns (short words with specific letters)
+  const muqattaatLetters = ['ا', 'ل', 'م', 'ر', 'ح', 'ط', 'س', 'ي', 'ص', 'ق', 'ن', 'ع', 'ك', 'ه'];
+  
+  // Remove diacritics for pattern matching
+  const cleanWord = normalized.replace(/\s/g, '');
+  
+  // Muqatta'at are typically 1-5 letters and only contain specific letters
+  if (cleanWord.length >= 1 && cleanWord.length <= 6) {
+    const allLettersAreMuqattaat = [...cleanWord].every(char => 
+      muqattaatLetters.includes(char) || char === ' '
+    );
+    
+    // Additional check: these words appear at the beginning of surahs
+    // and are typically read as individual letters
+    if (allLettersAreMuqattaat) {
+      // Known normalized patterns
+      const knownNormalized = [
+        'الم', 'المص', 'الر', 'المر', 'كهيعص', 'طه', 'طسم', 'طس', 'يس', 'ص', 'حم', 'عسق', 'ق', 'ن'
+      ];
+      return knownNormalized.includes(cleanWord);
+    }
+  }
+  
   return false;
 }
 
 /**
- * Separate a word into individual letters
+ * Separate a Muqatta'at word into individual letters
+ * Each letter becomes its own token
  */
-function separateIntoLetters(word: string): string[] {
-  return word.split('').filter(char => char.trim() !== '');
+function separateMuqattaatLetters(word: string): string[] {
+  // Remove diacritics but preserve the original characters
+  const letters: string[] = [];
+  let currentLetter = '';
+  
+  for (const char of word) {
+    // Check if it's a base Arabic letter
+    const isBaseLetter = /[\u0621-\u063A\u0641-\u064A]/.test(char);
+    // Check if it's a diacritic or modifier
+    const isDiacritic = /[\u064B-\u065F\u0610-\u061A\u06D6-\u06ED\u0670]/.test(char);
+    // Check if it's a special marker (like superscript alef)
+    const isMarker = /[\u0653-\u0655\u06E5-\u06E6]/.test(char);
+    
+    if (isBaseLetter) {
+      if (currentLetter) {
+        letters.push(currentLetter);
+      }
+      currentLetter = char;
+    } else if (isDiacritic || isMarker) {
+      // Add diacritic to current letter
+      currentLetter += char;
+    } else if (char.trim() === '') {
+      // Skip whitespace
+      if (currentLetter) {
+        letters.push(currentLetter);
+        currentLetter = '';
+      }
+    } else {
+      // Other characters (like special marks)
+      currentLetter += char;
+    }
+  }
+  
+  if (currentLetter) {
+    letters.push(currentLetter);
+  }
+  
+  return letters.filter(l => l.trim() !== '');
 }
 
 /**
  * Tokenize an Ayah text into word tokens
  */
 export function tokenizeAyah(ayahText: string): WordToken[] {
-  const parts = ayahText
-    .trim()
+  const trimmed = ayahText.trim();
+  if (!trimmed) return [];
+  
+  const parts = trimmed
     .split(/\s+/)
-    .filter(Boolean)
-    .reduce((acc: string[], part: string, index: number, array: string[]) => {
-      const isPunctuation = part.length <= 3 && /^[^\u0600-\u06FF]*$/.test(part);
-      const isTripleDots = part === '...' || part === '…';
-      const isCommonPunctuation = /^[.,;:!?()\[\]{}""''«»…]+$/.test(part);
-      const isSmallArabicParticle = part.length <= 4 && /^[\u0600-\u06FF]+$/.test(part);
-      const arabicParticles = [
-        'من', 'إلى', 'في', 'على', 'عن', 'مع', 'ب', 'ل', 'ك', 'ه', 'هذا', 'هذه', 'ذلك', 'تلك',
-        'التي', 'الذي', 'اللذان', 'اللتان', 'الذين', 'اللاتي', 'اللائي', 'اللذين', 'اللتين',
-        'و', 'ف', 'ثم', 'أو', 'لكن', 'إلا', 'إن', 'أن', 'ما', 'لا', 'كل', 'بعض', 'أي', 'أين',
-        'متى', 'كيف', 'لماذا', 'ماذا', 'عند', 'لدى', 'حول', 'خلال', 'بعد', 'قبل',
-        'توا', 'قد', 'سوف', 'كان', 'يكون', 'كانت', 'تكون', 'كانوا', 'يكونوا'
-      ];
-      const isKnownParticle = arabicParticles.includes(part);
-
-      if (isPunctuation || isTripleDots || isCommonPunctuation) {
-        if (acc.length > 0) {
-          acc[acc.length - 1] += ' ' + part;
+    .filter(Boolean);
+  
+  // Check if the first word is a Muqatta'at
+  const firstWord = parts[0] || '';
+  const firstWordIsMuqattaat = isMuqattaat(firstWord);
+  
+  // Process parts - combine small particles with following words
+  const processedParts: string[] = [];
+  const arabicParticles = [
+    'من', 'إلى', 'في', 'على', 'عن', 'مع', 'ب', 'ل', 'ك', 'ه', 'و', 'ف', 'ثم', 'أو', 'لكن', 
+    'إلا', 'إن', 'أن', 'ما', 'لا', 'كل', 'بعض', 'أي', 'أين', 'متى', 'كيف', 'لماذا', 'ماذا',
+    'عند', 'لدى', 'حول', 'خلال', 'بعد', 'قبل', 'قد', 'سوف', 'كان', 'يكون', 'كانت', 'تكون'
+  ];
+  
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    
+    // Skip Muqatta'at from particle processing - they'll be handled separately
+    if (i === 0 && firstWordIsMuqattaat) {
+      processedParts.push(part);
+      continue;
+    }
+    
+    const isPunctuation = part.length <= 3 && /^[^\u0600-\u06FF]*$/.test(part);
+    const isTripleDots = part === '...' || part === '…';
+    const isCommonPunctuation = /^[.,;:!?()\[\]{}""''«»…]+$/.test(part);
+    const isSmallArabicParticle = part.length <= 2 && /^[\u0600-\u06FF]+$/.test(part);
+    const isKnownParticle = arabicParticles.includes(part);
+    
+    if (isPunctuation || isTripleDots || isCommonPunctuation) {
+      if (processedParts.length > 0) {
+        processedParts[processedParts.length - 1] += ' ' + part;
+      } else {
+        processedParts.push(part);
+      }
+    } else if (isSmallArabicParticle || isKnownParticle) {
+      if (i < parts.length - 1) {
+        const nextPart = parts[i + 1];
+        if (nextPart && /^[\u0600-\u06FF]+/.test(nextPart)) {
+          processedParts.push(part + ' ' + nextPart);
+          i++; // Skip next part as we've combined it
         } else {
-          acc.push(part);
-        }
-      } else if (isSmallArabicParticle || isKnownParticle) {
-        if (index < array.length - 1) {
-          const nextPart = array[index + 1];
-          if (nextPart && /^[\u0600-\u06FF]+/.test(nextPart)) {
-            acc.push(part + ' ' + nextPart);
-            array.splice(index + 1, 1);
-          } else {
-            acc.push(part);
-          }
-        } else {
-          if (acc.length > 0) {
-            acc[acc.length - 1] += ' ' + part;
-          } else {
-            acc.push(part);
-          }
+          processedParts.push(part);
         }
       } else {
-        acc.push(part);
+        if (processedParts.length > 0) {
+          processedParts[processedParts.length - 1] += ' ' + part;
+        } else {
+          processedParts.push(part);
+        }
       }
-      return acc;
-    }, []);
+    } else {
+      processedParts.push(part);
+    }
+  }
 
+  // Now create tokens
   let order = 0;
   let tokenCounter = 0;
   const tokens: WordToken[] = [];
   
-  parts.forEach((word) => {
-    if (shouldSeparateLetters(word)) {
-      const letters = separateIntoLetters(word);
-      letters.forEach((letter) => {
+  for (let i = 0; i < processedParts.length; i++) {
+    const word = processedParts[i];
+    
+    // Check if this is a Muqatta'at (only for first word)
+    if (i === 0 && firstWordIsMuqattaat) {
+      const letters = separateMuqattaatLetters(word);
+      for (const letter of letters) {
         tokens.push({
           id: `token-${tokenCounter++}-${order}`,
           text: letter,
           norm: normalizeArabic(letter),
           position: order++,
         });
-      });
+      }
     } else {
       tokens.push({
         id: `token-${tokenCounter++}-${order}`,
@@ -162,7 +246,7 @@ export function tokenizeAyah(ayahText: string): WordToken[] {
         position: order++,
       });
     }
-  });
+  }
 
   return tokens;
 }
@@ -216,4 +300,3 @@ export function getCorrectTokenAtPosition(
   if (position >= correctTokens.length) return null;
   return correctTokens[position];
 }
-

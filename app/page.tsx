@@ -1,12 +1,13 @@
 'use client';
 
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { BookOpen, Puzzle, Trophy, Flame, Star, Sparkles } from "lucide-react";
 import { Suspense } from "react";
 import UserProfileSection from "@/components/UserProfileSection";
+import DemoPuzzle from "@/components/DemoPuzzle";
 
 // Floating Arabic letters/words for the background
 const floatingArabicWords = [
@@ -231,6 +232,38 @@ export default function Home() {
                   </motion.div>
                 ))}
               </div>
+            </section>
+
+            {/* Demo Section */}
+            <section className="py-20 border-t border-white/5">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-center mb-12"
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm mb-6">
+                  <Puzzle className="w-4 h-4" />
+                  <span>Try It Now</span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                  Experience the <span className="text-green-500">Puzzle</span>
+                </h2>
+                <p className="text-gray-400 max-w-xl mx-auto">
+                  Watch how words come together to form a verse, or click to try it yourself!
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 sm:p-8 max-w-2xl mx-auto"
+              >
+                <DemoPuzzle />
+              </motion.div>
             </section>
 
             {/* CTA Section */}

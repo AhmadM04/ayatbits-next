@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 import JuzContent from './JuzContent';
 import DashboardI18nProvider from '../../DashboardI18nProvider';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
-import { getMessages, getLocaleFromTranslationCode } from '@/lib/i18n-server';
 
 export default async function JuzPage({
   params,
@@ -24,8 +23,6 @@ export default async function JuzPage({
   const dbUser = await requireDashboardAccess();
 
   const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
-  const locale = getLocaleFromTranslationCode(selectedTranslation);
-  const messages = await getMessages(locale);
   const juz = await Juz.findOne({ number: juzNumber }).lean() as any;
 
   if (!juz) {
@@ -90,7 +87,7 @@ export default async function JuzPage({
   }));
 
   return (
-    <DashboardI18nProvider translationCode={selectedTranslation} messages={messages}>
+    <DashboardI18nProvider translationCode={selectedTranslation}>
       <JuzContent
         juzName={juz.name}
         surahs={serializedSurahs}

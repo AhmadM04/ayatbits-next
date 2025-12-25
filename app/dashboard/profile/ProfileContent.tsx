@@ -1,10 +1,13 @@
 'use client';
 
-import { useI18n } from '@/lib/i18n';
 import { Calendar, CheckCircle, BookOpen, Crown } from 'lucide-react';
 
 interface ProfileContentProps {
-  user: any; // Add this prop
+  user: {
+    firstName?: string;
+    email?: string;
+    isAdmin?: boolean;
+  };
   stats: {
     joinedDate: string;
     planType: string;
@@ -15,7 +18,8 @@ interface ProfileContentProps {
 }
 
 export default function ProfileContent({ user, stats, trialDaysLeft }: ProfileContentProps) {
-  const { t } = useI18n();
+  // Admins don't need to see subscription info
+  const showSubscriptionBadge = !user.isAdmin;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -30,15 +34,23 @@ export default function ProfileContent({ user, stats, trialDaysLeft }: ProfileCo
               {user.email}
             </p>
           </div>
-          <div className={`px-4 py-2 rounded-xl text-sm font-medium capitalize flex items-center gap-2
-            ${stats.planType === 'lifetime' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 
-              stats.planType === 'monthly' || stats.planType === 'yearly' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 
-              'bg-orange-500/20 text-orange-400 border border-orange-500/30'}`}>
-            <Crown className="w-4 h-4" />
-            {stats.planType === 'trial' 
-              ? `${trialDaysLeft} Days Left` 
-              : stats.planType}
-          </div>
+          {showSubscriptionBadge && (
+            <div className={`px-4 py-2 rounded-xl text-sm font-medium capitalize flex items-center gap-2
+              ${stats.planType === 'lifetime' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 
+                stats.planType === 'monthly' || stats.planType === 'yearly' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 
+                'bg-orange-500/20 text-orange-400 border border-orange-500/30'}`}>
+              <Crown className="w-4 h-4" />
+              {stats.planType === 'trial' 
+                ? `${trialDaysLeft} Days Left` 
+                : stats.planType}
+            </div>
+          )}
+          {user.isAdmin && (
+            <div className="px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 bg-purple-500/20 text-purple-400 border border-purple-500/30">
+              <Crown className="w-4 h-4" />
+              Admin
+            </div>
+          )}
         </div>
       </div>
 

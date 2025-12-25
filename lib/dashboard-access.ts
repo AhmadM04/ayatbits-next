@@ -15,20 +15,37 @@ function isAdminEmail(email?: string | null) {
 
 async function ensureDbUser(clerkUser: Awaited<ReturnType<typeof currentUser>>) {
   const email = clerkUser?.emailAddresses[0]?.emailAddress;
+  const emailLower = email?.toLowerCase();
+
+  // 1) Try by current clerkId
   let dbUser = await User.findOne({ clerkId: clerkUser?.id });
 
+  // 2) If not found, try merge by email (case-insensitive) and attach new clerkId
+  if (!dbUser && emailLower) {
+    dbUser = await User.findOne({ email: { $regex: new RegExp(`^${emailLower}$`, 'i') } });
+    if (dbUser && clerkUser?.id) {
+      dbUser.clerkId = clerkUser.id as string;
+    }
+  }
+
+  // 3) If still not found, create new
   if (!dbUser) {
     dbUser = await User.create({
-      clerkId: clerkUser?.id,
-      email: email || '',
+      clerkId: clerkUser?.id ?? '',
+      email: emailLower || '',
       firstName: clerkUser?.firstName,
       lastName: clerkUser?.lastName,
       name: clerkUser?.fullName,
       imageUrl: clerkUser?.imageUrl,
-      isAdmin: isAdminEmail(email),
+      isAdmin: isAdminEmail(emailLower),
     });
-  } else if (isAdminEmail(email) && !dbUser.isAdmin) {
-    dbUser.isAdmin = true;
+  } else {
+    // 4) Keep admin flag in sync
+    const shouldBeAdmin = isAdminEmail(emailLower);
+    if (shouldBeAdmin && !dbUser.isAdmin) {
+      dbUser.isAdmin = true;
+    }
+    // 5) Persist any updates (clerkId/admin flag)
     await dbUser.save();
   }
 
@@ -61,6 +78,11 @@ export async function requireDashboardAccess() {
   
   if (!dbUser) {
     redirect('/onboarding'); // Or wherever new users go
+  }
+
+  // Admins always have access without subscription checks
+  if (dbUser.isAdmin) {
+    return dbUser;
   }
 
   // Use the standard checkSubscription function

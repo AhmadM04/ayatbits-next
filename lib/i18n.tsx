@@ -1,15 +1,92 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from 'react';
-import { getLocaleFromTranslation, Locale, DEFAULT_LOCALE } from './i18n-config';
+import { createContext, useContext, ReactNode, useMemo, useCallback } from 'react';
 
-type Messages = Record<string, any>;
+// Hardcoded English strings
+const EN_MESSAGES: Record<string, Record<string, string>> = {
+  common: {
+    search: 'Search',
+    home: 'Home',
+    liked: 'Liked',
+    profile: 'Profile',
+    award: 'Awards',
+    awards: 'Awards',
+    resume: 'Resume',
+    startLearning: 'Start Learning',
+    surah: 'Surah',
+    ayah: 'Ayah',
+  },
+  dashboard: {
+    welcome: 'Welcome back, {name}!',
+    continueJourney: 'Continue your Quranic journey',
+    selectJuz: 'Select a Juz',
+    noJuzsFound: 'No Juz available',
+    learner: 'Learner',
+  },
+  achievements: {
+    title: 'Achievements',
+    description: 'Track your progress and unlock rewards',
+    streak: 'Day Streak',
+    puzzlesSolved: 'Puzzles Solved',
+    puzzles: 'Puzzles',
+    bestStreak: 'Best Streak',
+    trophies: 'Trophies',
+    surahsCompleted: 'Surahs Completed',
+    juzsExplored: 'Juz Explored',
+    badges: 'Badges',
+    locked: 'Locked',
+    unlocked: 'Unlocked ({count})',
+    unlockedOf: '{unlocked} of {total} unlocked',
+    inProgress: 'In Progress ({count})',
+  },
+  navigation: {
+    home: 'Home',
+    search: 'Search',
+    liked: 'Liked',
+    profile: 'Profile',
+    resume: 'Resume',
+  },
+  search: {
+    placeholder: 'Surah:Ayah (e.g., 2:255)',
+    noResults: 'No results found',
+    invalidFormat: 'Invalid format. Use Surah:Ayah (e.g., 2:255)',
+    surahNotFound: 'Surah not found',
+    notAvailable: 'This verse is not available yet',
+    goToDashboard: 'Go to Dashboard',
+    examples: 'Examples',
+    startLearning: 'Start learning',
+  },
+  liked: {
+    title: 'Liked Ayahs',
+    empty: 'No liked ayahs yet',
+    emptyDescription: 'Ayahs you like will appear here',
+    noLikedYet: 'No liked ayahs yet',
+    tapHeartToSave: 'Tap the heart icon on any ayah to save it here',
+    ayahsSaved: '{count} ayahs saved',
+    ayahInfo: 'Ayah {ayahNumber} • Juz {juzNumber}',
+  },
+  ayah: {
+    previous: 'Previous',
+    next: 'Next',
+    select: 'Select Ayah',
+  },
+  juz: {
+    surahs: 'Surahs in this Juz',
+    progress: 'Progress',
+    ayahs: 'ayahs',
+  },
+  profile: {
+    selectTranslation: 'Select Translation',
+    translationDescription: 'Choose your preferred Quran translation',
+  },
+};
+
 type MessagePath = string;
 
 interface I18nContextType {
-  locale: Locale;
+  locale: string;
   t: (key: MessagePath, params?: Record<string, string | number>) => string;
-  setLocale: (locale: Locale) => void;
+  setLocale: (locale: string) => void;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -34,7 +111,6 @@ function getNestedValue(obj: Record<string, unknown>, path: string): string | un
 
 /**
  * Replace template placeholders with values
- * Supports {name} and {count} style placeholders
  */
 function interpolate(template: string, params?: Record<string, string | number>): string {
   if (!params) return template;
@@ -46,65 +122,27 @@ function interpolate(template: string, params?: Record<string, string | number>)
 
 interface I18nProviderProps {
   children: ReactNode;
-  locale: Locale;
-  messages: Messages; // Passed from server
-  translationCode?: string; // Optional, for backward compatibility
+  locale?: string;
+  messages?: Record<string, any>;
+  translationCode?: string;
 }
 
-export function I18nProvider({ children, locale: initialLocale, messages: initialMessages, translationCode }: I18nProviderProps) {
-  const [locale, setLocaleState] = useState<Locale>(() => {
-    // Initialize from translation code if provided
-    if (translationCode) {
-      return getLocaleFromTranslation(translationCode);
-    }
-    return initialLocale || DEFAULT_LOCALE;
-  });
-
-  // Store messages in state (they come from server)
-  const [messages, setMessages] = useState<Messages>(initialMessages);
-
-  // Update locale when translationCode changes
-  useEffect(() => {
-    if (translationCode) {
-      const newLocale = getLocaleFromTranslation(translationCode);
-      setLocaleState(newLocale);
-    }
-  }, [translationCode]);
-
-  // Also check localStorage on mount (client-side only)
-  useEffect(() => {
-    if (typeof window !== 'undefined' && !translationCode) {
-      const stored = localStorage.getItem('selectedTranslation');
-      if (stored) {
-        setLocaleState(getLocaleFromTranslation(stored));
-      }
-    }
-  }, [translationCode]);
-
-  const setLocale = useCallback((newLocale: Locale) => {
-    setLocaleState(newLocale);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('appLocale', newLocale);
-    }
-  }, []);
-
+export function I18nProvider({ children }: I18nProviderProps) {
   const t = useCallback((key: MessagePath, params?: Record<string, string | number>): string => {
-    const localeMessages = messages || {};
-    const value = getNestedValue(localeMessages as Record<string, unknown>, key);
+    const value = getNestedValue(EN_MESSAGES as Record<string, unknown>, key);
     
     if (!value) {
-      console.warn(`Translation missing for key: ${key} in locale: ${locale}`);
       return key;
     }
     
     return interpolate(value, params);
-  }, [locale, messages]);
+  }, []);
 
   const value = useMemo(() => ({
-    locale,
+    locale: 'en',
     t,
-    setLocale,
-  }), [locale, t, setLocale]);
+    setLocale: () => {},
+  }), [t]);
 
   return (
     <I18nContext.Provider value={value}>
@@ -114,35 +152,31 @@ export function I18nProvider({ children, locale: initialLocale, messages: initia
 }
 
 /**
- * Hook to access i18n context - throws error if not in provider
+ * Hook to access i18n context
  */
 export function useI18n() {
   const context = useContext(I18nContext);
   if (!context) {
-    throw new Error('useI18n must be used within an I18nProvider');
+    // Return fallback implementation when outside provider
+    return {
+      locale: 'en',
+      t: (key: string, params?: Record<string, string | number>): string => {
+        const value = getNestedValue(EN_MESSAGES as Record<string, unknown>, key);
+        if (!value) return key;
+        return interpolate(value, params);
+      },
+      setLocale: () => {},
+    };
   }
   return context;
 }
 
 /**
- * Safe hook that returns fallback if not in provider (for components that might render outside provider)
+ * Safe hook that returns fallback if not in provider
  */
 export function useI18nSafe() {
-  const context = useContext(I18nContext);
-  
-  if (!context) {
-    // Return fallback implementation
-    return {
-      locale: DEFAULT_LOCALE as Locale,
-      t: (key: string, params?: Record<string, string | number>): string => {
-        // No access to messages, just return key
-        return key;
-      },
-      setLocale: () => {},
-    };
-  }
-  
-  return context;
+  return useI18n();
 }
 
-export type { Locale, Messages };
+export type Locale = 'en';
+export type Messages = Record<string, any>;
