@@ -112,13 +112,13 @@ export default function DemoPuzzle() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5,
+        distance: 8,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 100,
-        tolerance: 5,
+        delay: 200,
+        tolerance: 8,
       },
     })
   );

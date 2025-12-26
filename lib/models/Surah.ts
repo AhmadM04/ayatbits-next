@@ -31,3 +31,4 @@ export default mongoose.models.Surah || mongoose.model<ISurah>('Surah', SurahSch
 
 
 
+

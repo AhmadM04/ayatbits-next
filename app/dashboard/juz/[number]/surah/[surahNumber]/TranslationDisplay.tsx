@@ -29,6 +29,7 @@ const translationNames: Record<string, string> = {
   'zh.chinese': 'Chinese',
   'ja.japanese': 'Japanese',
   'nl.dutch': 'Dutch',
+  'et.estonian': 'Estonian',
 };
 
 export default function TranslationDisplay({

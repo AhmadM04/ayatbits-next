@@ -45,8 +45,30 @@ async function ensureDbUser(clerkUser: Awaited<ReturnType<typeof currentUser>>) 
     if (shouldBeAdmin && !dbUser.isAdmin) {
       dbUser.isAdmin = true;
     }
-    // 5) Persist any updates (clerkId/admin flag)
-    await dbUser.save();
+    
+    // 5) Sync user profile data from Clerk (name, image, etc.)
+    let hasChanges = false;
+    if (clerkUser?.firstName && dbUser.firstName !== clerkUser.firstName) {
+      dbUser.firstName = clerkUser.firstName;
+      hasChanges = true;
+    }
+    if (clerkUser?.lastName && dbUser.lastName !== clerkUser.lastName) {
+      dbUser.lastName = clerkUser.lastName;
+      hasChanges = true;
+    }
+    if (clerkUser?.fullName && dbUser.name !== clerkUser.fullName) {
+      dbUser.name = clerkUser.fullName;
+      hasChanges = true;
+    }
+    if (clerkUser?.imageUrl && dbUser.imageUrl !== clerkUser.imageUrl) {
+      dbUser.imageUrl = clerkUser.imageUrl;
+      hasChanges = true;
+    }
+    
+    // 6) Persist any updates (clerkId/admin flag/profile data)
+    if (hasChanges || dbUser.isModified()) {
+      await dbUser.save();
+    }
   }
 
   return dbUser;

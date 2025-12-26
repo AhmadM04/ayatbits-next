@@ -7,6 +7,8 @@ interface ProfileContentProps {
     firstName?: string;
     email?: string;
     isAdmin?: boolean;
+    subscriptionStatus?: string;
+    subscriptionEndDate?: string;
   };
   stats: {
     joinedDate: string;
@@ -74,6 +76,7 @@ export default function ProfileContent({ user, stats, trialDaysLeft }: ProfileCo
         </div>
         <p className="text-4xl font-bold text-white">{stats.puzzlesSolved}</p>
       </div>
+
     </div>
   );
 }
