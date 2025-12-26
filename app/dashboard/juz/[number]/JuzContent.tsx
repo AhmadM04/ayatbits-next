@@ -1,6 +1,5 @@
 'use client';
 
-import { useI18n } from '@/lib/i18n';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
@@ -24,7 +23,6 @@ export default function JuzContent({
   surahs,
   juzNumber,
 }: JuzContentProps) {
-  const { t } = useI18n();
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
@@ -41,7 +39,7 @@ export default function JuzContent({
             <div>
               <h1 className="text-lg font-semibold">{juzName}</h1>
               <p className="text-xs text-gray-500">
-                {surahs.length} {t('common.surah')}s
+                {surahs.length} Surahs
               </p>
             </div>
           </div>
@@ -69,7 +67,7 @@ export default function JuzContent({
                     <div className="text-sm text-gray-500" dir="rtl">{surah.nameArabic}</div>
                     {surah.startAyahNumber > 1 && (
                       <div className="text-xs text-blue-400 mt-1">
-                        {t('verse.ayahNumber', { number: surah.startAyahNumber })}
+                        Ayah {surah.startAyahNumber}
                       </div>
                     )}
                   </div>
@@ -84,7 +82,7 @@ export default function JuzContent({
                   />
                 </div>
                 <div className="text-xs text-gray-600">
-                  {surah.completedCount}/{surah.puzzleCount} {t('puzzle.puzzles') || 'puzzles'}
+                  {surah.completedCount}/{surah.puzzleCount} puzzles
                 </div>
               </Link>
             );

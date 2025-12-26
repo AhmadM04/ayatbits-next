@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useI18n } from '@/lib/i18n';
 
 interface AyahSelectorModalProps {
   isOpen: boolean;
@@ -22,7 +21,6 @@ export default function AyahSelectorModal({
   juzNumber,
   surahNumber,
 }: AyahSelectorModalProps) {
-  const { t } = useI18n();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAyah, setSelectedAyah] = useState<number | null>(null);
   const router = useRouter();
@@ -91,7 +89,7 @@ export default function AyahSelectorModal({
       <div className="relative bg-[#111] border border-white/10 rounded-2xl shadow-2xl w-full max-w-md mx-4 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/5">
-          <h2 className="text-xl font-semibold text-white">{t('verse.selectAyah')}</h2>
+          <h2 className="text-xl font-semibold text-white">Select Ayah</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-white/5 rounded-lg transition-colors"
@@ -108,7 +106,7 @@ export default function AyahSelectorModal({
               <input
                 ref={inputRef}
                 type="number"
-                placeholder={t('verse.enterAyahNumber', { min: minAyah, max: maxAyah })}
+                placeholder={`Enter ayah number (${minAyah}-${maxAyah})`}
                 value={searchTerm}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 onKeyPress={handleKeyPress}
@@ -121,9 +119,9 @@ export default function AyahSelectorModal({
             {searchTerm && (
               <div className="text-sm">
                 {selectedAyah !== null ? (
-                  <p className="text-green-500 font-medium">{t('verse.ayahFound')}</p>
+                  <p className="text-green-500 font-medium">Ayah found</p>
                 ) : (
-                  <p className="text-red-500">{t('verse.ayahNotFound')}</p>
+                  <p className="text-red-500">Ayah not found</p>
                 )}
               </div>
             )}
@@ -140,7 +138,7 @@ export default function AyahSelectorModal({
                 }
               `}
             >
-              {t('verse.goToAyah')}
+              Go to Ayah
             </button>
           </div>
         </div>

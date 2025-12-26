@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import { Search, X, Sparkles, Loader2, BookOpen } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useI18nSafe } from '@/lib/i18n';
 
 // Complete mapping of all 114 surahs to their primary juz
 const SURAH_TO_JUZ: { [key: number]: number } = {
@@ -131,7 +130,6 @@ export default function VerseSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const { t } = useI18nSafe(); // Use safe version
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -166,13 +164,13 @@ export default function VerseSearch() {
     const result = parseQuery(query);
     
     if (!result) {
-      setError(t('search.invalidFormat'));
+      setError('Invalid format. Use Surah:Ayah (e.g., 2:255)');
       return;
     }
 
     // Validate surah number
     if (result.surah < 1 || result.surah > 114) {
-      setError(t('search.surahNotFound'));
+      setError('Surah not found');
       return;
     }
 
@@ -199,7 +197,7 @@ export default function VerseSearch() {
           setQuery('');
           setError('');
         } else {
-          setError(t('search.notAvailable'));
+          setError('This verse is not available yet');
         }
       }
     } catch {
@@ -211,7 +209,7 @@ export default function VerseSearch() {
         setQuery('');
         setError('');
       } else {
-        setError(t('search.notAvailable'));
+        setError('This verse is not available yet');
       }
     } finally {
       setIsLoading(false);
@@ -237,7 +235,7 @@ export default function VerseSearch() {
         className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors"
       >
         <Search className="w-4 h-4 text-gray-400" />
-        <span className="text-sm text-gray-400 hidden sm:inline">{t('common.search')}</span>
+        <span className="text-sm text-gray-400 hidden sm:inline">Search</span>
       </button>
 
       {/* Search Modal - rendered at root level */}
@@ -292,7 +290,7 @@ export default function VerseSearch() {
                       setError('');
                     }}
                     onKeyDown={handleKeyDown}
-                    placeholder={t('search.placeholder')}
+                    placeholder="Surah:Ayah (e.g., 2:255)"
                     className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-base"
                   />
                   {query && (
@@ -321,14 +319,14 @@ export default function VerseSearch() {
                       }}
                       className="mt-2 text-xs text-gray-400 hover:text-white underline"
                     >
-                      {t('search.goToDashboard')}
+                      Go to Dashboard
                     </button>
                   </div>
                 )}
 
                 {/* Quick Actions */}
                 <div className="p-3">
-                  <p className="text-xs text-gray-500 mb-2 px-1">{t('search.examples')}:</p>
+                  <p className="text-xs text-gray-500 mb-2 px-1">Examples:</p>
                   <div className="flex flex-wrap gap-2">
                     {['1', '2:255', '36', '67:1'].map((example) => (
                       <button
@@ -360,7 +358,7 @@ export default function VerseSearch() {
                       ) : (
                         <>
                           <BookOpen className="w-4 h-4" />
-                          <span>{t('search.startLearning')}</span>
+                          <span>Start learning</span>
                           <Sparkles className="w-4 h-4" />
                         </>
                       )}

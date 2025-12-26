@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Heart, Trophy, Play, Home, User } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useI18nSafe } from '@/lib/i18n';
 
 interface ResumeData {
   resumeUrl: string | null;
@@ -18,7 +17,6 @@ const DEFAULT_RESUME_URL = '/dashboard/juz/1/surah/1?ayah=1';
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const { t } = useI18nSafe(); // Use safe version that won't crash
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
@@ -58,11 +56,11 @@ export default function BottomNav() {
   }, [pathname, isMounted]);
 
   const navItems = [
-    { href: '/dashboard', icon: Home, labelKey: 'common.home' },
-    { href: '/dashboard/liked', icon: Heart, labelKey: 'common.liked' },
-    { href: 'resume', icon: Play, labelKey: 'common.resume', isResume: true },
-    { href: '/dashboard/achievements', icon: Trophy, labelKey: 'common.awards' },
-    { href: '/dashboard/profile', icon: User, labelKey: 'common.profile' },
+    { href: '/dashboard', icon: Home, label: 'Home' },
+    { href: '/dashboard/liked', icon: Heart, label: 'Liked' },
+    { href: 'resume', icon: Play, label: 'Resume', isResume: true },
+    { href: '/dashboard/achievements', icon: Trophy, label: 'Awards' },
+    { href: '/dashboard/profile', icon: User, label: 'Profile' },
   ];
 
   return (
@@ -79,7 +77,7 @@ export default function BottomNav() {
               
               return (
                 <Link
-                  key={item.labelKey}
+                  key={item.href}
                   href={resumeUrl}
                   className="relative -mt-6 flex-shrink-0"
                 >
@@ -114,7 +112,7 @@ export default function BottomNav() {
               >
                 <item.icon className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${isActive ? 'text-green-500' : ''}`} />
                 <span className="text-[8px] sm:text-[10px] font-medium truncate w-full text-center leading-tight">
-                  {t(item.labelKey)}
+                  {item.label}
                 </span>
               </Link>
             );
