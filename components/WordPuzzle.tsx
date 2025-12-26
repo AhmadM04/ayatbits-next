@@ -224,6 +224,12 @@ export default function WordPuzzle({
   const [shakingIds, setShakingIds] = useState<Set<string>>(new Set());
   
   const pendingToast = useRef<{ message: string; type: 'success' | 'error'; duration: number } | null>(null);
+  const onSolvedRef = useRef(onSolved);
+  
+  // Keep ref updated
+  useEffect(() => {
+    onSolvedRef.current = onSolved;
+  }, [onSolved]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -268,14 +274,36 @@ export default function WordPuzzle({
 
   useEffect(() => {
     if (isComplete && !hasCompleted) {
+      console.log('Puzzle completed! Calling onSolved callback', { 
+        onSolved: !!onSolvedRef.current, 
+        onSolvedType: typeof onSolvedRef.current,
+        isComplete,
+        hasCompleted
+      });
       setHasCompleted(true);
+      
+      // Show toast immediately
       setTimeout(() => {
         showToast('Masha Allah! Perfect!', 'success', 2000);
       }, 0);
-      const timer = setTimeout(() => onSolved?.(true), 800);
-      return () => clearTimeout(timer);
+      
+      // Call onSolved immediately - no delay
+      if (onSolvedRef.current && typeof onSolvedRef.current === 'function') {
+        console.log('🚀 Calling onSolved(true) immediately');
+        try {
+          onSolvedRef.current(true);
+          console.log('✅ onSolved(true) called successfully');
+        } catch (error) {
+          console.error('❌ Error calling onSolved:', error);
+        }
+      } else {
+        console.error('❌ onSolved is not available!', { 
+          onSolved: onSolvedRef.current, 
+          type: typeof onSolvedRef.current 
+        });
+      }
     }
-  }, [isComplete, hasCompleted, onSolved, showToast]);
+  }, [isComplete, hasCompleted, showToast]); // Removed onSolved from dependencies to prevent cleanup
 
   const registerMistake = useCallback((tokenId: string) => {
     setShakingIds((prev) => new Set(prev).add(tokenId));

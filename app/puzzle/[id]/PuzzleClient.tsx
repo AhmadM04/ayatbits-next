@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import WordPuzzle from '@/components/WordPuzzle';
 import { useToast } from '@/components/Toast';
 import { apiPost, apiDelete, getErrorMessage, NetworkError } from '@/lib/api-client';
@@ -21,6 +21,7 @@ interface PuzzleClientProps {
   isLiked: boolean;
   previousPuzzleId?: string | null;
   nextPuzzleId?: string | null;
+  nextPuzzleAyahNumber?: number | null;
   versePageUrl: string;
   isLastAyahInSurah?: boolean;
 }
@@ -31,6 +32,7 @@ export default function PuzzleClient({
   isLiked: initialIsLiked,
   previousPuzzleId,
   nextPuzzleId,
+  nextPuzzleAyahNumber,
   versePageUrl,
   isLastAyahInSurah = false,
 }: PuzzleClientProps) {
@@ -41,6 +43,11 @@ export default function PuzzleClient({
   
   const hasHandledCompletion = useRef(false);
   const backUrl = versePageUrl || '/dashboard';
+
+  // Reset completion handler when puzzle changes
+  useEffect(() => {
+    hasHandledCompletion.current = false;
+  }, [puzzle.id]);
 
   const handleToggleLike = async () => {
     try {
@@ -61,12 +68,30 @@ export default function PuzzleClient({
   };
 
   const handleSolved = useCallback(async (isCorrect: boolean) => {
-    console.log('handleSolved called', { isCorrect, hasHandled: hasHandledCompletion.current });
+    console.log('=== handleSolved CALLED ===', { 
+      isCorrect, 
+      hasHandled: hasHandledCompletion.current,
+      isLastAyahInSurah,
+      nextPuzzleId,
+      nextPuzzleAyahNumber,
+      puzzleId: puzzle.id,
+      puzzleSurah: puzzle.surah?.number,
+      puzzleJuz: puzzle.juz?.number,
+      currentAyah: puzzle.content?.ayahNumber
+    });
     
-    if (!isCorrect || hasHandledCompletion.current) {
+    if (!isCorrect) {
+      console.log('Puzzle not correct, returning early');
       return;
     }
+    
+    if (hasHandledCompletion.current) {
+      console.log('Already handled completion, returning early');
+      return;
+    }
+    
     hasHandledCompletion.current = true;
+    console.log('Setting hasHandledCompletion to true, proceeding with navigation logic');
 
     // Save progress (don't block on this)
     apiPost(`/api/puzzles/${puzzle.id}/progress`, {
@@ -82,30 +107,37 @@ export default function PuzzleClient({
 
     setShowSuccessTransition(true);
     
-    // Navigate after animation
-    setTimeout(() => {
-      let targetUrl = '/dashboard';
-      
-      if (isLastAyahInSurah) {
-        if (puzzle.surah?.number && puzzle.juz?.number) {
-          targetUrl = `/dashboard/juz/${puzzle.juz.number}/surah/${puzzle.surah.number}/complete`;
-        }
-      } else if (nextPuzzleId) {
-        const juzNum = puzzle.juz?.number;
-        const surahNum = puzzle.surah?.number;
-        const nextAyahNum = (puzzle.content?.ayahNumber || 0) + 1;
-        
-        if (juzNum && surahNum) {
-          targetUrl = `/dashboard/juz/${juzNum}/surah/${surahNum}?ayah=${nextAyahNum}`;
-        } else {
-          targetUrl = `/puzzle/${nextPuzzleId}`;
-        }
+    // Navigate immediately - no delay
+    let targetUrl = '/dashboard';
+    
+    if (isLastAyahInSurah) {
+      // Last ayah in surah - go to completion page
+      if (puzzle.surah?.number && puzzle.juz?.number) {
+        targetUrl = `/dashboard/juz/${puzzle.juz.number}/surah/${puzzle.surah.number}/complete`;
       }
+    } else if (nextPuzzleId) {
+      // Has next puzzle - go to next ayah's full view
+      const juzNum = puzzle.juz?.number;
+      const surahNum = puzzle.surah?.number;
       
-      console.log('Navigating to:', targetUrl);
-      router.push(targetUrl);
-    }, 1500);
-  }, [puzzle, nextPuzzleId, isLastAyahInSurah, router, showToast]);
+      // Use nextPuzzleAyahNumber if available, otherwise calculate it
+      const nextAyahNum = nextPuzzleAyahNumber !== null && nextPuzzleAyahNumber !== undefined 
+        ? nextPuzzleAyahNumber 
+        : (puzzle.content?.ayahNumber || 0) + 1;
+      
+      if (juzNum && surahNum) {
+        targetUrl = `/dashboard/juz/${juzNum}/surah/${surahNum}?ayah=${nextAyahNum}`;
+      } else {
+        // Fallback to next puzzle if we don't have juz/surah info
+        targetUrl = `/puzzle/${nextPuzzleId}`;
+      }
+    }
+    
+    console.log('🚀 Navigating to:', targetUrl);
+    
+    // Navigate immediately using router.replace for better Next.js integration
+    router.replace(targetUrl);
+  }, [puzzle, nextPuzzleId, nextPuzzleAyahNumber, isLastAyahInSurah, router, showToast]);
 
   const handleMistakeLimitExceeded = useCallback(() => {
     router.push(backUrl);
@@ -206,7 +238,10 @@ export default function PuzzleClient({
         <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 sm:p-6">
           <WordPuzzle
             ayahText={ayahText}
-            onSolved={handleSolved}
+            onSolved={(isCorrect) => {
+              console.log('🔵 WordPuzzle onSolved callback invoked!', { isCorrect });
+              handleSolved(isCorrect);
+            }}
             onMistakeLimitExceeded={handleMistakeLimitExceeded}
           />
         </div>

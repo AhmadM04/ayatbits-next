@@ -113,6 +113,10 @@ export default async function PuzzlePage({
     ? `/dashboard/juz/${puzzle.juzId.number}/surah/${puzzle.surahId.number}?ayah=${puzzle.content.ayahNumber}`
     : '/dashboard';
 
+  // Extract next puzzle ayah number safely
+  const nextPuzzleContent = nextPuzzle?.content as { ayahNumber?: number } | undefined;
+  const nextPuzzleAyahNumber = nextPuzzleContent?.ayahNumber ?? null;
+
   return (
     <PuzzleClient
       puzzle={serializedPuzzle}
@@ -121,6 +125,7 @@ export default async function PuzzlePage({
       isLiked={!!likedAyat}
       previousPuzzleId={previousPuzzle?._id.toString() || null}
       nextPuzzleId={nextPuzzle?._id.toString() || null}
+      nextPuzzleAyahNumber={nextPuzzleAyahNumber}
       versePageUrl={versePageUrl}
       isLastAyahInSurah={isLastAyahInSurah}
     />
