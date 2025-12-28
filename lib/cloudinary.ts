@@ -1,11 +1,26 @@
 import { v2 as cloudinary } from 'cloudinary';
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+let isConfigured = false;
+
+/**
+ * Lazy configuration of Cloudinary
+ */
+function ensureConfigured() {
+  if (!isConfigured) {
+    // Provide defaults to prevent build-time errors
+    cloudinary.config({
+      cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'placeholder',
+      api_key: process.env.CLOUDINARY_API_KEY || 'placeholder',
+      api_secret: process.env.CLOUDINARY_API_SECRET || 'placeholder',
+    });
+    isConfigured = true;
+  }
+  
+  // Validate configuration when actually used
+  if (!process.env.CLOUDINARY_API_KEY || !process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
+    throw new Error('Cloudinary credentials are not configured');
+  }
+}
 
 /**
  * Upload an image to Cloudinary
@@ -18,6 +33,7 @@ export async function uploadImage(
     transformation?: any;
   }
 ): Promise<{ secure_url: string; public_id: string }> {
+  ensureConfigured();
   try {
     const uploadOptions: any = {
       folder,
@@ -86,6 +102,7 @@ export function getOptimizedImageUrl(
  * Delete an image from Cloudinary
  */
 export async function deleteImage(publicId: string): Promise<void> {
+  ensureConfigured();
   try {
     await cloudinary.uploader.destroy(publicId);
   } catch (error) {

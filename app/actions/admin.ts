@@ -1,8 +1,5 @@
 'use server';
 
-// Force Node.js runtime for MongoDB/Mongoose support
-export const runtime = 'nodejs';
-
 import { connectDB, User, SubscriptionStatusEnum, AdminGrantLog } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { getAdminUser } from '@/lib/dashboard-access';
