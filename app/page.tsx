@@ -4,7 +4,7 @@ import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { BookOpen, Puzzle, Trophy, Flame, Star, Sparkles } from "lucide-react";
+import { Puzzle, Trophy, Flame, Star, Sparkles } from "lucide-react";
 import { Suspense } from "react";
 import UserProfileSection from "@/components/UserProfileSection";
 import DemoPuzzle from "@/components/DemoPuzzle";
@@ -68,9 +68,6 @@ export default function Home() {
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
                 <Link href="/" className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 text-white" />
-                  </div>
                   <span className="text-xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
                     AyatBits
                   </span>
@@ -310,9 +307,6 @@ export default function Home() {
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded flex items-center justify-center">
-                    <BookOpen className="w-4 h-4 text-white" />
-                  </div>
                   <span className="text-sm text-gray-500">AyatBits</span>
                 </div>
                 <div className="flex gap-6 text-sm text-gray-500">
