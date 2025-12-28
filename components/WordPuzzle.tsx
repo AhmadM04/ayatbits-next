@@ -17,7 +17,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { RefreshCw, CheckCircle2 } from 'lucide-react';
+import { RefreshCw, CheckCircle2, Play, Pause, Volume2 } from 'lucide-react';
 import {
   shuffleArray,
   tokenizeAyah,
@@ -28,6 +28,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface WordPuzzleProps {
   ayahText: string;
+  surahNumber?: number;
+  ayahNumber?: number;
   onSolved?: (isCorrect: boolean) => void;
   onWordCorrect?: (wordIndex: number, word: string) => void;
   onMistakeLimitExceeded?: () => void;
@@ -141,15 +143,24 @@ function AnswerArea({
   correctTokens,
   placedTokens,
   activeTokenId,
+  isPlayingRecitation,
 }: {
   correctTokens: WordToken[];
   placedTokens: Map<number, WordToken>;
   activeTokenId: string | null;
+  isPlayingRecitation: boolean;
 }) {
   return (
     <div
       dir="rtl"
-      className="min-h-[80px] w-full rounded-xl border-2 border-dashed border-white/10 bg-[#0f0f0f] p-3"
+      className={`
+        min-h-[80px] w-full rounded-xl border-2 border-dashed p-3
+        transition-all duration-300
+        ${isPlayingRecitation 
+          ? 'border-green-500/50 bg-[#0f0f0f] shadow-[0_0_30px_rgba(34,197,94,0.3)] ring-2 ring-green-500/20' 
+          : 'border-white/10 bg-[#0f0f0f]'
+        }
+      `}
     >
       <div className="flex flex-wrap items-center gap-2" style={{ justifyContent: 'flex-start' }}>
         {correctTokens.map((token, index) => (
@@ -207,6 +218,8 @@ function WordBank({
 
 export default function WordPuzzle({
   ayahText,
+  surahNumber,
+  ayahNumber,
   onSolved,
   onWordCorrect,
   onMistakeLimitExceeded,
@@ -222,9 +235,13 @@ export default function WordPuzzle({
   const [hasCompleted, setHasCompleted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [shakingIds, setShakingIds] = useState<Set<string>>(new Set());
+  const [isPlayingRecitation, setIsPlayingRecitation] = useState(false);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
   
   const pendingToast = useRef<{ message: string; type: 'success' | 'error'; duration: number } | null>(null);
   const onSolvedRef = useRef(onSolved);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // Keep ref updated
   useEffect(() => {
@@ -252,8 +269,103 @@ export default function WordPuzzle({
     setHasCompleted(false);
     setShakingIds(new Set());
     pendingToast.current = null;
+    
+    // Stop audio on reset
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+      setIsPlayingRecitation(false);
+    }
+    
     setTimeout(() => setIsLoading(false), 0);
   }, [originalTokens]);
+  
+  // Audio player functions
+  const getAudioUrl = useCallback(async () => {
+    if (!surahNumber || !ayahNumber) return null;
+    
+    try {
+      const response = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/alafasy`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.data?.audio) {
+          return data.data.audio;
+        }
+      }
+    } catch (error) {
+      console.error('API fetch failed:', error);
+    }
+    
+    const paddedSurah = surahNumber.toString().padStart(3, '0');
+    const paddedAyah = ayahNumber.toString().padStart(3, '0');
+    return `https://everyayah.com/data/Alafasy_128kbps/${paddedSurah}${paddedAyah}.mp3`;
+  }, [surahNumber, ayahNumber]);
+
+  const handlePlayPause = useCallback(async () => {
+    if (!surahNumber || !ayahNumber) {
+      setAudioError('Audio not available');
+      return;
+    }
+
+    try {
+      if (!audioRef.current) {
+        setIsLoadingAudio(true);
+        setAudioError(null);
+        
+        const actualAudioUrl = await getAudioUrl();
+        
+        if (!actualAudioUrl) {
+          throw new Error('No audio URL available');
+        }
+        
+        const audio = new Audio(actualAudioUrl);
+        
+        audio.addEventListener('loadeddata', () => {
+          setIsLoadingAudio(false);
+        });
+        
+        audio.addEventListener('error', () => {
+          setIsLoadingAudio(false);
+          setAudioError('Failed to load audio');
+        });
+        
+        audio.addEventListener('ended', () => {
+          setIsPlayingRecitation(false);
+          audioRef.current = null;
+        });
+        
+        audio.addEventListener('play', () => {
+          setIsPlayingRecitation(true);
+        });
+        
+        audio.addEventListener('pause', () => {
+          setIsPlayingRecitation(false);
+        });
+        
+        audioRef.current = audio;
+      }
+
+      if (isPlayingRecitation) {
+        audioRef.current.pause();
+      } else {
+        await audioRef.current.play();
+      }
+    } catch (err) {
+      setIsLoadingAudio(false);
+      setAudioError('Failed to play audio');
+      console.error('Audio error:', err);
+    }
+  }, [surahNumber, ayahNumber, isPlayingRecitation, getAudioUrl]);
+  
+  // Cleanup audio on unmount or ayah change
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [surahNumber, ayahNumber]);
 
   useEffect(() => {
     resetState();
@@ -491,6 +603,45 @@ export default function WordPuzzle({
         </div>
       </div>
 
+      {/* Audio Player - Compact version */}
+      {surahNumber && ayahNumber && (
+        <div className="mb-4 bg-white/[0.02] border border-white/5 rounded-xl p-2">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePlayPause}
+              disabled={isLoadingAudio}
+              className={`
+                flex items-center justify-center w-9 h-9 rounded-full transition-all flex-shrink-0
+                ${isPlayingRecitation 
+                  ? 'bg-green-500 text-white shadow-lg shadow-green-500/30' 
+                  : 'bg-white/10 text-white hover:bg-white/20'
+                }
+                ${isLoadingAudio ? 'opacity-50' : ''}
+              `}
+            >
+              {isLoadingAudio ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : isPlayingRecitation ? (
+                <Pause className="w-4 h-4 fill-current" />
+              ) : (
+                <Play className="w-4 h-4 fill-current ml-0.5" />
+              )}
+            </button>
+            
+            <div className="flex items-center gap-1.5 flex-1">
+              <Volume2 className="w-3.5 h-3.5 text-gray-500" />
+              <span className="text-xs text-gray-400">
+                {isLoadingAudio ? 'Loading...' : isPlayingRecitation ? 'Playing recitation' : 'Listen to recitation'}
+              </span>
+            </div>
+          </div>
+          
+          {audioError && (
+            <p className="text-xs text-red-400 mt-1.5">{audioError}</p>
+          )}
+        </div>
+      )}
+
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -501,6 +652,7 @@ export default function WordPuzzle({
           correctTokens={originalTokens}
           placedTokens={placedTokens}
           activeTokenId={activeToken?.id || null}
+          isPlayingRecitation={isPlayingRecitation}
         />
         <WordBank
           bank={bank}

@@ -1,5 +1,8 @@
 'use server';
 
+// Force Node.js runtime for MongoDB/Mongoose support
+export const runtime = 'nodejs';
+
 import { connectDB, User, SubscriptionStatusEnum, AdminGrantLog } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { getAdminUser } from '@/lib/dashboard-access';
@@ -137,6 +140,11 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
     return { success: true, message: `Successfully ${action} ${updatedUser.email}` };
   } catch (error) {
     console.error('Admin grant error:', error);
-    return { success: false, error: 'Database connection failed' };
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error details:', errorMessage);
+    return { 
+      success: false, 
+      error: `Database connection failed: ${errorMessage}` 
+    };
   }
 }

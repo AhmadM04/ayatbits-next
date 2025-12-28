@@ -238,6 +238,8 @@ export default function PuzzleClient({
         <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 sm:p-6">
           <WordPuzzle
             ayahText={ayahText}
+            surahNumber={puzzle.surah?.number}
+            ayahNumber={puzzle.content?.ayahNumber}
             onSolved={(isCorrect) => {
               console.log('🔵 WordPuzzle onSolved callback invoked!', { isCorrect });
               handleSolved(isCorrect);

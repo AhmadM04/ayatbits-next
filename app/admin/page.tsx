@@ -2,6 +2,9 @@ import AdminForm from './AdminForm';
 import { grantPremiumAccess, type GrantDuration } from '@/app/actions/admin';
 import { requireAdminUser } from '@/lib/dashboard-access';
 
+// Force Node.js runtime for MongoDB/Mongoose support
+export const runtime = 'nodejs';
+
 type GrantFormState = {
   message?: string;
   error?: string;
