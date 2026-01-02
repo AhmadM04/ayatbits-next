@@ -64,7 +64,17 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-bold text-white mb-2">9. Contact</h2>
+              <h2 className="text-lg font-bold text-white mb-2">9. Company Information</h2>
+              <p>
+                AyatBits is a product of HIYA FOR EDUCATION AND TUTORING OU, registered in Estonia.
+              </p>
+              <p className="mt-2 text-gray-500">
+                Copyright © 2026 HIYA FOR EDUCATION AND TUTORING OU. All rights reserved.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-bold text-white mb-2">10. Contact</h2>
               <p>
                 Questions? Email us at{' '}
                 <a href="mailto:support@ayatbits.com" className="text-green-500 hover:underline">
