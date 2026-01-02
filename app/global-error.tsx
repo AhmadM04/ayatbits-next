@@ -47,7 +47,7 @@ export default function GlobalError({
                 <li>• Clear your browser cache and cookies</li>
                 <li>• Try a different browser</li>
                 <li>• Check if JavaScript is enabled</li>
-                <li>• Contact support at support@ayatbits.com</li>
+                <li>• Contact support at hello@ayatbits.com</li>
               </ul>
             </div>
           </div>
