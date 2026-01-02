@@ -1,0 +1,14 @@
+<svg width="150" height="40" viewBox="0 0 150 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon - Stylized "A" with Islamic geometric pattern -->
+  <g>
+    <path d="M12 8L18 28H15L13.5 23H10.5L9 28H6L12 8Z" fill="#10b981"/>
+    <path d="M12 13L10.8 19H13.2L12 13Z" fill="#0a0a0a"/>
+    <circle cx="12" cy="6" r="2" fill="#10b981"/>
+  </g>
+  
+  <!-- Text: AyatBits -->
+  <text x="24" y="24" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#10b981">
+    AyatBits
+  </text>
+</svg>
+
