@@ -36,7 +36,7 @@ const faqItems = [
   },
   {
     question: "How do I contact support?",
-    answer: "You can reach our support team at support@ayatbits.com. We typically respond within 24-48 hours."
+    answer: "You can reach our support team at hello@ayatbits.com. We typically respond within 24-48 hours."
   },
 ];
 
@@ -107,7 +107,7 @@ export default function FAQPage() {
         <div className="mt-6 text-center">
           <p className="text-gray-500 text-sm mb-3">Still have questions?</p>
           <Link
-            href="mailto:support@ayatbits.com"
+            href="mailto:hello@ayatbits.com"
             className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm font-medium"
           >
             Contact Support

@@ -77,8 +77,8 @@ export default function TermsPage() {
               <h2 className="text-lg font-bold text-white mb-2">10. Contact</h2>
               <p>
                 Questions? Email us at{' '}
-                <a href="mailto:support@ayatbits.com" className="text-green-500 hover:underline">
-                  support@ayatbits.com
+                <a href="mailto:hello@ayatbits.com" className="text-green-500 hover:underline">
+                  hello@ayatbits.com
                 </a>
               </p>
             </section>

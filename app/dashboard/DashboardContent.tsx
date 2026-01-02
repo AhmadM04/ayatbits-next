@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Flame, BookOpen, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
@@ -86,8 +87,14 @@ export default function DashboardContent({
       <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between items-center h-14">
-            <Link href="/dashboard" className="text-xl font-bold text-green-500">
-              AyatBits
+            <Link href="/dashboard" className="hover:opacity-80 transition-opacity">
+              <Image 
+                src="/ayatbits-logo.svg" 
+                alt="AyatBits" 
+                width={150} 
+                height={40}
+                className="h-7 w-auto"
+              />
             </Link>
             <div className="flex items-center gap-2 sm:gap-3">
               {/* Search */}

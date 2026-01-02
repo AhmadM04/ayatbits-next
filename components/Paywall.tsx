@@ -144,7 +144,7 @@ export default function Paywall({ status, message }: PaywallProps) {
           {/* Help link */}
           {isPastDue && (
             <Link 
-              href="mailto:support@ayatbits.com"
+              href="mailto:hello@ayatbits.com"
               className="block mt-4 text-sm text-gray-500 hover:text-gray-400 transition-colors"
             >
               Need help? Contact support
@@ -161,8 +161,8 @@ export default function Paywall({ status, message }: PaywallProps) {
         {/* Footer */}
         <p className="text-center text-gray-600 text-sm mt-6">
           Questions? Email us at{' '}
-          <a href="mailto:support@ayatbits.com" className="text-green-500 hover:underline">
-            support@ayatbits.com
+          <a href="mailto:hello@ayatbits.com" className="text-green-500 hover:underline">
+            hello@ayatbits.com
           </a>
         </p>
       </motion.div>

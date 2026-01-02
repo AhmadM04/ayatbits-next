@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Check, Sparkles, Loader2, CreditCard, Shield, Clock, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
@@ -80,8 +81,15 @@ export default function PricingContent() {
       <header className="fixed w-full top-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
-              AyatBits
+            <Link href="/" className="hover:opacity-80 transition-opacity">
+              <Image 
+                src="/ayatbits-logo.svg" 
+                alt="AyatBits" 
+                width={150} 
+                height={40}
+                priority
+                className="h-8 w-auto"
+              />
             </Link>
             <SignedIn>
               <span className="text-sm text-gray-400 hidden sm:inline">
@@ -289,7 +297,7 @@ export default function PricingContent() {
             >
               <h2 className="text-2xl font-bold mb-4">Questions?</h2>
               <p className="text-gray-400 mb-6">
-                Contact us at support@ayatbits.com
+                Contact us at hello@ayatbits.com
               </p>
               <Link href="/">
                 <button className="px-6 py-3 border border-white/20 text-gray-300 hover:bg-white/5 rounded-full transition-colors">

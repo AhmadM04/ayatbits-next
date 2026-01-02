@@ -177,7 +177,7 @@ export default function SurahCompleteClient({
               transition={{ delay: 0.3 }}
               className="text-3xl font-bold text-white mb-2"
             >
-              Masha Allah!
+              Mashallah!
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}

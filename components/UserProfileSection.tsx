@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser, SignOutButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -8,10 +8,49 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, LogOut } from 'lucide-react';
 
 export default function UserProfileSection() {
-  const { user } = useUser();
+  const { user, isSignedIn, isLoaded } = useUser();
   const [showModal, setShowModal] = useState(false);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (isSignedIn && isLoaded) {
+      // Add a small delay to ensure Clerk session is fully established
+      const checkAccess = async () => {
+        try {
+          const res = await fetch('/api/check-access', {
+            credentials: 'include', // Ensure cookies are sent
+          });
+          
+          if (res.ok) {
+            const data = await res.json();
+            setHasAccess(data.hasAccess);
+          } else if (res.status === 401) {
+            // Session not ready yet, retry after a short delay
+            setTimeout(() => {
+              fetch('/api/check-access', { credentials: 'include' })
+                .then(res => res.ok ? res.json() : { hasAccess: false })
+                .then(data => setHasAccess(data.hasAccess))
+                .catch(() => setHasAccess(false));
+            }, 1000);
+          } else {
+            setHasAccess(false);
+          }
+        } catch (error) {
+          console.error('Error checking access:', error);
+          setHasAccess(false);
+        }
+      };
+
+      // Small delay to ensure Clerk session is ready
+      const timeoutId = setTimeout(checkAccess, 300);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isSignedIn, isLoaded]);
   
   if (!user) return null;
+
+  const buttonText = hasAccess === null ? 'Dashboard' : (hasAccess ? 'Dashboard' : 'Start Learning');
+  const buttonLink = hasAccess === null ? '/dashboard' : (hasAccess ? '/dashboard' : '/pricing');
 
   const userInitial = user.firstName?.[0] || user.emailAddresses[0]?.emailAddress[0].toUpperCase() || 'U';
 
@@ -42,9 +81,9 @@ export default function UserProfileSection() {
             {user.emailAddresses[0]?.emailAddress}
           </div>
         </div>
-        <Link href="/dashboard">
+        <Link href={buttonLink}>
           <Button className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2">
-            Dashboard
+            {buttonText}
           </Button>
         </Link>
         <SignOutButton>
@@ -99,9 +138,9 @@ export default function UserProfileSection() {
                 </div>
 
                 <div className="space-y-3">
-                  <Link href="/dashboard" onClick={() => setShowModal(false)}>
+                  <Link href={buttonLink} onClick={() => setShowModal(false)}>
                     <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
-                      Go to Dashboard
+                      {buttonText}
                     </Button>
                   </Link>
                   <SignOutButton>

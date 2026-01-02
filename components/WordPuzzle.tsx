@@ -396,7 +396,7 @@ export default function WordPuzzle({
       
       // Show toast immediately
       setTimeout(() => {
-        showToast('Masha Allah! Perfect!', 'success', 2000);
+        showToast('Mashallah! Perfect!', 'success', 2000);
       }, 0);
       
       // Call onSolved immediately - no delay

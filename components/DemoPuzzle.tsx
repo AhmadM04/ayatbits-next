@@ -315,7 +315,7 @@ export default function DemoPuzzle() {
               className="mt-4 p-4 bg-green-500/10 border border-green-500/20 rounded-xl flex items-center justify-center gap-2"
             >
               <Check className="w-5 h-5 text-green-400" />
-              <span className="text-green-400 font-medium">Masha Allah! Perfect!</span>
+              <span className="text-green-400 font-medium">MashaAllah! Perfect!</span>
             </motion.div>
           )}
         </AnimatePresence>
