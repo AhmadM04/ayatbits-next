@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { SignedIn, SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Puzzle, Trophy, Flame, Star, Sparkles } from "lucide-react";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import UserProfileSection from "@/components/UserProfileSection";
 import DemoPuzzle from "@/components/DemoPuzzle";
 
@@ -23,6 +23,56 @@ const floatingArabicWords = [
   { text: 'يَوْمِ', x: '70%', y: '30%', delay: 1.2, duration: 8 },
   { text: 'ٱلدِّينِ', x: '20%', y: '40%', delay: 2.2, duration: 10 },
 ];
+
+// Component to check access and render appropriate button
+function DashboardButton({ size = "lg", className = "" }: { size?: "lg", className?: string }) {
+  const { isSignedIn } = useUser();
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (isSignedIn) {
+      fetch('/api/check-access')
+        .then(res => res.json())
+        .then(data => setHasAccess(data.hasAccess))
+        .catch(() => setHasAccess(false));
+    }
+  }, [isSignedIn]);
+
+  if (!isSignedIn) return null;
+
+  // While loading, show a generic button
+  if (hasAccess === null) {
+    return (
+      <Link href="/dashboard">
+        <Button size={size} className={className}>
+          Loading...
+        </Button>
+      </Link>
+    );
+  }
+
+  // If user has no access, show "Start Learning" and link to pricing
+  if (!hasAccess) {
+    return (
+      <Link href="/pricing">
+        <Button size={size} className={className}>
+          Start Learning
+          <Flame className="w-5 h-5 ml-2" />
+        </Button>
+      </Link>
+    );
+  }
+
+  // If user has access, show "Continue Learning" and link to dashboard
+  return (
+    <Link href="/dashboard">
+      <Button size={size} className={className}>
+        Continue Learning
+        <Flame className="w-5 h-5 ml-2" />
+      </Button>
+    </Link>
+  );
+}
 
 
 export default function Home() {
@@ -140,12 +190,10 @@ export default function Home() {
                     </SignUpButton>
                   </SignedOut>
                   <SignedIn>
-                    <Link href="/dashboard">
-                      <Button size="lg" className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-green-600/25">
-                        Continue Learning
-                        <Flame className="w-5 h-5 ml-2" />
-                      </Button>
-                    </Link>
+                    <DashboardButton 
+                      size="lg" 
+                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-green-600/25"
+                    />
                   </SignedIn>
                 </div>
               </motion.div>
@@ -297,11 +345,10 @@ export default function Home() {
                     </SignUpButton>
                   </SignedOut>
                   <SignedIn>
-                    <Link href="/dashboard">
-                      <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg rounded-xl">
-                        Go to Dashboard
-                      </Button>
-                    </Link>
+                    <DashboardButton 
+                      size="lg" 
+                      className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg rounded-xl"
+                    />
                   </SignedIn>
                 </div>
               </motion.div>
