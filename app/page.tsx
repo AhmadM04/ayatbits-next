@@ -26,17 +26,43 @@ const floatingArabicWords = [
 
 // Component to check access and render appropriate button
 function DashboardButton({ size = "lg", className = "" }: { size?: "lg", className?: string }) {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (isSignedIn) {
-      fetch('/api/check-access')
-        .then(res => res.json())
-        .then(data => setHasAccess(data.hasAccess))
-        .catch(() => setHasAccess(false));
+    if (isSignedIn && isLoaded) {
+      // Add a small delay to ensure Clerk session is fully established
+      const checkAccess = async () => {
+        try {
+          const res = await fetch('/api/check-access', {
+            credentials: 'include', // Ensure cookies are sent
+          });
+          
+          if (res.ok) {
+            const data = await res.json();
+            setHasAccess(data.hasAccess);
+          } else if (res.status === 401) {
+            // Session not ready yet, retry after a short delay
+            setTimeout(() => {
+              fetch('/api/check-access', { credentials: 'include' })
+                .then(res => res.ok ? res.json() : { hasAccess: false })
+                .then(data => setHasAccess(data.hasAccess))
+                .catch(() => setHasAccess(false));
+            }, 1000);
+          } else {
+            setHasAccess(false);
+          }
+        } catch (error) {
+          console.error('Error checking access:', error);
+          setHasAccess(false);
+        }
+      };
+
+      // Small delay to ensure Clerk session is ready
+      const timeoutId = setTimeout(checkAccess, 300);
+      return () => clearTimeout(timeoutId);
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, isLoaded]);
 
   if (!isSignedIn) return null;
 

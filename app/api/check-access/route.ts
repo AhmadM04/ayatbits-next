@@ -6,14 +6,20 @@ export async function GET() {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ hasAccess: false }, { status: 401 });
+      return NextResponse.json({ hasAccess: false, error: 'Not authenticated' }, { status: 401 });
     }
 
     await connectDB();
     const user = await User.findOne({ clerkId: userId });
 
     if (!user) {
-      return NextResponse.json({ hasAccess: false });
+      // User is authenticated via Clerk but not in DB yet (race condition during signup)
+      return NextResponse.json({ hasAccess: false, error: 'User setup pending' }, { status: 200 });
+    }
+
+    // Admins always have access
+    if (user.isAdmin) {
+      return NextResponse.json({ hasAccess: true, plan: 'admin' });
     }
 
     // Check for lifetime access
