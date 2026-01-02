@@ -26,24 +26,29 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { priceId } = body;
 
-    // If priceId is provided, use it; otherwise create a default subscription
+    // Check if it's a valid Stripe price ID (not just a placeholder)
+    // Real Stripe price IDs look like: price_1A2B3C4D5E6F7G8H
+    const isValidStripePriceId = priceId && priceId.startsWith('price_') && priceId.length > 20;
+
+    // If priceId is provided and valid, use it; otherwise create a price on the fly
     let lineItems: any[];
-    if (priceId && priceId.startsWith('price_')) {
+    if (isValidStripePriceId) {
       // Use existing Stripe price
       lineItems = [{ price: priceId, quantity: 1 }];
     } else {
-      // Fallback: create price on the fly (for development)
+      // Fallback: create price on the fly (for development/when env vars not set)
+      const isYearly = priceId === 'price_yearly';
       lineItems = [
         {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'AyatBits Pro',
+              name: `AyatBits Pro - ${isYearly ? 'Yearly' : 'Monthly'}`,
               description: 'Unlimited access to all puzzles and features',
             },
-            unit_amount: priceId === 'price_yearly' ? 4799 : 599, // $47.99 or $5.99
+            unit_amount: isYearly ? 4799 : 599, // $47.99 or $5.99
             recurring: {
-              interval: priceId === 'price_yearly' ? 'year' : 'month',
+              interval: isYearly ? 'year' : 'month',
             },
           },
           quantity: 1,
