@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Lock, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
+import { QuranLoader, TrophyAnimation } from '@/components/animations';
 
 interface Achievement {
   id: string;
@@ -100,45 +101,137 @@ export default function AchievementsContent() {
       <main className="max-w-2xl mx-auto px-4 py-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <QuranLoader size={120} />
+            </motion.div>
           </div>
         ) : (
           <>
             {/* Stats Overview */}
             {stats && (
-              <div className="grid grid-cols-3 gap-3 mb-8">
-                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-center">
-                  <div className="text-2xl font-bold text-green-500">{stats.completedPuzzles}</div>
+              <motion.div 
+                className="grid grid-cols-3 gap-3 mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <motion.div 
+                  className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-center"
+                  whileHover={{ scale: 1.05, borderColor: 'rgba(34, 197, 94, 0.3)' }}
+                  transition={{ type: 'spring', stiffness: 400 }}
+                >
+                  <motion.div 
+                    className="text-2xl font-bold text-green-500"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.1, type: 'spring' }}
+                  >
+                    {stats.completedPuzzles}
+                  </motion.div>
                   <div className="text-xs text-gray-500">Puzzles</div>
-                </div>
-                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-center">
-                  <div className="text-2xl font-bold text-orange-500">{stats.longestStreak}</div>
+                </motion.div>
+                <motion.div 
+                  className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-center"
+                  whileHover={{ scale: 1.05, borderColor: 'rgba(249, 115, 22, 0.3)' }}
+                  transition={{ type: 'spring', stiffness: 400 }}
+                >
+                  <motion.div 
+                    className="text-2xl font-bold text-orange-500"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2, type: 'spring' }}
+                  >
+                    {stats.longestStreak}
+                  </motion.div>
                   <div className="text-xs text-gray-500">Best Streak</div>
-                </div>
-                <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-center">
-                  <div className="text-2xl font-bold text-purple-500">{stats.totalUnlocked}</div>
-                  <div className="text-xs text-gray-500">Trophies</div>
-                </div>
-              </div>
+                </motion.div>
+                <motion.div 
+                  className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-center relative overflow-hidden"
+                  whileHover={{ scale: 1.05, borderColor: 'rgba(168, 85, 247, 0.3)' }}
+                  transition={{ type: 'spring', stiffness: 400 }}
+                >
+                  {stats.totalUnlocked > 0 && (
+                    <motion.div
+                      className="absolute -top-2 -right-2 opacity-20"
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <TrophyAnimation size={60} loop={false} />
+                    </motion.div>
+                  )}
+                  <motion.div 
+                    className="text-2xl font-bold text-purple-500 relative z-10"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.3, type: 'spring' }}
+                  >
+                    {stats.totalUnlocked}
+                  </motion.div>
+                  <div className="text-xs text-gray-500 relative z-10">Trophies</div>
+                </motion.div>
+              </motion.div>
             )}
 
             {/* Unlocked Achievements */}
             {unlockedAchievements.length > 0 && (
-              <div className="mb-8">
+              <motion.div 
+                className="mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
                 <h2 className="text-sm font-semibold text-gray-400 mb-3 flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <Check className="w-4 h-4 text-green-500" />
+                  </motion.div>
                   Unlocked ({unlockedAchievements.length})
                 </h2>
                 <div className="grid grid-cols-2 gap-3">
                   {unlockedAchievements.map((achievement, index) => (
                     <motion.div
                       key={achievement.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4"
+                      initial={{ opacity: 0, scale: 0.8, rotateY: -90 }}
+                      animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                      transition={{ 
+                        delay: 0.3 + index * 0.1,
+                        type: 'spring',
+                        damping: 15
+                      }}
+                      whileHover={{ 
+                        scale: 1.05,
+                        y: -5,
+                        transition: { duration: 0.2 }
+                      }}
+                      className="relative bg-gradient-to-br from-green-500/10 via-emerald-500/10 to-green-500/5 border border-green-500/30 rounded-2xl p-4 overflow-hidden"
                     >
-                      <div className="text-3xl mb-2">{achievement.icon}</div>
+                      {/* Shine effect on hover */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+                        initial={{ x: '-100%' }}
+                        whileHover={{ x: '100%' }}
+                        transition={{ duration: 0.6 }}
+                      />
+                      
+                      <motion.div 
+                        className="text-3xl mb-2"
+                        animate={{ 
+                          rotate: [0, 10, -10, 0],
+                        }}
+                        transition={{ 
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: index * 0.2
+                        }}
+                      >
+                        {achievement.icon}
+                      </motion.div>
                       <div className="font-semibold text-white text-sm mb-1">
                         {achievement.name}
                       </div>
@@ -148,12 +241,16 @@ export default function AchievementsContent() {
                     </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             )}
 
             {/* Locked Achievements */}
             {lockedAchievements.length > 0 && (
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
                 <h2 className="text-sm font-semibold text-gray-400 mb-3 flex items-center gap-2">
                   <Lock className="w-4 h-4" />
                   In Progress ({lockedAchievements.length})
@@ -162,13 +259,19 @@ export default function AchievementsContent() {
                   {lockedAchievements.map((achievement, index) => (
                     <motion.div
                       key={achievement.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="bg-white/[0.02] border border-white/5 rounded-2xl p-4"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 + index * 0.05 }}
+                      whileHover={{ x: 5 }}
+                      className="bg-white/[0.02] border border-white/5 hover:border-white/10 rounded-2xl p-4 transition-colors"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="text-2xl opacity-50 grayscale">{achievement.icon}</div>
+                        <motion.div 
+                          className="text-2xl opacity-50 grayscale"
+                          whileHover={{ scale: 1.2, opacity: 0.7 }}
+                        >
+                          {achievement.icon}
+                        </motion.div>
                         <div className="flex-1 min-w-0">
                           <div className="font-semibold text-white text-sm mb-1">
                             {achievement.name}
@@ -176,10 +279,12 @@ export default function AchievementsContent() {
                           <div className="text-xs text-gray-500 mb-2">
                             {achievement.description}
                           </div>
-                          <div className="w-full bg-white/5 rounded-full h-1.5 mb-1">
-                            <div
-                              className="bg-green-500 h-1.5 rounded-full transition-all"
-                              style={{ width: `${achievement.progress}%` }}
+                          <div className="w-full bg-white/5 rounded-full h-1.5 mb-1 overflow-hidden">
+                            <motion.div
+                              className="bg-gradient-to-r from-green-600 to-emerald-500 h-1.5 rounded-full"
+                              initial={{ width: 0 }}
+                              animate={{ width: `${achievement.progress}%` }}
+                              transition={{ duration: 0.8, delay: 0.6 + index * 0.05 }}
                             />
                           </div>
                           <div className="text-xs text-gray-600">
@@ -190,7 +295,7 @@ export default function AchievementsContent() {
                     </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             )}
           </>
         )}

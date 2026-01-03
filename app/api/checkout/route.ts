@@ -1,6 +1,8 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { connectDB, User } from '@/lib/db';
+import { checkSubscription } from '@/lib/subscription';
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -21,6 +23,26 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if user already has access (subscription or admin-granted)
+    await connectDB();
+    const dbUser = await User.findOne({ clerkId: user.id });
+    
+    if (dbUser) {
+      const hasAccess = checkSubscription(dbUser);
+      const isAdmin = dbUser.isAdmin;
+
+      // If user already has access via subscription, trial, lifetime, or is admin, prevent checkout
+      if (hasAccess || isAdmin) {
+        return NextResponse.json(
+          { 
+            error: 'You already have access to AyatBits Pro', 
+            redirect: '/dashboard' 
+          },
+          { status: 400 }
+        );
+      }
     }
 
     const body = await req.json();

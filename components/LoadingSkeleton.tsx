@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { QuranLoader } from './animations';
 
 interface LoadingSkeletonProps {
   className?: string;
@@ -191,10 +192,12 @@ export function PageLoader() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
       <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-        className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full"
-      />
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <QuranLoader size={140} />
+      </motion.div>
     </div>
   );
 }

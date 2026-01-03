@@ -8,6 +8,7 @@ import { ArrowLeft, Heart } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SuccessAnimation, SparkleAnimation } from '@/components/animations';
 
 interface PuzzleClientProps {
   puzzle: {
@@ -152,47 +153,70 @@ export default function PuzzleClient({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#0a0a0a] flex items-center justify-center"
+            className="fixed inset-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-sm flex items-center justify-center"
           >
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: 'spring', damping: 15 }}
-              className="text-center px-4"
+              className="text-center px-4 relative"
             >
+              {/* Background glow effect */}
+              <div className="absolute inset-0 -z-10">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-green-500/20 rounded-full blur-3xl" />
+              </div>
+              
+              {/* Floating sparkles around the success animation */}
+              <motion.div
+                className="absolute -top-4 -left-4"
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                <SparkleAnimation size={50} loop={true} />
+              </motion.div>
+              <motion.div
+                className="absolute -top-4 -right-4"
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                <SparkleAnimation size={50} loop={true} />
+              </motion.div>
+              <motion.div
+                className="absolute -bottom-4 left-1/2 -translate-x-1/2"
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                <SparkleAnimation size={50} loop={true} />
+              </motion.div>
+              
+              {/* Main success animation */}
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', damping: 10 }}
-                className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center"
+                transition={{ delay: 0.1, type: 'spring', damping: 12 }}
+                className="mb-4"
               >
-                <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <motion.path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={3}
-                    d="M5 13l4 4L19 7"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ delay: 0.4, duration: 0.5 }}
-                  />
-                </svg>
+                <SuccessAnimation size={160} loop={false} />
               </motion.div>
+              
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="text-xl font-bold text-white mb-2"
+                transition={{ delay: 0.4 }}
+                className="text-2xl font-bold text-white mb-2"
               >
                 Mashallah!
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                className="text-gray-400 text-sm"
+                transition={{ delay: 0.5 }}
+                className="text-green-400 text-base"
               >
-                {isLastAyahInSurah ? 'Surah completed!' : 'Moving to next ayah...'}
+                {isLastAyahInSurah ? '🎉 Surah completed!' : '✨ Moving to next ayah...'}
               </motion.p>
             </motion.div>
           </motion.div>

@@ -25,6 +25,7 @@
     "cloudinary": "^2.8.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.25",
+    "lottie-react": "^2.4.1",
     "lucide-react": "^0.555.0",
     "mongoose": "^8.8.4",
     "next": "^16.1.1",

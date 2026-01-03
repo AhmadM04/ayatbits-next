@@ -8,6 +8,7 @@ import BottomNav from '@/components/BottomNav';
 import DailyQuote from '@/components/DailyQuote';
 import TrialBanner from '@/components/TrialBanner';
 import VerseSearch from '@/components/VerseSearch';
+import { SparkleAnimation } from '@/components/animations';
 
 interface DashboardContentProps {
   userFirstName: string | null | undefined;
@@ -160,38 +161,78 @@ export default function DashboardContent({
 
         {/* Juz Selector */}
         <section>
-          <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="w-5 h-5 text-green-500" />
+          <motion.div 
+            className="flex items-center gap-2 mb-4"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.div
+              animate={{ 
+                rotate: [0, 5, -5, 0],
+              }}
+              transition={{ 
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <BookOpen className="w-5 h-5 text-green-500" />
+            </motion.div>
             <h2 className="text-lg font-semibold">Select a Juz</h2>
-          </div>
+          </motion.div>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
             {juzs.length === 0 ? (
               <div className="col-span-full text-center py-8 text-gray-500">
                 <p className="text-sm">No Juz available</p>
               </div>
             ) : (
-              juzs.map((juz) => (
-                <Link
+              juzs.map((juz, index) => (
+                <motion.div
                   key={juz._id}
-                  href={`/dashboard/juz/${juz.number}`}
-                  className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 hover:border-green-500/50 transition-all group"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.03 }}
                 >
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-500 mb-1 group-hover:scale-110 transition-transform">
-                      {juz.number}
+                  <Link
+                    href={`/dashboard/juz/${juz.number}`}
+                    className="relative block bg-white/[0.02] border border-white/5 rounded-2xl p-4 hover:border-green-500/50 transition-all group overflow-hidden"
+                  >
+                    {/* Completion badge with sparkle animation */}
+                    {juz.progress >= 100 && (
+                      <motion.div 
+                        className="absolute -top-1 -right-1 z-10"
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: 'spring', damping: 10 }}
+                      >
+                        <SparkleAnimation size={35} loop={true} />
+                      </motion.div>
+                    )}
+                    
+                    <div className="text-center relative z-0">
+                      <motion.div 
+                        className="text-2xl font-bold text-green-500 mb-1"
+                        whileHover={{ scale: 1.15 }}
+                        transition={{ type: 'spring', stiffness: 400 }}
+                      >
+                        {juz.number}
+                      </motion.div>
+                      <div className="text-xs text-gray-500 mb-2 truncate">{juz.name}</div>
+                      <div className="w-full bg-white/5 rounded-full h-1.5 mb-1 overflow-hidden">
+                        <motion.div
+                          className="bg-gradient-to-r from-green-600 to-emerald-500 h-1.5 rounded-full"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${isNaN(juz.progress) ? 0 : Math.max(0, Math.min(100, juz.progress))}%` }}
+                          transition={{ duration: 0.8, delay: index * 0.03 + 0.2, ease: 'easeOut' }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-gray-600">
+                        {juz.completedPuzzles}/{juz._count.puzzles}
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-500 mb-2 truncate">{juz.name}</div>
-                    <div className="w-full bg-white/5 rounded-full h-1.5 mb-1">
-                      <div
-                        className="bg-green-500 h-1.5 rounded-full transition-all"
-                        style={{ width: `${isNaN(juz.progress) ? 0 : Math.max(0, Math.min(100, juz.progress))}%` }}
-                      />
-                    </div>
-                    <div className="text-[10px] text-gray-600">
-                      {juz.completedPuzzles}/{juz._count.puzzles}
-                    </div>
-                  </div>
-                </Link>
+                  </Link>
+                </motion.div>
               ))
             )}
           </div>

@@ -14,6 +14,7 @@ import {
   Award
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { TrophyAnimation, SparkleAnimation } from '@/components/animations';
 
 interface SurahCompleteClientProps {
   surah: {
@@ -150,24 +151,37 @@ export default function SurahCompleteClient({
             transition={{ duration: 0.5, type: 'spring', damping: 15 }}
             className="text-center mb-8"
           >
-            {/* Trophy Icon */}
+            {/* Trophy Animation */}
             <motion.div
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, type: 'spring', damping: 12 }}
               className="relative inline-flex items-center justify-center mb-6"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full blur-2xl opacity-50 animate-pulse" />
-              <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-2xl shadow-green-500/30">
-                <Trophy className="w-12 h-12 text-white" />
+              {/* Glowing background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full blur-3xl opacity-40 animate-pulse" />
+              
+              {/* Main Trophy Animation */}
+              <div className="relative">
+                <TrophyAnimation size={180} loop={false} />
               </div>
+              
+              {/* Floating sparkles around trophy */}
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="absolute -top-2 -right-2"
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8 }}
+                className="absolute -top-4 -right-4"
               >
-                <Sparkles className="w-8 h-8 text-yellow-400" />
+                <SparkleAnimation size={50} loop={true} />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1 }}
+                className="absolute -top-4 -left-4"
+              >
+                <SparkleAnimation size={50} loop={true} />
               </motion.div>
             </motion.div>
 

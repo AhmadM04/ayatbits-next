@@ -9,6 +9,7 @@ import { Puzzle, Trophy, Flame, Star, Sparkles } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import UserProfileSection from "@/components/UserProfileSection";
 import DemoPuzzle from "@/components/DemoPuzzle";
+import { QuranLoader } from "@/components/animations";
 
 // Floating Arabic letters/words for the background
 const floatingArabicWords = [
@@ -105,7 +106,7 @@ export default function Home() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+        <QuranLoader size={140} />
       </div>
     }>
       <div className="min-h-screen bg-[#0a0a0a] text-white overflow-hidden">

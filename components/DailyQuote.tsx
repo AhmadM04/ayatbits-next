@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, ExternalLink, RefreshCw, Volume2, WifiOff } from 'lucide-react';
 import { apiGet, NetworkError } from '@/lib/api-client';
+import { SparkleAnimation } from './animations';
 
 interface DailyQuoteData {
   arabicText: string;
@@ -98,16 +99,19 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-green-900/20 to-emerald-900/10 border border-green-500/20 rounded-2xl p-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-gradient-to-br from-green-900/20 to-emerald-900/10 border border-green-500/20 rounded-2xl p-6"
+      >
         <div className="flex items-center gap-2 mb-4">
           <Sparkles className="w-5 h-5 text-green-500" />
           <span className="text-sm font-medium text-green-500">Verse of the Day</span>
         </div>
-        <div className="animate-pulse space-y-4">
-          <div className="h-16 bg-white/5 rounded-lg" />
-          <div className="h-12 bg-white/5 rounded-lg" />
+        <div className="flex items-center justify-center py-8">
+          <SparkleAnimation size={80} loop={true} />
         </div>
-      </div>
+      </motion.div>
     );
   }
 
@@ -147,7 +151,19 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-green-400" />
+            <motion.div
+              animate={{ 
+                rotate: [0, 10, -10, 0],
+                scale: [1, 1.1, 1.1, 1]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <Sparkles className="w-5 h-5 text-green-400" />
+            </motion.div>
             <span className="text-sm font-medium text-green-400">Verse of the Day</span>
           </div>
           <div className="flex items-center gap-2">

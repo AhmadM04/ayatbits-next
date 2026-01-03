@@ -1,18 +1,48 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Check, Sparkles, Loader2, CreditCard, Shield, Clock, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
 
 export default function PricingContent() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+  const [checkingAccess, setCheckingAccess] = useState(true);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const isTrialFlow = searchParams.get('trial') === 'true';
   const reason = searchParams.get('reason');
+
+  // Check if user already has access
+  useEffect(() => {
+    const checkAccess = async () => {
+      try {
+        const response = await fetch('/api/check-access');
+        const data = await response.json();
+        
+        if (data.hasAccess) {
+          setHasAccess(true);
+          // Redirect users who already have access to dashboard
+          setTimeout(() => {
+            router.push('/dashboard');
+          }, 2000);
+        } else {
+          setHasAccess(false);
+        }
+      } catch (error) {
+        console.error('Error checking access:', error);
+        setHasAccess(false);
+      } finally {
+        setCheckingAccess(false);
+      }
+    };
+
+    checkAccess();
+  }, [router]);
 
   // Stripe Price IDs - these should match your Stripe dashboard
   const plans = [
@@ -63,6 +93,10 @@ export default function PricingContent() {
       
       if (data.url) {
         window.location.href = data.url;
+      } else if (data.redirect) {
+        // User already has access - redirect to dashboard
+        alert(data.error || 'You already have access!');
+        window.location.href = data.redirect;
       } else {
         console.error('No checkout URL returned:', data);
         setLoadingPlan(null);
@@ -102,6 +136,30 @@ export default function PricingContent() {
 
       <main className="pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
+          {/* Already Has Access Alert */}
+          {hasAccess && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8 p-6 bg-green-500/10 border border-green-500/30 rounded-2xl text-center"
+            >
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Check className="w-5 h-5 text-green-500" />
+                <h3 className="text-lg font-semibold text-green-400">You already have access!</h3>
+              </div>
+              <p className="text-gray-300 mb-4">
+                Redirecting you to the dashboard...
+              </p>
+              <Link 
+                href="/dashboard"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg font-medium transition-colors"
+              >
+                Go to Dashboard
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
+          )}
+
           {/* Header */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -244,32 +302,46 @@ export default function PricingContent() {
                   </SignUpButton>
                 </SignedOut>
                 <SignedIn>
-                  <button
-                    type="button"
-                    onClick={() => handleSubscribe(plan.priceId)}
-                    disabled={loadingPlan !== null}
-                    className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed visible ${
-                      plan.popular
-                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white'
-                        : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
-                    }`}
-                    style={{ display: 'block', visibility: 'visible' }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-100%] group-hover:translate-x-[100%] animate-shimmer" />
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      {loadingPlan === plan.priceId ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          {plan.cta}
+                  {hasAccess ? (
+                    <Link href="/dashboard">
+                      <button
+                        type="button"
+                        className="w-full h-12 rounded-xl font-semibold bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all"
+                      >
+                        <span className="flex items-center justify-center gap-2">
+                          Go to Dashboard
                           <ArrowRight className="w-4 h-4" />
-                        </>
-                      )}
-                    </span>
-                  </button>
+                        </span>
+                      </button>
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleSubscribe(plan.priceId)}
+                      disabled={loadingPlan !== null || checkingAccess}
+                      className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed visible ${
+                        plan.popular
+                          ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white'
+                          : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
+                      }`}
+                      style={{ display: 'block', visibility: 'visible' }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-100%] group-hover:translate-x-[100%] animate-shimmer" />
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {loadingPlan === plan.priceId ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            {plan.cta}
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
+                      </span>
+                    </button>
+                  )}
                 </SignedIn>
               </motion.div>
             ))}
