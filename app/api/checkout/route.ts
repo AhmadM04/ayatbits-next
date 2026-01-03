@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
               name: `AyatBits Pro - ${isYearly ? 'Yearly' : 'Monthly'}`,
               description: 'Unlimited access to all puzzles and features',
             },
-            unit_amount: isYearly ? 4799 : 599, // $47.99 or $5.99
+            unit_amount: isYearly ? 4999 : 599, // $49.99 or $5.99
             recurring: {
               interval: isYearly ? 'year' : 'month',
             },

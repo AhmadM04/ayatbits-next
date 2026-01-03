@@ -34,11 +34,11 @@ export default function PricingContent() {
     },
     {
       name: 'Yearly',
-      price: '$47.99',
+      price: '$49.99',
       period: '/year',
       priceId: process.env.NEXT_PUBLIC_STRIPE_YEARLY_PRICE_ID || 'price_yearly',
       originalPrice: '$71.88',
-      savings: 'Save 33%',
+      savings: 'Save 30%',
       features: [
         'Everything in Monthly',
         'Offline mode (coming soon)',
