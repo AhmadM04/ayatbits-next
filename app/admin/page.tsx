@@ -8,6 +8,7 @@ export const runtime = 'nodejs';
 type GrantFormState = {
   message?: string;
   error?: string;
+  signUpUrl?: string;
 };
 
 async function grantAccessAction(_prevState: GrantFormState, formData: FormData): Promise<GrantFormState> {
@@ -24,7 +25,10 @@ async function grantAccessAction(_prevState: GrantFormState, formData: FormData)
     return { error: result.error || 'Failed to grant access.' };
   }
 
-  return { message: result.message || 'Access granted.' };
+  return { 
+    message: result.message || 'Access granted.',
+    signUpUrl: result.signUpUrl 
+  };
 }
 
 export default async function AdminPage() {

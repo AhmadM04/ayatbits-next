@@ -37,10 +37,17 @@ async function ensureDbUser(clerkUser: Awaited<ReturnType<typeof currentUser>>) 
 
     // 2) If not found, try merge by email (case-insensitive) and attach new clerkId
     if (!dbUser && emailLower) {
+      console.log(`[ensureDbUser] User not found by clerkId. Searching by email: ${emailLower}`);
       dbUser = await User.findOne({ email: { $regex: new RegExp(`^${emailLower}$`, 'i') } });
-      if (dbUser && clerkUser.id) {
+      if (dbUser) {
+        console.log(`[ensureDbUser] Found existing user by email! Merging accounts...`);
+        console.log(`[ensureDbUser] User _id: ${dbUser._id}, existing clerkId: ${dbUser.clerkId || 'NULL'}`);
+        console.log(`[ensureDbUser] Attaching new clerkId: ${clerkUser.id}`);
         dbUser.clerkId = clerkUser.id as string;
         await dbUser.save();
+        console.log(`[ensureDbUser] ✅ Account merged successfully!`);
+      } else {
+        console.log(`[ensureDbUser] No existing user found by email. Will create new user.`);
       }
     }
 

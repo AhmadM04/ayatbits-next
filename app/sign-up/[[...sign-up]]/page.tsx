@@ -4,8 +4,13 @@ import { SignUp } from "@clerk/nextjs";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function SignUpPage() {
+function SignUpContent() {
+  const searchParams = useSearchParams();
+  const emailParam = searchParams.get('email');
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
       {/* Header */}
@@ -60,6 +65,9 @@ export default function SignUpPage() {
             routing="path"
             path="/sign-up"
             signInUrl="/sign-in"
+            initialValues={{
+              emailAddress: emailParam || undefined
+            }}
           />
 
           {/* Custom Footer */}
@@ -74,5 +82,13 @@ export default function SignUpPage() {
         </motion.div>
       </main>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0a0a0a]" />}>
+      <SignUpContent />
+    </Suspense>
   );
 }

@@ -134,7 +134,13 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
     revalidatePath('/admin');
     
     const action = duration === 'revoke' ? 'Revoked access for' : `Granted ${duration} access to`;
-    return { success: true, message: `Successfully ${action} ${updatedUser.email}` };
+    const signUpUrl = `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/sign-up?email=${encodeURIComponent(email)}`;
+    
+    return { 
+      success: true, 
+      message: `Successfully ${action} ${updatedUser.email}`,
+      signUpUrl: duration !== 'revoke' ? signUpUrl : undefined
+    };
   } catch (error) {
     console.error('Admin grant error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
