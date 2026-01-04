@@ -12,7 +12,7 @@ export enum SubscriptionStatusEnum {
 export type SubscriptionPlan = 'monthly' | 'yearly' | 'lifetime'; // Removed 'free'
 
 export interface IUser extends Document {
-  clerkId: string;
+  clerkId?: string; // Optional: Admin-created users may not have a Clerk account yet
   email: string;
   firstName?: string;
   lastName?: string;
@@ -38,7 +38,7 @@ export interface IUser extends Document {
 
 const userSchema = new mongoose.Schema<IUser>(
   {
-    clerkId: { type: String, required: true, unique: true, index: true },
+    clerkId: { type: String, required: false, unique: true, sparse: true, index: true },
     email: { type: String, required: true, unique: true },
     firstName: { type: String },
     lastName: { type: String },
