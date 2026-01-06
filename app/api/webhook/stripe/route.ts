@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
               stripeCustomerId: session.customer as string,
               subscriptionStatus: 'active',
               subscriptionPlan: plan || 'monthly',
+              subscriptionPlatform: 'web',
             }
           );
         }
