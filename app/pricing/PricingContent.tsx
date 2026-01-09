@@ -17,19 +17,25 @@ export default function PricingContent() {
   const isTrialFlow = searchParams.get('trial') === 'true';
   const reason = searchParams.get('reason');
 
-  // Check if user already has access
+  // Check if user already has access (with polling for real-time updates)
   useEffect(() => {
     const checkAccess = async () => {
       try {
-        const response = await fetch('/api/check-access');
+        const response = await fetch('/api/check-access', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        });
         const data = await response.json();
         
         if (data.hasAccess) {
           setHasAccess(true);
           // Redirect users who already have access to dashboard
+          console.log('[Pricing] Access detected! Redirecting to dashboard...');
           setTimeout(() => {
             router.push('/dashboard');
-          }, 2000);
+          }, 1500);
         } else {
           setHasAccess(false);
         }
@@ -41,8 +47,20 @@ export default function PricingContent() {
       }
     };
 
+    // Initial check
     checkAccess();
-  }, [router]);
+
+    // Poll every 5 seconds to detect when admin grants access
+    const pollInterval = setInterval(() => {
+      if (!hasAccess) {
+        console.log('[Pricing] Polling access status...');
+        checkAccess();
+      }
+    }, 5000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(pollInterval);
+  }, [router, hasAccess]);
 
   // Stripe Price IDs - these should match your Stripe dashboard
   const plans = [

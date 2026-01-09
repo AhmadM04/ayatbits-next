@@ -25,6 +25,11 @@ export async function GET() {
       return NextResponse.json({ hasAccess: true, plan: 'admin' });
     }
 
+    // Check for direct access (admin-granted)
+    if (user.hasDirectAccess) {
+      return NextResponse.json({ hasAccess: true, plan: 'granted' });
+    }
+
     // Check for lifetime access
     if (
       user.subscriptionPlan === 'lifetime' && 

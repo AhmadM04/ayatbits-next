@@ -137,14 +137,21 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
     });
 
     await sendGrantEmail(updatedUser.email, duration);
+    
+    // Revalidate all relevant paths to clear cache
     revalidatePath('/admin');
+    revalidatePath('/dashboard');
+    revalidatePath('/pricing');
+    revalidatePath('/api/check-access');
     
     const action = duration === 'revoke' ? 'Revoked access for' : `Granted ${duration} access to`;
     const signUpUrl = `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/sign-up?email=${encodeURIComponent(email)}`;
     
+    console.log(`[Admin] ${action} ${updatedUser.email} - User should see access within 5 seconds`);
+    
     return { 
       success: true, 
-      message: `Successfully ${action} ${updatedUser.email}`,
+      message: `Successfully ${action} ${updatedUser.email}. User will see access within 5 seconds if they're on the pricing page.`,
       signUpUrl: duration !== 'revoke' ? signUpUrl : undefined
     };
   } catch (error) {
