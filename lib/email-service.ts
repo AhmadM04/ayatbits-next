@@ -22,7 +22,7 @@ export async function sendWaitlistWelcomeEmail({ email, firstName }: WaitlistWel
   }
 
   try {
-    const emailHtml = render(WaitlistWelcomeEmail({ firstName }));
+    const emailHtml = await render(WaitlistWelcomeEmail({ firstName }));
 
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
