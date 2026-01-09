@@ -725,7 +725,11 @@ export default function WordPuzzle({
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              onClick={() => setActiveHint(null)}
+              onClick={() => {
+                setActiveHint(null);
+                // Don't count dismissed tip - decrement used tips
+                setUsedTips((prev) => Math.max(0, prev - 1));
+              }}
               className="px-3 py-1.5 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 hover:bg-orange-500/30 transition-colors flex items-center gap-1.5"
               title="Dismiss hint"
             >

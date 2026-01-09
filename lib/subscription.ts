@@ -6,6 +6,11 @@ const DAY_IN_MS = 86_400_000;
  * Checks if a user has a valid active subscription or lifetime access.
  */
 export const checkSubscription = (user: IUser) => {
+  // Direct Access (Admin-granted bypass)
+  if (user.hasDirectAccess) {
+    return true;
+  }
+
   // Admin/Lifetime Access
   if (
     user.subscriptionPlan === 'lifetime' && 

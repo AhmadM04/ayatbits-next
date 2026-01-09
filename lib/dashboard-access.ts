@@ -144,21 +144,37 @@ export async function requireDashboardAccess() {
     const dbUser = await ensureDbUser(user); // ensureDbUser already calls connectDB()
     
     if (!dbUser) {
+      console.log('[requireDashboardAccess] No DB user found, redirecting to onboarding');
       redirect('/onboarding');
     }
 
+    console.log('[requireDashboardAccess] DB User found:', {
+      email: dbUser.email,
+      clerkId: dbUser.clerkId,
+      isAdmin: dbUser.isAdmin,
+      hasDirectAccess: dbUser.hasDirectAccess,
+      subscriptionPlan: dbUser.subscriptionPlan,
+      subscriptionStatus: dbUser.subscriptionStatus,
+      subscriptionEndDate: dbUser.subscriptionEndDate,
+      trialEndsAt: dbUser.trialEndsAt,
+    });
+
     // Admins always have access without subscription checks
     if (dbUser.isAdmin) {
+      console.log('[requireDashboardAccess] Admin user - access granted');
       return dbUser;
     }
 
     // Use the standard checkSubscription function
     const hasAccess = checkSubscription(dbUser);
+    console.log('[requireDashboardAccess] Subscription check result:', hasAccess);
 
     if (!hasAccess) {
+      console.log('[requireDashboardAccess] No access - redirecting to pricing');
       redirect('/pricing');
     }
 
+    console.log('[requireDashboardAccess] Access granted');
     return dbUser;
   } catch (error: any) {
     console.error('Dashboard access error:', error);

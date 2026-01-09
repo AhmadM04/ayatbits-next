@@ -47,6 +47,7 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
             subscriptionPlan: 'lifetime',
             subscriptionEndDate: null, 
             trialEndsAt: null,
+            hasDirectAccess: true,
           },
         };
         break;
@@ -58,6 +59,7 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
             subscriptionPlan: 'monthly',
             subscriptionEndDate: addMonths(now, 1),
             trialEndsAt: null,
+            hasDirectAccess: true,
           },
         };
         break;
@@ -69,6 +71,7 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
             subscriptionPlan: 'monthly',
             subscriptionEndDate: addMonths(now, 3),
             trialEndsAt: null,
+            hasDirectAccess: true,
           },
         };
         break;
@@ -80,6 +83,7 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
             subscriptionPlan: 'monthly',
             subscriptionEndDate: addMonths(now, 6),
             trialEndsAt: null,
+            hasDirectAccess: true,
           },
         };
         break;
@@ -91,6 +95,7 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
             subscriptionPlan: 'yearly',
             subscriptionEndDate: addMonths(now, 12),
             trialEndsAt: null,
+            hasDirectAccess: true,
           },
         };
         break;
@@ -101,6 +106,7 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
             subscriptionStatus: SubscriptionStatusEnum.INACTIVE,
             subscriptionEndDate: null,
             trialEndsAt: null,
+            hasDirectAccess: false,
           },
           $unset: { subscriptionPlan: 1 },
         };
