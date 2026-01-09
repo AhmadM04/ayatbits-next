@@ -45,7 +45,8 @@ export async function GET() {
       });
     }
 
-    const hasAccess = checkSubscription(dbUser);
+    // Admins always have access (matches requireDashboardAccess logic)
+    const hasAccess = dbUser.isAdmin || checkSubscription(dbUser);
 
     return NextResponse.json({
       authenticated: true,
@@ -72,6 +73,7 @@ export async function GET() {
       accessCheck: {
         hasAccess,
         checks: {
+          isAdmin: !!dbUser.isAdmin,
           hasDirectAccess: !!dbUser.hasDirectAccess,
           isLifetime: dbUser.subscriptionPlan === 'lifetime' && dbUser.subscriptionStatus === 'active',
           hasActiveSubscription: !!(
