@@ -32,15 +32,31 @@ A Next.js application for learning and memorizing Quranic verses through interac
    ```
 
 2. **Set up environment variables**:
-   Create `.env.local` with:
+   Create `.env.local` for development with:
    ```env
    MONGODB_URL="mongodb+srv://..."
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_key
-   CLERK_SECRET_KEY=your_clerk_secret
+   
+   # Development Clerk Keys (for local testing)
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_TEST=pk_test_your_clerk_key
+   CLERK_SECRET_KEY_TEST=sk_test_your_clerk_secret
+   
+   # Production Clerk Keys (for production deployment)
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_your_clerk_key
+   CLERK_SECRET_KEY=sk_live_your_clerk_secret
+   
+   # iOS Clerk (if applicable)
+   CLERK_PUBLISHABLE_KEY=your_ios_clerk_key
+   APPLE_BUNDLE_ID=com.your.app
+   
+   # Stripe
    STRIPE_SECRET_KEY=your_stripe_secret
    STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+   
+   # App URL
    NEXT_PUBLIC_APP_URL=http://localhost:3000
    ```
+   
+   **Note**: The app automatically uses `_TEST` keys in development and standard keys in production.
 
 3. **Run the development server**:
    ```bash

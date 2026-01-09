@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import '@/lib/clerk-config'; // Ensure Clerk is configured with the right keys
 
 const isPublicRoute = createRouteMatcher([
   '/',

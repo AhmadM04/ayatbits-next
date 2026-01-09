@@ -35,10 +35,21 @@ Go to your Clerk Dashboard and adjust bot protection settings:
 Ensure your `.env.local` has the correct Clerk keys:
 
 ```env
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_xxxxxxxx  # or pk_test_xxxxxxxx
-CLERK_SECRET_KEY=sk_live_xxxxxxxx  # or sk_test_xxxxxxxx
+# Development Keys (used in local environment)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_TEST=pk_test_xxxxxxxx
+CLERK_SECRET_KEY_TEST=sk_test_xxxxxxxx
+
+# Production Keys (used when NODE_ENV=production)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_xxxxxxxx
+CLERK_SECRET_KEY=sk_live_xxxxxxxx
+
+# App URL
 NEXT_PUBLIC_APP_URL=https://www.ayatbits.com  # or http://localhost:3000 for dev
 ```
+
+**Note**: The app automatically selects the correct keys based on `NODE_ENV`:
+- Development: Uses `_TEST` suffixed keys
+- Production: Uses standard keys (no suffix)
 
 ### 3. Clear Cache and Restart
 
