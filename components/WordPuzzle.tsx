@@ -17,7 +17,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { RefreshCw, CheckCircle2, Play, Pause, Volume2, Lightbulb, X } from 'lucide-react';
+import { RefreshCw, CheckCircle2, Play, Pause, Volume2, Lightbulb, X, Languages } from 'lucide-react';
 import {
   shuffleArray,
   tokenizeAyah,
@@ -34,6 +34,8 @@ interface WordPuzzleProps {
   onSolved?: (isCorrect: boolean) => void;
   onWordCorrect?: (wordIndex: number, word: string) => void;
   onMistakeLimitExceeded?: () => void;
+  transliteration?: string;
+  isLoadingTransliteration?: boolean;
 }
 
 const MAX_MISTAKES = 3;
@@ -292,6 +294,8 @@ export default function WordPuzzle({
   onSolved,
   onWordCorrect,
   onMistakeLimitExceeded,
+  transliteration = '',
+  isLoadingTransliteration = false,
 }: WordPuzzleProps) {
   const { showToast } = useToast();
   const originalTokens = useMemo(() => tokenizeAyah(ayahText), [ayahText]);
@@ -827,6 +831,30 @@ export default function WordPuzzle({
           {activeToken ? <DraggableWord token={activeToken} isOverlay /> : null}
         </DragOverlay>
       </DndContext>
+
+      {/* Transliteration Display */}
+      {transliteration && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-6 bg-teal-500/5 border border-teal-500/20 rounded-xl p-4"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <Languages className="w-4 h-4 text-teal-400" />
+            <span className="text-xs font-medium text-teal-400">Transliteration</span>
+          </div>
+          <p className="text-base text-gray-300 italic leading-relaxed">
+            {transliteration}
+          </p>
+        </motion.div>
+      )}
+
+      {isLoadingTransliteration && (
+        <div className="mt-6 bg-teal-500/5 border border-teal-500/20 rounded-xl p-4 flex items-center justify-center">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-teal-400 border-t-transparent" />
+          <span className="ml-2 text-sm text-gray-400">Loading transliteration...</span>
+        </div>
+      )}
     </div>
   );
 }

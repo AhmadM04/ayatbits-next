@@ -200,6 +200,26 @@ export default async function RootLayout({
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           />
+          {/* Suppress Next.js 15+ async params warnings from React DevTools */}
+          <Script
+            id="suppress-async-warnings"
+            strategy="beforeInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                if (typeof window !== 'undefined') {
+                  const originalError = console.error;
+                  console.error = (...args) => {
+                    const msg = args[0]?.toString() || '';
+                    // Filter out specific Next.js 15+ async params warnings
+                    if (msg.includes('params') && msg.includes('Promise') && msg.includes('React.use()')) return;
+                    if (msg.includes('searchParams') && msg.includes('Promise') && msg.includes('React.use()')) return;
+                    if (msg.includes('sync-dynamic-apis')) return;
+                    originalError.apply(console, args);
+                  };
+                }
+              `,
+            }}
+          />
           {/* Preconnect to external domains for performance */}
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

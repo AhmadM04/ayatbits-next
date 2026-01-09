@@ -82,6 +82,23 @@ export default async function PuzzlePage({
   // Remove bismillah from first ayah of surahs (except Al-Fatiha)
   const ayahText = cleanAyahText(rawAyahText, surahNum, ayahNum);
 
+  // Fetch transliteration if user preference is enabled
+  let initialTransliteration = '';
+  if (dbUser.showTransliteration) {
+    try {
+      const transliterationResponse = await fetch(
+        `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/en.transliteration`,
+        { next: { revalidate: 86400 } }
+      );
+      if (transliterationResponse.ok) {
+        const transliterationData = await transliterationResponse.json();
+        initialTransliteration = transliterationData.data?.text || '';
+      }
+    } catch (error) {
+      console.error('Failed to pre-fetch transliteration:', error);
+    }
+  }
+
   // Check if liked
   const likedAyat = await LikedAyat.findOne({
     userId: dbUser._id,
@@ -128,6 +145,8 @@ export default async function PuzzlePage({
       nextPuzzleAyahNumber={nextPuzzleAyahNumber}
       versePageUrl={versePageUrl}
       isLastAyahInSurah={isLastAyahInSurah}
+      initialTransliteration={initialTransliteration}
+      initialShowTransliteration={dbUser.showTransliteration || false}
     />
   );
 }

@@ -8,10 +8,12 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/pricing',
+  '/waitlist',
   '/manifest.json',
   '/manifest',
   '/api/webhook/(.*)', // Webhooks should be publicly accessible
   '/api/daily-quote', // Public API for daily quote
+  '/api/waitlist/(.*)', // Allow waitlist API to be public
 ]);
 
 // Allowed origins for CORS

@@ -9,10 +9,11 @@ import LikedAyat from './models/LikedAyat';
 import Trophy from './models/Trophy';
 import UserAchievement, { ACHIEVEMENTS } from './models/Achievement';
 import AdminGrantLog from './models/AdminGrantLog';
+import Waitlist from './models/Waitlist';
 
 // Export models and connection function
 export { connectDB };
-export { User, Juz, Surah, Puzzle, UserProgress, LikedAyat, Trophy, UserAchievement, ACHIEVEMENTS, AdminGrantLog };
+export { User, Juz, Surah, Puzzle, UserProgress, LikedAyat, Trophy, UserAchievement, ACHIEVEMENTS, AdminGrantLog, Waitlist };
 
 // Export types
 export type { IUser } from './models/User';
@@ -24,8 +25,10 @@ export type { ILikedAyat } from './models/LikedAyat';
 export type { ITrophy } from './models/Trophy';
 export type { IUserAchievement } from './models/Achievement';
 export type { IAdminGrantLog } from './models/AdminGrantLog';
+export type { IWaitlist } from './models/Waitlist';
 export { SubscriptionStatusEnum } from './models/User';
 export type { SubscriptionPlan } from './models/User';
 export { PuzzleType } from './models/Puzzle';
 export { ProgressStatus } from './models/UserProgress';
+export { WaitlistStatus } from './models/Waitlist';
 

@@ -18,6 +18,8 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@radix-ui/react-slot": "^1.2.4",
+    "@react-email/components": "^1.0.4",
+    "@react-email/render": "^2.0.2",
     "@stripe/stripe-js": "^8.5.3",
     "@types/canvas-confetti": "^1.9.0",
     "canvas-confetti": "^1.9.4",
@@ -32,6 +34,7 @@
     "next-intl": "^4.5.8",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "resend": "^6.7.0",
     "stripe": "^20.0.0",
     "tailwind-merge": "^3.4.0",
     "zustand": "^5.0.9"

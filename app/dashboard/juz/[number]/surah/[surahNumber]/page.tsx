@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Play, Heart, CheckCircle } from 'lucide-react';
 import VersePageClient from './VersePageClient';
 import TranslationDisplay from './TranslationDisplay';
+import TransliterationDisplay from './TransliterationDisplay';
 import AudioPlayer from './AudioPlayer';
 import AyahSelectorClient from './AyahSelectorClient';
 import LikeButton from './LikeButton';
@@ -79,6 +80,23 @@ export default async function SurahVersePage({
     }
   } catch (error) {
     console.error('Failed to pre-fetch translation:', error);
+  }
+
+  // Fetch transliteration if user preference is enabled
+  let initialTransliteration = '';
+  if (dbUser.showTransliteration) {
+    try {
+      const transliterationResponse = await fetch(
+        `https://api.alquran.cloud/v1/ayah/${parseInt(surahNumber)}:${selectedAyah}/en.transliteration`,
+        { next: { revalidate: 86400 } }
+      );
+      if (transliterationResponse.ok) {
+        const transliterationData = await transliterationResponse.json();
+        initialTransliteration = transliterationData.data?.text || '';
+      }
+    } catch (error) {
+      console.error('Failed to pre-fetch transliteration:', error);
+    }
   }
 
   const totalAyahs = puzzles.length;
@@ -209,6 +227,14 @@ export default async function SurahVersePage({
                 ayahNumber={selectedAyah}
                 selectedTranslation={selectedTranslation}
                 initialTranslation={initialTranslation}
+              />
+
+              {/* Transliteration */}
+              <TransliterationDisplay
+                surahNumber={parseInt(surahNumber)}
+                ayahNumber={selectedAyah}
+                initialTransliteration={initialTransliteration}
+                initialShowTransliteration={dbUser.showTransliteration || false}
               />
 
               {/* Start Puzzle Button - Redesigned */}

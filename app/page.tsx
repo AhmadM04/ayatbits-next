@@ -5,11 +5,12 @@ import Image from "next/image";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Puzzle, Trophy, Flame, Star, Sparkles } from "lucide-react";
+import { Puzzle, Trophy, Flame, Star, Sparkles, CheckCircle2, Quote } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import UserProfileSection from "@/components/UserProfileSection";
 import DemoPuzzle from "@/components/DemoPuzzle";
 import { QuranLoader } from "@/components/animations";
+import WaitlistForm from "@/components/WaitlistForm";
 
 // Floating Arabic letters/words for the background
 const floatingArabicWords = [
@@ -26,7 +27,7 @@ const floatingArabicWords = [
 ];
 
 // Component to check access and render appropriate button
-function DashboardButton({ size = "lg", className = "" }: { size?: "lg", className?: string }) {
+function DashboardButton({ size, className = "" }: { size?: "default" | "sm" | "lg" | "icon" | null, className?: string }) {
   const { isSignedIn, isLoaded } = useUser();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
@@ -177,7 +178,7 @@ export default function Home() {
           </header>
 
           <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Hero Section */}
+            {/* Hero Section with Integrated Waitlist */}
             <section className="py-20 md:py-32 text-center">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -197,29 +198,57 @@ export default function Home() {
                   </span>
                 </h1>
 
-                <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10">
-                  An interactive puzzle-based application designed to help you memorize
-                  and deeply understand Quranic verses through engaging gameplay.
+                <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-8">
+                  Join thousands of learners who are mastering Quranic verses through 
+                  interactive puzzles and engaging gameplay. Start your journey today!
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                {/* Waitlist Section - Prominent Hero CTA */}
+                <div className="max-w-2xl mx-auto">
                   <SignedOut>
-                    <SignInButton mode="modal">
-                      <Button size="lg" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-6 text-lg rounded-xl">
-                        Sign In
-                      </Button>
-                    </SignInButton>
-                    <SignUpButton mode="modal">
-                      <Button size="lg" className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-green-600/25">
-                        Start Free Trial
-                        <Flame className="w-5 h-5 ml-2" />
-                      </Button>
-                    </SignUpButton>
+                    {/* Waitlist Form */}
+                    <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
+                      <div className="text-center mb-6">
+                        <h3 className="text-xl font-semibold text-white mb-2">
+                          Join the Waitlist
+                        </h3>
+                        <p className="text-sm text-gray-400">
+                          Be the first to know when we launch. Get exclusive early access!
+                        </p>
+                      </div>
+                      
+                      <WaitlistForm source="hero-banner" />
+                      
+                      <div className="mt-6 flex flex-wrap justify-center gap-4 text-xs text-gray-500">
+                        <div className="flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                          <span>Free to join</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                          <span>Early access perks</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                          <span>Launch updates</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-center gap-4 text-sm text-gray-500 mt-6">
+                      <span>Already have an account?</span>
+                      <SignInButton mode="modal">
+                        <button className="text-green-400 hover:text-green-300 underline">
+                          Sign In
+                        </button>
+                      </SignInButton>
+                    </div>
                   </SignedOut>
+
+                  {/* CTA for Signed In Users */}
                   <SignedIn>
                     <DashboardButton 
-                      size="lg" 
-                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-green-600/25"
+                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-5 text-lg rounded-xl shadow-lg shadow-green-600/25 min-h-[56px]"
                     />
                   </SignedIn>
                 </div>
@@ -312,6 +341,73 @@ export default function Home() {
               </div>
             </section>
 
+            {/* Testimonials Section */}
+            <section className="py-20 border-t border-white/5">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-center mb-16"
+              >
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                  What Our <span className="text-green-500">Learners</span> Say
+                </h2>
+                <p className="text-gray-400 max-w-xl mx-auto">
+                  Real stories from people who are transforming their Quranic learning journey
+                </p>
+              </motion.div>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                {[
+                  {
+                    name: "Amina K.",
+                    role: "Student",
+                    text: "I finally memorized Surah Al-Mulk thanks to this! The puzzle format makes it so much easier to remember the order of words.",
+                    rating: 5,
+                  },
+                  {
+                    name: "Omar T.",
+                    role: "Teacher",
+                    text: "As a Quran teacher, I recommend this to all my students. The gamification keeps them motivated and engaged every day.",
+                    rating: 5,
+                  },
+                  {
+                    name: "Fatima R.",
+                    role: "Mother of 3",
+                    text: "My kids love the characters and streaks! It's turned Quran memorization into something they look forward to daily.",
+                    rating: 5,
+                  },
+                ].map((testimonial, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 hover:border-green-500/30 transition-all duration-300"
+                  >
+                    <div className="flex gap-1 mb-4">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} className="w-5 h-5 fill-yellow-500 text-yellow-500" />
+                      ))}
+                    </div>
+                    <Quote className="w-8 h-8 text-green-500/30 mb-3" />
+                    <p className="text-gray-300 mb-6 leading-relaxed">"{testimonial.text}"</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500/30 to-emerald-500/30 flex items-center justify-center text-white font-semibold">
+                        {testimonial.name[0]}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-white">{testimonial.name}</div>
+                        <div className="text-sm text-gray-500">{testimonial.role}</div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </section>
+
             {/* Demo Section */}
             <section className="py-20 border-t border-white/5">
               <motion.div
@@ -344,37 +440,57 @@ export default function Home() {
               </motion.div>
             </section>
 
-            {/* CTA Section */}
+            {/* Final CTA Section - Strong Call to Action */}
             <section className="py-20 border-t border-white/5">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="text-center bg-gradient-to-br from-green-900/20 to-emerald-900/10 border border-green-500/20 rounded-3xl p-8 sm:p-12"
+                className="relative overflow-hidden bg-gradient-to-br from-green-900/30 to-emerald-900/20 border border-green-500/30 rounded-3xl p-8 sm:p-16"
               >
-                <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-                  Ready to Begin Your Journey?
-                </h2>
-                <p className="text-gray-400 max-w-lg mx-auto mb-8">
-                  Join thousands of learners who are mastering the Quran through interactive puzzles.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                {/* Background decoration */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl" />
+                
+                <div className="relative z-10 text-center">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
+                    Ready to Transform Your
+                    <br />
+                    <span className="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                      Quranic Learning Journey?
+                    </span>
+                  </h2>
+                  
+                  <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto mb-10">
+                    Don't wait! Join thousands of learners who are already memorizing 
+                    the Quran the fun way. Start your journey today.
+                  </p>
+
+                  {/* Primary CTA */}
                   <SignedOut>
-                    <SignInButton mode="modal">
-                      <Button size="lg" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-6 text-lg rounded-xl">
-                        Sign In
-                      </Button>
-                    </SignInButton>
-                    <SignUpButton mode="modal">
-                      <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg rounded-xl">
-                        Start Your Free Trial
-                      </Button>
-                    </SignUpButton>
+                    <div className="mb-8">
+                      <WaitlistForm source="final-cta" />
+                    </div>
+                    
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                      <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        <span>Free to join</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        <span>No credit card required</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        <span>Start immediately</span>
+                      </div>
+                    </div>
                   </SignedOut>
+
                   <SignedIn>
                     <DashboardButton 
-                      size="lg" 
-                      className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg rounded-xl"
+                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-12 py-6 text-xl rounded-xl shadow-xl shadow-green-600/30 font-semibold min-h-[60px]"
                     />
                   </SignedIn>
                 </div>
@@ -395,11 +511,12 @@ export default function Home() {
                     className="h-8 w-auto"
                   />
                 </Link>
-                <div className="flex gap-6 text-sm text-gray-500">
-                  <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-                  <Link href="/faq" className="hover:text-white transition-colors">FAQ</Link>
-                  <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
-                </div>
+              <div className="flex gap-6 text-sm text-gray-500">
+                <Link href="/waitlist" className="hover:text-white transition-colors">Waitlist</Link>
+                <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+                <Link href="/faq" className="hover:text-white transition-colors">FAQ</Link>
+                <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
+              </div>
                 <div className="text-sm text-gray-600 text-center sm:text-right">
                   <p className="mb-1">© 2026 AyatBits. All rights reserved.</p>
                   <p className="text-xs text-gray-700">

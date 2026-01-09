@@ -1,4 +1,5 @@
 import AdminForm from './AdminForm';
+import WaitlistManagement from './WaitlistManagement';
 import { grantPremiumAccess, type GrantDuration } from '@/app/actions/admin';
 import { requireAdminUser } from '@/lib/dashboard-access';
 
@@ -36,9 +37,23 @@ export default async function AdminPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Admin Panel</h1>
+      <div className="max-w-6xl mx-auto space-y-12">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Admin Panel</h1>
+          <p className="text-gray-400">Manage user access and waitlist signups</p>
+        </div>
+
+        {/* Grant Access Section */}
+        <section>
+          <h2 className="text-2xl font-bold mb-6">Grant Premium Access</h2>
         <AdminForm action={grantAccessAction} />
+        </section>
+
+        {/* Waitlist Management Section */}
+        <section>
+          <h2 className="text-2xl font-bold mb-6">Waitlist Management</h2>
+          <WaitlistManagement />
+        </section>
       </div>
     </div>
   );

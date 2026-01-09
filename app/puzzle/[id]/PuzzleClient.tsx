@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import WordPuzzle from '@/components/WordPuzzle';
 import { useToast } from '@/components/Toast';
 import { apiPost, apiDelete, getErrorMessage, NetworkError } from '@/lib/api-client';
-import { ArrowLeft, Heart } from 'lucide-react';
+import { ArrowLeft, Heart, Languages } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,6 +25,8 @@ interface PuzzleClientProps {
   nextPuzzleAyahNumber?: number | null;
   versePageUrl: string;
   isLastAyahInSurah?: boolean;
+  initialTransliteration?: string;
+  initialShowTransliteration?: boolean;
 }
 
 export default function PuzzleClient({
@@ -36,9 +38,14 @@ export default function PuzzleClient({
   nextPuzzleAyahNumber,
   versePageUrl,
   isLastAyahInSurah = false,
+  initialTransliteration = '',
+  initialShowTransliteration = false,
 }: PuzzleClientProps) {
   const [isLiked, setIsLiked] = useState(initialIsLiked);
   const [showSuccessTransition, setShowSuccessTransition] = useState(false);
+  const [showTransliteration, setShowTransliteration] = useState(initialShowTransliteration);
+  const [transliteration, setTransliteration] = useState(initialTransliteration);
+  const [isLoadingTransliteration, setIsLoadingTransliteration] = useState(false);
   const { showToast } = useToast();
   const router = useRouter();
   
@@ -65,6 +72,41 @@ export default function PuzzleClient({
       } else {
         showToast(getErrorMessage(error), 'error');
       }
+    }
+  };
+
+  const handleToggleTransliteration = async () => {
+    const newValue = !showTransliteration;
+    setShowTransliteration(newValue);
+
+    // If enabling and we don't have transliteration yet, fetch it
+    if (newValue && !transliteration && puzzle.surah?.number && puzzle.content?.ayahNumber) {
+      setIsLoadingTransliteration(true);
+      try {
+        const response = await fetch(
+          `/api/verse/transliteration?surah=${puzzle.surah.number}&ayah=${puzzle.content.ayahNumber}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setTransliteration(data.transliteration || '');
+        }
+      } catch (error) {
+        console.error('Failed to fetch transliteration:', error);
+        showToast('Failed to load transliteration', 'error');
+      } finally {
+        setIsLoadingTransliteration(false);
+      }
+    }
+
+    // Save preference to backend
+    try {
+      await fetch('/api/user/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ showTransliteration: newValue }),
+      });
+    } catch (error) {
+      console.error('Failed to save transliteration preference:', error);
     }
   };
 
@@ -243,16 +285,29 @@ export default function PuzzleClient({
                 </p>
               </div>
             </div>
-            <button
-              onClick={handleToggleLike}
-              className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
-                isLiked
-                  ? 'bg-red-500/20 text-red-400'
-                  : 'bg-white/5 text-gray-400 hover:bg-white/10'
-              }`}
-            >
-              <Heart className={`w-5 h-5 ${isLiked ? 'fill-red-400' : ''}`} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleToggleTransliteration}
+                className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
+                  showTransliteration
+                    ? 'bg-teal-500/20 text-teal-400'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                }`}
+                title={showTransliteration ? 'Hide transliteration' : 'Show transliteration'}
+              >
+                <Languages className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleToggleLike}
+                className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
+                  isLiked
+                    ? 'bg-red-500/20 text-red-400'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                }`}
+              >
+                <Heart className={`w-5 h-5 ${isLiked ? 'fill-red-400' : ''}`} />
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -269,6 +324,8 @@ export default function PuzzleClient({
               handleSolved(isCorrect);
             }}
             onMistakeLimitExceeded={handleMistakeLimitExceeded}
+            transliteration={showTransliteration ? transliteration : ''}
+            isLoadingTransliteration={isLoadingTransliteration}
           />
         </div>
       </main>
