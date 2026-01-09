@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { connectDB, User, SubscriptionStatusEnum } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
     const { userId } = await auth();
@@ -23,7 +26,6 @@ export async function GET() {
     }
 
     // Check for lifetime access
-    // Fix: Check subscriptionPlan, not subscriptionStatus, for 'lifetime' string
     if (
       user.subscriptionPlan === 'lifetime' && 
       user.subscriptionStatus === SubscriptionStatusEnum.ACTIVE
@@ -41,7 +43,6 @@ export async function GET() {
     }
 
     // Check trial
-    // Fix: Use trialEndsAt instead of trialEndDate
     if (
       user.trialEndsAt &&
       new Date(user.trialEndsAt) > new Date()
@@ -55,3 +56,4 @@ export async function GET() {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

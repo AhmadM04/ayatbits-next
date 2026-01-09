@@ -11,54 +11,22 @@
  */
 
 /**
- * Get the appropriate Clerk publishable key based on environment
- */
-export function getClerkPublishableKey(): string {
-  const isProduction = process.env.NODE_ENV === 'production';
-  
-  if (isProduction) {
-    // In production, use the standard NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-    return process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 
-           process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_TEST || 
-           '';
-  }
-  
-  // In development, use the _TEST version
-  return process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_TEST || 
-         'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k';
-}
-
-/**
- * Get the appropriate Clerk secret key based on environment
- * This is used server-side only
- */
-export function getClerkSecretKey(): string {
-  const isProduction = process.env.NODE_ENV === 'production';
-  
-  if (isProduction) {
-    // In production, use the standard CLERK_SECRET_KEY
-    return process.env.CLERK_SECRET_KEY || 
-           process.env.CLERK_SECRET_KEY_TEST || 
-           '';
-  }
-  
-  // In development, use the _TEST version
-  return process.env.CLERK_SECRET_KEY_TEST || '';
-}
-
-/**
- * Set the appropriate Clerk secret key in the environment
- * This ensures Clerk SDK uses the correct key
+ * Configure Clerk environment to use test keys in development
+ * This runs automatically when this module is imported
  */
 export function configureClerkEnvironment(): void {
   // Only run on server-side
   if (typeof window === 'undefined') {
-    const secretKey = getClerkSecretKey();
+    // Prefer _TEST keys (for development), fall back to standard keys (for production)
+    const secretKey = process.env.CLERK_SECRET_KEY_TEST || process.env.CLERK_SECRET_KEY;
+    const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_TEST || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
     
-    // If we're in development and only have _TEST keys, set them to the standard env vars
-    // so Clerk SDK can find them
-    if (process.env.NODE_ENV !== 'production' && secretKey && !process.env.CLERK_SECRET_KEY) {
+    // Set the standard env vars so Clerk SDK can find them
+    if (secretKey) {
       process.env.CLERK_SECRET_KEY = secretKey;
+    }
+    if (publishableKey) {
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = publishableKey;
     }
   }
 }

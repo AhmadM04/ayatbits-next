@@ -4,7 +4,6 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ToastProvider } from "@/components/Toast";
 import { ThemeProvider } from "@/lib/theme-context";
 import { I18nProvider } from "@/lib/i18n";
-import { getClerkPublishableKey } from "@/lib/clerk-config";
 import "./globals.css";
 import Script from "next/script";
 
@@ -184,9 +183,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // In dev mode, prefer test keys. In production, use production keys.
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_TEST || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
+  
   return (
     <ClerkProvider
-      publishableKey={getClerkPublishableKey()}
+      publishableKey={clerkKey}
       appearance={clerkAppearance}
       signInUrl="/sign-in"
       signUpUrl="/sign-up"

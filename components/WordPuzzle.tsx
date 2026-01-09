@@ -17,12 +17,13 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { RefreshCw, CheckCircle2, Play, Pause, Volume2 } from 'lucide-react';
+import { RefreshCw, CheckCircle2, Play, Pause, Volume2, Lightbulb, X } from 'lucide-react';
 import {
   shuffleArray,
   tokenizeAyah,
   type WordToken,
 } from '@/lib/puzzle-logic';
+import { calculateTipsForAyah } from '@/lib/tips-system';
 import { useToast } from '@/components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -43,11 +44,13 @@ function DropSlot({
   expectedToken,
   placedToken,
   isActive,
+  isHinted = false,
 }: {
   position: number;
   expectedToken: WordToken;
   placedToken: WordToken | null;
   isActive: boolean;
+  isHinted?: boolean;
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: `slot-${position}`,
@@ -58,17 +61,46 @@ function DropSlot({
     <motion.div
       ref={setNodeRef}
       initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: position * 0.02, duration: 0.15 }}
+      animate={
+        isHinted
+          ? {
+              opacity: 1,
+              scale: 1,
+              x: [0, -4, 4, -4, 4, 0],
+              boxShadow: [
+                '0 0 0 rgba(16, 185, 129, 0)',
+                '0 0 20px rgba(16, 185, 129, 0.5)',
+                '0 0 0 rgba(16, 185, 129, 0)',
+              ],
+            }
+          : { opacity: 1, scale: 1 }
+      }
+      transition={
+        isHinted
+          ? {
+              x: {
+                duration: 0.6,
+                repeat: Infinity,
+                repeatDelay: 0.5,
+              },
+              boxShadow: {
+                duration: 1.5,
+                repeat: Infinity,
+              },
+            }
+          : { delay: position * 0.02, duration: 0.15 }
+      }
       className={`
         min-w-[50px] min-h-[44px] px-3 py-2 rounded-lg
         flex items-center justify-center
         transition-all duration-150
         ${placedToken 
           ? 'bg-green-500/20 border-2 border-green-500' 
-          : isOver && isActive
+          : isHinted
             ? 'bg-green-500/30 border-2 border-green-400 scale-105'
-            : 'bg-[#1a1a1a]/50 border-2 border-dashed border-white/20'
+            : isOver && isActive
+              ? 'bg-green-500/30 border-2 border-green-400 scale-105'
+              : 'bg-[#1a1a1a]/50 border-2 border-dashed border-white/20'
         }
       `}
     >
@@ -94,11 +126,13 @@ function DraggableWord({
   token,
   isOverlay = false,
   isShaking = false,
+  isHinted = false,
   onClick,
 }: {
   token: WordToken;
   isOverlay?: boolean;
   isShaking?: boolean;
+  isHinted?: boolean;
   onClick?: (id: string) => void;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -119,8 +153,35 @@ function DraggableWord({
       {...attributes}
       {...listeners}
       onClick={handleClick}
-      animate={isShaking ? { x: [0, -8, 8, -8, 8, 0] } : {}}
-      transition={{ duration: 0.3 }}
+      animate={
+        isHinted
+          ? {
+              x: [0, -4, 4, -4, 4, 0],
+              boxShadow: [
+                '0 0 0 rgba(16, 185, 129, 0)',
+                '0 0 20px rgba(16, 185, 129, 0.5)',
+                '0 0 0 rgba(16, 185, 129, 0)',
+              ],
+            }
+          : isShaking
+            ? { x: [0, -8, 8, -8, 8, 0] }
+            : {}
+      }
+      transition={
+        isHinted
+          ? {
+              x: {
+                duration: 0.6,
+                repeat: Infinity,
+                repeatDelay: 0.5,
+              },
+              boxShadow: {
+                duration: 1.5,
+                repeat: Infinity,
+              },
+            }
+          : { duration: 0.3 }
+      }
       className={`
         relative cursor-pointer
         px-4 py-2.5 rounded-xl
@@ -130,7 +191,9 @@ function DraggableWord({
         ${
           isOverlay
             ? 'bg-[#1a1a1a] border-2 border-green-500 shadow-xl text-white scale-105 z-50'
-            : 'bg-[#1a1a1a] border border-white/10 text-gray-200 hover:bg-[#222] hover:border-white/20 active:scale-95'
+            : isHinted
+              ? 'bg-[#1a1a1a] border-2 border-green-400 text-green-300 shadow-lg shadow-green-500/30 scale-105'
+              : 'bg-[#1a1a1a] border border-white/10 text-gray-200 hover:bg-[#222] hover:border-white/20 active:scale-95'
         }
       `}
     >
@@ -144,11 +207,13 @@ function AnswerArea({
   placedTokens,
   activeTokenId,
   isPlayingRecitation,
+  hintedSlotPosition,
 }: {
   correctTokens: WordToken[];
   placedTokens: Map<number, WordToken>;
   activeTokenId: string | null;
   isPlayingRecitation: boolean;
+  hintedSlotPosition: number | null;
 }) {
   return (
     <div
@@ -170,6 +235,7 @@ function AnswerArea({
             expectedToken={token}
             placedToken={placedTokens.get(index) || null}
             isActive={activeTokenId !== null}
+            isHinted={hintedSlotPosition === index}
           />
         ))}
       </div>
@@ -185,10 +251,12 @@ function AnswerArea({
 function WordBank({
   bank,
   shakingIds,
+  hintedTokenId,
   onSelect,
 }: {
   bank: WordToken[];
   shakingIds: Set<string>;
+  hintedTokenId: string | null;
   onSelect?: (id: string) => void;
 }) {
   return (
@@ -206,6 +274,7 @@ function WordBank({
               <DraggableWord
                 token={token}
                 isShaking={shakingIds.has(token.id)}
+                isHinted={hintedTokenId === token.id}
                 onClick={onSelect}
               />
             </motion.div>
@@ -239,6 +308,12 @@ export default function WordPuzzle({
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const [audioError, setAudioError] = useState<string | null>(null);
   
+  // Tips system state
+  const [availableTips, setAvailableTips] = useState(0);
+  const [usedTips, setUsedTips] = useState(0);
+  const [consecutiveMistakes, setConsecutiveMistakes] = useState(0);
+  const [activeHint, setActiveHint] = useState<{ tokenId: string; slotPosition: number } | null>(null);
+  
   const pendingToast = useRef<{ message: string; type: 'success' | 'error'; duration: number } | null>(null);
   const onSolvedRef = useRef(onSolved);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -269,6 +344,13 @@ export default function WordPuzzle({
     setHasCompleted(false);
     setShakingIds(new Set());
     pendingToast.current = null;
+    
+    // Reset tips system
+    const tipsCount = calculateTipsForAyah(originalTokens.length);
+    setAvailableTips(tipsCount);
+    setUsedTips(0);
+    setConsecutiveMistakes(0);
+    setActiveHint(null);
     
     // Stop audio on reset
     if (audioRef.current) {
@@ -427,6 +509,42 @@ export default function WordPuzzle({
       });
     }, 300);
 
+    // Track consecutive mistakes for tips system
+    setConsecutiveMistakes((prevConsecutive) => {
+      const nextConsecutive = prevConsecutive + 1;
+      
+      // After 2nd consecutive mistake, trigger hint if available
+      if (nextConsecutive === 2 && usedTips < availableTips) {
+        // Find the first empty slot and the correct word for it
+        let firstEmptySlot = -1;
+        for (let i = 0; i < originalTokens.length; i++) {
+          if (!placedTokens.has(i)) {
+            firstEmptySlot = i;
+            break;
+          }
+        }
+        
+        if (firstEmptySlot !== -1) {
+          const correctToken = originalTokens[firstEmptySlot];
+          const correctWordInBank = bank.find(t => t.norm === correctToken.norm);
+          
+          if (correctWordInBank) {
+            setActiveHint({
+              tokenId: correctWordInBank.id,
+              slotPosition: firstEmptySlot,
+            });
+            setUsedTips((prev) => prev + 1);
+            
+            setTimeout(() => {
+              showToast('💡 Hint: Watch the highlighted word and slot!', 'success', 3000);
+            }, 100);
+          }
+        }
+      }
+      
+      return nextConsecutive;
+    });
+
     setMistakeCount((prev) => {
       const next = prev + 1;
       
@@ -445,7 +563,7 @@ export default function WordPuzzle({
       }
       return next;
     });
-  }, [onMistakeLimitExceeded, showToast]);
+  }, [onMistakeLimitExceeded, showToast, usedTips, availableTips, originalTokens, placedTokens, bank]);
 
   // Try to place a token on a specific slot
   // Returns true if placed successfully, false otherwise
@@ -473,6 +591,17 @@ export default function WordPuzzle({
 
       setBank((prev) => prev.filter((t) => t.id !== token.id));
       onWordCorrect?.(slotPosition, token.text);
+      
+      // Reset consecutive mistakes on correct placement
+      setConsecutiveMistakes(0);
+      
+      // Clear hint if this was the hinted word
+      setActiveHint((prev) => {
+        if (prev && prev.tokenId === token.id) {
+          return null;
+        }
+        return prev;
+      });
       
       return true;
     },
@@ -567,7 +696,7 @@ export default function WordPuzzle({
       
       {/* Compact header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <div className={`px-3 py-1.5 rounded-full border flex items-center gap-2 ${
             hasExceededMistakeLimit 
               ? 'bg-red-500/20 border-red-500/30' 
@@ -577,6 +706,34 @@ export default function WordPuzzle({
               Mistakes: {mistakeCount}/{MAX_MISTAKES}
             </span>
           </div>
+          
+          {/* Tips Counter */}
+          <div className={`px-3 py-1.5 rounded-full border flex items-center gap-1.5 ${
+            usedTips >= availableTips
+              ? 'bg-gray-500/10 border-gray-500/30'
+              : 'bg-green-500/10 border-green-500/30'
+          }`}>
+            <Lightbulb className={`w-3.5 h-3.5 ${usedTips >= availableTips ? 'text-gray-500' : 'text-green-400'}`} />
+            <span className={`text-xs font-medium ${usedTips >= availableTips ? 'text-gray-500' : 'text-green-400'}`}>
+              Tips: {usedTips}/{availableTips}
+            </span>
+          </div>
+          
+          {/* Dismiss Hint Button - only shows when hint is active */}
+          {activeHint && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              onClick={() => setActiveHint(null)}
+              className="px-3 py-1.5 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 hover:bg-orange-500/30 transition-colors flex items-center gap-1.5"
+              title="Dismiss hint"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span className="text-xs font-medium">Dismiss</span>
+            </motion.button>
+          )}
+          
           <button
             onClick={resetState}
             className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 transition-colors"
@@ -653,10 +810,12 @@ export default function WordPuzzle({
           placedTokens={placedTokens}
           activeTokenId={activeToken?.id || null}
           isPlayingRecitation={isPlayingRecitation}
+          hintedSlotPosition={activeHint?.slotPosition ?? null}
         />
         <WordBank
           bank={bank}
           shakingIds={shakingIds}
+          hintedTokenId={activeHint?.tokenId ?? null}
           onSelect={handleBankClick}
         />
 
