@@ -84,8 +84,8 @@ async function grantAccess(email: string, duration: GrantDuration = 'lifetime') 
       case 'lifetime':
         user.subscriptionPlan = 'lifetime';
         user.subscriptionStatus = SubscriptionStatusEnum.ACTIVE;
-        user.subscriptionEndDate = null;
-        user.trialEndsAt = null;
+        user.subscriptionEndDate = undefined;
+        user.trialEndsAt = undefined;
         user.hasDirectAccess = true;
         break;
 
@@ -93,7 +93,7 @@ async function grantAccess(email: string, duration: GrantDuration = 'lifetime') 
         user.subscriptionPlan = 'monthly';
         user.subscriptionStatus = SubscriptionStatusEnum.ACTIVE;
         user.subscriptionEndDate = addMonths(now, 1);
-        user.trialEndsAt = null;
+        user.trialEndsAt = undefined;
         user.hasDirectAccess = true;
         break;
 
@@ -101,7 +101,7 @@ async function grantAccess(email: string, duration: GrantDuration = 'lifetime') 
         user.subscriptionPlan = 'monthly';
         user.subscriptionStatus = SubscriptionStatusEnum.ACTIVE;
         user.subscriptionEndDate = addMonths(now, 3);
-        user.trialEndsAt = null;
+        user.trialEndsAt = undefined;
         user.hasDirectAccess = true;
         break;
 
@@ -109,7 +109,7 @@ async function grantAccess(email: string, duration: GrantDuration = 'lifetime') 
         user.subscriptionPlan = 'monthly';
         user.subscriptionStatus = SubscriptionStatusEnum.ACTIVE;
         user.subscriptionEndDate = addMonths(now, 6);
-        user.trialEndsAt = null;
+        user.trialEndsAt = undefined;
         user.hasDirectAccess = true;
         break;
 
@@ -117,15 +117,15 @@ async function grantAccess(email: string, duration: GrantDuration = 'lifetime') 
         user.subscriptionPlan = 'yearly';
         user.subscriptionStatus = SubscriptionStatusEnum.ACTIVE;
         user.subscriptionEndDate = addMonths(now, 12);
-        user.trialEndsAt = null;
+        user.trialEndsAt = undefined;
         user.hasDirectAccess = true;
         break;
 
       case 'revoke':
         user.subscriptionStatus = SubscriptionStatusEnum.INACTIVE;
         user.subscriptionPlan = undefined;
-        user.subscriptionEndDate = null;
-        user.trialEndsAt = null;
+        user.subscriptionEndDate = undefined;
+        user.trialEndsAt = undefined;
         user.hasDirectAccess = false;
         break;
     }
