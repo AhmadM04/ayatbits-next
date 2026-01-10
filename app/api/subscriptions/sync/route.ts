@@ -64,6 +64,33 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Check if user has admin-granted access before syncing iOS subscription
+    const existingUser = await User.findOne({ clerkId: user.id });
+    
+    if (!existingUser) {
+      return NextResponse.json(
+        { error: 'User not found in database' },
+        { status: 404 }
+      );
+    }
+
+    // If user has admin-granted access, don't overwrite with iOS subscription
+    if (existingUser.hasDirectAccess) {
+      console.warn(`⚠️ User ${user.id} has admin-granted access (hasDirectAccess=true). Skipping iOS subscription sync to preserve admin access.`);
+      
+      return NextResponse.json({ 
+        success: true,
+        message: 'Admin-granted access is active. iOS subscription not required.',
+        subscription: {
+          status: existingUser.subscriptionStatus,
+          plan: existingUser.subscriptionPlan,
+          endDate: existingUser.subscriptionEndDate,
+          platform: existingUser.subscriptionPlatform,
+          hasDirectAccess: true
+        }
+      });
+    }
+
     // Update user subscription in MongoDB
     const updatedUser = await User.findOneAndUpdate(
       { clerkId: user.id },

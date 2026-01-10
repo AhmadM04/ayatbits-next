@@ -50,13 +50,13 @@ export default function PricingContent() {
     // Initial check
     checkAccess();
 
-    // Poll every 5 seconds to detect when admin grants access
+    // Poll every 2 seconds to detect when admin grants access (more responsive)
     const pollInterval = setInterval(() => {
       if (!hasAccess) {
         console.log('[Pricing] Polling access status...');
         checkAccess();
       }
-    }, 5000);
+    }, 2000); // Reduced from 5000ms to 2000ms for faster detection
 
     // Cleanup interval on unmount
     return () => clearInterval(pollInterval);
@@ -100,7 +100,22 @@ export default function PricingContent() {
 
   const handleSubscribe = async (priceId: string) => {
     setLoadingPlan(priceId);
+    
     try {
+      // Final access check before initiating checkout (prevents race conditions)
+      const accessCheck = await fetch('/api/check-access', {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' },
+      });
+      const accessData = await accessCheck.json();
+      
+      if (accessData.hasAccess) {
+        console.log('[Pricing] Access detected during checkout initiation - redirecting to dashboard');
+        alert('You already have access to AyatBits Pro!');
+        window.location.href = '/dashboard';
+        return;
+      }
+
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -346,7 +361,12 @@ export default function PricingContent() {
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-100%] group-hover:translate-x-[100%] animate-shimmer" />
                       <span className="relative z-10 flex items-center justify-center gap-2">
-                        {loadingPlan === plan.priceId ? (
+                        {checkingAccess ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Checking access...
+                          </>
+                        ) : loadingPlan === plan.priceId ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
                             Processing...

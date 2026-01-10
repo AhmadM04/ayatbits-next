@@ -30,11 +30,39 @@ export async function POST(req: NextRequest) {
     const dbUser = await User.findOne({ clerkId: user.id });
     
     if (dbUser) {
-      const hasAccess = checkSubscription(dbUser);
-      const isAdmin = dbUser.isAdmin;
+      // Explicit check for admin-granted access
+      if (dbUser.hasDirectAccess) {
+        console.log(`[Checkout Blocked] User ${user.id} (${dbUser.email}) has admin-granted access (hasDirectAccess=true)`);
+        return NextResponse.json(
+          { 
+            error: 'You already have lifetime access granted by admin', 
+            redirect: '/dashboard' 
+          },
+          { status: 400 }
+        );
+      }
 
-      // If user already has access via subscription, trial, lifetime, or is admin, prevent checkout
-      if (hasAccess || isAdmin) {
+      // Check for admin status
+      if (dbUser.isAdmin) {
+        console.log(`[Checkout Blocked] User ${user.id} (${dbUser.email}) is an admin`);
+        return NextResponse.json(
+          { 
+            error: 'Admins have automatic access', 
+            redirect: '/dashboard' 
+          },
+          { status: 400 }
+        );
+      }
+
+      // Check for active subscription or trial
+      const hasAccess = checkSubscription(dbUser);
+      if (hasAccess) {
+        console.log(`[Checkout Blocked] User ${user.id} (${dbUser.email}) already has active subscription/trial`, {
+          subscriptionStatus: dbUser.subscriptionStatus,
+          subscriptionPlan: dbUser.subscriptionPlan,
+          subscriptionEndDate: dbUser.subscriptionEndDate,
+          trialEndsAt: dbUser.trialEndsAt
+        });
         return NextResponse.json(
           { 
             error: 'You already have access to AyatBits Pro', 
@@ -78,6 +106,21 @@ export async function POST(req: NextRequest) {
       ];
     }
 
+    // Final access check right before creating Stripe session (double-check for race conditions)
+    const finalCheck = await User.findOne({ clerkId: user.id });
+    if (finalCheck) {
+      if (finalCheck.hasDirectAccess || finalCheck.isAdmin || checkSubscription(finalCheck)) {
+        console.log(`[Checkout Blocked - Final Check] User ${user.id} gained access during checkout flow`);
+        return NextResponse.json(
+          { 
+            error: 'You already have access to AyatBits Pro', 
+            redirect: '/dashboard' 
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     // Create Stripe Checkout Session
     const sessionParams: any = {
       payment_method_types: ['card'],
@@ -99,6 +142,7 @@ export async function POST(req: NextRequest) {
 
     const session = await stripe.checkout.sessions.create(sessionParams);
 
+    console.log(`[Checkout Success] Created Stripe session ${session.id} for user ${user.id}`);
     return NextResponse.json({ url: session.url });
   } catch (error: any) {
     console.error('Stripe checkout error:', error);

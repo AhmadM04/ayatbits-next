@@ -30,9 +30,36 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
-        const { userId, plan } = session.metadata || {};
+        const { clerkId: userId, plan } = session.metadata || {};
 
         if (userId && session.customer) {
+          // Check if user has admin-granted access before updating
+          const existingUser = await User.findOne({ clerkId: userId });
+          
+          if (existingUser?.hasDirectAccess) {
+            console.warn(`[Stripe Webhook] ⚠️ User ${userId} (${existingUser.email}) has admin-granted access (hasDirectAccess=true). Canceling Stripe subscription to prevent billing.`);
+            
+            // Save customer ID for reference, but don't overwrite subscription details
+            await User.findOneAndUpdate(
+              { clerkId: userId },
+              {
+                stripeCustomerId: session.customer as string,
+              }
+            );
+
+            // Cancel the Stripe subscription immediately so they're not charged
+            try {
+              if (session.subscription) {
+                await stripe.subscriptions.cancel(session.subscription as string);
+                console.log(`[Stripe Webhook] ✅ Canceled Stripe subscription ${session.subscription} for user ${userId} with admin access`);
+              }
+            } catch (error) {
+              console.error(`[Stripe Webhook] ❌ Failed to cancel subscription for user ${userId}:`, error);
+            }
+            
+            break;
+          }
+
           await User.findOneAndUpdate(
             { clerkId: userId },
             {
@@ -42,6 +69,7 @@ export async function POST(request: NextRequest) {
               subscriptionPlatform: 'web',
             }
           );
+          console.log(`[Stripe Webhook] Updated subscription for user ${userId}`);
         }
         break;
       }
@@ -50,6 +78,14 @@ export async function POST(request: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         
+        // Check if user has admin-granted access before updating
+        const existingUser = await User.findOne({ stripeCustomerId: customerId });
+        
+        if (existingUser?.hasDirectAccess) {
+          console.warn(`[Stripe Webhook] User with Stripe customer ${customerId} has admin-granted access (hasDirectAccess=true). Skipping subscription status update.`);
+          break;
+        }
+        
         await User.findOneAndUpdate(
           { stripeCustomerId: customerId },
           {
@@ -57,6 +93,7 @@ export async function POST(request: NextRequest) {
                                subscription.status === 'trialing' ? 'trialing' : 'inactive',
           }
         );
+        console.log(`[Stripe Webhook] Updated subscription status for customer ${customerId} to ${subscription.status}`);
         break;
       }
 
@@ -64,10 +101,19 @@ export async function POST(request: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         
+        // Check if user has admin-granted access before updating
+        const existingUser = await User.findOne({ stripeCustomerId: customerId });
+        
+        if (existingUser?.hasDirectAccess) {
+          console.warn(`[Stripe Webhook] User with Stripe customer ${customerId} has admin-granted access (hasDirectAccess=true). Skipping subscription deletion update.`);
+          break;
+        }
+        
         await User.findOneAndUpdate(
           { stripeCustomerId: customerId },
           { subscriptionStatus: 'canceled' }
         );
+        console.log(`[Stripe Webhook] Marked subscription as canceled for customer ${customerId}`);
         break;
       }
 
@@ -75,10 +121,19 @@ export async function POST(request: NextRequest) {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId = invoice.customer as string;
         
+        // Check if user has admin-granted access before updating
+        const existingUser = await User.findOne({ stripeCustomerId: customerId });
+        
+        if (existingUser?.hasDirectAccess) {
+          console.warn(`[Stripe Webhook] User with Stripe customer ${customerId} has admin-granted access (hasDirectAccess=true). Skipping payment failure update.`);
+          break;
+        }
+        
         await User.findOneAndUpdate(
           { stripeCustomerId: customerId },
           { subscriptionStatus: 'past_due' }
         );
+        console.log(`[Stripe Webhook] Marked subscription as past_due for customer ${customerId}`);
         break;
       }
     }
