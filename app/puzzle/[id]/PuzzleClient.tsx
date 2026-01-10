@@ -27,6 +27,7 @@ interface PuzzleClientProps {
   isLastAyahInSurah?: boolean;
   initialTransliteration?: string;
   initialShowTransliteration?: boolean;
+  initialWordTransliterations?: Array<{ text: string; transliteration: string }>;
 }
 
 export default function PuzzleClient({
@@ -40,11 +41,13 @@ export default function PuzzleClient({
   isLastAyahInSurah = false,
   initialTransliteration = '',
   initialShowTransliteration = false,
+  initialWordTransliterations = [],
 }: PuzzleClientProps) {
   const [isLiked, setIsLiked] = useState(initialIsLiked);
   const [showSuccessTransition, setShowSuccessTransition] = useState(false);
   const [showTransliteration, setShowTransliteration] = useState(initialShowTransliteration);
   const [transliteration, setTransliteration] = useState(initialTransliteration);
+  const [wordTransliterations, setWordTransliterations] = useState<Array<{ text: string; transliteration: string }>>(initialWordTransliterations);
   const [isLoadingTransliteration, setIsLoadingTransliteration] = useState(false);
   const { showToast } = useToast();
   const router = useRouter();
@@ -79,16 +82,25 @@ export default function PuzzleClient({
     const newValue = !showTransliteration;
     setShowTransliteration(newValue);
 
-    // If enabling and we don't have transliteration yet, fetch it
-    if (newValue && !transliteration && puzzle.surah?.number && puzzle.content?.ayahNumber) {
+    // If enabling and we don't have word transliterations yet, fetch them
+    if (newValue && wordTransliterations.length === 0 && puzzle.surah?.number && puzzle.content?.ayahNumber) {
       setIsLoadingTransliteration(true);
       try {
         const response = await fetch(
-          `/api/verse/transliteration?surah=${puzzle.surah.number}&ayah=${puzzle.content.ayahNumber}`
+          `/api/verse/words?surah=${puzzle.surah.number}&ayah=${puzzle.content.ayahNumber}`
         );
         if (response.ok) {
           const data = await response.json();
-          setTransliteration(data.transliteration || '');
+          setWordTransliterations(data.words || []);
+        }
+        
+        // Also fetch full transliteration for display at bottom
+        const translitResponse = await fetch(
+          `/api/verse/transliteration?surah=${puzzle.surah.number}&ayah=${puzzle.content.ayahNumber}`
+        );
+        if (translitResponse.ok) {
+          const translitData = await translitResponse.json();
+          setTransliteration(translitData.transliteration || '');
         }
       } catch (error) {
         console.error('Failed to fetch transliteration:', error);
@@ -325,6 +337,7 @@ export default function PuzzleClient({
             }}
             onMistakeLimitExceeded={handleMistakeLimitExceeded}
             transliteration={showTransliteration ? transliteration : ''}
+            wordTransliterations={showTransliteration ? wordTransliterations : []}
             isLoadingTransliteration={isLoadingTransliteration}
           />
         </div>

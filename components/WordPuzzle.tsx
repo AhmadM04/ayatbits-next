@@ -35,6 +35,7 @@ interface WordPuzzleProps {
   onWordCorrect?: (wordIndex: number, word: string) => void;
   onMistakeLimitExceeded?: () => void;
   transliteration?: string;
+  wordTransliterations?: Array<{ text: string; transliteration: string }>;
   isLoadingTransliteration?: boolean;
 }
 
@@ -47,12 +48,14 @@ function DropSlot({
   placedToken,
   isActive,
   isHinted = false,
+  showTransliteration = false,
 }: {
   position: number;
   expectedToken: WordToken;
   placedToken: WordToken | null;
   isActive: boolean;
   isHinted?: boolean;
+  showTransliteration?: boolean;
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: `slot-${position}`,
@@ -93,8 +96,8 @@ function DropSlot({
           : { delay: position * 0.02, duration: 0.15 }
       }
       className={`
-        min-w-[50px] min-h-[44px] px-3 py-2 rounded-lg
-        flex items-center justify-center
+        relative min-w-[50px] min-h-[44px] px-3 py-2 rounded-lg
+        flex flex-col items-center justify-center
         transition-all duration-150
         ${placedToken 
           ? 'bg-green-500/20 border-2 border-green-500' 
@@ -107,14 +110,26 @@ function DropSlot({
       `}
     >
       {placedToken ? (
-        <motion.span
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="text-base font-medium font-arabic text-green-400 flex items-center gap-1"
-        >
-          {placedToken.text}
-          <CheckCircle2 className="w-3 h-3 text-green-400 hidden sm:block" />
-        </motion.span>
+        <motion.div className="flex flex-col items-center group">
+          <motion.span
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="text-base font-medium font-arabic text-green-400 flex items-center gap-1"
+          >
+            {placedToken.text}
+            <CheckCircle2 className="w-3 h-3 text-green-400 hidden sm:block" />
+          </motion.span>
+          {showTransliteration && placedToken.transliteration && (
+            <motion.span
+              initial={{ opacity: 0, y: -10 }}
+              whileHover={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="absolute top-full mt-1 text-xs text-gray-400 italic whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
+            >
+              {placedToken.transliteration}
+            </motion.span>
+          )}
+        </motion.div>
       ) : (
         <span className="text-gray-600 text-xs">
           {isOver && isActive ? '✓' : (position + 1)}
@@ -129,12 +144,14 @@ function DraggableWord({
   isOverlay = false,
   isShaking = false,
   isHinted = false,
+  showTransliteration = false,
   onClick,
 }: {
   token: WordToken;
   isOverlay?: boolean;
   isShaking?: boolean;
   isHinted?: boolean;
+  showTransliteration?: boolean;
   onClick?: (id: string) => void;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -185,7 +202,7 @@ function DraggableWord({
           : { duration: 0.3 }
       }
       className={`
-        relative cursor-pointer
+        relative cursor-pointer group
         px-4 py-2.5 rounded-xl
         text-lg font-medium font-arabic text-center
         transition-all duration-150 select-none
@@ -200,6 +217,16 @@ function DraggableWord({
       `}
     >
       {token.text}
+      {showTransliteration && token.transliteration && !isOverlay && (
+        <motion.span
+          initial={{ opacity: 0, y: -10 }}
+          whileHover={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs text-gray-400 italic whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
+        >
+          {token.transliteration}
+        </motion.span>
+      )}
     </motion.div>
   );
 }
@@ -210,12 +237,14 @@ function AnswerArea({
   activeTokenId,
   isPlayingRecitation,
   hintedSlotPosition,
+  showTransliteration,
 }: {
   correctTokens: WordToken[];
   placedTokens: Map<number, WordToken>;
   activeTokenId: string | null;
   isPlayingRecitation: boolean;
   hintedSlotPosition: number | null;
+  showTransliteration: boolean;
 }) {
   return (
     <div
@@ -238,6 +267,7 @@ function AnswerArea({
             placedToken={placedTokens.get(index) || null}
             isActive={activeTokenId !== null}
             isHinted={hintedSlotPosition === index}
+            showTransliteration={showTransliteration}
           />
         ))}
       </div>
@@ -254,11 +284,13 @@ function WordBank({
   bank,
   shakingIds,
   hintedTokenId,
+  showTransliteration,
   onSelect,
 }: {
   bank: WordToken[];
   shakingIds: Set<string>;
   hintedTokenId: string | null;
+  showTransliteration: boolean;
   onSelect?: (id: string) => void;
 }) {
   return (
@@ -277,6 +309,7 @@ function WordBank({
                 token={token}
                 isShaking={shakingIds.has(token.id)}
                 isHinted={hintedTokenId === token.id}
+                showTransliteration={showTransliteration}
                 onClick={onSelect}
               />
             </motion.div>
@@ -295,10 +328,27 @@ export default function WordPuzzle({
   onWordCorrect,
   onMistakeLimitExceeded,
   transliteration = '',
+  wordTransliterations = [],
   isLoadingTransliteration = false,
 }: WordPuzzleProps) {
   const { showToast } = useToast();
-  const originalTokens = useMemo(() => tokenizeAyah(ayahText), [ayahText]);
+  
+  // Tokenize ayah and map transliterations to tokens
+  const originalTokens = useMemo(() => {
+    const tokens = tokenizeAyah(ayahText);
+    
+    // Map transliterations to tokens if available
+    if (wordTransliterations.length > 0) {
+      // Match transliterations to tokens by index
+      tokens.forEach((token, index) => {
+        if (index < wordTransliterations.length) {
+          token.transliteration = wordTransliterations[index].transliteration;
+        }
+      });
+    }
+    
+    return tokens;
+  }, [ayahText, wordTransliterations]);
 
   const [bank, setBank] = useState<WordToken[]>([]);
   const [placedTokens, setPlacedTokens] = useState<Map<number, WordToken>>(new Map());
@@ -819,11 +869,13 @@ export default function WordPuzzle({
           activeTokenId={activeToken?.id || null}
           isPlayingRecitation={isPlayingRecitation}
           hintedSlotPosition={activeHint?.slotPosition ?? null}
+          showTransliteration={wordTransliterations.length > 0}
         />
         <WordBank
           bank={bank}
           shakingIds={shakingIds}
           hintedTokenId={activeHint?.tokenId ?? null}
+          showTransliteration={wordTransliterations.length > 0}
           onSelect={handleBankClick}
         />
 

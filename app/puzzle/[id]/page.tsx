@@ -84,8 +84,11 @@ export default async function PuzzlePage({
 
   // Fetch transliteration if user preference is enabled
   let initialTransliteration = '';
+  let initialWordTransliterations: Array<{ text: string; transliteration: string }> = [];
+  
   if (dbUser.showTransliteration) {
     try {
+      // Fetch full-ayah transliteration
       const transliterationResponse = await fetch(
         `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/en.transliteration`,
         { next: { revalidate: 86400 } }
@@ -93,6 +96,20 @@ export default async function PuzzlePage({
       if (transliterationResponse.ok) {
         const transliterationData = await transliterationResponse.json();
         initialTransliteration = transliterationData.data?.text || '';
+      }
+      
+      // Fetch word-by-word transliteration from Quran.com
+      const wordsResponse = await fetch(
+        `https://api.quran.com/api/v4/verses/by_key/${surahNum}:${ayahNum}?words=true&word_fields=transliteration,text_uthmani`,
+        { next: { revalidate: 86400 } }
+      );
+      if (wordsResponse.ok) {
+        const wordsData = await wordsResponse.json();
+        const words = wordsData.verse?.words || [];
+        initialWordTransliterations = words.map((word: any) => ({
+          text: word.text_uthmani || '',
+          transliteration: word.transliteration?.text || '',
+        }));
       }
     } catch (error) {
       console.error('Failed to pre-fetch transliteration:', error);
@@ -146,6 +163,7 @@ export default async function PuzzlePage({
       versePageUrl={versePageUrl}
       isLastAyahInSurah={isLastAyahInSurah}
       initialTransliteration={initialTransliteration}
+      initialWordTransliterations={initialWordTransliterations}
       initialShowTransliteration={dbUser.showTransliteration || false}
     />
   );

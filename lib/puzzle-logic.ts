@@ -8,6 +8,7 @@ export type WordToken = {
   text: string;
   norm: string;
   position: number;
+  transliteration?: string;
 };
 
 export type PuzzleValidationResult = {
