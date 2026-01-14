@@ -337,6 +337,14 @@ export default function WordPuzzle({
   const originalTokens = useMemo(() => {
     const tokens = tokenizeAyah(ayahText);
     
+    console.log('[INIT] Original tokens created:', tokens.length);
+    console.log('[INIT] Token details:', tokens.map(t => ({ 
+      id: t.id, 
+      text: t.text, 
+      norm: t.norm, 
+      position: t.position 
+    })));
+    
     // Map transliterations to tokens if available
     if (wordTransliterations.length > 0) {
       // Match transliterations to tokens by index
@@ -625,18 +633,31 @@ export default function WordPuzzle({
     (token: WordToken, slotPosition: number): boolean => {
       // Check if slot is already filled
       if (placedTokens.has(slotPosition)) {
+        console.log('[PLACEMENT] Slot already filled:', { slotPosition });
         return false;
       }
 
       // Check if this token is correct for THIS specific slot
       const expectedToken = originalTokens[slotPosition];
+      
+      console.log('[PLACEMENT] Attempting placement:', {
+        slotPosition,
+        token: { id: token.id, text: token.text, norm: token.norm, position: token.position },
+        expected: { id: expectedToken.id, text: expectedToken.text, norm: expectedToken.norm, position: expectedToken.position },
+        normMatch: token.norm === expectedToken.norm,
+        tokenNormBytes: [...token.norm].map(c => c.charCodeAt(0)),
+        expectedNormBytes: [...expectedToken.norm].map(c => c.charCodeAt(0)),
+      });
+      
       if (token.norm !== expectedToken.norm) {
         // Wrong token for this slot - count as mistake
+        console.log('[PLACEMENT] ❌ REJECTED - norm mismatch');
         registerMistake(token.id);
         return false;
       }
 
       // Correct! Place the token
+      console.log('[PLACEMENT] ✅ ACCEPTED - placing token');
       setPlacedTokens((prev) => {
         const next = new Map(prev);
         next.set(slotPosition, token);

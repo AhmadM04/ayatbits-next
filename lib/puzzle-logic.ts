@@ -36,27 +36,54 @@ export function shuffleArray<T>(input: T[]): T[] {
  */
 export function normalizeArabic(input: string): string {
   if (!input) return '';
+  
+  const original = input;
   let out = input.normalize('NFKD');
-  // Remove tashkeel and Quranic annotation marks
+  
+  // Remove tashkeel and Quranic annotation marks (all diacritics)
   out = out.replace(/[\u064B-\u065F\u0610-\u061A\u06D6-\u06ED]/g, '');
-  // Remove kashida
+  
+  // Remove kashida (tatweel)
   out = out.replace(/\u0640/g, '');
-  // Remove zero-width characters
-  out = out.replace(/[\u200c\u200d\u200e\u200f\ufeff]/g, '');
+  
+  // Remove zero-width characters and invisible formatting
+  out = out.replace(/[\u200c\u200d\u200e\u200f\ufeff\u2060\u2061\u2062\u2063]/g, '');
+  
   // Normalize Alef forms to bare Alef
   out = out.replace(/[\u0622\u0623\u0625\u0671]/g, '\u0627');
+  
   // Normalize Lam-Alef ligatures to Lam + Alef
   out = out.replace(/[\ufefb\ufefc\ufef7\ufef8\ufef5\ufef6]/g, '\u0644\u0627');
+  
   // Normalize Alef Maqsura to Ya
   out = out.replace(/\u0649/g, '\u064A');
+  
   // Normalize Teh Marbuta to Heh
   out = out.replace(/\u0629/g, '\u0647');
+  
   // Strip Arabic punctuation/marks
   out = out.replace(/[\u061B\u061F\u060C\u066B\u066C\u0670]/g, '');
-  // Collapse whitespace
+  
+  // Collapse whitespace and trim
   out = out.replace(/\s+/g, ' ').trim();
-  // NFC
-  return out.normalize('NFC');
+  
+  // Final NFC normalization for consistent comparison
+  const normalized = out.normalize('NFC');
+  
+  // Debug logging for normalization differences
+  if (original !== normalized && process.env.NODE_ENV === 'development') {
+    const changed = original !== normalized;
+    if (changed) {
+      console.log('[NORMALIZE]', {
+        original,
+        normalized,
+        originalBytes: [...original].map(c => c.charCodeAt(0).toString(16)),
+        normalizedBytes: [...normalized].map(c => c.charCodeAt(0).toString(16)),
+      });
+    }
+  }
+  
+  return normalized;
 }
 
 /**
@@ -225,6 +252,9 @@ export function tokenizeAyah(ayahText: string): WordToken[] {
   let tokenCounter = 0;
   const tokens: WordToken[] = [];
   
+  // Track word occurrences for debugging duplicates
+  const wordNormMap = new Map<string, number>();
+  
   for (let i = 0; i < processedParts.length; i++) {
     const word = processedParts[i];
     
@@ -232,21 +262,55 @@ export function tokenizeAyah(ayahText: string): WordToken[] {
     if (i === 0 && firstWordIsMuqattaat) {
       const letters = separateMuqattaatLetters(word);
       for (const letter of letters) {
-        tokens.push({
+        const norm = normalizeArabic(letter);
+        const count = (wordNormMap.get(norm) || 0) + 1;
+        wordNormMap.set(norm, count);
+        
+        const token = {
           id: `token-${tokenCounter++}-${order}`,
           text: letter,
-          norm: normalizeArabic(letter),
+          norm,
           position: order++,
-        });
+        };
+        tokens.push(token);
+        
+        if (count > 1) {
+          console.log(`[DUPLICATE] Token created (${count}x):`, { 
+            id: token.id, 
+            text: token.text, 
+            norm: token.norm,
+            position: token.position 
+          });
+        }
       }
     } else {
-      tokens.push({
+      const norm = normalizeArabic(word);
+      const count = (wordNormMap.get(norm) || 0) + 1;
+      wordNormMap.set(norm, count);
+      
+      const token = {
         id: `token-${tokenCounter++}-${order}`,
         text: word,
-        norm: normalizeArabic(word),
+        norm,
         position: order++,
-      });
+      };
+      tokens.push(token);
+      
+      if (count > 1) {
+        console.log(`[DUPLICATE] Token created (${count}x):`, { 
+          id: token.id, 
+          text: token.text, 
+          norm: token.norm,
+          position: token.position 
+        });
+      }
     }
+  }
+  
+  // Log summary of duplicates
+  const duplicates = Array.from(wordNormMap.entries()).filter(([_, count]) => count > 1);
+  if (duplicates.length > 0) {
+    console.log('[TOKENIZATION] Duplicate words found:', duplicates.map(([norm, count]) => `"${norm}" (${count}x)`).join(', '));
   }
 
   return tokens;

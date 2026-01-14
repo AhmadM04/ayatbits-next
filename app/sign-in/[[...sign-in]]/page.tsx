@@ -47,6 +47,8 @@ export default function SignInPage() {
                 formButtonPrimary: "bg-green-600 hover:bg-green-700 text-white",
                 socialButtonsBlockButton: "bg-white/10 hover:bg-white/20 border border-white/20 text-white",
                 socialButtonsBlockButtonText: "text-white font-medium",
+                alternativeMethodsBlockButton: "bg-white/10 hover:bg-white/20 border border-white/20 text-white",
+                alternativeMethodsBlockButtonText: "text-white font-medium",
                 footerActionLink: "text-green-500 hover:text-green-400",
                 identityPreviewText: "text-white",
                 identityPreviewEditButton: "text-green-500 hover:text-green-400",
