@@ -16,13 +16,19 @@ interface WaitlistWelcomeEmailParams {
  * Send a welcome email to a new waitlist subscriber
  */
 export async function sendWaitlistWelcomeEmail({ email, firstName }: WaitlistWelcomeEmailParams) {
+  console.log('[Email Service] sendWaitlistWelcomeEmail called with:', { email, firstName });
+  
   if (!resend) {
     console.warn('[Email Service] Resend API key not configured. Skipping email.');
     return { success: false, error: 'Email service not configured' };
   }
 
+  console.log('[Email Service] Resend client is configured, attempting to send email...');
+  console.log('[Email Service] FROM_EMAIL:', FROM_EMAIL);
+
   try {
     const emailHtml = await render(WaitlistWelcomeEmail({ firstName }));
+    console.log('[Email Service] Email HTML rendered successfully');
 
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -33,13 +39,16 @@ export async function sendWaitlistWelcomeEmail({ email, firstName }: WaitlistWel
 
     if (error) {
       console.error('[Email Service] Error sending welcome email:', error);
+      console.error('[Email Service] Error details:', JSON.stringify(error));
       return { success: false, error: error.message };
     }
 
     console.log('[Email Service] Welcome email sent successfully:', data?.id);
+    console.log('[Email Service] Email data:', JSON.stringify(data));
     return { success: true, emailId: data?.id };
   } catch (error) {
     console.error('[Email Service] Unexpected error sending email:', error);
+    console.error('[Email Service] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return { success: false, error: 'Failed to send email' };
   }
 }

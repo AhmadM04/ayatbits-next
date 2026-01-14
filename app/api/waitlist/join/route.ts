@@ -37,10 +37,12 @@ function isDisposableEmail(email: string): boolean {
  * Join the waitlist
  */
 export async function POST(request: NextRequest) {
+  console.log('[Waitlist API] POST request received');
   try {
     // Get request data
     const body = await request.json();
     const { firstName, email, source = 'web' } = body;
+    console.log('[Waitlist API] Request body:', { firstName, email: email?.substring(0, 3) + '***', source });
 
     // Validation
     if (!firstName || typeof firstName !== 'string' || firstName.trim().length < 2) {
@@ -82,6 +84,7 @@ export async function POST(request: NextRequest) {
     const existingEntry = await Waitlist.findOne({ email: normalizedEmail });
 
     if (existingEntry) {
+      console.log('[Waitlist API] Email already exists in waitlist, returning early');
       // Return success even if already exists (don't reveal if email is in system)
       return NextResponse.json({
         success: true,
@@ -89,6 +92,8 @@ export async function POST(request: NextRequest) {
         alreadyExists: true,
       });
     }
+    
+    console.log('[Waitlist API] Email is new, creating waitlist entry');
 
     // Collect metadata
     const clientIP = getClientIP(request);
@@ -114,10 +119,12 @@ export async function POST(request: NextRequest) {
       source,
       route: '/api/waitlist/join',
     });
+    console.log('[Waitlist API] Waitlist entry created successfully, initiating email send');
 
     // Send welcome email (async, don't wait)
     sendWaitlistWelcomeEmail({ email: normalizedEmail, firstName: normalizedFirstName }).catch((err) => {
       logger.error('Error sending waitlist welcome email', err, { email: normalizedEmail });
+      console.error('[Waitlist API] Email sending error caught:', err);
     });
 
     // Notify admin (async, don't wait)
