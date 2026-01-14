@@ -15,20 +15,13 @@ import {
   useDroppable,
   useDraggable,
 } from '@dnd-kit/core';
+import { tokenizeAyah, type WordToken } from '@/lib/puzzle-logic';
 
-// Demo words for the puzzle (Surah Al-Fatiha verse 1)
-const DEMO_WORDS = [
-  { id: '1', text: 'بِسْمِ', position: 0 },
-  { id: '2', text: 'ٱللَّهِ', position: 1 },
-  { id: '3', text: 'ٱلرَّحْمَٰنِ', position: 2 },
-  { id: '4', text: 'ٱلرَّحِيمِ', position: 3 },
-];
+// Demo ayah text for the puzzle (Surah Al-Fatiha verse 1)
+const DEMO_AYAH = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
 
-interface WordToken {
-  id: string;
-  text: string;
-  position: number;
-}
+// Generate demo words using tokenization (ensures norm is included)
+const DEMO_WORDS = tokenizeAyah(DEMO_AYAH);
 
 // Draggable word button
 function DraggableWord({ word, isActive }: { word: WordToken; isActive: boolean }) {
@@ -130,7 +123,7 @@ export default function DemoPuzzle() {
 
   // Check for completion
   useEffect(() => {
-    if (placedWords.size === 4) {
+    if (placedWords.size === DEMO_WORDS.length) {
       setIsComplete(true);
     }
   }, [placedWords]);
@@ -169,9 +162,10 @@ export default function DemoPuzzle() {
         return;
       }
 
-      // Check if the word is correct for this position
-      if (word.position === targetPosition) {
-        // Correct placement
+      // Check if the word is correct for this position (compare normalized text)
+      const expectedWord = DEMO_WORDS[targetPosition];
+      if (expectedWord && word.norm === expectedWord.norm) {
+        // Correct placement - word matches expected word at this position
         setPlacedWords(prev => {
           const next = new Map(prev);
           next.set(targetPosition, word);
@@ -192,7 +186,7 @@ export default function DemoPuzzle() {
 
     // Find the first empty slot
     let targetPosition = -1;
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < DEMO_WORDS.length; i++) {
       if (!placedWords.has(i)) {
         targetPosition = i;
         break;
@@ -201,8 +195,9 @@ export default function DemoPuzzle() {
 
     if (targetPosition === -1) return;
 
-    // Check if correct
-    if (word.position === targetPosition) {
+    // Check if correct (compare normalized text)
+    const expectedWord = DEMO_WORDS[targetPosition];
+    if (expectedWord && word.norm === expectedWord.norm) {
       setPlacedWords(prev => {
         const next = new Map(prev);
         next.set(targetPosition, word);
@@ -246,7 +241,7 @@ export default function DemoPuzzle() {
           </div>
 
           <div className="text-xs text-gray-500">
-            {placedWords.size}/4
+            {placedWords.size}/{DEMO_WORDS.length}
           </div>
         </div>
 
@@ -254,7 +249,7 @@ export default function DemoPuzzle() {
         <div className="h-1 bg-white/5 rounded-full overflow-hidden mb-4">
           <motion.div
             className="h-full bg-green-500"
-            animate={{ width: `${(placedWords.size / 4) * 100}%` }}
+            animate={{ width: `${(placedWords.size / DEMO_WORDS.length) * 100}%` }}
             transition={{ duration: 0.3 }}
           />
         </div>
@@ -265,7 +260,7 @@ export default function DemoPuzzle() {
           className="min-h-[80px] p-4 rounded-xl border-2 border-dashed border-white/10 bg-white/[0.02] mb-4"
         >
           <div className="flex flex-wrap gap-2 justify-start">
-            {Array.from({ length: 4 }).map((_, index) => (
+            {Array.from({ length: DEMO_WORDS.length }).map((_, index) => (
               <DropSlot
                 key={`slot-${index}`}
                 index={index}
