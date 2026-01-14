@@ -190,6 +190,23 @@ html {
   filter: brightness(0) invert(1);
 }
 
+/* Clerk Alternative Methods Button Overrides */
+.cl-alternativeMethodsBlockButton {
+  color: white !important;
+}
+
+.cl-alternativeMethodsBlockButtonText {
+  color: white !important;
+}
+
+.cl-alternativeMethodsBlockButton span {
+  color: white !important;
+}
+
+.cl-alternativeMethodsBlockButtonArrow {
+  color: white !important;
+}
+
 /* Shimmer animation for buttons */
 @keyframes shimmer {
   0% {

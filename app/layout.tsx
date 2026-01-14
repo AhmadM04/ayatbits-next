@@ -136,6 +136,9 @@ const clerkAppearance: any = {
     headerSubtitle: "text-gray-400",
     socialButtonsBlockButton: "bg-white/10 hover:bg-white/20 border border-white/20 text-white",
     socialButtonsBlockButtonText: "text-white",
+    alternativeMethodsBlockButton: "bg-white/10 hover:bg-white/20 border border-white/20 text-white",
+    alternativeMethodsBlockButtonText: "text-white font-medium",
+    alternativeMethodsBlockButtonArrow: "text-white",
     formButtonPrimary: "bg-green-600 hover:bg-green-700 text-white",
     formFieldInput: "bg-[#111] border-white/20 text-white",
     formFieldLabel: "text-gray-400",
@@ -147,6 +150,9 @@ const clerkAppearance: any = {
     alertText: "text-gray-300",
     formFieldSuccessText: "text-green-500",
     formFieldErrorText: "text-red-500",
+    dividerText: "text-gray-400",
+    dividerLine: "bg-white/10",
+    formFieldInputShowPasswordButton: "text-gray-400 hover:text-white",
   },
 };
 
