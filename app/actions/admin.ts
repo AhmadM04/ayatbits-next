@@ -3,6 +3,8 @@
 import { connectDB, User, SubscriptionStatusEnum, AdminGrantLog } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { getAdminUser } from '@/lib/dashboard-access';
+import { logger } from '@/lib/logger';
+import { securityLogger } from '@/lib/security-logger';
 
 export type GrantDuration =
   | 'lifetime'
@@ -20,7 +22,7 @@ function addMonths(base: Date, months: number) {
 
 async function sendGrantEmail(to: string, duration: GrantDuration) {
   // Stub for email notification; replace with real provider (e.g., SendGrid, SES)
-  console.log(`[grantPremiumAccess] Email to ${to} for ${duration}`);
+  logger.debug('Grant email sent', { to, grantDuration: duration });
 }
 
 export async function grantPremiumAccess(email: string, duration: GrantDuration) {
@@ -147,7 +149,11 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
     const action = duration === 'revoke' ? 'Revoked access for' : `Granted ${duration} access to`;
     const signUpUrl = `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/sign-up?email=${encodeURIComponent(email)}`;
     
-    console.log(`[Admin] ${action} ${updatedUser.email} - User should see access within 5 seconds`);
+    securityLogger.logAdminAction(action, {
+      email: updatedUser.email,
+      grantDuration: duration,
+      adminEmail: adminUser.email,
+    });
     
     return { 
       success: true, 
@@ -155,9 +161,12 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
       signUpUrl: duration !== 'revoke' ? signUpUrl : undefined
     };
   } catch (error) {
-    console.error('Admin grant error:', error);
+    logger.error('Admin grant error', error as Error, {
+      email,
+      grantDuration: duration,
+      adminEmail: adminUser?.email,
+    });
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Error details:', errorMessage);
     return { 
       success: false, 
       error: `Database connection failed: ${errorMessage}` 

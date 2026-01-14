@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { connectDB, User } from '@/lib/db';
 import { checkSubscription } from './subscription';
 import { currentUser } from '@clerk/nextjs/server';
+import { logger } from './logger';
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || '')
   .split(',')
@@ -37,17 +38,19 @@ async function ensureDbUser(clerkUser: Awaited<ReturnType<typeof currentUser>>) 
 
     // 2) If not found, try merge by email (case-insensitive) and attach new clerkId
     if (!dbUser && emailLower) {
-      console.log(`[ensureDbUser] User not found by clerkId. Searching by email: ${emailLower}`);
+      logger.debug('User not found by clerkId, searching by email', { email: emailLower });
       dbUser = await User.findOne({ email: { $regex: new RegExp(`^${emailLower}$`, 'i') } });
       if (dbUser) {
-        console.log(`[ensureDbUser] Found existing user by email! Merging accounts...`);
-        console.log(`[ensureDbUser] User _id: ${dbUser._id}, existing clerkId: ${dbUser.clerkId || 'NULL'}`);
-        console.log(`[ensureDbUser] Attaching new clerkId: ${clerkUser.id}`);
+        logger.info('Merging existing user account', {
+          userId: clerkUser.id,
+          email: emailLower,
+          existingClerkId: dbUser.clerkId || 'NULL',
+        });
         dbUser.clerkId = clerkUser.id as string;
         await dbUser.save();
-        console.log(`[ensureDbUser] ✅ Account merged successfully!`);
+        logger.info('Account merged successfully', { userId: clerkUser.id, email: emailLower });
       } else {
-        console.log(`[ensureDbUser] No existing user found by email. Will create new user.`);
+        logger.debug('No existing user found, will create new', { email: emailLower });
       }
     }
 

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { connectDB, User } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { securityLogger } from '@/lib/security-logger';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
   apiVersion: '2025-11-17.clover' as any,
@@ -21,7 +23,10 @@ export async function POST(request: NextRequest) {
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
     } catch (err: any) {
-      console.error('Webhook signature verification failed:', err.message);
+      securityLogger.logWebhookSignatureFailure({
+        route: '/api/webhook/stripe',
+        error: err.message,
+      });
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
@@ -37,7 +42,12 @@ export async function POST(request: NextRequest) {
           const existingUser = await User.findOne({ clerkId: userId });
           
           if (existingUser?.hasDirectAccess) {
-            console.warn(`[Stripe Webhook] ⚠️ User ${userId} (${existingUser.email}) has admin-granted access (hasDirectAccess=true). Canceling Stripe subscription to prevent billing.`);
+            logger.warn('User with admin access attempted Stripe checkout', {
+              userId,
+              email: existingUser.email,
+              route: '/api/webhook/stripe',
+              event: 'checkout.session.completed',
+            });
             
             // Save customer ID for reference, but don't overwrite subscription details
             await User.findOneAndUpdate(
@@ -51,10 +61,17 @@ export async function POST(request: NextRequest) {
             try {
               if (session.subscription) {
                 await stripe.subscriptions.cancel(session.subscription as string);
-                console.log(`[Stripe Webhook] ✅ Canceled Stripe subscription ${session.subscription} for user ${userId} with admin access`);
+                logger.info('Canceled Stripe subscription for user with admin access', {
+                  userId,
+                  subscriptionId: session.subscription,
+                  route: '/api/webhook/stripe',
+                });
               }
             } catch (error) {
-              console.error(`[Stripe Webhook] ❌ Failed to cancel subscription for user ${userId}:`, error);
+              logger.error('Failed to cancel subscription', error as Error, {
+                userId,
+                route: '/api/webhook/stripe',
+              });
             }
             
             break;
@@ -69,7 +86,11 @@ export async function POST(request: NextRequest) {
               subscriptionPlatform: 'web',
             }
           );
-          console.log(`[Stripe Webhook] Updated subscription for user ${userId}`);
+          logger.info('Subscription activated', {
+            userId,
+            plan: plan || 'monthly',
+            route: '/api/webhook/stripe',
+          });
         }
         break;
       }
@@ -82,7 +103,11 @@ export async function POST(request: NextRequest) {
         const existingUser = await User.findOne({ stripeCustomerId: customerId });
         
         if (existingUser?.hasDirectAccess) {
-          console.warn(`[Stripe Webhook] User with Stripe customer ${customerId} has admin-granted access (hasDirectAccess=true). Skipping subscription status update.`);
+          logger.warn('Skipping subscription update for user with admin access', {
+            customerId,
+            route: '/api/webhook/stripe',
+            event: 'customer.subscription.updated',
+          });
           break;
         }
         
@@ -93,7 +118,11 @@ export async function POST(request: NextRequest) {
                                subscription.status === 'trialing' ? 'trialing' : 'inactive',
           }
         );
-        console.log(`[Stripe Webhook] Updated subscription status for customer ${customerId} to ${subscription.status}`);
+        logger.info('Subscription status updated', {
+          customerId,
+          status: subscription.status,
+          route: '/api/webhook/stripe',
+        });
         break;
       }
 
@@ -105,7 +134,11 @@ export async function POST(request: NextRequest) {
         const existingUser = await User.findOne({ stripeCustomerId: customerId });
         
         if (existingUser?.hasDirectAccess) {
-          console.warn(`[Stripe Webhook] User with Stripe customer ${customerId} has admin-granted access (hasDirectAccess=true). Skipping subscription deletion update.`);
+          logger.warn('Skipping subscription deletion for user with admin access', {
+            customerId,
+            route: '/api/webhook/stripe',
+            event: 'customer.subscription.deleted',
+          });
           break;
         }
         
@@ -113,7 +146,10 @@ export async function POST(request: NextRequest) {
           { stripeCustomerId: customerId },
           { subscriptionStatus: 'canceled' }
         );
-        console.log(`[Stripe Webhook] Marked subscription as canceled for customer ${customerId}`);
+        logger.info('Subscription canceled', {
+          customerId,
+          route: '/api/webhook/stripe',
+        });
         break;
       }
 
@@ -125,7 +161,11 @@ export async function POST(request: NextRequest) {
         const existingUser = await User.findOne({ stripeCustomerId: customerId });
         
         if (existingUser?.hasDirectAccess) {
-          console.warn(`[Stripe Webhook] User with Stripe customer ${customerId} has admin-granted access (hasDirectAccess=true). Skipping payment failure update.`);
+          logger.warn('Skipping payment failure update for user with admin access', {
+            customerId,
+            route: '/api/webhook/stripe',
+            event: 'invoice.payment_failed',
+          });
           break;
         }
         
@@ -133,14 +173,19 @@ export async function POST(request: NextRequest) {
           { stripeCustomerId: customerId },
           { subscriptionStatus: 'past_due' }
         );
-        console.log(`[Stripe Webhook] Marked subscription as past_due for customer ${customerId}`);
+        logger.warn('Subscription marked as past due', {
+          customerId,
+          route: '/api/webhook/stripe',
+        });
         break;
       }
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Stripe webhook error:', error);
+    logger.error('Stripe webhook error', error as Error, {
+      route: '/api/webhook/stripe',
+    });
     return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }

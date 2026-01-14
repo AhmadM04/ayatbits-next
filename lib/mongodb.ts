@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { logger } from './logger';
 
 /**
  * Global is used here to maintain a cached connection across hot reloads
@@ -43,7 +44,7 @@ async function connectDB(): Promise<typeof mongoose> {
     };
 
     cached.promise = mongoose.connect(MONGODB_URL, opts).then((mongoose) => {
-      console.log('MongoDB connected successfully');
+      logger.info('MongoDB connected successfully');
       return mongoose;
     });
   }

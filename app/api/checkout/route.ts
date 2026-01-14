@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { connectDB, User } from '@/lib/db';
 import { checkSubscription } from '@/lib/subscription';
+import { logger } from '@/lib/logger';
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -32,7 +33,11 @@ export async function POST(req: NextRequest) {
     if (dbUser) {
       // Explicit check for admin-granted access
       if (dbUser.hasDirectAccess) {
-        console.log(`[Checkout Blocked] User ${user.id} (${dbUser.email}) has admin-granted access (hasDirectAccess=true)`);
+        logger.info('Checkout blocked - user has admin access', {
+          userId: user.id,
+          email: dbUser.email,
+          route: '/api/checkout',
+        });
         return NextResponse.json(
           { 
             error: 'You already have lifetime access granted by admin', 
@@ -44,7 +49,11 @@ export async function POST(req: NextRequest) {
 
       // Check for admin status
       if (dbUser.isAdmin) {
-        console.log(`[Checkout Blocked] User ${user.id} (${dbUser.email}) is an admin`);
+        logger.info('Checkout blocked - user is admin', {
+          userId: user.id,
+          email: dbUser.email,
+          route: '/api/checkout',
+        });
         return NextResponse.json(
           { 
             error: 'Admins have automatic access', 
@@ -57,11 +66,12 @@ export async function POST(req: NextRequest) {
       // Check for active subscription or trial
       const hasAccess = checkSubscription(dbUser);
       if (hasAccess) {
-        console.log(`[Checkout Blocked] User ${user.id} (${dbUser.email}) already has active subscription/trial`, {
+        logger.info('Checkout blocked - user already has access', {
+          userId: user.id,
+          email: dbUser.email,
+          route: '/api/checkout',
           subscriptionStatus: dbUser.subscriptionStatus,
           subscriptionPlan: dbUser.subscriptionPlan,
-          subscriptionEndDate: dbUser.subscriptionEndDate,
-          trialEndsAt: dbUser.trialEndsAt
         });
         return NextResponse.json(
           { 
@@ -110,7 +120,10 @@ export async function POST(req: NextRequest) {
     const finalCheck = await User.findOne({ clerkId: user.id });
     if (finalCheck) {
       if (finalCheck.hasDirectAccess || finalCheck.isAdmin || checkSubscription(finalCheck)) {
-        console.log(`[Checkout Blocked - Final Check] User ${user.id} gained access during checkout flow`);
+        logger.info('Checkout blocked - user gained access during checkout', {
+          userId: user.id,
+          route: '/api/checkout',
+        });
         return NextResponse.json(
           { 
             error: 'You already have access to AyatBits Pro', 
@@ -142,10 +155,16 @@ export async function POST(req: NextRequest) {
 
     const session = await stripe.checkout.sessions.create(sessionParams);
 
-    console.log(`[Checkout Success] Created Stripe session ${session.id} for user ${user.id}`);
+    logger.info('Stripe checkout session created', {
+      userId: user.id,
+      sessionId: session.id,
+      route: '/api/checkout',
+    });
     return NextResponse.json({ url: session.url });
   } catch (error: any) {
-    console.error('Stripe checkout error:', error);
+    logger.error('Stripe checkout error', error, {
+      route: '/api/checkout',
+    });
     return NextResponse.json(
       { error: error.message || 'Failed to create checkout session' },
       { status: 500 }

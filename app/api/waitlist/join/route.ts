@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB, Waitlist } from '@/lib/db';
 import { sendWaitlistWelcomeEmail, notifyAdminWaitlistSignup } from '@/lib/email-service';
-
-// Rate limiting map (in-memory for simplicity, consider Redis for production)
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+import { getClientIP } from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
 
 // List of common disposable email domains
 const DISPOSABLE_DOMAINS = [
@@ -32,42 +31,6 @@ function isDisposableEmail(email: string): boolean {
   return DISPOSABLE_DOMAINS.some((disposable) => domain === disposable);
 }
 
-/**
- * Rate limiting check (3 attempts per hour per IP)
- */
-function checkRateLimit(ip: string): { allowed: boolean; remainingAttempts?: number } {
-  const now = Date.now();
-  const limit = rateLimitMap.get(ip);
-
-  if (!limit || now > limit.resetAt) {
-    // Reset or new entry
-    rateLimitMap.set(ip, { count: 1, resetAt: now + 60 * 60 * 1000 }); // 1 hour
-    return { allowed: true, remainingAttempts: 2 };
-  }
-
-  if (limit.count >= 3) {
-    return { allowed: false };
-  }
-
-  // Increment count
-  limit.count += 1;
-  return { allowed: true, remainingAttempts: 3 - limit.count };
-}
-
-/**
- * Get client IP address
- */
-function getClientIP(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for');
-  const realIP = request.headers.get('x-real-ip');
-  const cfConnectingIP = request.headers.get('cf-connecting-ip');
-  
-  if (cfConnectingIP) return cfConnectingIP;
-  if (forwarded) return forwarded.split(',')[0].trim();
-  if (realIP) return realIP;
-  
-  return 'unknown';
-}
 
 /**
  * POST /api/waitlist/join
@@ -111,21 +74,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Rate limiting
-    const clientIP = getClientIP(request);
-    const rateLimitCheck = checkRateLimit(clientIP);
-
-    if (!rateLimitCheck.allowed) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Too many requests. Please try again later.',
-          retryAfter: 3600 // seconds
-        },
-        { status: 429 }
-      );
-    }
-
+    // Rate limiting is now handled by middleware
     // Connect to database
     await connectDB();
 
@@ -142,6 +91,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Collect metadata
+    const clientIP = getClientIP(request);
     const metadata = {
       ip: clientIP,
       userAgent: request.headers.get('user-agent') || '',
@@ -158,16 +108,21 @@ export async function POST(request: NextRequest) {
       status: 'pending',
     });
 
-    console.log(`[Waitlist] New signup: ${normalizedFirstName} (${normalizedEmail}) from ${source}`);
+    logger.info('New waitlist signup', {
+      firstName: normalizedFirstName,
+      email: normalizedEmail,
+      source,
+      route: '/api/waitlist/join',
+    });
 
     // Send welcome email (async, don't wait)
     sendWaitlistWelcomeEmail({ email: normalizedEmail, firstName: normalizedFirstName }).catch((err) => {
-      console.error('[Waitlist] Error sending welcome email:', err);
+      logger.error('Error sending waitlist welcome email', err, { email: normalizedEmail });
     });
 
     // Notify admin (async, don't wait)
     notifyAdminWaitlistSignup({ email: normalizedEmail, firstName: normalizedFirstName }).catch((err) => {
-      console.error('[Waitlist] Error sending admin notification:', err);
+      logger.error('Error sending admin notification', err, { email: normalizedEmail });
     });
 
     return NextResponse.json({
@@ -176,7 +131,7 @@ export async function POST(request: NextRequest) {
       id: waitlistEntry._id,
     });
   } catch (error) {
-    console.error('[Waitlist API] Error:', error);
+    logger.error('Waitlist API error', error as Error, { route: '/api/waitlist/join' });
     
     return NextResponse.json(
       { 

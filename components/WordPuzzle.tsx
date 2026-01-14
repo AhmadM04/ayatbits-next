@@ -373,7 +373,6 @@ export default function WordPuzzle({
   // Tips system state
   const [availableTips, setAvailableTips] = useState(0);
   const [usedTips, setUsedTips] = useState(0);
-  const [consecutiveMistakes, setConsecutiveMistakes] = useState(0);
   const [activeHint, setActiveHint] = useState<{ tokenId: string; slotPosition: number } | null>(null);
   
   const pendingToast = useRef<{ message: string; type: 'success' | 'error'; duration: number } | null>(null);
@@ -411,7 +410,6 @@ export default function WordPuzzle({
     const tipsCount = calculateTipsForAyah(originalTokens.length);
     setAvailableTips(tipsCount);
     setUsedTips(0);
-    setConsecutiveMistakes(0);
     setActiveHint(null);
     
     // Stop audio on reset
@@ -571,44 +569,39 @@ export default function WordPuzzle({
       });
     }, 300);
 
-    // Track consecutive mistakes for tips system
-    setConsecutiveMistakes((prevConsecutive) => {
-      const nextConsecutive = prevConsecutive + 1;
-      
-      // After 2nd consecutive mistake, trigger hint if available
-      if (nextConsecutive === 2 && usedTips < availableTips) {
-        // Find the first empty slot and the correct word for it
-        let firstEmptySlot = -1;
-        for (let i = 0; i < originalTokens.length; i++) {
-          if (!placedTokens.has(i)) {
-            firstEmptySlot = i;
-            break;
-          }
-        }
-        
-        if (firstEmptySlot !== -1) {
-          const correctToken = originalTokens[firstEmptySlot];
-          const correctWordInBank = bank.find(t => t.norm === correctToken.norm);
-          
-          if (correctWordInBank) {
-            setActiveHint({
-              tokenId: correctWordInBank.id,
-              slotPosition: firstEmptySlot,
-            });
-            setUsedTips((prev) => prev + 1);
-            
-            setTimeout(() => {
-              showToast('💡 Hint: Watch the highlighted word and slot!', 'success', 3000);
-            }, 100);
-          }
-        }
-      }
-      
-      return nextConsecutive;
-    });
-
     setMistakeCount((prev) => {
       const next = prev + 1;
+      
+      // Trigger automatic tip on every 2nd mistake (if tips available)
+      if (next % 2 === 0 && usedTips < availableTips && !activeHint) {
+        setTimeout(() => {
+          // Find the first empty slot and the correct word for it
+          let firstEmptySlot = -1;
+          for (let i = 0; i < originalTokens.length; i++) {
+            if (!placedTokens.has(i)) {
+              firstEmptySlot = i;
+              break;
+            }
+          }
+          
+          if (firstEmptySlot !== -1) {
+            const correctToken = originalTokens[firstEmptySlot];
+            const correctWordInBank = bank.find(t => t.norm === correctToken.norm);
+            
+            if (correctWordInBank) {
+              setActiveHint({
+                tokenId: correctWordInBank.id,
+                slotPosition: firstEmptySlot,
+              });
+              setUsedTips((prev) => prev + 1);
+              
+              setTimeout(() => {
+                showToast('💡 Hint: Watch the highlighted word and slot!', 'success', 3000);
+              }, 100);
+            }
+          }
+        }, 400);
+      }
       
       setTimeout(() => {
         if (next >= MAX_MISTAKES) {
@@ -625,7 +618,50 @@ export default function WordPuzzle({
       }
       return next;
     });
-  }, [onMistakeLimitExceeded, showToast, usedTips, availableTips, originalTokens, placedTokens, bank]);
+  }, [onMistakeLimitExceeded, showToast, usedTips, availableTips, originalTokens, placedTokens, bank, activeHint]);
+
+  // Manual tip triggering (when user clicks tips button)
+  const handleManualTip = useCallback(() => {
+    // Check if tips are available
+    if (usedTips >= availableTips) {
+      showToast('No tips available!', 'error', 2000);
+      return;
+    }
+
+    // Don't trigger if hint is already active
+    if (activeHint) {
+      showToast('Tip already showing! Dismiss or use it first.', 'info', 2000);
+      return;
+    }
+
+    // Find the first empty slot and the correct word for it
+    let firstEmptySlot = -1;
+    for (let i = 0; i < originalTokens.length; i++) {
+      if (!placedTokens.has(i)) {
+        firstEmptySlot = i;
+        break;
+      }
+    }
+    
+    if (firstEmptySlot === -1) {
+      showToast('All slots are filled!', 'info', 2000);
+      return;
+    }
+
+    const correctToken = originalTokens[firstEmptySlot];
+    const correctWordInBank = bank.find(t => t.norm === correctToken.norm);
+    
+    if (correctWordInBank) {
+      setActiveHint({
+        tokenId: correctWordInBank.id,
+        slotPosition: firstEmptySlot,
+      });
+      setUsedTips((prev) => prev + 1);
+      showToast('💡 Tip activated! Watch the highlighted word and slot.', 'success', 3000);
+    } else {
+      showToast('Unable to find the correct word. Try placing more words!', 'error', 2000);
+    }
+  }, [usedTips, availableTips, activeHint, originalTokens, placedTokens, bank, showToast]);
 
   // Try to place a token on a specific slot
   // Returns true if placed successfully, false otherwise
@@ -666,9 +702,6 @@ export default function WordPuzzle({
 
       setBank((prev) => prev.filter((t) => t.id !== token.id));
       onWordCorrect?.(slotPosition, token.text);
-      
-      // Reset consecutive mistakes on correct placement
-      setConsecutiveMistakes(0);
       
       // Clear hint if this was the hinted word
       setActiveHint((prev) => {
@@ -782,17 +815,46 @@ export default function WordPuzzle({
             </span>
           </div>
           
-          {/* Tips Counter */}
-          <div className={`px-3 py-1.5 rounded-full border flex items-center gap-1.5 ${
-            usedTips >= availableTips
-              ? 'bg-gray-500/10 border-gray-500/30'
-              : 'bg-green-500/10 border-green-500/30'
-          }`}>
+          {/* Tips Counter - Clickable Button */}
+          <motion.button
+            onClick={handleManualTip}
+            disabled={usedTips >= availableTips || hasExceededMistakeLimit}
+            animate={
+              usedTips < availableTips && !activeHint && !hasExceededMistakeLimit
+                ? {
+                    boxShadow: [
+                      '0 0 0 rgba(34, 197, 94, 0)',
+                      '0 0 15px rgba(34, 197, 94, 0.4)',
+                      '0 0 0 rgba(34, 197, 94, 0)',
+                    ],
+                  }
+                : {}
+            }
+            transition={{
+              boxShadow: {
+                duration: 2,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              },
+            }}
+            className={`px-3 py-1.5 rounded-full border flex items-center gap-1.5 transition-all ${
+              usedTips >= availableTips || hasExceededMistakeLimit
+                ? 'bg-gray-500/10 border-gray-500/30 cursor-not-allowed opacity-50'
+                : 'bg-green-500/10 border-green-500/30 hover:bg-green-500/20 hover:border-green-500/50 cursor-pointer active:scale-95'
+            }`}
+            title={
+              usedTips >= availableTips
+                ? 'No tips available'
+                : hasExceededMistakeLimit
+                ? 'Cannot use tips (too many mistakes)'
+                : 'Click to get a tip!'
+            }
+          >
             <Lightbulb className={`w-3.5 h-3.5 ${usedTips >= availableTips ? 'text-gray-500' : 'text-green-400'}`} />
             <span className={`text-xs font-medium ${usedTips >= availableTips ? 'text-gray-500' : 'text-green-400'}`}>
               Tips: {usedTips}/{availableTips}
             </span>
-          </div>
+          </motion.button>
           
           {/* Dismiss Hint Button - only shows when hint is active */}
           {activeHint && (

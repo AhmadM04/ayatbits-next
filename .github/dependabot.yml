@@ -1,0 +1,55 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    # Set timezone for schedule
+    timezone: "America/New_York"
+    # Allow both direct and indirect updates for all dependencies
+    allow:
+      - dependency-type: "all"
+    # Group minor and patch updates together
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    # Open pull requests for security updates
+    open-pull-requests-limit: 10
+    # Automatically rebase PRs if the base branch changes
+    rebase-strategy: "auto"
+    # Add labels to PRs
+    labels:
+      - "dependencies"
+      - "automated"
+    # Commit message prefix
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    # Ignore specific dependencies (if needed)
+    # ignore:
+    #   - dependency-name: "@types/node"
+    #     versions: ["20.x"]
+
+  # Security updates check daily
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    # Only security updates
+    open-pull-requests-limit: 5
+    labels:
+      - "security"
+      - "dependencies"
+

@@ -2,6 +2,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB, LikedAyat, User } from '@/lib/db';
 import mongoose from 'mongoose';
+import { logger } from '@/lib/logger';
 
 export async function POST(
   request: NextRequest,
@@ -54,7 +55,7 @@ export async function POST(
     if (error.code === 11000) {
       return NextResponse.json({ success: true, alreadyLiked: true });
     }
-    console.error('Like error:', error);
+    logger.error('Like error', error, { route: '/api/puzzles/[id]/like' });
     return NextResponse.json(
       { error: error.message || 'Failed to like puzzle' },
       { status: 500 }
@@ -94,7 +95,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('Unlike error:', error);
+    logger.error('Unlike error', error, { route: '/api/puzzles/[id]/like' });
     return NextResponse.json(
       { error: error.message || 'Failed to unlike puzzle' },
       { status: 500 }
