@@ -63,14 +63,26 @@ export async function fetchWordSegments(
     const segments: WordSegment[] = data.verse.words
       .filter(word => word.char_type_name === 'word') // Filter out non-word characters
       .map((word, index) => {
+        const wordAudioUrl = word.audio_url || '';
+        
+        // Debug: Log if audio URL is missing
+        if (!wordAudioUrl) {
+          console.warn(`Missing audio URL for word at position ${word.position}:`, word.text_uthmani || word.text);
+        }
+        
         return {
           position: index,
           text: word.text_uthmani || word.text,
-          audioUrl: word.audio_url || '', // Use individual word audio URL
+          audioUrl: wordAudioUrl,
           startTime: 0, // Not needed for individual word audio
           endTime: 0,   // Not needed for individual word audio
         };
       });
+    
+    // Debug: Log the first segment to verify structure
+    if (segments.length > 0) {
+      console.log('Sample word audio URL:', segments[0].audioUrl);
+    }
 
     const result: AyahAudioSegments = {
       surahNumber,

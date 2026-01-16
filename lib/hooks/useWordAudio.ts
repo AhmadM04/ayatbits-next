@@ -126,11 +126,15 @@ export function useWordAudio({
       
       // Check if audio URL is valid
       if (!wordSegment.audioUrl) {
+        console.error('No audio URL for word:', wordSegment);
         throw new Error('No audio URL available for this word');
       }
       
+      console.log('Attempting to play word audio:', wordSegment.audioUrl);
+      
       // Always set the audio source for individual word audio
       audio.src = wordSegment.audioUrl;
+      audio.crossOrigin = 'anonymous'; // Enable CORS
 
       setCurrentWordIndex(wordIndex);
       setIsPlaying(true);
@@ -138,20 +142,64 @@ export function useWordAudio({
 
       // Wait for audio to be ready
       await new Promise<void>((resolve, reject) => {
-        const onCanPlay = () => {
+        const timeoutId = setTimeout(() => {
           audio.removeEventListener('canplay', onCanPlay);
           audio.removeEventListener('error', onError);
+          audio.removeEventListener('loadeddata', onLoadedData);
+          reject(new Error('Audio loading timeout'));
+        }, 10000); // 10 second timeout
+        
+        const onCanPlay = () => {
+          clearTimeout(timeoutId);
+          audio.removeEventListener('canplay', onCanPlay);
+          audio.removeEventListener('error', onError);
+          audio.removeEventListener('loadeddata', onLoadedData);
+          resolve();
+        };
+        
+        const onLoadedData = () => {
+          clearTimeout(timeoutId);
+          audio.removeEventListener('canplay', onCanPlay);
+          audio.removeEventListener('error', onError);
+          audio.removeEventListener('loadeddata', onLoadedData);
           resolve();
         };
         
         const onError = (e: Event) => {
+          clearTimeout(timeoutId);
           audio.removeEventListener('canplay', onCanPlay);
           audio.removeEventListener('error', onError);
-          console.error('Audio load error:', e);
-          reject(new Error('Failed to load audio'));
+          audio.removeEventListener('loadeddata', onLoadedData);
+          
+          // Get more detailed error info
+          const mediaError = (e.target as HTMLAudioElement).error;
+          let errorMessage = 'Failed to load audio';
+          
+          if (mediaError) {
+            switch (mediaError.code) {
+              case mediaError.MEDIA_ERR_ABORTED:
+                errorMessage = 'Audio loading aborted';
+                break;
+              case mediaError.MEDIA_ERR_NETWORK:
+                errorMessage = 'Network error while loading audio';
+                break;
+              case mediaError.MEDIA_ERR_DECODE:
+                errorMessage = 'Audio decoding error';
+                break;
+              case mediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                errorMessage = 'Audio format not supported or URL invalid';
+                break;
+            }
+            console.error('Audio error details:', errorMessage, mediaError);
+          }
+          
+          console.error('Audio load error event:', e);
+          console.error('Audio URL that failed:', audio.src);
+          reject(new Error(errorMessage));
         };
 
         audio.addEventListener('canplay', onCanPlay);
+        audio.addEventListener('loadeddata', onLoadedData);
         audio.addEventListener('error', onError);
 
         // Start loading
