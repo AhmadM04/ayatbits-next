@@ -70,7 +70,7 @@ function DropSlot({
   });
 
   const handleWordClick = (e: React.MouseEvent) => {
-    if (enableWordAudio && placedToken && onWordClick) {
+    if (enableWordAudio && placedToken && placedToken.norm === expectedToken.norm && onWordClick) {
       e.stopPropagation();
       onWordClick(position);
     }
@@ -83,17 +83,7 @@ function DropSlot({
       ref={setNodeRef}
       initial={{ opacity: 0, scale: 0.8 }}
       animate={
-        isPlayingThis
-          ? {
-              opacity: 1,
-              scale: 1,
-              boxShadow: [
-                '0 0 0 rgba(168, 85, 247, 0)',
-                '0 0 20px rgba(168, 85, 247, 0.5)',
-                '0 0 0 rgba(168, 85, 247, 0)',
-              ],
-            }
-          : isHinted
+        isHinted
           ? {
               opacity: 1,
               scale: 1,
@@ -107,14 +97,7 @@ function DropSlot({
           : { opacity: 1, scale: 1 }
       }
       transition={
-        isPlayingThis
-          ? {
-              boxShadow: {
-                duration: 1,
-                repeat: Infinity,
-              },
-            }
-          : isHinted
+        isHinted
           ? {
               x: {
                 duration: 0.6,
@@ -133,11 +116,9 @@ function DropSlot({
         relative min-w-[50px] min-h-[44px] px-3 py-2 rounded-lg
         flex flex-col items-center justify-center
         transition-all duration-150
-        ${enableWordAudio && placedToken ? 'cursor-pointer' : ''}
+        ${enableWordAudio && placedToken && placedToken.norm === expectedToken.norm ? 'cursor-pointer' : ''}
         ${placedToken 
-          ? isPlayingThis
-            ? 'bg-purple-500/30 border-2 border-purple-400'
-            : 'bg-green-500/20 border-2 border-green-500'
+          ? 'bg-green-500/20 border-2 border-green-500'
           : isHinted
             ? 'bg-green-500/30 border-2 border-green-400 scale-105'
             : isOver && isActive
@@ -155,7 +136,7 @@ function DropSlot({
           >
             {placedToken.text}
             {enableWordAudio && (
-              <Volume2 className="w-3 h-3 text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Volume2 className="w-3 h-3 text-green-400 opacity-0 group-hover:opacity-100 transition-opacity" />
             )}
             {!enableWordAudio && <CheckCircle2 className="w-3 h-3 text-green-400 hidden sm:block" />}
           </motion.span>
@@ -516,8 +497,11 @@ export default function WordPuzzle({
 
   // Handler for word click in answer area
   const handleAnswerWordClick = useCallback((wordIndex: number) => {
+    console.log('🎯 handleAnswerWordClick called with index:', wordIndex);
+    console.log('🎵 enableWordByWordAudio:', enableWordByWordAudio);
+    console.log('📚 originalTokens length:', originalTokens.length);
     playWord(wordIndex);
-  }, [playWord]);
+  }, [playWord, enableWordByWordAudio, originalTokens]);
 
   // Handler for word click in word bank
   const handleBankWordClick = useCallback((token: WordToken) => {
