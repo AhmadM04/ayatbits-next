@@ -57,12 +57,16 @@ export async function fetchWordSegments(
     }
 
     // Debug: Log the full response to understand structure
-    console.log('Quran.com API response for', verseKey, ':', data);
+    console.log('Quran.com API response for', verseKey, ':', {
+      totalWords: data.verse.words.length,
+      wordTypes: data.verse.words.map(w => ({ pos: w.position, type: w.char_type_name, text: w.text_uthmani })),
+    });
 
     // Extract audio URL from the verse (for reference)
     const audioUrl = data.verse.audio?.url || '';
 
     // Map words to segments using individual word audio URLs
+    // Use sequential array index as position (0, 1, 2, 3...) for easy lookup
     const segments: WordSegment[] = data.verse.words
       .filter(word => word.char_type_name === 'word') // Filter out non-word characters
       .map((word, index) => {
@@ -73,13 +77,11 @@ export async function fetchWordSegments(
           wordAudioUrl = `https://verses.quran.com/${wordAudioUrl}`;
         }
         
-        // Debug: Log if audio URL is missing
-        if (!wordAudioUrl) {
-          console.warn(`Missing audio URL for word at position ${word.position}:`, word.text_uthmani || word.text);
-        }
+        // Debug: Log word mapping
+        console.log(`Word ${index}: API position=${word.position}, text=${word.text_uthmani}, audioURL=${wordAudioUrl}`);
         
         return {
-          position: index,
+          position: index, // Use sequential array index for easy lookup
           text: word.text_uthmani || word.text,
           audioUrl: wordAudioUrl,
           startTime: 0, // Not needed for individual word audio
@@ -87,10 +89,8 @@ export async function fetchWordSegments(
         };
       });
     
-    // Debug: Log the first segment to verify structure
-    if (segments.length > 0) {
-      console.log('Sample word audio URL (after fix):', segments[0].audioUrl);
-    }
+    // Debug: Log summary
+    console.log(`Loaded ${segments.length} word segments for ${verseKey}`);
 
     const result: AyahAudioSegments = {
       surahNumber,
