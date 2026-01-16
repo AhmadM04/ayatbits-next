@@ -35,7 +35,6 @@ export function useWordAudio({
   const [error, setError] = useState<string | null>(null);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const timeUpdateHandlerRef = useRef<(() => void) | null>(null);
 
   // Fetch segments when component mounts or verse changes
   useEffect(() => {
@@ -98,12 +97,6 @@ export function useWordAudio({
     }
     setIsPlaying(false);
     setCurrentWordIndex(null);
-    
-    // Remove time update listener
-    if (timeUpdateHandlerRef.current && audioRef.current) {
-      audioRef.current.removeEventListener('timeupdate', timeUpdateHandlerRef.current);
-      timeUpdateHandlerRef.current = null;
-    }
   }, []);
 
   // Play a specific word
@@ -131,10 +124,13 @@ export function useWordAudio({
 
       const audio = audioRef.current;
       
-      // Set the audio source if needed
-      if (audio.src !== wordSegment.audioUrl) {
-        audio.src = wordSegment.audioUrl;
+      // Check if audio URL is valid
+      if (!wordSegment.audioUrl) {
+        throw new Error('No audio URL available for this word');
       }
+      
+      // Always set the audio source for individual word audio
+      audio.src = wordSegment.audioUrl;
 
       setCurrentWordIndex(wordIndex);
       setIsPlaying(true);
@@ -148,35 +144,19 @@ export function useWordAudio({
           resolve();
         };
         
-        const onError = () => {
+        const onError = (e: Event) => {
           audio.removeEventListener('canplay', onCanPlay);
           audio.removeEventListener('error', onError);
+          console.error('Audio load error:', e);
           reject(new Error('Failed to load audio'));
         };
 
         audio.addEventListener('canplay', onCanPlay);
         audio.addEventListener('error', onError);
 
-        // If already loaded, resolve immediately
-        if (audio.readyState >= 2) {
-          audio.removeEventListener('canplay', onCanPlay);
-          audio.removeEventListener('error', onError);
-          resolve();
-        }
+        // Start loading
+        audio.load();
       });
-
-      // Set start time
-      audio.currentTime = wordSegment.startTime;
-
-      // Create time update handler to stop at end time
-      const timeUpdateHandler = () => {
-        if (audio.currentTime >= wordSegment.endTime) {
-          stopPlayback();
-        }
-      };
-      
-      timeUpdateHandlerRef.current = timeUpdateHandler;
-      audio.addEventListener('timeupdate', timeUpdateHandler);
 
       // Add ended event listener
       const onEnded = () => {

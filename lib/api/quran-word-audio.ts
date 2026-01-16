@@ -56,25 +56,19 @@ export async function fetchWordSegments(
       return null;
     }
 
-    // Extract audio URL from the verse
+    // Extract audio URL from the verse (for reference)
     const audioUrl = data.verse.audio?.url || '';
-    const audioSegments = data.verse.audio?.segments || [];
 
-    // Map words to segments
+    // Map words to segments using individual word audio URLs
     const segments: WordSegment[] = data.verse.words
       .filter(word => word.char_type_name === 'word') // Filter out non-word characters
       .map((word, index) => {
-        // Find matching audio segment
-        const segment = audioSegments.find((seg: QuranComAudioSegment) => 
-          seg.segments && seg.segments.includes(word.position)
-        );
-
         return {
           position: index,
           text: word.text_uthmani || word.text,
-          audioUrl: audioUrl,
-          startTime: segment?.timestamp_from || 0,
-          endTime: segment?.timestamp_to || 0,
+          audioUrl: word.audio_url || '', // Use individual word audio URL
+          startTime: 0, // Not needed for individual word audio
+          endTime: 0,   // Not needed for individual word audio
         };
       });
 
