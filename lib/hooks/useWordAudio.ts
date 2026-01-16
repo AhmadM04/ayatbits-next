@@ -101,14 +101,20 @@ export function useWordAudio({
 
   // Play a specific word
   const playWord = useCallback(async (wordIndex: number) => {
+    console.log('🔊 playWord called with index:', wordIndex);
+    console.log('📚 Total segments available:', segments?.segments.length);
+    
     if (!segments || !enabled) {
+      console.log('❌ playWord: segments or enabled is false');
       return;
     }
 
     const wordSegment = getWordSegment(segments, wordIndex);
     
+    console.log('🎯 wordSegment retrieved:', wordSegment);
+    
     if (!wordSegment) {
-      console.error(`Invalid word index: ${wordIndex}`);
+      console.error(`❌ Invalid word index: ${wordIndex}`);
       return;
     }
 

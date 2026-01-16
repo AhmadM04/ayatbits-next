@@ -29,8 +29,11 @@ export async function fetchWordSegments(
 ): Promise<AyahAudioSegments | null> {
   const cacheKey = getCacheKey(surahNumber, ayahNumber);
   
+  console.log('🎵 fetchWordSegments called for', surahNumber, ':', ayahNumber);
+  
   // Check cache first
   if (segmentsCache.has(cacheKey)) {
+    console.log('📦 Using cached segments');
     return segmentsCache.get(cacheKey)!;
   }
 
