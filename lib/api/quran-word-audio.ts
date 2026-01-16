@@ -126,9 +126,19 @@ export function getWordSegment(
   segments: AyahAudioSegments,
   wordIndex: number
 ): WordSegment | null {
+  console.log('🔍 getWordSegment called:', {
+    requestedIndex: wordIndex,
+    totalSegments: segments.segments.length,
+    allSegments: segments.segments.map(s => ({ pos: s.position, text: s.text, url: s.audioUrl }))
+  });
+  
   if (wordIndex < 0 || wordIndex >= segments.segments.length) {
+    console.error(`❌ Index ${wordIndex} out of bounds (0-${segments.segments.length - 1})`);
     return null;
   }
-  return segments.segments[wordIndex];
+  
+  const segment = segments.segments[wordIndex];
+  console.log('✅ Found segment:', segment);
+  return segment;
 }
 
