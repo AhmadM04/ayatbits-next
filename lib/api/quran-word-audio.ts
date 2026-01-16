@@ -56,6 +56,9 @@ export async function fetchWordSegments(
       return null;
     }
 
+    // Debug: Log the full response to understand structure
+    console.log('Quran.com API response for', verseKey, ':', data);
+
     // Extract audio URL from the verse (for reference)
     const audioUrl = data.verse.audio?.url || '';
 
@@ -63,7 +66,12 @@ export async function fetchWordSegments(
     const segments: WordSegment[] = data.verse.words
       .filter(word => word.char_type_name === 'word') // Filter out non-word characters
       .map((word, index) => {
-        const wordAudioUrl = word.audio_url || '';
+        let wordAudioUrl = word.audio_url || '';
+        
+        // Fix relative URLs - Quran.com returns relative paths that need the base URL
+        if (wordAudioUrl && !wordAudioUrl.startsWith('http')) {
+          wordAudioUrl = `https://verses.quran.com/${wordAudioUrl}`;
+        }
         
         // Debug: Log if audio URL is missing
         if (!wordAudioUrl) {
@@ -81,7 +89,7 @@ export async function fetchWordSegments(
     
     // Debug: Log the first segment to verify structure
     if (segments.length > 0) {
-      console.log('Sample word audio URL:', segments[0].audioUrl);
+      console.log('Sample word audio URL (after fix):', segments[0].audioUrl);
     }
 
     const result: AyahAudioSegments = {
