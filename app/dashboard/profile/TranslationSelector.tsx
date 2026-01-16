@@ -74,28 +74,28 @@ export default function TranslationSelector({ initialTranslation = 'en.sahih' }:
   };
 
   return (
-    <div className="bg-[#111] border border-white/10 rounded-2xl p-6">
+    <div className="bg-[#111] border border-white/10 rounded-2xl p-6 transition-colors hover:border-white/20">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-blue-500/20 rounded-xl">
+        <div className="p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
           <Globe className="w-6 h-6 text-blue-400" />
         </div>
-        <div>
+        <div className="flex-1">
           <h3 className="text-lg font-semibold text-white">Translation Preference</h3>
           <p className="text-sm text-gray-400">Choose your preferred translation language</p>
         </div>
       </div>
 
-      <div className="max-h-[400px] overflow-y-auto">
+      <div className="max-h-[400px] overflow-y-auto pr-2 -mr-2">
         <ul className="space-y-1">
           {translationOptions.map((option) => (
             <li key={option.code}>
               <button
                 onClick={() => handleTranslationChange(option.code)}
                 disabled={isLoading}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all ${
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
                   selectedTranslation === option.code
-                    ? 'bg-green-500/10 text-white'
-                    : 'text-gray-300 hover:bg-white/5'
+                    ? 'bg-green-500/10 text-white border border-green-500/30'
+                    : 'text-gray-300 hover:bg-white/5 border border-transparent'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 <span className="text-sm font-medium">{option.name}</span>

@@ -16,12 +16,12 @@ interface BillingSectionProps {
 
 export default function BillingSection({ user, stats }: BillingSectionProps) {
   return (
-    <div className="bg-[#111] border border-white/10 rounded-2xl p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-3 bg-purple-500/20 rounded-xl">
+    <div className="bg-[#111] border border-white/10 rounded-2xl p-6 transition-colors hover:border-white/20">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-3 bg-purple-500/20 rounded-xl border border-purple-500/30">
           <CreditCard className="w-6 h-6 text-purple-400" />
         </div>
-        <div>
+        <div className="flex-1">
           <h3 className="text-lg font-semibold text-white">Subscription & Billing</h3>
           <p className="text-sm text-gray-400">Manage your subscription plan</p>
         </div>
@@ -29,14 +29,14 @@ export default function BillingSection({ user, stats }: BillingSectionProps) {
       
       {!user.isAdmin ? (
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+          <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 transition-colors hover:border-white/20">
             <div>
-              <p className="text-sm text-gray-400">Current Plan</p>
+              <p className="text-sm text-gray-400 mb-1">Current Plan</p>
               <p className="text-lg font-medium text-white capitalize">{stats.planType}</p>
             </div>
             {user.subscriptionEndDate && (
               <div className="text-right">
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-400 mb-1">
                   {stats.planType === 'trial' ? 'Trial ends' : 'Renews on'}
                 </p>
                 <p className="text-sm font-medium text-white">
@@ -60,7 +60,7 @@ export default function BillingSection({ user, stats }: BillingSectionProps) {
             </Link>
             <Link
               href="/dashboard/billing"
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 rounded-xl font-medium transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gray-300 rounded-xl font-medium transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
               Billing & Subscription
@@ -69,13 +69,13 @@ export default function BillingSection({ user, stats }: BillingSectionProps) {
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="p-4 bg-white/5 rounded-xl">
+          <div className="p-4 bg-white/5 rounded-xl border border-white/10">
             <p className="text-sm text-gray-400 mb-2">Admin Account</p>
             <p className="text-lg font-medium text-white">Full access granted</p>
           </div>
           <Link
             href="/dashboard/billing"
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 rounded-xl font-medium transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gray-300 rounded-xl font-medium transition-colors"
           >
             <ExternalLink className="w-4 h-4" />
             View Billing Page

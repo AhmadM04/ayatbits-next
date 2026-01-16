@@ -9,6 +9,8 @@ import TransliterationDisplay from './TransliterationDisplay';
 import AudioPlayer from './AudioPlayer';
 import AyahSelectorClient from './AyahSelectorClient';
 import LikeButton from './LikeButton';
+import AyahTextDisplay from './AyahTextDisplay';
+import BismillahDisplay from './BismillahDisplay';
 import { cleanAyahText, extractBismillah, shouldShowBismillahSeparately } from '@/lib/ayah-utils';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
 
@@ -174,15 +176,10 @@ export default async function SurahVersePage({
             <div className="space-y-4">
               {/* Bismillah - Shown separately for surahs 2-114 (except 9) on first ayah */}
               {showBismillahSeparately && bismillah && (
-                <div className="bg-green-500/5 border border-green-500/20 rounded-xl p-4 text-center">
-                  <p
-                    className="text-xl sm:text-2xl leading-loose text-green-400"
-                    dir="rtl"
-                    style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
-                  >
-                    {bismillah}
-                  </p>
-                </div>
+                <BismillahDisplay
+                  bismillah={bismillah}
+                  surahNumber={parseInt(surahNumber)}
+                />
               )}
 
               {/* Arabic Text Card with icons on top right */}
@@ -202,17 +199,15 @@ export default async function SurahVersePage({
                 </div>
 
                 {/* Arabic Text */}
-                <p
-                  className="text-xl sm:text-2xl md:text-3xl leading-[2] text-white text-right"
-                  dir="rtl"
-                  style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
-                >
-                  {showBismillahSeparately ? remainingText : cleanAyahText(
+                <AyahTextDisplay
+                  ayahText={showBismillahSeparately ? remainingText : cleanAyahText(
                     currentPuzzle.content?.ayahText || '',
                     parseInt(surahNumber),
                     selectedAyah
                   )}
-                </p>
+                  surahNumber={parseInt(surahNumber)}
+                  ayahNumber={selectedAyah}
+                />
               </div>
 
               {/* Audio Player - Redesigned */}

@@ -1,6 +1,7 @@
 import { UserProgress, Puzzle } from '@/lib/db';
 import ProfileContent from './ProfileContent';
 import TranslationSelector from './TranslationSelector';
+import AudioSettings from './AudioSettings';
 import BillingSection from './BillingSection';
 import { getTrialDaysRemaining } from '@/lib/subscription';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
@@ -58,42 +59,79 @@ export default async function ProfilePage() {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Custom AyatBits Profile Stats */}
-        <ProfileContent 
-          user={userData}
-          stats={JSON.parse(JSON.stringify(stats))}
-          trialDaysLeft={trialDaysLeft}
-        />
+      <div className="max-w-4xl mx-auto px-4 py-8 pb-20 space-y-6">
+        {/* User Profile & Stats Section */}
+        <div className="space-y-6">
+          <ProfileContent 
+            user={userData}
+            stats={JSON.parse(JSON.stringify(stats))}
+            trialDaysLeft={trialDaysLeft}
+          />
+        </div>
 
-        {/* Translation Selector */}
-        <TranslationSelector initialTranslation={user.selectedTranslation || 'en.sahih'} />
+        {/* Settings Section */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2 px-1">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Settings</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+          </div>
+
+          <TranslationSelector initialTranslation={user.selectedTranslation || 'en.sahih'} />
+          <AudioSettings initialEnabled={user.enableWordByWordAudio || false} />
+        </div>
 
         {/* Billing Section */}
-        <BillingSection 
-          user={userData}
-          stats={JSON.parse(JSON.stringify(stats))}
-        />
+        <div className="space-y-6">
+          <div className="flex items-center gap-2 px-1">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Billing</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+          </div>
 
-        {/* Clerk Account Management */}
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-6">Account Settings</h2>
-          <div className="flex justify-center bg-[#111] p-6 rounded-2xl border border-white/10">
+          <BillingSection 
+            user={userData}
+            stats={JSON.parse(JSON.stringify(stats))}
+          />
+        </div>
+
+        {/* Account Management Section */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2 px-1">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Account</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+          </div>
+
+          <div className="bg-[#111] rounded-2xl border border-white/10 overflow-hidden">
             <UserProfile 
               appearance={{
                 elements: {
                   rootBox: "w-full",
-                  card: "bg-transparent shadow-none w-full",
+                  card: "bg-transparent shadow-none w-full border-none",
                   navbar: "hidden",
                   headerTitle: "text-white",
                   headerSubtitle: "text-gray-400",
-                  profileSectionTitleText: "text-white",
+                  profileSectionTitleText: "text-white font-semibold",
+                  profileSectionTitle: "text-white",
+                  profileSectionContent: "text-gray-300",
+                  formButtonPrimary: "bg-green-600 hover:bg-green-700 text-white transition-colors",
+                  formFieldInput: "bg-white/5 border-white/10 text-white",
+                  formFieldLabel: "text-gray-300",
+                  identityPreviewText: "text-gray-300",
+                  identityPreviewEditButton: "text-gray-400 hover:text-white",
                   userPreviewMainIdentifier: "text-white",
                   userPreviewSecondaryIdentifier: "text-gray-400",
+                  accordionTriggerButton: "text-white hover:bg-white/5",
+                  accordionContent: "text-gray-300",
+                  badge: "bg-green-600/20 text-green-400 border-green-600/30",
                   // Hide profile image section
                   avatarBox: "hidden",
                   avatarImage: "hidden",
                   profileSection__profile: "hidden",
+                  // Remove modal overlay styling
+                  modalBackdrop: "hidden",
+                  modalContent: "shadow-none",
                 }
               }}
               routing="hash" 

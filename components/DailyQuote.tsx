@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, ExternalLink, RefreshCw, Volume2, WifiOff } from 'lucide-react';
 import { apiGet, NetworkError } from '@/lib/api-client';
 import { SparkleAnimation } from './animations';
+import { useWordAudio } from '@/lib/hooks/useWordAudio';
 
 interface DailyQuoteData {
   arabicText: string;
@@ -29,6 +30,18 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
   const [error, setError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const [enableWordByWordAudio, setEnableWordByWordAudio] = useState(false);
+  
+  // Word audio hook
+  const {
+    playWord,
+    isPlaying: isPlayingWord,
+    currentWordIndex,
+  } = useWordAudio({
+    surahNumber: quote?.surahNumber,
+    ayahNumber: quote?.ayahNumber,
+    enabled: enableWordByWordAudio,
+  });
 
   const fetchDailyQuote = useCallback(async () => {
     setIsLoading(true);
@@ -55,6 +68,22 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
   useEffect(() => {
     fetchDailyQuote();
   }, [fetchDailyQuote]);
+
+  // Fetch user settings for word audio
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/user/settings');
+        if (response.ok) {
+          const data = await response.json();
+          setEnableWordByWordAudio(data.enableWordByWordAudio || false);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user settings:', error);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const playAudio = async () => {
     if (!quote) return;
@@ -202,7 +231,40 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
               dir="rtl"
               style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
             >
-              {quote.arabicText}
+              {enableWordByWordAudio ? (
+                quote.arabicText.split(/\s+/).map((word, index) => (
+                  <motion.span
+                    key={index}
+                    onClick={() => playWord(index)}
+                    animate={
+                      isPlayingWord && currentWordIndex === index
+                        ? {
+                            boxShadow: [
+                              '0 0 0 rgba(168, 85, 247, 0)',
+                              '0 0 20px rgba(168, 85, 247, 0.5)',
+                              '0 0 0 rgba(168, 85, 247, 0)',
+                            ],
+                          }
+                        : {}
+                    }
+                    transition={{
+                      boxShadow: {
+                        duration: 1,
+                        repeat: Infinity,
+                      },
+                    }}
+                    className={`inline-block cursor-pointer px-1 rounded transition-colors ${
+                      isPlayingWord && currentWordIndex === index
+                        ? 'bg-purple-500/30 text-purple-300'
+                        : 'hover:bg-purple-500/10'
+                    }`}
+                  >
+                    {word}
+                  </motion.span>
+                ))
+              ) : (
+                quote.arabicText
+              )}
             </p>
           </motion.div>
         </AnimatePresence>

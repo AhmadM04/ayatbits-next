@@ -32,6 +32,7 @@ export interface IUser extends Document {
   preferredTranslation?: string;
   selectedTranslation?: string;
   showTransliteration?: boolean;
+  enableWordByWordAudio?: boolean;
   isAdmin?: boolean;
   hasDirectAccess?: boolean; // Granted by admin to bypass subscription
   lastActivityDate?: Date;
@@ -67,6 +68,7 @@ const userSchema = new mongoose.Schema<IUser>(
     preferredTranslation: { type: String },
     selectedTranslation: { type: String, default: 'en.sahih' },
     showTransliteration: { type: Boolean, default: false },
+    enableWordByWordAudio: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false },
     hasDirectAccess: { type: Boolean, default: false },
     subscriptionEndDate: { type: Date },

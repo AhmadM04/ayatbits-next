@@ -1,0 +1,117 @@
+// Quran.com API integration for word-by-word audio
+
+import { 
+  AyahAudioSegments, 
+  WordSegment, 
+  QuranComResponse,
+  QuranComAudioSegment 
+} from '@/lib/types/word-audio';
+
+const QURAN_API_BASE = 'https://api.quran.com/api/v4';
+const ALAFASY_RECITER_ID = 7; // Alafasy reciter ID on Quran.com
+
+// In-memory cache for audio segments
+const segmentsCache = new Map<string, AyahAudioSegments>();
+
+/**
+ * Get cache key for a verse
+ */
+function getCacheKey(surahNumber: number, ayahNumber: number): string {
+  return `${surahNumber}:${ayahNumber}`;
+}
+
+/**
+ * Fetch word-level audio segments from Quran.com API
+ */
+export async function fetchWordSegments(
+  surahNumber: number,
+  ayahNumber: number
+): Promise<AyahAudioSegments | null> {
+  const cacheKey = getCacheKey(surahNumber, ayahNumber);
+  
+  // Check cache first
+  if (segmentsCache.has(cacheKey)) {
+    return segmentsCache.get(cacheKey)!;
+  }
+
+  try {
+    const verseKey = `${surahNumber}:${ayahNumber}`;
+    const url = `${QURAN_API_BASE}/verses/by_key/${verseKey}?` +
+      `words=true&` +
+      `audio=${ALAFASY_RECITER_ID}&` +
+      `fields=text_uthmani&` +
+      `word_fields=text_uthmani,audio_url`;
+
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      console.error(`Failed to fetch word segments: ${response.status}`);
+      return null;
+    }
+
+    const data: QuranComResponse = await response.json();
+    
+    if (!data.verse || !data.verse.words) {
+      console.error('Invalid response structure from Quran.com API');
+      return null;
+    }
+
+    // Extract audio URL from the verse
+    const audioUrl = data.verse.audio?.url || '';
+    const audioSegments = data.verse.audio?.segments || [];
+
+    // Map words to segments
+    const segments: WordSegment[] = data.verse.words
+      .filter(word => word.char_type_name === 'word') // Filter out non-word characters
+      .map((word, index) => {
+        // Find matching audio segment
+        const segment = audioSegments.find((seg: QuranComAudioSegment) => 
+          seg.segments && seg.segments.includes(word.position)
+        );
+
+        return {
+          position: index,
+          text: word.text_uthmani || word.text,
+          audioUrl: audioUrl,
+          startTime: segment?.timestamp_from || 0,
+          endTime: segment?.timestamp_to || 0,
+        };
+      });
+
+    const result: AyahAudioSegments = {
+      surahNumber,
+      ayahNumber,
+      segments,
+      audioUrl,
+    };
+
+    // Cache the result
+    segmentsCache.set(cacheKey, result);
+
+    return result;
+  } catch (error) {
+    console.error('Error fetching word segments:', error);
+    return null;
+  }
+}
+
+/**
+ * Clear the segments cache (useful for memory management)
+ */
+export function clearSegmentsCache(): void {
+  segmentsCache.clear();
+}
+
+/**
+ * Get a specific word segment
+ */
+export function getWordSegment(
+  segments: AyahAudioSegments,
+  wordIndex: number
+): WordSegment | null {
+  if (wordIndex < 0 || wordIndex >= segments.segments.length) {
+    return null;
+  }
+  return segments.segments[wordIndex];
+}
+

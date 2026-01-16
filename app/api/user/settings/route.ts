@@ -12,7 +12,7 @@ export async function GET() {
 
     if (!userId) {
       return NextResponse.json(
-        { translation: 'en.sahih', showTransliteration: false },
+        { translation: 'en.sahih', showTransliteration: false, enableWordByWordAudio: false },
         { headers: { 'Cache-Control': 'no-store, max-age=0' } }
       );
     }
@@ -24,14 +24,15 @@ export async function GET() {
     return NextResponse.json(
       { 
         translation: user?.selectedTranslation || 'en.sahih',
-        showTransliteration: user?.showTransliteration || false
+        showTransliteration: user?.showTransliteration || false,
+        enableWordByWordAudio: user?.enableWordByWordAudio || false
       },
       { headers: { 'Cache-Control': 'no-store, max-age=0' } }
     );
   } catch (error) {
     console.error('Error fetching user settings:', error);
     return NextResponse.json(
-      { translation: 'en.sahih', showTransliteration: false },
+      { translation: 'en.sahih', showTransliteration: false, enableWordByWordAudio: false },
       { headers: { 'Cache-Control': 'no-store, max-age=0' } }
     );
   }
@@ -51,18 +52,43 @@ export async function PATCH(request: Request) {
     await connectDB();
 
     const body = await request.json();
-    const { showTransliteration } = body;
+    const { showTransliteration, enableWordByWordAudio } = body;
 
-    if (typeof showTransliteration !== 'boolean') {
+    // Validate input - at least one field must be provided
+    if (showTransliteration === undefined && enableWordByWordAudio === undefined) {
+      return NextResponse.json(
+        { error: 'No settings provided' },
+        { status: 400 }
+      );
+    }
+
+    // Validate types if provided
+    if (showTransliteration !== undefined && typeof showTransliteration !== 'boolean') {
       return NextResponse.json(
         { error: 'Invalid showTransliteration value' },
         { status: 400 }
       );
     }
 
+    if (enableWordByWordAudio !== undefined && typeof enableWordByWordAudio !== 'boolean') {
+      return NextResponse.json(
+        { error: 'Invalid enableWordByWordAudio value' },
+        { status: 400 }
+      );
+    }
+
+    // Build update object with only provided fields
+    const updateFields: any = {};
+    if (showTransliteration !== undefined) {
+      updateFields.showTransliteration = showTransliteration;
+    }
+    if (enableWordByWordAudio !== undefined) {
+      updateFields.enableWordByWordAudio = enableWordByWordAudio;
+    }
+
     const user = await User.findOneAndUpdate(
       { clerkId: userId },
-      { showTransliteration },
+      updateFields,
       { new: true }
     );
 
@@ -76,7 +102,8 @@ export async function PATCH(request: Request) {
     return NextResponse.json(
       { 
         success: true,
-        showTransliteration: user.showTransliteration 
+        showTransliteration: user.showTransliteration,
+        enableWordByWordAudio: user.enableWordByWordAudio
       },
       { headers: { 'Cache-Control': 'no-store, max-age=0' } }
     );
