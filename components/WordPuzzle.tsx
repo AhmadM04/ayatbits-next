@@ -720,7 +720,7 @@ export default function WordPuzzle({
         clearTimeout(timeoutId);
       };
     }
-  }, [isComplete, hasCompleted, showToast, isPlayingWord, currentWordIndex]); // Added isPlayingWord and currentWordIndex
+  }, [isComplete, hasCompleted, showToast]); // Only essential dependencies - don't cancel if audio state changes!
 
   const registerMistake = useCallback((tokenId: string) => {
     setShakingIds((prev) => new Set(prev).add(tokenId));
