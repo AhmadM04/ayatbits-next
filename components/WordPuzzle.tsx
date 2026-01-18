@@ -428,7 +428,7 @@ export default function WordPuzzle({
   const [activeToken, setActiveToken] = useState<WordToken | null>(null);
   const [mistakeCount, setMistakeCount] = useState(0);
   const [hasExceededMistakeLimit, setHasExceededMistakeLimit] = useState(false);
-  const [hasCompleted, setHasCompleted] = useState(false);
+  const hasCompletedRef = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
   
   // Ensure component is mounted before initializing drag and drop
@@ -673,17 +673,17 @@ export default function WordPuzzle({
   }, [placedTokens.size, originalTokens.length]);
 
   useEffect(() => {
-    console.log('[COMPLETION] useEffect running', { isComplete, hasCompleted });
-    if (isComplete && !hasCompleted) {
+    console.log('[COMPLETION] useEffect running', { isComplete, hasCompleted: hasCompletedRef.current });
+    if (isComplete && !hasCompletedRef.current) {
       console.log('Puzzle completed! Calling onSolved callback', { 
         onSolved: !!onSolvedRef.current, 
         onSolvedType: typeof onSolvedRef.current,
         isComplete,
-        hasCompleted,
+        hasCompleted: hasCompletedRef.current,
         isPlayingWord,
         currentWordIndex
       });
-      setHasCompleted(true);
+      hasCompletedRef.current = true;
       
       // Show toast immediately
       setTimeout(() => {
@@ -722,7 +722,7 @@ export default function WordPuzzle({
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isComplete, hasCompleted]); // ONLY these two - nothing else!
+  }, [isComplete]); // ONLY isComplete - hasCompleted is now a ref!
 
   const registerMistake = useCallback((tokenId: string) => {
     setShakingIds((prev) => new Set(prev).add(tokenId));
