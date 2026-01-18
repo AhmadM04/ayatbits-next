@@ -32,6 +32,16 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  // Add build tracking for cache busting
+  generateBuildId: async () => {
+    return `build-${Date.now()}`;
+  },
+
+  // Environment variables for build time tracking
+  env: {
+    BUILD_TIME: new Date().getTime().toString(),
+  },
+
   // Configure headers for CORS and security
   async headers() {
     return [
