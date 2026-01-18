@@ -159,6 +159,7 @@ function DraggableWord({
       style={style}
       {...attributes}
       {...listeners}
+      onClick={onClick}
       className="px-3 py-2 rounded-lg cursor-grab active:cursor-grabbing bg-[var(--bg-tertiary)] border border-[var(--border-color)] hover:bg-[var(--bg-secondary)] text-[var(--text-primary)] shadow-sm hover:shadow-md font-medium text-base transition-all"
       dir="rtl"
     >

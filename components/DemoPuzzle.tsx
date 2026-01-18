@@ -271,7 +271,7 @@ export default function DemoPuzzle() {
           </div>
 
           <p className="text-gray-500 text-xs text-center mt-3">
-            Drag words to their correct positions
+            Drag or tap words to place them
           </p>
         </div>
 

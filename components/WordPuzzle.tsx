@@ -197,7 +197,7 @@ function DropSlot({
   );
 }
 
-// Bank words are drag-only, no click/audio functionality
+// Bank words support both drag and click/tap
 function DraggableWord({
   token,
   isOverlay = false,
@@ -205,6 +205,7 @@ function DraggableWord({
   isHinted = false,
   isFadingHint = false,
   showTransliteration = false,
+  onTap,
 }: {
   token: WordToken;
   isOverlay?: boolean;
@@ -212,6 +213,7 @@ function DraggableWord({
   isHinted?: boolean;
   isFadingHint?: boolean;
   showTransliteration?: boolean;
+  onTap?: (token: WordToken) => void;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: token.id,
@@ -227,13 +229,22 @@ function DraggableWord({
     isFadingHint
   });
 
+  const handleClick = (e: React.MouseEvent) => {
+    // Only trigger click if not dragging and not overlay
+    if (!isDragging && !isOverlay && onTap) {
+      e.stopPropagation();
+      onTap(token);
+    }
+  };
+
   return (
     <motion.div
       ref={setNodeRef}
       {...attributes}
       {...listeners}
+      onClick={handleClick}
       tabIndex={-1}
-      role="none"
+      role="button"
       data-component="draggable-word-v2-fixed"
       data-hinted={isHinted}
       data-bank-word="true"
@@ -357,15 +368,20 @@ function WordBank({
   hintedTokenId,
   isFadingHint,
   showTransliteration,
+  onWordTap,
 }: {
   bank: WordToken[];
   shakingIds: Set<string>;
   hintedTokenId: string | null;
   isFadingHint: boolean;
   showTransliteration: boolean;
+  onWordTap?: (token: WordToken) => void;
 }) {
   return (
     <div className="mt-6" dir="rtl">
+      <p className="text-xs text-gray-500 text-center mb-3">
+        Drag or tap words to place them
+      </p>
       <div className="flex flex-wrap justify-center gap-2">
         <AnimatePresence mode="popLayout">
           {bank.map((token) => (
@@ -382,6 +398,7 @@ function WordBank({
                 isHinted={hintedTokenId === token.id}
                 isFadingHint={isFadingHint && hintedTokenId === token.id}
                 showTransliteration={showTransliteration}
+                onTap={onWordTap}
               />
             </motion.div>
           ))}
@@ -969,6 +986,31 @@ export default function WordPuzzle({
     [bank, hasExceededMistakeLimit, tryPlaceTokenOnSlot]
   );
 
+  // Handle tap/click on bank words - place in next available slot
+  const handleWordTap = useCallback(
+    (token: WordToken) => {
+      if (hasExceededMistakeLimit) return;
+
+      // Find the first empty slot
+      let firstEmptySlot = -1;
+      for (let i = 0; i < originalTokens.length; i++) {
+        if (!placedTokens.has(i)) {
+          firstEmptySlot = i;
+          break;
+        }
+      }
+
+      if (firstEmptySlot === -1) {
+        // All slots filled
+        return;
+      }
+
+      // Try to place the token in the first empty slot
+      tryPlaceTokenOnSlot(token, firstEmptySlot);
+    },
+    [hasExceededMistakeLimit, originalTokens, placedTokens, tryPlaceTokenOnSlot]
+  );
+
   const dropAnimation: DropAnimation = {
     sideEffects: defaultDropAnimationSideEffects({
       styles: {
@@ -1164,6 +1206,7 @@ export default function WordPuzzle({
             hintedTokenId={activeHint?.tokenId ?? null}
             isFadingHint={isFadingHint}
             showTransliteration={wordTransliterations.length > 0}
+            onWordTap={handleWordTap}
           />
 
           <DragOverlay dropAnimation={dropAnimation}>
