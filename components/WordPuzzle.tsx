@@ -631,9 +631,12 @@ export default function WordPuzzle({
     };
   }, [surahNumber, ayahNumber]);
 
+  // Initialize puzzle state on mount or when ayah changes
   useEffect(() => {
+    console.log('[PUZZLE] Initializing/resetting puzzle state');
     resetState();
-  }, [resetState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ayahText]); // Only reset when the ayah text changes, not when resetState function changes
 
   useEffect(() => {
     if (pendingToast.current) {
