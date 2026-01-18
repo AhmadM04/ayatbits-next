@@ -222,7 +222,9 @@ function DraggableWord({
     id: token.id, 
     hasListeners: !!listeners, 
     hasAttributes: !!attributes,
-    isOverlay 
+    isOverlay,
+    isHinted,
+    isFadingHint
   });
 
   return (
@@ -814,10 +816,12 @@ export default function WordPuzzle({
     
     if (correctWordInBank) {
       setIsFadingHint(false);
-      setActiveHint({
+      const hint = {
         tokenId: correctWordInBank.id,
         slotPosition: firstEmptySlot,
-      });
+      };
+      console.log('[TIPS] Setting activeHint:', hint);
+      setActiveHint(hint);
       setUsedTips((prev) => prev + 1);
       showToast('💡 Tip activated! Watch the highlighted word and slot.', 'success', 3000);
     } else {
