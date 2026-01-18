@@ -12,13 +12,22 @@ export default function PricingContent() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [checkingAccess, setCheckingAccess] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const isTrialFlow = searchParams.get('trial') === 'true';
-  const reason = searchParams.get('reason');
+  
+  // Use mounted state to prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  const isTrialFlow = mounted ? searchParams.get('trial') === 'true' : false;
+  const reason = mounted ? searchParams.get('reason') : null;
 
   // Check if user already has access (with polling for real-time updates)
   useEffect(() => {
+    if (!mounted) return;
+    
     const checkAccess = async () => {
       try {
         const response = await fetch('/api/check-access', {
@@ -60,7 +69,7 @@ export default function PricingContent() {
 
     // Cleanup interval on unmount
     return () => clearInterval(pollInterval);
-  }, [router, hasAccess]);
+  }, [mounted, hasAccess, router]);, [router, hasAccess]);
 
   // Stripe Price IDs - these should match your Stripe dashboard
   const plans = [

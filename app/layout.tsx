@@ -202,6 +202,8 @@ export default function RootLayout({
       appearance={clerkAppearance}
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
+      // Disable Clerk monetization features since we use custom Stripe integration
+      telemetry={false}
     >
       <html lang="en" className="dark">
         <head>
@@ -210,7 +212,7 @@ export default function RootLayout({
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           />
-          {/* Suppress Next.js 15+ async params warnings from React DevTools */}
+          {/* Suppress Next.js 15+ async params warnings and Clerk errors from React DevTools */}
           <Script
             id="suppress-async-warnings"
             strategy="beforeInteractive"
@@ -224,6 +226,8 @@ export default function RootLayout({
                     if (msg.includes('params') && msg.includes('Promise') && msg.includes('React.use()')) return;
                     if (msg.includes('searchParams') && msg.includes('Promise') && msg.includes('React.use()')) return;
                     if (msg.includes('sync-dynamic-apis')) return;
+                    // Filter out Clerk checkout popup errors (we use custom Stripe integration)
+                    if (msg.includes('checkout popup config')) return;
                     originalError.apply(console, args);
                   };
                 }

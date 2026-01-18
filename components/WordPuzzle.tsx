@@ -407,6 +407,7 @@ export default function WordPuzzle({
   isLoadingTransliteration = false,
 }: WordPuzzleProps) {
   const { showToast } = useToast();
+  const [mounted, setMounted] = useState(false);
   
   // Tokenize ayah and map transliterations to tokens
   const originalTokens = useMemo(() => {
@@ -433,6 +434,11 @@ export default function WordPuzzle({
   const [hasExceededMistakeLimit, setHasExceededMistakeLimit] = useState(false);
   const [hasCompleted, setHasCompleted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Ensure component is mounted before initializing drag and drop
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [shakingIds, setShakingIds] = useState<Set<string>>(new Set());
   const [isPlayingRecitation, setIsPlayingRecitation] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
@@ -1092,36 +1098,42 @@ export default function WordPuzzle({
         </div>
       )}
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={pointerWithin}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <AnswerArea
-          correctTokens={originalTokens}
-          placedTokens={placedTokens}
-          activeTokenId={activeToken?.id || null}
-          isPlayingRecitation={isPlayingRecitation}
-          hintedSlotPosition={activeHint?.slotPosition ?? null}
-          isFadingHint={isFadingHint}
-          showTransliteration={wordTransliterations.length > 0}
-          enableWordAudio={enableWordByWordAudio}
-          onWordClick={handleAnswerWordClick}
-          playingWordIndex={currentWordIndex}
-        />
-        <WordBank
-          bank={bank}
-          shakingIds={shakingIds}
-          hintedTokenId={activeHint?.tokenId ?? null}
-          isFadingHint={isFadingHint}
-          showTransliteration={wordTransliterations.length > 0}
-        />
+      {mounted ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={pointerWithin}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <AnswerArea
+            correctTokens={originalTokens}
+            placedTokens={placedTokens}
+            activeTokenId={activeToken?.id || null}
+            isPlayingRecitation={isPlayingRecitation}
+            hintedSlotPosition={activeHint?.slotPosition ?? null}
+            isFadingHint={isFadingHint}
+            showTransliteration={wordTransliterations.length > 0}
+            enableWordAudio={enableWordByWordAudio}
+            onWordClick={handleAnswerWordClick}
+            playingWordIndex={currentWordIndex}
+          />
+          <WordBank
+            bank={bank}
+            shakingIds={shakingIds}
+            hintedTokenId={activeHint?.tokenId ?? null}
+            isFadingHint={isFadingHint}
+            showTransliteration={wordTransliterations.length > 0}
+          />
 
-        <DragOverlay dropAnimation={dropAnimation}>
-          {activeToken ? <DraggableWord token={activeToken} isOverlay /> : null}
-        </DragOverlay>
-      </DndContext>
+          <DragOverlay dropAnimation={dropAnimation}>
+            {activeToken ? <DraggableWord token={activeToken} isOverlay /> : null}
+          </DragOverlay>
+        </DndContext>
+      ) : (
+        <div className="min-h-[400px] flex items-center justify-center">
+          <div className="animate-pulse text-gray-500">Loading puzzle...</div>
+        </div>
+      )}
 
       {/* Transliteration Display */}
       {transliteration && (
