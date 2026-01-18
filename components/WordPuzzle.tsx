@@ -2,6 +2,7 @@
 // MODIFIED: 2026-01-17 - Fixed drag/audio issues - NO GLOW ON BANK WORDS
 // MODIFIED: 2026-01-18 - Added harakat coloring
 // MODIFIED: 2026-01-18 - Migrated to Quran.com API for consistent Uthmani text
+// MODIFIED: 2026-01-18 - Fixed word-by-word audio index for Muqatta'at letters
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
@@ -510,13 +511,70 @@ export default function WordPuzzle({
     fetchSettings();
   }, []);
 
+  // Calculate Muqatta'at offset for word audio index mapping
+  // When an ayah starts with Muqatta'at letters (like "الم"), the puzzle tokenizer
+  // splits them into individual tokens [ا, ل, م], but the Quran.com API keeps them
+  // as one word. This creates an index mismatch that we need to correct.
+  // Example: ayah "الم ذَٰلِكَ" → Puzzle: [ا, ل, م, ذَٰلِكَ] vs API: [الم, ذَٰلِكَ]
+  // When clicking token 3 (ذَٰلِكَ), we need to request API word 1, not word 3.
+  const muqattaatOffset = useMemo(() => {
+    // Check if first token is part of Muqatta'at
+    if (originalTokens.length === 0) return 0;
+    
+    const firstWord = ayahText.trim().split(/\s+/)[0] || '';
+    
+    // Check if the first word is a Muqatta'at using the same logic as tokenizeAyah
+    const MUQATTAAT_PATTERNS = [
+      'الم', 'المص', 'الر', 'المر', 'كهيعص', 'طه', 'طسم', 'طس', 'يس', 'ص', 'حم', 'حم عسق', 'عسق', 'ق', 'ن',
+      'الٓمٓ', 'الٓمٓصٓ', 'الٓرٰ', 'الٓمٓرٰ', 'كٓهيعٓصٓ', 'طٰهٰ', 'طٰسٓمٓ', 'طٰسٓ', 'يٰسٓ', 'صٓ', 'حٰمٓ', 'قٓ', 'نٓ',
+      'الۤمۤ', 'الۤمۤصۤ', 'الۤرٰ', 'الۤمۤرٰ',
+    ];
+    
+    // Simple normalization for pattern matching
+    const normalizeForPattern = (text: string) => {
+      return text.replace(/[\u064B-\u065F\u0670\u0610-\u061A\u06D6-\u06ED]/g, '').trim();
+    };
+    
+    const normalizedFirst = normalizeForPattern(firstWord);
+    const isMuqattaat = MUQATTAAT_PATTERNS.some(
+      pattern => normalizeForPattern(pattern) === normalizedFirst
+    );
+    
+    if (!isMuqattaat) return 0;
+    
+    // Count how many letters the Muqatta'at was split into
+    // This is the number of consecutive tokens at the start that belong to the Muqatta'at
+    let muqattaatLetterCount = 0;
+    for (const token of originalTokens) {
+      // Muqatta'at letters are single characters (after normalization)
+      const isBaseLetter = /^[\u0621-\u063A\u0641-\u064A]/.test(token.text);
+      const isSingleLetter = token.text.replace(/[\u064B-\u065F\u0670\u0610-\u061A\u06D6-\u06ED]/g, '').length === 1;
+      
+      if (isBaseLetter && isSingleLetter) {
+        muqattaatLetterCount++;
+      } else {
+        break; // Stop at first non-letter token
+      }
+    }
+    
+    // The offset is (number of letters - 1) because the API has 1 word for all letters
+    // e.g., if "الم" is split into [ا, ل, م], that's 3 letters -> offset of 2
+    return Math.max(0, muqattaatLetterCount - 1);
+  }, [originalTokens, ayahText]);
+
   // Handler for word click in answer area
   const handleAnswerWordClick = useCallback((wordIndex: number) => {
-    console.log('🎯 handleAnswerWordClick called with index:', wordIndex);
+    console.log('🎯 handleAnswerWordClick called with puzzle index:', wordIndex);
+    console.log('📊 muqattaatOffset:', muqattaatOffset);
     console.log('🎵 enableWordByWordAudio:', enableWordByWordAudio);
     console.log('📚 originalTokens length:', originalTokens.length);
-    playWord(wordIndex);
-  }, [playWord, enableWordByWordAudio, originalTokens]);
+    
+    // Adjust the word index to account for Muqatta'at letters being combined in the API
+    const adjustedIndex = wordIndex - muqattaatOffset;
+    console.log('🔄 Adjusted audio index:', adjustedIndex);
+    
+    playWord(adjustedIndex);
+  }, [playWord, enableWordByWordAudio, originalTokens, muqattaatOffset]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -1187,7 +1245,7 @@ export default function WordPuzzle({
             showTransliteration={wordTransliterations.length > 0}
             enableWordAudio={enableWordByWordAudio}
             onWordClick={handleAnswerWordClick}
-            playingWordIndex={currentWordIndex}
+            playingWordIndex={currentWordIndex !== null ? currentWordIndex + muqattaatOffset : null}
           />
           <WordBank
             bank={bank}

@@ -55,6 +55,11 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
         `/api/daily-quote?translation=${translationEdition}`
       );
       if (data.success) {
+        console.log('📖 Daily Quote data received:', {
+          hasTranslation: !!data.data.translation,
+          translationLength: data.data.translation?.length,
+          translation: data.data.translation,
+        });
         setQuote(data.data);
       }
     } catch (err) {
@@ -290,15 +295,23 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
 
         {/* Translation */}
         <AnimatePresence mode="wait">
-          <motion.p
+          <motion.div
             key={quote.translation}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="text-gray-400 text-xs sm:text-sm md:text-base leading-relaxed mb-3 sm:mb-4"
+            className="mb-3 sm:mb-4"
           >
-            "{quote.translation}"
-          </motion.p>
+            {quote.translation ? (
+              <p className="text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed">
+                "{quote.translation}"
+              </p>
+            ) : (
+              <p className="text-gray-500 text-xs sm:text-sm italic">
+                Translation not available
+              </p>
+            )}
+          </motion.div>
         </AnimatePresence>
 
         {/* Footer */}

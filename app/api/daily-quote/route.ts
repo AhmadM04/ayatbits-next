@@ -88,6 +88,21 @@ export async function GET(request: Request) {
     
     if (translationResponse.ok && translationResponse.data) {
       translation = translationResponse.data.data?.text || '';
+      console.log('📖 Translation fetched:', {
+        surahNumber,
+        ayahInSurah,
+        translationEdition,
+        hasTranslation: !!translation,
+        translationLength: translation.length,
+        translationPreview: translation.substring(0, 100),
+      });
+    } else {
+      console.warn('⚠️ Translation fetch failed:', {
+        surahNumber,
+        ayahInSurah,
+        translationEdition,
+        responseOk: translationResponse.ok,
+      });
     }
     
     const responseData = {
