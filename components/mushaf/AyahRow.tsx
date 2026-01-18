@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, CheckCircle } from 'lucide-react';
 import { toArabicNumerals } from '@/lib/mushaf-utils';
@@ -29,16 +29,23 @@ const LONG_PRESS_DURATION = 500; // 500ms for long press
 export default function AyahRow({ verse, onLongPress, isHighlighted = false }: AyahRowProps) {
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const isLongPressing = useRef(false);
+  const [isHolding, setIsHolding] = useState(false);
 
   const handleTouchStart = useCallback(() => {
     isLongPressing.current = false;
+    setIsHolding(true);
+    
     longPressTimer.current = setTimeout(() => {
       isLongPressing.current = true;
-      // Haptic feedback
+      
+      // Enhanced haptic feedback - a more noticeable pattern
       if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate(50);
+        // Double vibration pattern for better feedback: [vibrate, pause, vibrate]
+        navigator.vibrate([100, 50, 100]);
       }
+      
       onLongPress(verse);
+      setIsHolding(false);
     }, LONG_PRESS_DURATION);
   }, [verse, onLongPress]);
 
@@ -47,10 +54,17 @@ export default function AyahRow({ verse, onLongPress, isHighlighted = false }: A
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
+    setIsHolding(false);
   }, []);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
+    
+    // Haptic feedback for right-click/context menu as well
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate([100, 50, 100]);
+    }
+    
     onLongPress(verse);
   }, [verse, onLongPress]);
 
@@ -59,6 +73,7 @@ export default function AyahRow({ verse, onLongPress, isHighlighted = false }: A
       className={`
         relative inline group cursor-pointer select-none
         ${isHighlighted ? 'bg-green-500/20 rounded-lg px-1 -mx-1' : ''}
+        ${isHolding ? 'bg-blue-500/20 rounded-lg px-1 -mx-1' : ''}
       `}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -67,7 +82,18 @@ export default function AyahRow({ verse, onLongPress, isHighlighted = false }: A
       onMouseUp={handleTouchEnd}
       onMouseLeave={handleTouchEnd}
       onContextMenu={handleContextMenu}
-      whileTap={{ scale: 0.98, opacity: 0.8 }}
+      animate={isHolding ? {
+        scale: [1, 1.02, 1.02],
+        backgroundColor: 'rgba(59, 130, 246, 0.15)',
+      } : {
+        scale: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0)',
+      }}
+      transition={{
+        duration: 0.5,
+        ease: 'easeInOut',
+      }}
+      whileTap={!isHolding ? { scale: 0.98, opacity: 0.8 } : {}}
     >
       {/* Status indicators - shown inline before ayah number */}
       {(verse.isCompleted || verse.isLiked) && (
@@ -92,7 +118,23 @@ export default function AyahRow({ verse, onLongPress, isHighlighted = false }: A
       </span>
       
       {/* Hover/active indicator */}
-      <span className="absolute inset-0 opacity-0 group-hover:opacity-100 group-active:opacity-100 bg-white/5 rounded-lg pointer-events-none transition-opacity duration-150" />
+      <span className={`
+        absolute inset-0 rounded-lg pointer-events-none transition-opacity duration-150
+        ${isHolding 
+          ? 'opacity-100 bg-blue-500/20 animate-pulse' 
+          : 'opacity-0 group-hover:opacity-100 group-active:opacity-100 bg-white/5'
+        }
+      `} />
+      
+      {/* Long-press progress indicator */}
+      {isHolding && (
+        <motion.span
+          className="absolute bottom-0 left-0 h-0.5 bg-blue-400 rounded-full"
+          initial={{ width: '0%' }}
+          animate={{ width: '100%' }}
+          transition={{ duration: LONG_PRESS_DURATION / 1000, ease: 'linear' }}
+        />
+      )}
     </motion.span>
   );
 }
