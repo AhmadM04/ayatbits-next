@@ -217,6 +217,13 @@ function DraggableWord({
     id: token.id,
     data: { type: 'bank-item', token },
   });
+  
+  console.log('[DND] DraggableWord rendered', { 
+    id: token.id, 
+    hasListeners: !!listeners, 
+    hasAttributes: !!attributes,
+    isOverlay 
+  });
 
   return (
     <motion.div
@@ -437,6 +444,7 @@ export default function WordPuzzle({
   
   // Ensure component is mounted before initializing drag and drop
   useEffect(() => {
+    console.log('[DND] Component mounting, setting mounted=true');
     setMounted(true);
   }, []);
   const [shakingIds, setShakingIds] = useState<Set<string>>(new Set());
@@ -513,6 +521,8 @@ export default function WordPuzzle({
       },
     })
   );
+  
+  console.log('[DND] Sensors setup complete', { mounted, sensorsLength: sensors?.length });
 
   const resetState = useCallback(() => {
     setIsLoading(true);
@@ -1105,12 +1115,14 @@ export default function WordPuzzle({
       )}
 
       {mounted ? (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={pointerWithin}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
+        <>
+          {console.log('[DND] Rendering DndContext', { mounted, bankLength: bank.length })}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={pointerWithin}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
           <AnswerArea
             correctTokens={originalTokens}
             placedTokens={placedTokens}
@@ -1135,6 +1147,7 @@ export default function WordPuzzle({
             {activeToken ? <DraggableWord token={activeToken} isOverlay /> : null}
           </DragOverlay>
         </DndContext>
+        </>
       ) : (
         <div className="min-h-[400px] flex items-center justify-center">
           <div className="animate-pulse text-gray-500">Loading puzzle...</div>
