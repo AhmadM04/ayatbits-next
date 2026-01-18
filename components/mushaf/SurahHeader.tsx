@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { SURAH_NAMES_ARABIC } from '@/lib/mushaf-utils';
+import { HarakatColoredText } from '@/components/arabic';
 
 interface SurahHeaderProps {
   surahNumber: number;
@@ -63,7 +64,7 @@ export default function SurahHeader({ surahNumber, showBismillah = true }: Surah
             className="text-xl font-arabic text-white/80"
             dir="rtl"
           >
-            {BISMILLAH}
+            <HarakatColoredText text={BISMILLAH} />
           </p>
         </motion.div>
       )}

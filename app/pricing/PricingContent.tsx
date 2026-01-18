@@ -69,7 +69,7 @@ export default function PricingContent() {
 
     // Cleanup interval on unmount
     return () => clearInterval(pollInterval);
-  }, [mounted, hasAccess, router]);, [router, hasAccess]);
+  }, [mounted, hasAccess, router]);
 
   // Stripe Price IDs - these should match your Stripe dashboard
   const plans = [

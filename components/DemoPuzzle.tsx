@@ -16,6 +16,7 @@ import {
   useDraggable,
 } from '@dnd-kit/core';
 import { tokenizeAyah, type WordToken } from '@/lib/puzzle-logic';
+import { HarakatColoredText } from '@/components/arabic';
 
 // Demo ayah text for the puzzle (Surah Al-Fatiha verse 1)
 const DEMO_AYAH = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
@@ -45,7 +46,7 @@ function DraggableWord({ word, isActive }: { word: WordToken; isActive: boolean 
         isDragging ? 'opacity-50' : ''
       }`}
     >
-      {word.text}
+      <HarakatColoredText text={word.text} />
     </motion.button>
   );
 }
@@ -85,7 +86,7 @@ function DropSlot({
           animate={{ scale: 1, opacity: 1 }}
           className="text-lg font-arabic text-green-400 px-3"
         >
-          {placedWord.text}
+          <HarakatColoredText text={placedWord.text} />
         </motion.span>
       ) : (
         <span className="text-xs text-gray-600">{index + 1}</span>
@@ -295,7 +296,7 @@ export default function DemoPuzzle() {
         <DragOverlay>
           {activeWord ? (
             <div className="px-4 py-3 bg-green-600 border border-green-500 rounded-xl text-white font-arabic text-lg shadow-lg shadow-green-600/30 cursor-grabbing">
-              {activeWord.text}
+              <HarakatColoredText text={activeWord.text} />
             </div>
           ) : null}
         </DragOverlay>

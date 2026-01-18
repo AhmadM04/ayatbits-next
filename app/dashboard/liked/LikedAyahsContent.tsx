@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Heart, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
+import { HarakatColoredText } from '@/components/arabic';
 
 interface LikedAyah {
   id: string;
@@ -146,10 +147,11 @@ export default function LikedAyahsContent() {
                   </div>
                 </div>
                 <p 
-                  className="text-lg leading-relaxed text-gray-300 text-right"
+                  className="text-lg leading-relaxed text-gray-300 text-right font-arabic"
                   dir="rtl"
+                  style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
                 >
-                  {ayah.ayahText}
+                  <HarakatColoredText text={ayah.ayahText} />
                 </p>
               </motion.div>
             ))}
