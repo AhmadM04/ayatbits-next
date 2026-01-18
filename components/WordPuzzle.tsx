@@ -633,7 +633,10 @@ export default function WordPuzzle({
 
   // Initialize puzzle state ONLY on mount - don't reset during completion
   useEffect(() => {
-    console.log('[PUZZLE] Initializing puzzle state on mount');
+    console.log('[PUZZLE] Initializing puzzle state on mount', {
+      originalTokensLength: originalTokens.length,
+      ayahText: ayahText.substring(0, 50)
+    });
     const initialBank = shuffleArray(originalTokens);
     setBank(initialBank);
     setPlacedTokens(new Map());
@@ -649,7 +652,7 @@ export default function WordPuzzle({
     setIsFadingHint(false);
     setIsLoading(false);
     
-    console.log('[PUZZLE] Initial state set with', originalTokens.length, 'tokens');
+    console.log('[PUZZLE] Initial state set with', originalTokens.length, 'tokens, bank length:', initialBank.length);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // ONLY on mount - never reset automatically
 
