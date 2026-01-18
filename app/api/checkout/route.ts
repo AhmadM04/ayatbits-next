@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     // Check if user already has access (subscription or admin-granted)
     await connectDB();
-    const dbUser = await User.findOne({ clerkId: user.id });
+    const dbUser = await User.findOne({ clerkIds: user.id });
     
     if (dbUser) {
       // Explicit check for admin-granted access
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Final access check right before creating Stripe session (double-check for race conditions)
-    const finalCheck = await User.findOne({ clerkId: user.id });
+    const finalCheck = await User.findOne({ clerkIds: user.id });
     if (finalCheck) {
       if (finalCheck.hasDirectAccess || finalCheck.isAdmin || checkSubscription(finalCheck)) {
         logger.info('Checkout blocked - user gained access during checkout', {

@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
         if (userId && session.customer) {
           // Check if user has admin-granted access before updating
-          const existingUser = await User.findOne({ clerkId: userId });
+          const existingUser = await User.findOne({ clerkIds: userId });
           
           if (existingUser?.hasDirectAccess) {
             logger.warn('User with admin access attempted Stripe checkout', {
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
             
             // Save customer ID for reference, but don't overwrite subscription details
             await User.findOneAndUpdate(
-              { clerkId: userId },
+              { clerkIds: userId },
               {
                 stripeCustomerId: session.customer as string,
               }
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
           }
 
           await User.findOneAndUpdate(
-            { clerkId: userId },
+            { clerkIds: userId },
             {
               stripeCustomerId: session.customer as string,
               subscriptionStatus: 'active',

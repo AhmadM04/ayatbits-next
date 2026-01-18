@@ -1,0 +1,13 @@
+{
+    "mcpServers": {
+      "TalkToFigma": {
+        "command": "bunx",
+        "args": [
+          "cursor-talk-to-figma-mcp@latest"
+        ]
+      },
+      "clerk": {
+        "url": "https://mcp.clerk.com/mcp"
+      }
+    }
+  }

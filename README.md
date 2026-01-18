@@ -36,6 +36,9 @@ A Next.js application for learning and memorizing Quranic verses through interac
    ```env
    MONGODB_URL="mongodb+srv://..."
    
+   # Clerk Environment Selector (NEW - prevents key mismatch)
+   CLERK_ENVIRONMENT=test  # Use 'test' for development, 'production' for prod
+   
    # Development Clerk Keys (for local testing)
    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_TEST=pk_test_your_clerk_key
    CLERK_SECRET_KEY_TEST=sk_test_your_clerk_secret

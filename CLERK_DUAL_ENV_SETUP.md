@@ -68,6 +68,9 @@ export function configureClerkEnvironment(): void
 Based on your configuration, you should have:
 
 ```env
+# Clerk Environment Selector (prevents JWT kid mismatch)
+CLERK_ENVIRONMENT=test
+
 # Development Clerk Keys (for local testing)
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_TEST=pk_test_your_key_here
 CLERK_SECRET_KEY_TEST=sk_test_enczHYrJa4SIvpA72UcCTXS8ifkp2b1uTvEgPXv3xz
@@ -112,10 +115,26 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_xxxxxxxxxxxxxxxxxxxx
 ## Benefits
 
 ✅ **Safe Development**: Test locally without affecting production users  
-✅ **Easy Switching**: Automatic environment detection, no manual configuration  
+✅ **Easy Switching**: Change one variable (`CLERK_ENVIRONMENT`) to switch environments  
 ✅ **Clean Code**: Centralized key management in one place  
 ✅ **Type Safe**: Full TypeScript support  
-✅ **Fallback Support**: Gracefully falls back if keys are missing  
+✅ **No Kid Mismatch**: Guaranteed frontend/backend key consistency  
+✅ **Debug Endpoint**: Visit `/api/debug/clerk-status` to verify configuration
+
+## Troubleshooting JWT Kid Mismatch
+
+If you see this error:
+```
+Clerk: unable to resolve handshake: Error: Unable to find a signing key in JWKS that matches the kid='ins_xxxxx'
+```
+
+**Root Cause**: Frontend and backend are using keys from different Clerk instances.
+
+**Solution**:
+1. Add `CLERK_ENVIRONMENT=test` to your `.env.local`
+2. Restart your dev server
+3. Visit `http://localhost:3000/api/debug/clerk-status` to verify keys match
+4. Ensure both `_TEST` and production keys are configured  
 
 ## Verification
 

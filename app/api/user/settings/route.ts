@@ -19,7 +19,7 @@ export async function GET() {
 
     await connectDB();
 
-    const user = await User.findOne({ clerkId: userId }).lean() as any;
+    const user = await User.findOne({ clerkIds: userId }).lean() as any;
 
     return NextResponse.json(
       { 
@@ -87,7 +87,7 @@ export async function PATCH(request: Request) {
     }
 
     const user = await User.findOneAndUpdate(
-      { clerkId: userId },
+      { clerkIds: userId },
       updateFields,
       { new: true }
     );

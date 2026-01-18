@@ -65,10 +65,10 @@ export async function POST(
     await connectDB();
 
     // Find or create user
-    let dbUser = await User.findOne({ clerkId: user.id });
+    let dbUser = await User.findOne({ clerkIds: user.id });
     if (!dbUser) {
       dbUser = await User.create({
-        clerkId: user.id,
+        clerkIds: [user.id],
         email: user.emailAddresses[0]?.emailAddress || '',
         firstName: user.firstName,
         lastName: user.lastName,

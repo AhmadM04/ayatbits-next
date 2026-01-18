@@ -14,7 +14,7 @@ export type SubscriptionPlan = 'monthly' | 'yearly' | 'lifetime'; // Removed 'fr
 export type SubscriptionPlatform = 'web' | 'ios';
 
 export interface IUser extends Document {
-  clerkId?: string; // Optional: Admin-created users may not have a Clerk account yet
+  clerkIds?: string[]; // Array to support multiple Clerk instances (dev/prod). Admin-created users may not have any.
   email: string;
   firstName?: string;
   lastName?: string;
@@ -46,7 +46,7 @@ export interface IUser extends Document {
 
 const userSchema = new mongoose.Schema<IUser>(
   {
-    clerkId: { type: String, required: false, unique: true, sparse: true, index: true },
+    clerkIds: { type: [String], required: false, index: true },
     email: { type: String, required: true, unique: true },
     firstName: { type: String },
     lastName: { type: String },

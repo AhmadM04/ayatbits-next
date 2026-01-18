@@ -13,7 +13,7 @@ export async function GET() {
     }
 
     await connectDB();
-    const user = await User.findOne({ clerkId: userId });
+    const user = await User.findOne({ clerkIds: userId });
 
     if (!user) {
       // User is authenticated via Clerk but not in DB yet (race condition during signup)

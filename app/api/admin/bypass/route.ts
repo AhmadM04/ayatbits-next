@@ -13,7 +13,7 @@ export async function POST() {
     await connectDB();
 
     await User.findOneAndUpdate(
-      { clerkId: adminUser.clerkId },
+      { clerkIds: adminUser.clerkIds?.[0] },
       { 
         subscriptionStatus: 'active',
         subscriptionPlan: 'lifetime',

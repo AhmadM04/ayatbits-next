@@ -33,10 +33,10 @@ async function ensureDbUser(clerkUser: Awaited<ReturnType<typeof currentUser>>) 
   await connectDB();
 
   try {
-    // 1) Try by current clerkId
-    let dbUser = await User.findOne({ clerkId: clerkUser.id });
+    // 1) Try by current clerkId (MongoDB automatically searches arrays)
+    let dbUser = await User.findOne({ clerkIds: clerkUser.id });
 
-    // 2) If not found, try merge by email (case-insensitive) and attach new clerkId
+    // 2) If not found, try merge by email (case-insensitive) and add new clerkId
     if (!dbUser && emailLower) {
       logger.debug('User not found by clerkId, searching by email', { email: emailLower });
       dbUser = await User.findOne({ email: { $regex: new RegExp(`^${emailLower}$`, 'i') } });
@@ -44,9 +44,20 @@ async function ensureDbUser(clerkUser: Awaited<ReturnType<typeof currentUser>>) 
         logger.info('Merging existing user account', {
           userId: clerkUser.id,
           email: emailLower,
-          existingClerkId: dbUser.clerkId || 'NULL',
+          existingClerkIds: dbUser.clerkIds || [],
         });
-        dbUser.clerkId = clerkUser.id as string;
+        // Add the new clerkId to the array if not already present
+        if (!dbUser.clerkIds) {
+          dbUser.clerkIds = [];
+        }
+        if (!dbUser.clerkIds.includes(clerkUser.id)) {
+          dbUser.clerkIds.push(clerkUser.id);
+          logger.info('Added new clerkId to user account', { 
+            userId: clerkUser.id, 
+            email: emailLower,
+            totalClerkIds: dbUser.clerkIds.length 
+          });
+        }
         await dbUser.save();
         logger.info('Account merged successfully', { userId: clerkUser.id, email: emailLower });
       } else {
@@ -57,7 +68,7 @@ async function ensureDbUser(clerkUser: Awaited<ReturnType<typeof currentUser>>) 
     // 3) If still not found, create new
     if (!dbUser) {
       dbUser = await User.create({
-        clerkId: clerkUser.id, // No fallback - validated above
+        clerkIds: [clerkUser.id], // Store as array
         email: emailLower, // No fallback - validated above
         firstName: clerkUser?.firstName,
         lastName: clerkUser?.lastName,
@@ -104,7 +115,7 @@ async function ensureDbUser(clerkUser: Awaited<ReturnType<typeof currentUser>>) 
       // User was created between our check and create - fetch it
       const existingUser = await User.findOne({ 
         $or: [
-          { clerkId: clerkUser.id },
+          { clerkIds: clerkUser.id },
           { email: emailLower }
         ]
       });
@@ -153,7 +164,7 @@ export async function requireDashboardAccess() {
 
     console.log('[requireDashboardAccess] DB User found:', {
       email: dbUser.email,
-      clerkId: dbUser.clerkId,
+      clerkIds: dbUser.clerkIds,
       isAdmin: dbUser.isAdmin,
       hasDirectAccess: dbUser.hasDirectAccess,
       subscriptionPlan: dbUser.subscriptionPlan,

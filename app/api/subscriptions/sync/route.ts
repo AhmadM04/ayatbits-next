@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if user has admin-granted access before syncing iOS subscription
-    const existingUser = await User.findOne({ clerkId: user.id });
+    const existingUser = await User.findOne({ clerkIds: user.id });
     
     if (!existingUser) {
       return NextResponse.json(
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
 
     // Update user subscription in MongoDB
     const updatedUser = await User.findOneAndUpdate(
-      { clerkId: user.id },
+      { clerkIds: user.id },
       {
         subscriptionStatus: isInTrial 
           ? SubscriptionStatusEnum.TRIALING 
@@ -156,7 +156,7 @@ export async function GET(req: NextRequest) {
 
     await connectDB();
 
-    const dbUser = await User.findOne({ clerkId: user.id });
+    const dbUser = await User.findOne({ clerkIds: user.id });
 
     if (!dbUser) {
       return NextResponse.json(

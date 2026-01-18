@@ -69,7 +69,7 @@ async function grantAccess(email: string, duration: GrantDuration = 'lifetime') 
 
     console.log(`\n📋 Current user status:`);
     console.log(`   Email: ${user.email}`);
-    console.log(`   Clerk ID: ${user.clerkId || 'Not set'}`);
+    console.log(`   Clerk IDs: ${user.clerkIds?.join(', ') || 'Not set'}`);
     console.log(`   Subscription Plan: ${user.subscriptionPlan || 'None'}`);
     console.log(`   Subscription Status: ${user.subscriptionStatus || 'None'}`);
     console.log(`   Subscription End Date: ${user.subscriptionEndDate || 'None'}`);

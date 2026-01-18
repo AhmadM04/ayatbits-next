@@ -25,7 +25,7 @@ export async function POST() {
 
     await connectDB();
 
-    const dbUser = await User.findOne({ clerkId: user.id });
+    const dbUser = await User.findOne({ clerkIds: user.id });
     if (!dbUser?.stripeCustomerId) {
       return NextResponse.json(
         { error: 'No billing account found. Please subscribe first.' },

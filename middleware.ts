@@ -21,6 +21,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/webhook/(.*)', // Webhooks should be publicly accessible
   '/api/daily-quote', // Public API for daily quote
   '/api/waitlist/(.*)', // Allow waitlist API to be public
+  '/api/check-access', // Allow check-access to handle its own auth (returns 401 if not authenticated)
 ]);
 
 // Routes that require stricter rate limiting

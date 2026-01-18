@@ -139,6 +139,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
+  // Turbopack handles code splitting automatically
+  // Webpack config removed to avoid conflicts with Turbopack
 };
 
 export default nextConfig;

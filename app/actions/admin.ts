@@ -132,7 +132,7 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
 
     // 5. Log the grant for audit
     await AdminGrantLog.create({
-      adminId: adminUser.clerkId,
+      adminId: adminUser.clerkIds?.[0] || 'unknown',
       adminEmail: adminUser.email,
       targetEmail: updatedUser.email,
       duration,

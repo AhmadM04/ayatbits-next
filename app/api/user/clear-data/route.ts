@@ -13,7 +13,7 @@ export async function POST() {
     await connectDB();
 
     // Find the user
-    const user = await User.findOne({ clerkId: userId });
+    const user = await User.findOne({ clerkIds: userId });
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -27,7 +27,7 @@ export async function POST() {
 
     // Reset user stats (but keep subscription status)
     await User.updateOne(
-      { clerkId: userId },
+      { clerkIds: userId },
       {
         $set: {
           currentStreak: 0,

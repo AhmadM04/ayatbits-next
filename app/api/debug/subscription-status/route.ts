@@ -24,7 +24,7 @@ export async function GET() {
     const emailLower = email?.toLowerCase();
 
     // Try to find user by clerkId first
-    let dbUser = await User.findOne({ clerkId: clerkUser.id });
+    let dbUser = await User.findOne({ clerkIds: clerkUser.id });
 
     // If not found, try by email
     if (!dbUser && emailLower) {
@@ -58,7 +58,7 @@ export async function GET() {
       },
       dbUser: {
         _id: dbUser._id,
-        clerkId: dbUser.clerkId,
+        clerkIds: dbUser.clerkIds,
         email: dbUser.email,
         isAdmin: dbUser.isAdmin,
         hasDirectAccess: dbUser.hasDirectAccess,

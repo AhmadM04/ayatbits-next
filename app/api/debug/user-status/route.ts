@@ -19,7 +19,7 @@ export async function GET() {
 
     // Get database user
     await connectDB();
-    const dbUser = await User.findOne({ clerkId: clerkUser.id });
+    const dbUser = await User.findOne({ clerkIds: clerkUser.id });
     const dbUserByEmail = email ? await User.findOne({ 
       email: { $regex: new RegExp(`^${email}$`, 'i') } 
     }) : null;
@@ -39,7 +39,7 @@ export async function GET() {
         foundByEmail: !!dbUserByEmail,
         user: dbUser ? {
           _id: dbUser._id,
-          clerkId: dbUser.clerkId,
+          clerkIds: dbUser.clerkIds,
           email: dbUser.email,
           isAdmin: dbUser.isAdmin,
           subscriptionStatus: dbUser.subscriptionStatus,
@@ -49,7 +49,7 @@ export async function GET() {
         } : null,
         userByEmail: dbUserByEmail && dbUserByEmail._id !== dbUser?._id ? {
           _id: dbUserByEmail._id,
-          clerkId: dbUserByEmail.clerkId,
+          clerkIds: dbUserByEmail.clerkIds,
           email: dbUserByEmail.email,
           subscriptionStatus: dbUserByEmail.subscriptionStatus,
           subscriptionPlan: dbUserByEmail.subscriptionPlan,

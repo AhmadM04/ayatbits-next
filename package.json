@@ -3,14 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "next dev",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "typecheck": "tsc --noEmit",
-    "db:seed": "tsx -r dotenv/config scripts/seed.ts"
+    "db:seed": "tsx -r dotenv/config scripts/seed.ts",
+    "db:migrate-clerkids": "tsx -r dotenv/config scripts/migrate-clerkids.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.36.5",

@@ -184,13 +184,17 @@ const jsonLd = {
   ],
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // In dev mode, prefer test keys. In production, use production keys.
-  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_TEST || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
+  // Use environment selector to ensure frontend and backend use matching keys
+  // Check NEXT_PUBLIC_CLERK_ENVIRONMENT to determine which keys to use
+  const clerkEnv = process.env.NEXT_PUBLIC_CLERK_ENVIRONMENT || 'test';
+  const clerkKey = clerkEnv === 'production' 
+    ? (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '')
+    : (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_TEST || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '');
   
   return (
     <ClerkProvider

@@ -11,7 +11,7 @@ export async function GET() {
 
     await connectDB();
 
-    const dbUser = await User.findOne({ clerkId: user.id }).lean() as any;
+    const dbUser = await User.findOne({ clerkIds: user.id }).lean() as any;
     if (!dbUser) {
       return NextResponse.json({ achievements: [], stats: {} });
     }

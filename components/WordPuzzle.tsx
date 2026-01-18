@@ -1,4 +1,5 @@
 // components/WordPuzzle.tsx
+// MODIFIED: 2026-01-17 - Fixed drag/audio issues - NO GLOW ON BANK WORDS
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
@@ -10,7 +11,7 @@ import {
   DropAnimation,
   PointerSensor,
   TouchSensor,
-  closestCenter,
+  pointerWithin,
   defaultDropAnimationSideEffects,
   useDraggable,
   useDroppable,
@@ -83,7 +84,17 @@ function DropSlot({
       ref={setNodeRef}
       initial={{ opacity: 0, scale: 0.8 }}
       animate={
-        isHinted
+        isPlayingThis
+          ? {
+              opacity: 1,
+              scale: 1,
+              boxShadow: [
+                '0 0 0 rgba(16, 185, 129, 0)',
+                '0 0 25px rgba(16, 185, 129, 0.6)',
+                '0 0 0 rgba(16, 185, 129, 0)',
+              ],
+            }
+          : isHinted
           ? {
               opacity: 1,
               scale: 1,
@@ -97,7 +108,15 @@ function DropSlot({
           : { opacity: 1, scale: 1 }
       }
       transition={
-        isHinted
+        isPlayingThis
+          ? {
+              boxShadow: {
+                duration: 1,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              },
+            }
+          : isHinted
           ? {
               x: {
                 duration: 0.6,
@@ -109,7 +128,7 @@ function DropSlot({
                 repeat: Infinity,
               },
             }
-          : { delay: position * 0.02, duration: 0.15 }
+          : { delay: position * 0.02, duration: 0.3 }
       }
       onClick={handleWordClick}
       className={`
@@ -160,113 +179,77 @@ function DropSlot({
   );
 }
 
+// Bank words are drag-only, no click/audio functionality
 function DraggableWord({
   token,
   isOverlay = false,
   isShaking = false,
   isHinted = false,
   showTransliteration = false,
-  onClick,
-  enableWordAudio = false,
-  onAudioClick,
-  isPlayingAudio = false,
 }: {
   token: WordToken;
   isOverlay?: boolean;
   isShaking?: boolean;
   isHinted?: boolean;
   showTransliteration?: boolean;
-  onClick?: (id: string) => void;
-  enableWordAudio?: boolean;
-  onAudioClick?: () => void;
-  isPlayingAudio?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: token.id,
     data: { type: 'bank-item', token },
   });
 
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (enableWordAudio && onAudioClick && !isDragging) {
-      onAudioClick();
-    } else if (!isDragging && onClick) {
-      onClick(token.id);
-    }
-  };
+  // Debug: log when component renders to verify new code is loaded
+  if (isHinted) {
+    console.log('[DraggableWord V2] Hinted word rendered:', token.text, 'NO GLOW ANIMATION');
+  }
 
   return (
     <motion.div
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      onClick={handleClick}
+      tabIndex={-1}
+      role="none"
+      data-component="draggable-word-v2-fixed"
+      data-hinted={isHinted}
+      data-bank-word="true"
       animate={
-        isPlayingAudio
-          ? {
-              boxShadow: [
-                '0 0 0 rgba(168, 85, 247, 0)',
-                '0 0 20px rgba(168, 85, 247, 0.5)',
-                '0 0 0 rgba(168, 85, 247, 0)',
-              ],
-            }
-          : isHinted
-          ? {
-              x: [0, -4, 4, -4, 4, 0],
-              boxShadow: [
-                '0 0 0 rgba(16, 185, 129, 0)',
-                '0 0 20px rgba(16, 185, 129, 0.5)',
-                '0 0 0 rgba(16, 185, 129, 0)',
-              ],
-            }
-          : isShaking
-            ? { x: [0, -8, 8, -8, 8, 0] }
-            : {}
+        isShaking
+          ? { x: [0, -8, 8, -8, 8, 0] }
+          : {}
       }
-      transition={
-        isPlayingAudio
-          ? {
-              boxShadow: {
-                duration: 1,
-                repeat: Infinity,
-              },
-            }
-          : isHinted
-          ? {
-              x: {
-                duration: 0.6,
-                repeat: Infinity,
-                repeatDelay: 0.5,
-              },
-              boxShadow: {
-                duration: 1.5,
-                repeat: Infinity,
-              },
-            }
-          : { duration: 0.3 }
-      }
+      transition={{ duration: 0.3 }}
       className={`
-        relative cursor-pointer group
+        relative cursor-grab active:cursor-grabbing group
         px-4 py-2.5 rounded-xl
         text-lg font-medium font-arabic text-center
         transition-all duration-150 select-none
         ${isDragging ? 'opacity-40' : 'opacity-100'}
         ${
-          isPlayingAudio
-            ? 'bg-purple-500/30 border-2 border-purple-400 text-purple-300'
-            : isOverlay
+          isOverlay
             ? 'bg-[#1a1a1a] border-2 border-green-500 shadow-xl text-white scale-105 z-50'
             : isHinted
-              ? 'bg-[#1a1a1a] border-2 border-green-400 text-green-300 shadow-lg shadow-green-500/30 scale-105'
+              ? 'bg-[#1a1a1a] border-2 border-amber-400 text-amber-200 shadow-lg shadow-amber-500/30'
               : 'bg-[#1a1a1a] border border-white/10 text-gray-200 hover:bg-[#222] hover:border-white/20 active:scale-95'
         }
       `}
+      style={{ pointerEvents: 'auto' }}
+      onPointerDown={(e) => {
+        // Prevent any click/audio behavior - only allow dragging
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => {
+        // Additional prevention for mouse-triggered clicks
+        e.stopPropagation();
+      }}
+      onClick={(e) => {
+        // Explicitly prevent click events from triggering audio
+        e.preventDefault();
+        e.stopPropagation();
+      }}
     >
-      <span className="flex items-center gap-1">
+      <span className="flex items-center gap-1 pointer-events-none">
         {token.text}
-        {enableWordAudio && !isOverlay && (
-          <Volume2 className="w-3 h-3 text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-        )}
       </span>
       {showTransliteration && token.transliteration && !isOverlay && (
         <motion.span
@@ -345,19 +328,11 @@ function WordBank({
   shakingIds,
   hintedTokenId,
   showTransliteration,
-  onSelect,
-  enableWordAudio = false,
-  onWordAudioClick,
-  playingTokenId,
 }: {
   bank: WordToken[];
   shakingIds: Set<string>;
   hintedTokenId: string | null;
   showTransliteration: boolean;
-  onSelect?: (id: string) => void;
-  enableWordAudio?: boolean;
-  onWordAudioClick?: (token: WordToken) => void;
-  playingTokenId?: string | null;
 }) {
   return (
     <div className="mt-6" dir="rtl">
@@ -376,10 +351,6 @@ function WordBank({
                 isShaking={shakingIds.has(token.id)}
                 isHinted={hintedTokenId === token.id}
                 showTransliteration={showTransliteration}
-                onClick={onSelect}
-                enableWordAudio={enableWordAudio}
-                onAudioClick={() => onWordAudioClick?.(token)}
-                isPlayingAudio={playingTokenId === token.id}
               />
             </motion.div>
           ))}
@@ -427,7 +398,8 @@ export default function WordPuzzle({
     return tokens;
   }, [ayahText, wordTransliterations]);
 
-  const [bank, setBank] = useState<WordToken[]>([]);
+  // Initialize bank with shuffled tokens immediately
+  const [bank, setBank] = useState<WordToken[]>(() => shuffleArray(originalTokens));
   const [placedTokens, setPlacedTokens] = useState<Map<number, WordToken>>(new Map());
   const [activeToken, setActiveToken] = useState<WordToken | null>(null);
   const [mistakeCount, setMistakeCount] = useState(0);
@@ -439,14 +411,17 @@ export default function WordPuzzle({
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const [audioError, setAudioError] = useState<string | null>(null);
   
-  // Tips system state
-  const [availableTips, setAvailableTips] = useState(0);
+  // Tips system state - initialize with calculated value from originalTokens
+  const [availableTips, setAvailableTips] = useState(() => {
+    const initialTips = calculateTipsForAyah(originalTokens.length);
+    console.log('[TIPS] Initial state - calculated tips:', initialTips, 'for', originalTokens.length, 'tokens');
+    return initialTips;
+  });
   const [usedTips, setUsedTips] = useState(0);
   const [activeHint, setActiveHint] = useState<{ tokenId: string; slotPosition: number } | null>(null);
   
   // Word audio state
   const [enableWordByWordAudio, setEnableWordByWordAudio] = useState(false);
-  const [playingTokenId, setPlayingTokenId] = useState<string | null>(null);
   
   const pendingToast = useRef<{ message: string; type: 'success' | 'error'; duration: number } | null>(null);
   const onSolvedRef = useRef(onSolved);
@@ -485,16 +460,6 @@ export default function WordPuzzle({
     fetchSettings();
   }, []);
 
-  // Update playing token ID when word audio plays
-  useEffect(() => {
-    if (isPlayingWord && currentWordIndex !== null) {
-      const token = originalTokens[currentWordIndex];
-      setPlayingTokenId(token?.id || null);
-    } else {
-      setPlayingTokenId(null);
-    }
-  }, [isPlayingWord, currentWordIndex, originalTokens]);
-
   // Handler for word click in answer area
   const handleAnswerWordClick = useCallback((wordIndex: number) => {
     console.log('🎯 handleAnswerWordClick called with index:', wordIndex);
@@ -502,15 +467,6 @@ export default function WordPuzzle({
     console.log('📚 originalTokens length:', originalTokens.length);
     playWord(wordIndex);
   }, [playWord, enableWordByWordAudio, originalTokens]);
-
-  // Handler for word click in word bank
-  const handleBankWordClick = useCallback((token: WordToken) => {
-    // Find the word index in original tokens
-    const wordIndex = originalTokens.findIndex(t => t.id === token.id);
-    if (wordIndex !== -1) {
-      playWord(wordIndex);
-    }
-  }, [originalTokens, playWord]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -536,6 +492,10 @@ export default function WordPuzzle({
     
     // Reset tips system
     const tipsCount = calculateTipsForAyah(originalTokens.length);
+    console.log('[TIPS] resetState - calculating tips:', {
+      originalTokensLength: originalTokens.length,
+      tipsCount,
+    });
     setAvailableTips(tipsCount);
     setUsedTips(0);
     setActiveHint(null);
@@ -750,14 +710,25 @@ export default function WordPuzzle({
 
   // Manual tip triggering (when user clicks tips button)
   const handleManualTip = useCallback(() => {
+    console.log('[TIPS] handleManualTip called', {
+      usedTips,
+      availableTips,
+      hasActiveHint: !!activeHint,
+      bankLength: bank.length,
+      originalTokensLength: originalTokens.length,
+      placedTokensSize: placedTokens.size,
+    });
+
     // Check if tips are available
     if (usedTips >= availableTips) {
+      console.log('[TIPS] No tips available - usedTips >= availableTips');
       showToast('No tips available!', 'error', 2000);
       return;
     }
 
     // Don't trigger if hint is already active
     if (activeHint) {
+      console.log('[TIPS] Hint already active');
       showToast('Tip already showing! Dismiss or use it first.', 'info', 2000);
       return;
     }
@@ -771,13 +742,29 @@ export default function WordPuzzle({
       }
     }
     
+    console.log('[TIPS] First empty slot:', firstEmptySlot);
+    
     if (firstEmptySlot === -1) {
       showToast('All slots are filled!', 'info', 2000);
       return;
     }
 
     const correctToken = originalTokens[firstEmptySlot];
-    const correctWordInBank = bank.find(t => t.norm === correctToken.norm);
+    console.log('[TIPS] Looking for token:', { 
+      text: correctToken.text, 
+      norm: correctToken.norm,
+      id: correctToken.id 
+    });
+    console.log('[TIPS] Bank contents:', bank.map(t => ({ id: t.id, text: t.text, norm: t.norm })));
+    
+    // Find the correct word in the bank - use exact ID match first, then fall back to norm match
+    let correctWordInBank = bank.find(t => t.id === correctToken.id);
+    if (!correctWordInBank) {
+      // Fall back to norm matching for duplicate words
+      correctWordInBank = bank.find(t => t.norm === correctToken.norm);
+    }
+    
+    console.log('[TIPS] Found word in bank:', correctWordInBank ? { id: correctWordInBank.id, text: correctWordInBank.text } : 'NOT FOUND');
     
     if (correctWordInBank) {
       setActiveHint({
@@ -787,6 +774,7 @@ export default function WordPuzzle({
       setUsedTips((prev) => prev + 1);
       showToast('💡 Tip activated! Watch the highlighted word and slot.', 'success', 3000);
     } else {
+      console.log('[TIPS] Could not find correct word in bank');
       showToast('Unable to find the correct word. Try placing more words!', 'error', 2000);
     }
   }, [usedTips, availableTips, activeHint, originalTokens, placedTokens, bank, showToast]);
@@ -839,31 +827,15 @@ export default function WordPuzzle({
         return prev;
       });
       
+      // Auto-play word audio if enabled
+      if (enableWordByWordAudio) {
+        console.log('[PLACEMENT] 🔊 Auto-playing word audio for position:', slotPosition);
+        playWord(slotPosition);
+      }
+      
       return true;
     },
-    [originalTokens, placedTokens, onWordCorrect, registerMistake]
-  );
-
-  // For click: find first empty slot and try to place there
-  const handleBankClick = useCallback(
-    (id: string) => {
-      const token = bank.find((t) => t.id === id);
-      if (!token || hasExceededMistakeLimit) return;
-
-      // Find first empty slot
-      let firstEmptySlot = -1;
-      for (let i = 0; i < originalTokens.length; i++) {
-        if (!placedTokens.has(i)) {
-          firstEmptySlot = i;
-          break;
-        }
-      }
-
-      if (firstEmptySlot === -1) return;
-
-      tryPlaceTokenOnSlot(token, firstEmptySlot);
-    },
-    [bank, hasExceededMistakeLimit, originalTokens.length, placedTokens, tryPlaceTokenOnSlot]
+    [originalTokens, placedTokens, onWordCorrect, registerMistake, enableWordByWordAudio, playWord]
   );
 
   const handleDragStart = useCallback(
@@ -1070,7 +1042,7 @@ export default function WordPuzzle({
 
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCenter}
+        collisionDetection={pointerWithin}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
@@ -1090,10 +1062,6 @@ export default function WordPuzzle({
           shakingIds={shakingIds}
           hintedTokenId={activeHint?.tokenId ?? null}
           showTransliteration={wordTransliterations.length > 0}
-          onSelect={handleBankClick}
-          enableWordAudio={enableWordByWordAudio}
-          onWordAudioClick={handleBankWordClick}
-          playingTokenId={playingTokenId}
         />
 
         <DragOverlay dropAnimation={dropAnimation}>
