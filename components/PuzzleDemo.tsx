@@ -6,6 +6,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -212,6 +213,11 @@ export default function PuzzleDemo() {
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 3,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        distance: 10,
       },
     }),
     useSensor(KeyboardSensor, {

@@ -122,10 +122,8 @@ export default function AyahContextMenu({
 
     try {
       setIsLiking(true);
-      const response = await fetch('/api/user/liked', {
+      const response = await fetch(`/api/puzzles/${verse.puzzleId}/like`, {
         method: isLiked ? 'DELETE' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ puzzleId: verse.puzzleId }),
       });
 
       if (response.ok) {

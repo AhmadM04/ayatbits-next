@@ -111,8 +111,7 @@ export default function DemoPuzzle() {
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 200,
-        tolerance: 8,
+        distance: 10,
       },
     })
   );

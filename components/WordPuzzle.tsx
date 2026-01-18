@@ -505,8 +505,7 @@ export default function WordPuzzle({
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 200,
-        tolerance: 8,
+        distance: 10,
       },
     })
   );
