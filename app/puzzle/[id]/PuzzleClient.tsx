@@ -162,7 +162,7 @@ export default function PuzzleClient({
 
     setShowSuccessTransition(true);
     
-    // Navigate immediately - no delay
+    // Determine target URL
     let targetUrl = '/dashboard';
     
     if (isLastAyahInSurah) {
@@ -188,10 +188,14 @@ export default function PuzzleClient({
       }
     }
     
-    console.log('🚀 Navigating to:', targetUrl);
+    console.log('🚀 Will navigate to:', targetUrl);
     
-    // Navigate immediately using router.replace for better Next.js integration
-    router.replace(targetUrl);
+    // Wait for success animation and word audio to complete before navigating
+    // This allows the user to see the success animation and hear any playing word audio
+    setTimeout(() => {
+      console.log('✈️ Navigating now to:', targetUrl);
+      router.replace(targetUrl);
+    }, 1800); // 1.8 seconds delay to allow word audio to finish
   }, [puzzle, nextPuzzleId, nextPuzzleAyahNumber, isLastAyahInSurah, router, showToast]);
 
   const handleMistakeLimitExceeded = useCallback(() => {

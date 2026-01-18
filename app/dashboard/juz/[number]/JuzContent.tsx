@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import { MushafFAB } from '@/components/mushaf';
 
 interface JuzContentProps {
   juzName: string;
@@ -89,6 +90,9 @@ export default function JuzContent({
           })}
         </div>
       </main>
+
+      {/* Mushaf FAB - Opens Mushaf at the start page for this Juz */}
+      <MushafFAB juzNumber={juzNumber} />
 
       <BottomNav />
     </div>

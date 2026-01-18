@@ -660,7 +660,9 @@ export default function WordPuzzle({
         onSolved: !!onSolvedRef.current, 
         onSolvedType: typeof onSolvedRef.current,
         isComplete,
-        hasCompleted
+        hasCompleted,
+        isPlayingWord,
+        currentWordIndex
       });
       setHasCompleted(true);
       
@@ -669,23 +671,34 @@ export default function WordPuzzle({
         showToast('Mashallah! Perfect!', 'success', 2000);
       }, 0);
       
-      // Call onSolved immediately - no delay
-      if (onSolvedRef.current && typeof onSolvedRef.current === 'function') {
-        console.log('🚀 Calling onSolved(true) immediately');
-        try {
-          onSolvedRef.current(true);
-          console.log('✅ onSolved(true) called successfully');
-        } catch (error) {
-          console.error('❌ Error calling onSolved:', error);
+      // Wait for word audio to finish before calling onSolved
+      // If word audio is playing, wait 1.5 seconds to let it complete
+      // Otherwise, wait a short 500ms to let the user see the completion
+      const delay = isPlayingWord ? 1500 : 500;
+      
+      console.log(`⏱️ Waiting ${delay}ms before calling onSolved (word audio playing: ${isPlayingWord})`);
+      
+      const timeoutId = setTimeout(() => {
+        if (onSolvedRef.current && typeof onSolvedRef.current === 'function') {
+          console.log('🚀 Calling onSolved(true) after delay');
+          try {
+            onSolvedRef.current(true);
+            console.log('✅ onSolved(true) called successfully');
+          } catch (error) {
+            console.error('❌ Error calling onSolved:', error);
+          }
+        } else {
+          console.error('❌ onSolved is not available!', { 
+            onSolved: onSolvedRef.current, 
+            type: typeof onSolvedRef.current 
+          });
         }
-      } else {
-        console.error('❌ onSolved is not available!', { 
-          onSolved: onSolvedRef.current, 
-          type: typeof onSolvedRef.current 
-        });
-      }
+      }, delay);
+      
+      // Cleanup timeout if component unmounts
+      return () => clearTimeout(timeoutId);
     }
-  }, [isComplete, hasCompleted, showToast]); // Removed onSolved from dependencies to prevent cleanup
+  }, [isComplete, hasCompleted, showToast, isPlayingWord, currentWordIndex]); // Added isPlayingWord and currentWordIndex
 
   const registerMistake = useCallback((tokenId: string) => {
     setShakingIds((prev) => new Set(prev).add(tokenId));
