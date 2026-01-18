@@ -897,7 +897,9 @@ export default function WordPuzzle({
 
   const handleDragStart = useCallback(
     (event: DragStartEvent) => {
+      console.log('[DND] handleDragStart called', event.active.id);
       const token = bank.find((t) => t.id === event.active.id) || null;
+      console.log('[DND] Found token:', token);
       setActiveToken(token);
     },
     [bank]
@@ -905,11 +907,15 @@ export default function WordPuzzle({
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
+      console.log('[DND] handleDragEnd called', { activeId: event.active.id, overId: event.over?.id });
       const { active, over } = event;
       setActiveToken(null);
 
       // If not dropped on anything, just return (no mistake)
-      if (!over || hasExceededMistakeLimit) return;
+      if (!over || hasExceededMistakeLimit) {
+        console.log('[DND] Early return - no over or exceeded limit');
+        return;
+      }
 
       const activeId = active.id as string;
       const token = bank.find((t) => t.id === activeId);
