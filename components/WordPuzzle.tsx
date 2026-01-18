@@ -673,6 +673,7 @@ export default function WordPuzzle({
   }, [placedTokens.size, originalTokens.length]);
 
   useEffect(() => {
+    console.log('[COMPLETION] useEffect running', { isComplete, hasCompleted, showToast: !!showToast });
     if (isComplete && !hasCompleted) {
       console.log('Puzzle completed! Calling onSolved callback', { 
         onSolved: !!onSolvedRef.current, 
