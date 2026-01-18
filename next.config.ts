@@ -11,35 +11,16 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   
-  // Remove console logs in production
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn'],
-    } : false,
-  },
-  
   // Experimental features for better performance
   experimental: {
     optimizePackageImports: [
       '@clerk/nextjs',
       'framer-motion',
       'lucide-react',
-      '@dnd-kit/core',
-      '@dnd-kit/sortable',
       'next-intl',
       'zustand',
       '@react-email/components',
     ],
-  },
-
-  // Add build tracking for cache busting
-  generateBuildId: async () => {
-    return `build-${Date.now()}`;
-  },
-
-  // Environment variables for build time tracking
-  env: {
-    BUILD_TIME: new Date().getTime().toString(),
   },
 
   // Configure headers for CORS and security
