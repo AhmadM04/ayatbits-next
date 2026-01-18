@@ -50,6 +50,7 @@ function DropSlot({
   placedToken,
   isActive,
   isHinted = false,
+  isFadingHint = false,
   showTransliteration = false,
   enableWordAudio = false,
   onWordClick,
@@ -60,6 +61,7 @@ function DropSlot({
   placedToken: WordToken | null;
   isActive: boolean;
   isHinted?: boolean;
+  isFadingHint?: boolean;
   showTransliteration?: boolean;
   enableWordAudio?: boolean;
   onWordClick?: (wordIndex: number) => void;
@@ -94,6 +96,13 @@ function DropSlot({
                 '0 0 0 rgba(16, 185, 129, 0)',
               ],
             }
+          : isFadingHint
+          ? {
+              opacity: 1,
+              scale: 1,
+              x: 0,
+              boxShadow: '0 0 0 rgba(16, 185, 129, 0)',
+            }
           : isHinted
           ? {
               opacity: 1,
@@ -115,6 +124,11 @@ function DropSlot({
                 repeat: Infinity,
                 ease: 'easeInOut',
               },
+            }
+          : isFadingHint
+          ? {
+              duration: 0.7,
+              ease: 'easeOut',
             }
           : isHinted
           ? {
@@ -138,7 +152,9 @@ function DropSlot({
         ${enableWordAudio && placedToken && placedToken.norm === expectedToken.norm ? 'cursor-pointer' : ''}
         ${placedToken 
           ? 'bg-green-500/20 border-2 border-green-500'
-          : isHinted
+          : isFadingHint
+            ? 'bg-[#1a1a1a]/50 border-2 border-dashed border-white/20'
+            : isHinted
             ? 'bg-green-500/30 border-2 border-green-400 scale-105'
             : isOver && isActive
               ? 'bg-green-500/30 border-2 border-green-400 scale-105'
@@ -185,12 +201,14 @@ function DraggableWord({
   isOverlay = false,
   isShaking = false,
   isHinted = false,
+  isFadingHint = false,
   showTransliteration = false,
 }: {
   token: WordToken;
   isOverlay?: boolean;
   isShaking?: boolean;
   isHinted?: boolean;
+  isFadingHint?: boolean;
   showTransliteration?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -216,9 +234,21 @@ function DraggableWord({
       animate={
         isShaking
           ? { x: [0, -8, 8, -8, 8, 0] }
+          : isFadingHint
+          ? {
+              borderColor: 'rgba(255, 255, 255, 0.1)',
+              backgroundColor: '#1a1a1a',
+              color: 'rgb(229, 229, 229)',
+            }
           : {}
       }
-      transition={{ duration: 0.3 }}
+      transition={
+        isShaking
+          ? { duration: 0.3 }
+          : isFadingHint
+          ? { duration: 0.7, ease: 'easeOut' }
+          : { duration: 0.3 }
+      }
       className={`
         relative cursor-grab active:cursor-grabbing group
         px-4 py-2.5 rounded-xl
@@ -228,7 +258,9 @@ function DraggableWord({
         ${
           isOverlay
             ? 'bg-[#1a1a1a] border-2 border-green-500 shadow-xl text-white scale-105 z-50'
-            : isHinted
+            : isFadingHint
+              ? 'bg-[#1a1a1a] border border-white/10 text-gray-200'
+              : isHinted
               ? 'bg-[#1a1a1a] border-2 border-amber-400 text-amber-200 shadow-lg shadow-amber-500/30'
               : 'bg-[#1a1a1a] border border-white/10 text-gray-200 hover:bg-[#222] hover:border-white/20 active:scale-95'
         }
@@ -271,6 +303,7 @@ function AnswerArea({
   activeTokenId,
   isPlayingRecitation,
   hintedSlotPosition,
+  isFadingHint,
   showTransliteration,
   enableWordAudio = false,
   onWordClick,
@@ -281,6 +314,7 @@ function AnswerArea({
   activeTokenId: string | null;
   isPlayingRecitation: boolean;
   hintedSlotPosition: number | null;
+  isFadingHint: boolean;
   showTransliteration: boolean;
   enableWordAudio?: boolean;
   onWordClick?: (wordIndex: number) => void;
@@ -307,6 +341,7 @@ function AnswerArea({
             placedToken={placedTokens.get(index) || null}
             isActive={activeTokenId !== null}
             isHinted={hintedSlotPosition === index}
+            isFadingHint={isFadingHint && hintedSlotPosition === index}
             showTransliteration={showTransliteration}
             enableWordAudio={enableWordAudio}
             onWordClick={onWordClick}
@@ -327,11 +362,13 @@ function WordBank({
   bank,
   shakingIds,
   hintedTokenId,
+  isFadingHint,
   showTransliteration,
 }: {
   bank: WordToken[];
   shakingIds: Set<string>;
   hintedTokenId: string | null;
+  isFadingHint: boolean;
   showTransliteration: boolean;
 }) {
   return (
@@ -350,6 +387,7 @@ function WordBank({
                 token={token}
                 isShaking={shakingIds.has(token.id)}
                 isHinted={hintedTokenId === token.id}
+                isFadingHint={isFadingHint && hintedTokenId === token.id}
                 showTransliteration={showTransliteration}
               />
             </motion.div>
@@ -419,6 +457,7 @@ export default function WordPuzzle({
   });
   const [usedTips, setUsedTips] = useState(0);
   const [activeHint, setActiveHint] = useState<{ tokenId: string; slotPosition: number } | null>(null);
+  const [isFadingHint, setIsFadingHint] = useState(false);
   
   // Word audio state
   const [enableWordByWordAudio, setEnableWordByWordAudio] = useState(false);
@@ -499,6 +538,7 @@ export default function WordPuzzle({
     setAvailableTips(tipsCount);
     setUsedTips(0);
     setActiveHint(null);
+    setIsFadingHint(false);
     
     // Stop audio on reset
     if (audioRef.current) {
@@ -677,6 +717,7 @@ export default function WordPuzzle({
             const correctWordInBank = bank.find(t => t.norm === correctToken.norm);
             
             if (correctWordInBank) {
+              setIsFadingHint(false);
               setActiveHint({
                 tokenId: correctWordInBank.id,
                 slotPosition: firstEmptySlot,
@@ -767,6 +808,7 @@ export default function WordPuzzle({
     console.log('[TIPS] Found word in bank:', correctWordInBank ? { id: correctWordInBank.id, text: correctWordInBank.text } : 'NOT FOUND');
     
     if (correctWordInBank) {
+      setIsFadingHint(false);
       setActiveHint({
         tokenId: correctWordInBank.id,
         slotPosition: firstEmptySlot,
@@ -819,10 +861,17 @@ export default function WordPuzzle({
       setBank((prev) => prev.filter((t) => t.id !== token.id));
       onWordCorrect?.(slotPosition, token.text);
       
-      // Clear hint if this was the hinted word
+      // Clear hint if this was the hinted word - with fade animation
       setActiveHint((prev) => {
         if (prev && prev.tokenId === token.id) {
-          return null;
+          // Trigger fade animation first
+          setIsFadingHint(true);
+          // Then clear the hint after fade duration
+          setTimeout(() => {
+            setActiveHint(null);
+            setIsFadingHint(false);
+          }, 700); // 700ms fade duration
+          return prev; // Keep the hint active during fade
         }
         return prev;
       });
@@ -964,6 +1013,7 @@ export default function WordPuzzle({
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={() => {
                 setActiveHint(null);
+                setIsFadingHint(false);
                 // Don't count dismissed tip - decrement used tips
                 setUsedTips((prev) => Math.max(0, prev - 1));
               }}
@@ -1052,6 +1102,7 @@ export default function WordPuzzle({
           activeTokenId={activeToken?.id || null}
           isPlayingRecitation={isPlayingRecitation}
           hintedSlotPosition={activeHint?.slotPosition ?? null}
+          isFadingHint={isFadingHint}
           showTransliteration={wordTransliterations.length > 0}
           enableWordAudio={enableWordByWordAudio}
           onWordClick={handleAnswerWordClick}
@@ -1061,6 +1112,7 @@ export default function WordPuzzle({
           bank={bank}
           shakingIds={shakingIds}
           hintedTokenId={activeHint?.tokenId ?? null}
+          isFadingHint={isFadingHint}
           showTransliteration={wordTransliterations.length > 0}
         />
 
