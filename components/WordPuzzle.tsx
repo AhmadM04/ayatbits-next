@@ -981,7 +981,10 @@ export default function WordPuzzle({
           
           {/* Tips Counter - Clickable Button */}
           <motion.button
-            onClick={handleManualTip}
+            onClick={(e) => {
+              console.log('[TIPS] Button clicked!', e);
+              handleManualTip();
+            }}
             disabled={usedTips >= availableTips || hasExceededMistakeLimit}
             animate={
               usedTips < availableTips && !activeHint && !hasExceededMistakeLimit
