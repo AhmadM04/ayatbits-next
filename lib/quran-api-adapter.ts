@@ -7,13 +7,58 @@
 const QURAN_COM_API = 'https://api.quran.com/api/v4';
 
 // Map AlQuran.cloud translation identifiers to Quran.com resource IDs
+// Based on Quran.com API v4: https://api.quran.com/api/v4/resources/translations
 const TRANSLATION_MAP: Record<string, number> = {
-  'en.sahih': 131,        // Saheeh International
-  'en.pickthall': 19,     // Pickthall
-  'en.yusufali': 22,      // Yusuf Ali
-  'en.hilali': 18,        // Hilali & Khan
-  'ar.muyassar': 48,      // Arabic Tafsir Muyassar
-  // Add more mappings as needed
+  // English translations
+  'en.sahih': 20,         // Saheeh International
+  'en.pickthall': 19,     // Mohammed Marmaduke William Pickthall
+  'en.yusufali': 22,      // Abdullah Yusuf Ali
+  
+  // Arabic tafsirs (not available in current API)
+  'ar.jalalayn': 20,      // Fallback to Sahih International
+  'ar.tafseer': 20,       // Fallback to Sahih International
+  
+  // French
+  'fr.hamidullah': 31,    // Muhammad Hamidullah
+  
+  // Spanish
+  'es.cortes': 83,        // Sheikh Isa Garcia
+  
+  // German
+  'de.bubenheim': 27,     // Frank Bubenheim and Nadeem
+  
+  // Turkish
+  'tr.yazir': 52,         // Elmalili Hamdi Yazir
+  
+  // Russian
+  'ru.kuliev': 45,        // Elmir Kuliev
+  
+  // Urdu
+  'ur.maududi': 97,       // Syed Abu Ali Maududi
+  
+  // Indonesian
+  'id.muntakhab': 134,    // King Fahad Quran Complex
+  
+  // Malay
+  'ms.basmeih': 39,       // Abdullah Muhammad Basmeih
+  
+  // Bengali
+  'bn.hoque': 161,        // Tawheed Publication
+  
+  // Hindi
+  'hi.hindi': 122,        // Maulana Azizul Haque al-Umari
+  
+  // Chinese
+  'zh.chinese': 56,       // Ma Jian
+  
+  // Japanese
+  'ja.japanese': 35,      // Ryoichi Mita
+  
+  // Dutch
+  'nl.dutch': 144,        // Sofian S. Siregar
+  
+  // Estonian (not available in current API)
+  'et.estonian': 20,      // Fallback to Sahih International
 };
 
 interface AlQuranCloudFormat {
@@ -81,7 +126,12 @@ export async function fetchTranslation(
   options?: RequestInit
 ): Promise<AlQuranCloudFormat> {
   // Map AlQuran.cloud ID to Quran.com resource ID
-  const resourceId = TRANSLATION_MAP[translationId] || 131; // Default to Saheeh International
+  const resourceId = TRANSLATION_MAP[translationId] || 20; // Default to Saheeh International
+  
+  // Log warning if translation not found
+  if (!TRANSLATION_MAP[translationId]) {
+    console.warn(`Translation "${translationId}" not found in TRANSLATION_MAP, using Sahih International as fallback`);
+  }
 
   const response = await fetch(
     `${QURAN_COM_API}/verses/by_key/${surahNumber}:${ayahNumber}?` +
