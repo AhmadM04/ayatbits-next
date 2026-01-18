@@ -2,7 +2,8 @@
  * Script to grant access to a user by email
  * 
  * Usage:
- * npx tsx scripts/grant-lifetime-access.ts your-email@example.com [duration]
+ * npx tsx -r dotenv/config scripts/grant-lifetime-access.ts your-email@example.com [duration]
+ * Note: Environment variables are loaded via tsx -r dotenv/config
  * 
  * Durations:
  * - lifetime (default)
@@ -13,14 +14,8 @@
  * - revoke
  */
 
-import dotenv from 'dotenv';
-import { resolve } from 'path';
 import mongoose from 'mongoose';
 import { connectDB, User, SubscriptionStatusEnum } from '../lib/db';
-
-// Load environment variables from .env.local first, then .env as fallback
-dotenv.config({ path: resolve(process.cwd(), '.env.local') });
-dotenv.config({ path: resolve(process.cwd(), '.env') });
 
 type GrantDuration = 'lifetime' | '1_month' | '3_months' | '6_months' | '1_year' | 'revoke';
 

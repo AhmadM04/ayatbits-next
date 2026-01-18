@@ -1,12 +1,8 @@
 /**
  * Seeds basic Juz (1-30) and Surah (1-114) data.
  * Run with: npm run db:seed
+ * Note: Environment variables are loaded via tsx -r dotenv/config
  */
-import dotenv from 'dotenv';
-// Load .env.local first (if present), then fallback to .env
-dotenv.config({ path: '.env.local' });
-dotenv.config();
-
 import { connectDB, Juz, Surah } from '../lib/db';
 
 type SurahSeed = { number: number; nameEnglish: string; nameArabic: string };

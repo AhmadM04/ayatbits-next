@@ -3,17 +3,12 @@
  * Useful for dev/prod environment syncing
  * 
  * Usage:
- * npx tsx scripts/add-clerkid.ts your-email@example.com user_xxxxxxxxxxxxx
+ * npx tsx -r dotenv/config scripts/add-clerkid.ts your-email@example.com user_xxxxxxxxxxxxx
+ * Note: Environment variables are loaded via tsx -r dotenv/config
  */
 
-import dotenv from 'dotenv';
-import { resolve } from 'path';
 import mongoose from 'mongoose';
 import { connectDB, User } from '../lib/db';
-
-// Load environment variables from .env.local first, then .env as fallback
-dotenv.config({ path: resolve(process.cwd(), '.env.local') });
-dotenv.config({ path: resolve(process.cwd(), '.env') });
 
 async function addClerkId(email: string, clerkId: string) {
   if (!email || !clerkId) {

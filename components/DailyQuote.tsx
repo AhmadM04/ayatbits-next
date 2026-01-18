@@ -7,6 +7,8 @@ import { Sparkles, ExternalLink, RefreshCw, Volume2, WifiOff } from 'lucide-reac
 import { apiGet, NetworkError } from '@/lib/api-client';
 import { SparkleAnimation } from './animations';
 import { useWordAudio } from '@/lib/hooks/useWordAudio';
+import { HarakatText, HarakatModal } from '@/components/arabic';
+import { type HarakatDefinition } from '@/lib/harakat-utils';
 
 interface DailyQuoteData {
   arabicText: string;
@@ -31,6 +33,8 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [enableWordByWordAudio, setEnableWordByWordAudio] = useState(false);
+  const [selectedHarakat, setSelectedHarakat] = useState<HarakatDefinition | null>(null);
+  const [showHarakatModal, setShowHarakatModal] = useState(false);
   
   // Word audio hook
   const {
@@ -125,6 +129,15 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
       }
     };
   }, [audio]);
+
+  const handleHarakatClick = useCallback((definition: HarakatDefinition) => {
+    setSelectedHarakat(definition);
+    setShowHarakatModal(true);
+  }, []);
+
+  const handleCloseHarakatModal = useCallback(() => {
+    setShowHarakatModal(false);
+  }, []);
 
   if (isLoading) {
     return (
@@ -259,11 +272,17 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
                         : 'hover:bg-purple-500/10'
                     }`}
                   >
-                    {word}
+                    <HarakatText 
+                      text={word}
+                      onHarakatClick={handleHarakatClick}
+                    />
                   </motion.span>
                 ))
               ) : (
-                quote.arabicText
+                <HarakatText 
+                  text={quote.arabicText}
+                  onHarakatClick={handleHarakatClick}
+                />
               )}
             </p>
           </motion.div>
@@ -297,6 +316,13 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
           </p>
         </div>
       </div>
+
+      {/* Harakat Modal */}
+      <HarakatModal
+        definition={selectedHarakat}
+        isOpen={showHarakatModal}
+        onClose={handleCloseHarakatModal}
+      />
     </motion.div>
   );
 }

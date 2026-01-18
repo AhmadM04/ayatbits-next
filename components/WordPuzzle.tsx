@@ -1,5 +1,6 @@
 // components/WordPuzzle.tsx
 // MODIFIED: 2026-01-17 - Fixed drag/audio issues - NO GLOW ON BANK WORDS
+// MODIFIED: 2026-01-18 - Added harakat coloring
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
@@ -28,6 +29,7 @@ import { calculateTipsForAyah } from '@/lib/tips-system';
 import { useToast } from '@/components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWordAudio } from '@/lib/hooks/useWordAudio';
+import { HarakatColoredText } from '@/components/arabic';
 
 interface WordPuzzleProps {
   ayahText: string;
@@ -169,7 +171,7 @@ function DropSlot({
             animate={{ scale: 1 }}
             className="text-base font-medium font-arabic text-green-400 flex items-center gap-1"
           >
-            {placedToken.text}
+            <HarakatColoredText text={placedToken.text} />
             {enableWordAudio && (
               <Volume2 className="w-3 h-3 text-green-400 opacity-0 group-hover:opacity-100 transition-opacity" />
             )}
@@ -215,11 +217,6 @@ function DraggableWord({
     id: token.id,
     data: { type: 'bank-item', token },
   });
-
-  // Debug: log when component renders to verify new code is loaded
-  if (isHinted) {
-    console.log('[DraggableWord V2] Hinted word rendered:', token.text, 'NO GLOW ANIMATION');
-  }
 
   return (
     <motion.div
@@ -281,7 +278,7 @@ function DraggableWord({
       }}
     >
       <span className="flex items-center gap-1 pointer-events-none">
-        {token.text}
+        <HarakatColoredText text={token.text} />
       </span>
       {showTransliteration && token.transliteration && !isOverlay && (
         <motion.span
@@ -414,14 +411,6 @@ export default function WordPuzzle({
   // Tokenize ayah and map transliterations to tokens
   const originalTokens = useMemo(() => {
     const tokens = tokenizeAyah(ayahText);
-    
-    console.log('[INIT] Original tokens created:', tokens.length);
-    console.log('[INIT] Token details:', tokens.map(t => ({ 
-      id: t.id, 
-      text: t.text, 
-      norm: t.norm, 
-      position: t.position 
-    })));
     
     // Map transliterations to tokens if available
     if (wordTransliterations.length > 0) {

@@ -12,6 +12,8 @@ import {
   SurahHeader,
   MushafVerse,
 } from '@/components/mushaf';
+import { HarakatModal, HarakatLegend } from '@/components/arabic';
+import { type HarakatDefinition } from '@/lib/harakat-utils';
 
 interface MushafPageClientProps {
   pageNumber: number;
@@ -37,6 +39,10 @@ export default function MushafPageClient({
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Harakat modal state
+  const [selectedHarakat, setSelectedHarakat] = useState<HarakatDefinition | null>(null);
+  const [showHarakatModal, setShowHarakatModal] = useState(false);
 
   // Keyboard navigation
   useEffect(() => {
@@ -68,6 +74,15 @@ export default function MushafPageClient({
 
   const handleCloseMenu = useCallback(() => {
     setShowContextMenu(false);
+  }, []);
+
+  const handleHarakatClick = useCallback((definition: HarakatDefinition) => {
+    setSelectedHarakat(definition);
+    setShowHarakatModal(true);
+  }, []);
+
+  const handleCloseHarakatModal = useCallback(() => {
+    setShowHarakatModal(false);
   }, []);
 
   // Handle swipe gestures
@@ -117,6 +132,7 @@ export default function MushafPageClient({
           key={verse.id}
           verse={verse}
           onLongPress={handleLongPress}
+          onHarakatClick={handleHarakatClick}
         />
       );
     });
@@ -254,6 +270,19 @@ export default function MushafPageClient({
         isOpen={showContextMenu}
         onClose={handleCloseMenu}
         selectedTranslation={selectedTranslation}
+      />
+
+      {/* Harakat Modal */}
+      <HarakatModal
+        definition={selectedHarakat}
+        isOpen={showHarakatModal}
+        onClose={handleCloseHarakatModal}
+      />
+
+      {/* Harakat Legend (Floating Help Button) */}
+      <HarakatLegend 
+        variant="floating" 
+        onHarakatSelect={handleHarakatClick}
       />
     </div>
   );

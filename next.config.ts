@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
 
+// Bundle analyzer configuration
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 const nextConfig: NextConfig = {
   // Performance optimizations
   compress: true,
@@ -21,6 +26,9 @@ const nextConfig: NextConfig = {
       'lucide-react',
       '@dnd-kit/core',
       '@dnd-kit/sortable',
+      'next-intl',
+      'zustand',
+      '@react-email/components',
     ],
   },
 
@@ -127,10 +135,6 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "res.cloudinary.com",
-      },
-      {
-        protocol: "https",
         hostname: "img.clerk.com",
       },
       {
@@ -141,4 +145,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

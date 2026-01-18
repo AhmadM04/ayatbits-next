@@ -7,16 +7,10 @@
  * 
  * Usage:
  *   npm run db:migrate-clerkids
- * 
- * Or directly:
- *   tsx scripts/migrate-clerkids.ts
+ * Note: Environment variables are loaded via tsx -r dotenv/config
  */
 
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-
-// Load environment variables
-dotenv.config({ path: '.env.local' });
 
 const MONGODB_URL = process.env.MONGODB_URL;
 

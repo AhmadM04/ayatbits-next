@@ -103,7 +103,6 @@ export default function PuzzleClient({
           setTransliteration(translitData.transliteration || '');
         }
       } catch (error) {
-        console.error('Failed to fetch transliteration:', error);
         showToast('Failed to load transliteration', 'error');
       } finally {
         setIsLoadingTransliteration(false);

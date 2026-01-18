@@ -4,6 +4,8 @@ import { useRef, useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, CheckCircle } from 'lucide-react';
 import { toArabicNumerals } from '@/lib/mushaf-utils';
+import { HarakatText } from '@/components/arabic';
+import { type HarakatDefinition } from '@/lib/harakat-utils';
 
 export interface MushafVerse {
   id: number;
@@ -21,12 +23,13 @@ export interface MushafVerse {
 interface AyahRowProps {
   verse: MushafVerse;
   onLongPress: (verse: MushafVerse) => void;
+  onHarakatClick?: (definition: HarakatDefinition) => void;
   isHighlighted?: boolean;
 }
 
 const LONG_PRESS_DURATION = 500; // 500ms for long press
 
-export default function AyahRow({ verse, onLongPress, isHighlighted = false }: AyahRowProps) {
+export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighlighted = false }: AyahRowProps) {
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const isLongPressing = useRef(false);
   const [isHolding, setIsHolding] = useState(false);
@@ -68,6 +71,16 @@ export default function AyahRow({ verse, onLongPress, isHighlighted = false }: A
     onLongPress(verse);
   }, [verse, onLongPress]);
 
+  const handleHarakatClick = useCallback((definition: HarakatDefinition) => {
+    // Cancel the long press timer since user clicked on harakat
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    setIsHolding(false);
+    onHarakatClick?.(definition);
+  }, [onHarakatClick]);
+
   return (
     <motion.span
       className={`
@@ -107,10 +120,12 @@ export default function AyahRow({ verse, onLongPress, isHighlighted = false }: A
         </span>
       )}
       
-      {/* Arabic text */}
-      <span className="text-white">
-        {verse.text}
-      </span>
+      {/* Arabic text with harakat coloring */}
+      <HarakatText 
+        text={verse.text} 
+        className="text-white"
+        onHarakatClick={handleHarakatClick}
+      />
       
       {/* Ayah number in Arabic numerals */}
       <span className="text-green-400 mx-2 text-lg">
