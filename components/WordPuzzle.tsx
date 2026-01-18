@@ -673,7 +673,7 @@ export default function WordPuzzle({
   }, [placedTokens.size, originalTokens.length]);
 
   useEffect(() => {
-    console.log('[COMPLETION] useEffect running', { isComplete, hasCompleted, showToast: !!showToast });
+    console.log('[COMPLETION] useEffect running', { isComplete, hasCompleted });
     if (isComplete && !hasCompleted) {
       console.log('Puzzle completed! Calling onSolved callback', { 
         onSolved: !!onSolvedRef.current, 
@@ -715,13 +715,14 @@ export default function WordPuzzle({
         }
       }, delay);
       
-      // Cleanup timeout if component unmounts or re-renders
+      // Cleanup timeout ONLY if component unmounts - not on re-render!
       return () => {
         console.log('🧹 Cleanup called - clearing timeout (this cancels navigation!)');
         clearTimeout(timeoutId);
       };
     }
-  }, [isComplete, hasCompleted, showToast]); // Only essential dependencies - don't cancel if audio state changes!
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isComplete, hasCompleted]); // ONLY these two - nothing else!
 
   const registerMistake = useCallback((tokenId: string) => {
     setShakingIds((prev) => new Set(prev).add(tokenId));
