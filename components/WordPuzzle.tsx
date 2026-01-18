@@ -631,12 +631,27 @@ export default function WordPuzzle({
     };
   }, [surahNumber, ayahNumber]);
 
-  // Initialize puzzle state on mount or when ayah changes
+  // Initialize puzzle state ONLY on mount - don't reset during completion
   useEffect(() => {
-    console.log('[PUZZLE] Initializing/resetting puzzle state');
-    resetState();
+    console.log('[PUZZLE] Initializing puzzle state on mount');
+    const initialBank = shuffleArray(originalTokens);
+    setBank(initialBank);
+    setPlacedTokens(new Map());
+    setMistakeCount(0);
+    setHasExceededMistakeLimit(false);
+    setHasCompleted(false);
+    setShakingIds(new Set());
+    
+    const tipsCount = calculateTipsForAyah(originalTokens.length);
+    setAvailableTips(tipsCount);
+    setUsedTips(0);
+    setActiveHint(null);
+    setIsFadingHint(false);
+    setIsLoading(false);
+    
+    console.log('[PUZZLE] Initial state set with', originalTokens.length, 'tokens');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ayahText]); // Only reset when the ayah text changes, not when resetState function changes
+  }, []); // ONLY on mount - never reset automatically
 
   useEffect(() => {
     if (pendingToast.current) {
