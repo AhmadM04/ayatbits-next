@@ -270,19 +270,6 @@ function DraggableWord({
         }
       `}
       style={{ pointerEvents: 'auto' }}
-      onPointerDown={(e) => {
-        // Prevent any click/audio behavior - only allow dragging
-        e.stopPropagation();
-      }}
-      onMouseDown={(e) => {
-        // Additional prevention for mouse-triggered clicks
-        e.stopPropagation();
-      }}
-      onClick={(e) => {
-        // Explicitly prevent click events from triggering audio
-        e.preventDefault();
-        e.stopPropagation();
-      }}
     >
       <span className="flex items-center gap-1 pointer-events-none">
         <HarakatColoredText text={token.text} />
