@@ -519,7 +519,7 @@ export default function WordPuzzle({
     setBank(shuffleArray(originalTokens));
     setMistakeCount(0);
     setHasExceededMistakeLimit(false);
-    setHasCompleted(false);
+    hasCompletedRef.current = false;
     setShakingIds(new Set());
     pendingToast.current = null;
     
@@ -646,7 +646,7 @@ export default function WordPuzzle({
     setPlacedTokens(new Map());
     setMistakeCount(0);
     setHasExceededMistakeLimit(false);
-    setHasCompleted(false);
+    hasCompletedRef.current = false;
     setShakingIds(new Set());
     
     const tipsCount = calculateTipsForAyah(originalTokens.length);
