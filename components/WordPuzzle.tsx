@@ -1,9 +1,11 @@
 // components/WordPuzzle.tsx
 // MODIFIED: 2026-01-17 - Fixed drag/audio issues - NO GLOW ON BANK WORDS
 // MODIFIED: 2026-01-18 - Added harakat coloring
+// MODIFIED: 2026-01-18 - Migrated to Quran.com API for consistent Uthmani text
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { getAudioUrl as getQuranAudioUrl } from '@/lib/quran-api-adapter';
 import {
   DndContext,
   DragEndEvent,
@@ -564,21 +566,8 @@ export default function WordPuzzle({
   const getAudioUrl = useCallback(async () => {
     if (!surahNumber || !ayahNumber) return null;
     
-    try {
-      const response = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/alafasy`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.data?.audio) {
-          return data.data.audio;
-        }
-      }
-    } catch (error) {
-      console.error('API fetch failed:', error);
-    }
-    
-    const paddedSurah = surahNumber.toString().padStart(3, '0');
-    const paddedAyah = ayahNumber.toString().padStart(3, '0');
-    return `https://everyayah.com/data/Alafasy_128kbps/${paddedSurah}${paddedAyah}.mp3`;
+    // Use adapter function for consistent audio URL generation
+    return getQuranAudioUrl(surahNumber, ayahNumber, 'alafasy');
   }, [surahNumber, ayahNumber]);
 
   const handlePlayPause = useCallback(async () => {

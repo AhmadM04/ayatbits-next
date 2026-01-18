@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectDB, Puzzle } from '@/lib/db';
 import cache, { CACHE_TTL } from '@/lib/cache';
+import { fetchVerseWithChapter, fetchTranslation } from '@/lib/quran-api-adapter';
 
 // Get a deterministic "random" index based on the date
 function getDailyIndex(max: number): number {
@@ -64,16 +65,14 @@ export async function GET(request: Request) {
     const ayahInSurah = puzzle.content?.ayahNumber || 1;
     const juzNumber = puzzle.juzId?.number || 1;
     
-    // Fetch Arabic text and translation in parallel
+    // Fetch Arabic text and translation in parallel using Quran.com API
     const [arabicResponse, translationResponse] = await Promise.all([
-      fetch(
-        `https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahInSurah}/quran-uthmani`,
-        { next: { revalidate: 86400 } } // Cache for 24 hours
-      ),
-      fetch(
-        `https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahInSurah}/${translationEdition}`,
-        { next: { revalidate: 86400 } } // Cache for 24 hours
-      ),
+      fetchVerseWithChapter(surahNumber, ayahInSurah, { next: { revalidate: 86400 } })
+        .then(data => ({ ok: true, data }))
+        .catch(() => ({ ok: false, data: null })),
+      fetchTranslation(surahNumber, ayahInSurah, translationEdition, { next: { revalidate: 86400 } })
+        .then(data => ({ ok: true, data }))
+        .catch(() => ({ ok: false, data: null })),
     ]);
     
     let arabicText = puzzle.content?.ayahText || '';
@@ -81,16 +80,14 @@ export async function GET(request: Request) {
     let surahNameEnglish = puzzle.surahId?.nameEnglish || '';
     let translation = '';
     
-    if (arabicResponse.ok) {
-      const arabicData = await arabicResponse.json();
-      arabicText = arabicData.data?.text || arabicText;
-      surahNameArabic = arabicData.data?.surah?.name || surahNameArabic;
-      surahNameEnglish = arabicData.data?.surah?.englishName || surahNameEnglish;
+    if (arabicResponse.ok && arabicResponse.data) {
+      arabicText = arabicResponse.data.data?.text || arabicText;
+      surahNameArabic = arabicResponse.data.data?.surah?.name || surahNameArabic;
+      surahNameEnglish = arabicResponse.data.data?.surah?.englishName || surahNameEnglish;
     }
     
-    if (translationResponse.ok) {
-      const translationData = await translationResponse.json();
-      translation = translationData.data?.text || '';
+    if (translationResponse.ok && translationResponse.data) {
+      translation = translationResponse.data.data?.text || '';
     }
     
     const responseData = {

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2 } from 'lucide-react';
+import { getAudioUrl as getQuranAudioUrl } from '@/lib/quran-api-adapter';
 
 interface AudioPlayerProps {
   surahNumber: number;
@@ -17,21 +18,8 @@ export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const getAudioUrl = async () => {
-    try {
-      const response = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/alafasy`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.data?.audio) {
-          return data.data.audio;
-        }
-      }
-    } catch (error) {
-      console.error('API fetch failed:', error);
-    }
-    
-    const paddedSurah = surahNumber.toString().padStart(3, '0');
-    const paddedAyah = ayahNumber.toString().padStart(3, '0');
-    return `https://everyayah.com/data/Alafasy_128kbps/${paddedSurah}${paddedAyah}.mp3`;
+    // Use adapter function for consistent audio URL generation
+    return getQuranAudioUrl(surahNumber, ayahNumber, 'alafasy');
   };
 
   useEffect(() => {

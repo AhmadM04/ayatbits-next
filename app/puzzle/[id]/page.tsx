@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import PuzzleClient from './PuzzleClient';
 import { cleanAyahText } from '@/lib/ayah-utils';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
+import { fetchTransliteration } from '@/lib/quran-api-adapter';
 
 export default async function PuzzlePage({
   params,
@@ -88,15 +89,13 @@ export default async function PuzzlePage({
   
   if (dbUser.showTransliteration) {
     try {
-      // Fetch full-ayah transliteration
-      const transliterationResponse = await fetch(
-        `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/en.transliteration`,
+      // Fetch full-ayah transliteration using adapter
+      const transliterationData = await fetchTransliteration(
+        surahNum,
+        ayahNum,
         { next: { revalidate: 86400 } }
       );
-      if (transliterationResponse.ok) {
-        const transliterationData = await transliterationResponse.json();
-        initialTransliteration = transliterationData.data?.text || '';
-      }
+      initialTransliteration = transliterationData.data?.text || '';
       
       // Fetch word-by-word transliteration from Quran.com
       const wordsResponse = await fetch(

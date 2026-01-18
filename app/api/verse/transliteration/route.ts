@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withCache, CACHE_TTL } from '@/lib/cache';
+import { fetchTransliteration } from '@/lib/quran-api-adapter';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,20 +20,13 @@ export async function GET(request: NextRequest) {
     const transliterationText = await withCache(
       cacheKey,
       async () => {
-        // Use single ayah endpoint with transliteration edition
-        const response = await fetch(
-          `https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/en.transliteration`,
-          {
-            next: { revalidate: 86400 }, // Cache for 24 hours
-          }
+        // Use Quran.com API via adapter for consistent transliteration
+        const result = await fetchTransliteration(
+          parseInt(surah),
+          parseInt(ayah),
+          { next: { revalidate: 86400 } }
         );
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch transliteration');
-        }
-
-        const data = await response.json();
-        return data.data?.text || '';
+        return result.data?.text || '';
       },
       CACHE_TTL.DAY // Cache for 24 hours
     );

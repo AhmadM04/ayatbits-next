@@ -13,6 +13,7 @@ import AyahTextDisplay from './AyahTextDisplay';
 import BismillahDisplay from './BismillahDisplay';
 import { cleanAyahText, extractBismillah, shouldShowBismillahSeparately } from '@/lib/ayah-utils';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
+import { fetchTranslation, fetchTransliteration } from '@/lib/quran-api-adapter';
 
 export default async function SurahVersePage({
   params,
@@ -72,14 +73,13 @@ export default async function SurahVersePage({
 
   let initialTranslation = '';
   try {
-    const translationResponse = await fetch(
-      `https://api.alquran.cloud/v1/ayah/${parseInt(surahNumber)}:${selectedAyah}/${selectedTranslation}`,
+    const translationData = await fetchTranslation(
+      parseInt(surahNumber),
+      selectedAyah,
+      selectedTranslation,
       { next: { revalidate: 86400 } }
     );
-    if (translationResponse.ok) {
-      const translationData = await translationResponse.json();
-      initialTranslation = translationData.data?.text || '';
-    }
+    initialTranslation = translationData.data?.text || '';
   } catch (error) {
     console.error('Failed to pre-fetch translation:', error);
   }
@@ -88,14 +88,12 @@ export default async function SurahVersePage({
   let initialTransliteration = '';
   if (dbUser.showTransliteration) {
     try {
-      const transliterationResponse = await fetch(
-        `https://api.alquran.cloud/v1/ayah/${parseInt(surahNumber)}:${selectedAyah}/en.transliteration`,
+      const transliterationData = await fetchTransliteration(
+        parseInt(surahNumber),
+        selectedAyah,
         { next: { revalidate: 86400 } }
       );
-      if (transliterationResponse.ok) {
-        const transliterationData = await transliterationResponse.json();
-        initialTransliteration = transliterationData.data?.text || '';
-      }
+      initialTransliteration = transliterationData.data?.text || '';
     } catch (error) {
       console.error('Failed to pre-fetch transliteration:', error);
     }
