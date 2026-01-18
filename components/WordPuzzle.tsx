@@ -637,6 +637,10 @@ export default function WordPuzzle({
       originalTokensLength: originalTokens.length,
       ayahText: ayahText.substring(0, 50)
     });
+    
+    return () => {
+      console.log('[PUZZLE] Component unmounting/cleanup');
+    };
     const initialBank = shuffleArray(originalTokens);
     setBank(initialBank);
     setPlacedTokens(new Map());
@@ -653,7 +657,6 @@ export default function WordPuzzle({
     setIsLoading(false);
     
     console.log('[PUZZLE] Initial state set with', originalTokens.length, 'tokens, bank length:', initialBank.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // ONLY on mount - never reset automatically
 
   useEffect(() => {
@@ -694,6 +697,7 @@ export default function WordPuzzle({
       console.log(`⏱️ Waiting ${delay}ms before calling onSolved (word audio playing: ${isPlayingWord})`);
       
       const timeoutId = setTimeout(() => {
+        console.log('⏰ TIMEOUT FIRED after', delay, 'ms');
         if (onSolvedRef.current && typeof onSolvedRef.current === 'function') {
           console.log('🚀 Calling onSolved(true) after delay');
           try {
@@ -710,8 +714,11 @@ export default function WordPuzzle({
         }
       }, delay);
       
-      // Cleanup timeout if component unmounts
-      return () => clearTimeout(timeoutId);
+      // Cleanup timeout if component unmounts or re-renders
+      return () => {
+        console.log('🧹 Cleanup called - clearing timeout (this cancels navigation!)');
+        clearTimeout(timeoutId);
+      };
     }
   }, [isComplete, hasCompleted, showToast, isPlayingWord, currentWordIndex]); // Added isPlayingWord and currentWordIndex
 
