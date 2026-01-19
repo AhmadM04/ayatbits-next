@@ -22,6 +22,7 @@ export default function AyahTextDisplay({ ayahText, surahNumber, ayahNumber }: A
     playWord,
     isPlaying: isPlayingWord,
     currentWordIndex,
+    segments,
   } = useWordAudio({
     surahNumber,
     ayahNumber,
@@ -60,8 +61,8 @@ export default function AyahTextDisplay({ ayahText, surahNumber, ayahNumber }: A
         dir="rtl"
         style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
       >
-        {enableWordByWordAudio ? (
-          ayahText.split(/\s+/).map((word, index) => (
+        {enableWordByWordAudio && segments && segments.segments.length > 0 ? (
+          segments.segments.map((wordSegment, index) => (
             <motion.span
               key={index}
               onClick={() => playWord(index)}
@@ -76,12 +77,18 @@ export default function AyahTextDisplay({ ayahText, surahNumber, ayahNumber }: A
                     }
                   : {}
               }
-              transition={{
-                boxShadow: {
-                  duration: 1,
-                  repeat: Infinity,
-                },
-              }}
+              transition={
+                isPlayingWord && currentWordIndex === index
+                  ? {
+                      boxShadow: {
+                        duration: 1,
+                        repeat: Infinity,
+                      },
+                    }
+                  : {
+                      duration: 0.2,
+                    }
+              }
               className={`inline-block cursor-pointer px-1 rounded transition-colors ${
                 isPlayingWord && currentWordIndex === index
                   ? 'bg-green-500/30 text-green-300'
@@ -89,7 +96,7 @@ export default function AyahTextDisplay({ ayahText, surahNumber, ayahNumber }: A
               }`}
             >
               <HarakatText 
-                text={word}
+                text={wordSegment.text}
                 onHarakatClick={handleHarakatClick}
               />
             </motion.span>
