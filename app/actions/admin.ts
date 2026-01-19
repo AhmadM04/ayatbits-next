@@ -34,10 +34,49 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
 
   if (!email) return { success: false, error: 'User email is required' };
 
+  // 2. Normalize email input (lowercase and trim)
+  const normalizedEmail = email.toLowerCase().trim();
+
   try {
     await connectDB();
 
-    // 2. Determine update fields based on duration
+    // 3. Find existing user first to verify they exist
+    const existingUser = await User.findOne({ 
+      email: { $regex: new RegExp(`^${normalizedEmail}$`, 'i') } 
+    });
+
+    if (!existingUser) {
+      // User doesn't exist
+      logger.warn('Attempted to grant access to non-existent user', {
+        email: normalizedEmail,
+        adminEmail: adminUser.email,
+      });
+      
+      if (duration === 'revoke') {
+        return { 
+          success: false, 
+          error: `No user found with email "${normalizedEmail}".`
+        };
+      }
+      
+      return { 
+        success: false, 
+        error: `No user found with email "${normalizedEmail}". The user must sign up first before access can be granted.`
+      };
+    }
+
+    // Log before update (existingUser is guaranteed to exist here)
+    logger.info('Granting access to existing user', {
+      email: normalizedEmail,
+      userId: existingUser._id.toString(),
+      clerkIds: existingUser.clerkIds || [],
+      currentStatus: existingUser.subscriptionStatus,
+      currentPlan: existingUser.subscriptionPlan,
+      hasDirectAccess: existingUser.hasDirectAccess,
+      grantDuration: duration,
+    });
+
+    // 4. Determine update fields based on duration
     let updateData: any = {};
     const now = new Date();
 
@@ -117,20 +156,36 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
         return { success: false, error: 'Invalid duration' };
     }
 
-    // 4. Upsert by email (case-insensitive). Works even if user hasn't visited dashboard yet.
+    // 5. Update by _id to ensure we update the exact user (no duplicates)
     const updatedUser = await User.findOneAndUpdate(
-      { email: { $regex: new RegExp(`^${email}$`, 'i') } },
-      {
-        ...updateData,
-        $setOnInsert: {
-          email: email.toLowerCase(),
-          isAdmin: false,
-        },
-      },
-      { new: true, upsert: true, setDefaultsOnInsert: true }
+      { _id: existingUser._id },
+      updateData,
+      { new: true }
     );
 
-    // 5. Log the grant for audit
+    if (!updatedUser) {
+      logger.error('Failed to update user after finding them', undefined, {
+        email: normalizedEmail,
+        userId: existingUser._id.toString(),
+      });
+      return {
+        success: false,
+        error: 'Failed to update user. Please try again.',
+      };
+    }
+
+    // Log after update
+    logger.info('Successfully granted access', {
+      email: updatedUser.email,
+      userId: updatedUser._id.toString(),
+      clerkIds: updatedUser.clerkIds || [],
+      newStatus: updatedUser.subscriptionStatus,
+      newPlan: updatedUser.subscriptionPlan,
+      hasDirectAccess: updatedUser.hasDirectAccess,
+      grantDuration: duration,
+    });
+
+    // 6. Log the grant for audit
     await AdminGrantLog.create({
       adminId: adminUser.clerkIds?.[0] || 'unknown',
       adminEmail: adminUser.email,
@@ -147,29 +202,35 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
     revalidatePath('/api/check-access');
     
     const action = duration === 'revoke' ? 'Revoked access for' : `Granted ${duration} access to`;
-    const signUpUrl = `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/sign-up?email=${encodeURIComponent(email)}`;
+    const signUpUrl = `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/sign-up?email=${encodeURIComponent(normalizedEmail)}`;
     
     securityLogger.logAdminAction(action, {
       email: updatedUser.email,
+      userId: updatedUser._id.toString(),
+      clerkIds: updatedUser.clerkIds || [],
       grantDuration: duration,
       adminEmail: adminUser.email,
     });
     
+    const clerkIdInfo = updatedUser.clerkIds && updatedUser.clerkIds.length > 0 
+      ? ` (User has ${updatedUser.clerkIds.length} Clerk ID(s))`
+      : ' (Warning: User has no Clerk IDs yet)';
+    
     return { 
       success: true, 
-      message: `Successfully ${action} ${updatedUser.email}. User will see access within 5 seconds if they're on the pricing page.`,
+      message: `Successfully ${action} ${updatedUser.email}${clerkIdInfo}. Changes take effect immediately.`,
       signUpUrl: duration !== 'revoke' ? signUpUrl : undefined
     };
   } catch (error) {
-    logger.error('Admin grant error', error as Error, {
-      email,
+    logger.error('Admin grant error', error instanceof Error ? error : undefined, {
+      email: normalizedEmail,
       grantDuration: duration,
       adminEmail: adminUser?.email,
     });
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return { 
       success: false, 
-      error: `Database connection failed: ${errorMessage}` 
+      error: `Failed to grant access: ${errorMessage}` 
     };
   }
 }

@@ -1,5 +1,6 @@
 import AdminForm from './AdminForm';
 import WaitlistManagement from './WaitlistManagement';
+import UserDebugTools from './UserDebugTools';
 import { grantPremiumAccess, type GrantDuration } from '@/app/actions/admin';
 import { requireAdminUser } from '@/lib/dashboard-access';
 
@@ -47,6 +48,13 @@ export default async function AdminPage() {
         <section>
           <h2 className="text-2xl font-bold mb-6">Grant Premium Access</h2>
         <AdminForm action={grantAccessAction} />
+        </section>
+
+        {/* User Debug Tools Section */}
+        <section>
+          <h2 className="text-2xl font-bold mb-6">User Debug Tools</h2>
+          <p className="text-gray-400 mb-4">Search for users and identify duplicate accounts</p>
+          <UserDebugTools />
         </section>
 
         {/* Waitlist Management Section */}
