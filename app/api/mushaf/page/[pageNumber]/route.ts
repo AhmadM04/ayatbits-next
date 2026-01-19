@@ -67,7 +67,7 @@ export async function GET(
     if (user) {
       await connectDB();
       
-      const dbUser = await User.findOne({ clerkId: user.id }).lean() as any;
+      const dbUser = await User.findOne({ clerkIds: user.id }).lean() as any;
       
       if (dbUser) {
         // Get verse keys for this page

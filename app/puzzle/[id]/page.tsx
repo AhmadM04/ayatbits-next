@@ -39,7 +39,7 @@ export default async function PuzzlePage({
   await connectDB();
 
   // Get user (already checked access above)
-  const dbUser = await User.findOne({ clerkId: user.id });
+  const dbUser = await User.findOne({ clerkIds: user.id });
   if (!dbUser) {
     redirect('/sign-in');
   }
