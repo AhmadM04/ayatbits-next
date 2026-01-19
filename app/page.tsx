@@ -12,18 +12,18 @@ import DemoPuzzle from "@/components/DemoPuzzle";
 import { QuranLoader } from "@/components/animations";
 import WaitlistForm from "@/components/WaitlistForm";
 
-// Floating Arabic letters/words for the background
+// Floating Arabic letters/words for the background - Names of Allah (Asma ul Husna)
 const floatingArabicWords = [
-  { text: 'بِسْمِ', x: '10%', y: '20%', delay: 0, duration: 8 },
-  { text: 'ٱللَّهِ', x: '85%', y: '15%', delay: 1, duration: 10 },
-  { text: 'ٱلرَّحْمَٰنِ', x: '75%', y: '70%', delay: 2, duration: 9 },
-  { text: 'ٱلرَّحِيمِ', x: '15%', y: '75%', delay: 0.5, duration: 11 },
-  { text: 'ٱلْحَمْدُ', x: '90%', y: '45%', delay: 1.5, duration: 8 },
-  { text: 'رَبِّ', x: '5%', y: '50%', delay: 2.5, duration: 10 },
-  { text: 'ٱلْعَٰلَمِينَ', x: '50%', y: '85%', delay: 3, duration: 9 },
-  { text: 'مَٰلِكِ', x: '30%', y: '10%', delay: 0.8, duration: 12 },
-  { text: 'يَوْمِ', x: '70%', y: '30%', delay: 1.2, duration: 8 },
-  { text: 'ٱلدِّينِ', x: '20%', y: '40%', delay: 2.2, duration: 10 },
+  { text: 'ٱلرَّحْمَٰن', x: '10%', y: '20%', delay: 0, duration: 8 },
+  { text: 'ٱلرَّحِيم', x: '85%', y: '15%', delay: 1, duration: 10 },
+  { text: 'ٱلْمَلِك', x: '75%', y: '70%', delay: 2, duration: 9 },
+  { text: 'ٱلْقُدُّوس', x: '15%', y: '75%', delay: 0.5, duration: 11 },
+  { text: 'ٱلسَّلَام', x: '90%', y: '45%', delay: 1.5, duration: 8 },
+  { text: 'ٱلْعَزِيز', x: '5%', y: '50%', delay: 2.5, duration: 10 },
+  { text: 'ٱلْحَكِيم', x: '50%', y: '85%', delay: 3, duration: 9 },
+  { text: 'ٱللَّطِيف', x: '30%', y: '10%', delay: 0.8, duration: 12 },
+  { text: 'ٱلْكَرِيم', x: '70%', y: '30%', delay: 1.2, duration: 8 },
+  { text: 'ٱلنُّور', x: '20%', y: '40%', delay: 2.2, duration: 10 },
 ];
 
 // Component to check access and render appropriate button

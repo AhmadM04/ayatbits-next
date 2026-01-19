@@ -258,9 +258,9 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
                       isPlayingWord && currentWordIndex === index
                         ? {
                             boxShadow: [
-                              '0 0 0 rgba(168, 85, 247, 0)',
-                              '0 0 20px rgba(168, 85, 247, 0.5)',
-                              '0 0 0 rgba(168, 85, 247, 0)',
+                              '0 0 0 rgba(16, 185, 129, 0)',
+                              '0 0 20px rgba(16, 185, 129, 0.5)',
+                              '0 0 0 rgba(16, 185, 129, 0)',
                             ],
                           }
                         : {}
@@ -273,8 +273,8 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
                     }}
                     className={`inline-block cursor-pointer px-1 rounded transition-colors ${
                       isPlayingWord && currentWordIndex === index
-                        ? 'bg-purple-500/30 text-purple-300'
-                        : 'hover:bg-purple-500/10'
+                        ? 'bg-green-500/30 text-green-300'
+                        : 'hover:bg-green-500/10'
                     }`}
                   >
                     <HarakatText 

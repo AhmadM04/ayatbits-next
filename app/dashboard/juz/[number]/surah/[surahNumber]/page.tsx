@@ -2,7 +2,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { redirect, notFound } from 'next/navigation';
 import { connectDB, Surah, Juz, Puzzle, UserProgress, User, LikedAyat } from '@/lib/db';
 import Link from 'next/link';
-import { ArrowLeft, Play, Heart, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Play, Heart, CheckCircle, BookOpen } from 'lucide-react';
 import VersePageClient from './VersePageClient';
 import TranslationDisplay from './TranslationDisplay';
 import TransliterationDisplay from './TransliterationDisplay';
@@ -99,6 +99,21 @@ export default async function SurahVersePage({
     }
   }
 
+  // Fetch page number for Mushaf navigation
+  let mushafPageNumber: number | null = null;
+  try {
+    const pageResponse = await fetch(
+      `https://api.quran.com/api/v4/verses/by_key/${surahNumber}:${selectedAyah}?fields=page_number`,
+      { next: { revalidate: 86400 } }
+    );
+    if (pageResponse.ok) {
+      const pageData = await pageResponse.json();
+      mushafPageNumber = pageData.verse?.page_number || null;
+    }
+  } catch (error) {
+    console.error('Failed to fetch page number:', error);
+  }
+
   const totalAyahs = puzzles.length;
   const completedAyahs = completedPuzzleIds.size;
   const progressPercentage = totalAyahs > 0 ? (completedAyahs / totalAyahs) * 100 : 0;
@@ -127,6 +142,15 @@ export default async function SurahVersePage({
                 <h1 className="text-base font-semibold truncate">{surah.nameEnglish}</h1>
                 <p className="text-xs text-gray-500 truncate">Juz {juz.number} • {completedAyahs}/{totalAyahs} completed</p>
               </div>
+              {mushafPageNumber && (
+                <Link
+                  href={`/dashboard/mushaf/page/${mushafPageNumber}`}
+                  className="p-2 -mr-2 hover:bg-white/5 rounded-lg transition-colors"
+                  title="View in Mushaf"
+                >
+                  <BookOpen className="w-5 h-5 text-gray-400" />
+                </Link>
+              )}
             </div>
           </div>
         </header>

@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { HarakatText, HarakatModal } from '@/components/arabic';
 import { type HarakatDefinition } from '@/lib/harakat-utils';
+import { useWordAudio } from '@/lib/hooks/useWordAudio';
 
 interface AyahTextDisplayProps {
   ayahText: string;
@@ -10,9 +12,37 @@ interface AyahTextDisplayProps {
   ayahNumber: number;
 }
 
-export default function AyahTextDisplay({ ayahText }: AyahTextDisplayProps) {
+export default function AyahTextDisplay({ ayahText, surahNumber, ayahNumber }: AyahTextDisplayProps) {
   const [selectedHarakat, setSelectedHarakat] = useState<HarakatDefinition | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [enableWordByWordAudio, setEnableWordByWordAudio] = useState(false);
+
+  // Word audio hook
+  const {
+    playWord,
+    isPlaying: isPlayingWord,
+    currentWordIndex,
+  } = useWordAudio({
+    surahNumber,
+    ayahNumber,
+    enabled: enableWordByWordAudio,
+  });
+
+  // Fetch user settings for word audio
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/user/settings');
+        if (response.ok) {
+          const data = await response.json();
+          setEnableWordByWordAudio(data.enableWordByWordAudio || false);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user settings:', error);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const handleHarakatClick = useCallback((definition: HarakatDefinition) => {
     setSelectedHarakat(definition);
@@ -30,10 +60,46 @@ export default function AyahTextDisplay({ ayahText }: AyahTextDisplayProps) {
         dir="rtl"
         style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
       >
-        <HarakatText 
-          text={ayahText}
-          onHarakatClick={handleHarakatClick}
-        />
+        {enableWordByWordAudio ? (
+          ayahText.split(/\s+/).map((word, index) => (
+            <motion.span
+              key={index}
+              onClick={() => playWord(index)}
+              animate={
+                isPlayingWord && currentWordIndex === index
+                  ? {
+                      boxShadow: [
+                        '0 0 0 rgba(16, 185, 129, 0)',
+                        '0 0 20px rgba(16, 185, 129, 0.5)',
+                        '0 0 0 rgba(16, 185, 129, 0)',
+                      ],
+                    }
+                  : {}
+              }
+              transition={{
+                boxShadow: {
+                  duration: 1,
+                  repeat: Infinity,
+                },
+              }}
+              className={`inline-block cursor-pointer px-1 rounded transition-colors ${
+                isPlayingWord && currentWordIndex === index
+                  ? 'bg-green-500/30 text-green-300'
+                  : 'hover:bg-green-500/10'
+              }`}
+            >
+              <HarakatText 
+                text={word}
+                onHarakatClick={handleHarakatClick}
+              />
+            </motion.span>
+          ))
+        ) : (
+          <HarakatText 
+            text={ayahText}
+            onHarakatClick={handleHarakatClick}
+          />
+        )}
       </p>
 
       <HarakatModal
