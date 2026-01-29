@@ -1,5 +1,10 @@
 import { ReactNode } from 'react';
+import { UserSyncProvider } from '@/components/UserSyncProvider';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  return children;
+  return (
+    <UserSyncProvider>
+      {children}
+    </UserSyncProvider>
+  );
 }

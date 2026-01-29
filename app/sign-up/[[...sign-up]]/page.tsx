@@ -85,6 +85,8 @@ function SignUpContent() {
             routing="path"
             path="/sign-up"
             signInUrl="/sign-in"
+            fallbackRedirectUrl="/dashboard"
+            afterSignUpUrl="/dashboard"
             initialValues={{
               emailAddress: emailParam || undefined
             }}

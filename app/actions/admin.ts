@@ -1,10 +1,20 @@
 'use server';
 
-import { connectDB, User, SubscriptionStatusEnum, AdminGrantLog } from '@/lib/db';
+import { connectDB, User, SubscriptionStatusEnum, AdminGrantLog, UserRole } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { getAdminUser } from '@/lib/dashboard-access';
 import { logger } from '@/lib/logger';
 import { securityLogger } from '@/lib/security-logger';
+
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || '')
+  .split(',')
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
+
+function isAdminEmail(email?: string | null): boolean {
+  if (!email) return false;
+  return ADMIN_EMAILS.includes(email.toLowerCase());
+}
 
 export type GrantDuration =
   | 'lifetime'
@@ -41,13 +51,13 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
     await connectDB();
 
     // 3. Find existing user first to verify they exist
-    const existingUser = await User.findOne({ 
+    let existingUser = await User.findOne({ 
       email: { $regex: new RegExp(`^${normalizedEmail}$`, 'i') } 
     });
 
     if (!existingUser) {
-      // User doesn't exist
-      logger.warn('Attempted to grant access to non-existent user', {
+      // User doesn't exist in database yet
+      logger.warn('User not found in database, will create placeholder', {
         email: normalizedEmail,
         adminEmail: adminUser.email,
       });
@@ -55,14 +65,45 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
       if (duration === 'revoke') {
         return { 
           success: false, 
-          error: `No user found with email "${normalizedEmail}".`
+          error: `No user found with email "${normalizedEmail}". Cannot revoke access for non-existent user.`
         };
       }
       
-      return { 
-        success: false, 
-        error: `No user found with email "${normalizedEmail}". The user must sign up first before access can be granted.`
-      };
+      // Create a placeholder user that will be merged when they sign in
+      // This allows admins to grant access before the user has signed up/in
+      const role = isAdminEmail(normalizedEmail) ? UserRole.ADMIN : UserRole.USER;
+      
+      try {
+        existingUser = await User.create({
+          email: normalizedEmail,
+          clerkIds: [], // Empty - will be populated when user signs in via webhook or sync
+          role,
+          subscriptionStatus: SubscriptionStatusEnum.INACTIVE, // Will be updated below
+        });
+        
+        logger.info('Created placeholder user for admin grant', {
+          email: normalizedEmail,
+          userId: existingUser._id.toString(),
+          role,
+          adminEmail: adminUser.email,
+        });
+      } catch (createError: any) {
+        // Handle duplicate key error (race condition)
+        if (createError.code === 11000) {
+          // User was created between our check and create - fetch it
+          existingUser = await User.findOne({ 
+            email: { $regex: new RegExp(`^${normalizedEmail}$`, 'i') } 
+          });
+          if (!existingUser) {
+            return { 
+              success: false, 
+              error: `Failed to create or find user with email "${normalizedEmail}".`
+            };
+          }
+        } else {
+          throw createError;
+        }
+      }
     }
 
     // Log before update (existingUser is guaranteed to exist here)
