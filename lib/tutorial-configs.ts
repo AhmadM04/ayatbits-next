@@ -9,7 +9,6 @@ export const dashboardTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="welcome-section"]',
     title: 'Welcome to Ayatbits! 👋',
     message: 'Your personal dashboard for exploring the Quran through interactive puzzles.',
-    arrow: 'curved-down',
     placement: 'bottom',
   },
   {
@@ -17,7 +16,6 @@ export const dashboardTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="stats-cards"]',
     title: 'Track Your Progress',
     message: 'Keep an eye on your streak, completed puzzles, and Juz explored here.',
-    arrow: 'curved-down',
     placement: 'bottom',
   },
   {
@@ -25,7 +23,6 @@ export const dashboardTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="daily-quote"]',
     title: 'Daily Inspiration',
     message: 'Get inspired with a new Quranic verse every day. Tap to hear the recitation!',
-    arrow: 'curved-down',
     placement: 'bottom',
   },
   {
@@ -33,7 +30,6 @@ export const dashboardTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="juz-grid"]',
     title: 'Explore the Quran',
     message: 'Choose any Juz to start solving puzzles and learning the Quran in a fun way.',
-    arrow: 'curved-down',
     placement: 'bottom',
   },
   {
@@ -41,7 +37,6 @@ export const dashboardTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="bottom-nav"]',
     title: 'Easy Navigation',
     message: 'Use the bottom navigation to quickly access your dashboard, search, and profile.',
-    arrow: 'curved-up',
     placement: 'top',
   },
 ];
@@ -55,7 +50,6 @@ export const puzzleTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="puzzle-container"]',
     title: 'Welcome to Puzzle Mode! 🧩',
     message: 'Complete the verse by dragging words from the bank to the correct positions.',
-    arrow: 'curved-down',
     placement: 'bottom',
   },
   {
@@ -63,7 +57,6 @@ export const puzzleTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="word-bank"]',
     title: 'Word Bank',
     message: 'All the words you need are here. Drag them to the answer area or tap to place them.',
-    arrow: 'curved-down',
     placement: 'bottom',
   },
   {
@@ -71,7 +64,6 @@ export const puzzleTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="answer-area"]',
     title: 'Answer Area',
     message: 'Drop words here in the correct order. Tap any word to hear its pronunciation.',
-    arrow: 'curved-up',
     placement: 'top',
   },
   {
@@ -79,7 +71,6 @@ export const puzzleTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="hint-button"]',
     title: 'Need Help?',
     message: 'Stuck? Use the hint button to reveal the next word. You have 3 hints per puzzle.',
-    arrow: 'curved-left',
     placement: 'left',
     offset: { x: -20 },
   },
@@ -88,7 +79,6 @@ export const puzzleTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="audio-button"]',
     title: 'Listen & Learn',
     message: 'Play the complete verse audio to hear the beautiful recitation.',
-    arrow: 'curved-left',
     placement: 'left',
     offset: { x: -20 },
   },
@@ -103,7 +93,6 @@ export const profileTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="profile-stats"]',
     title: 'Your Stats',
     message: 'View your account details, join date, and learning progress here.',
-    arrow: 'curved-down',
     placement: 'bottom',
   },
   {
@@ -111,7 +100,6 @@ export const profileTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="translation-selector"]',
     title: 'Choose Your Translation',
     message: 'Select from multiple English translations to enhance your understanding.',
-    arrow: 'curved-down',
     placement: 'bottom',
   },
   {
@@ -119,7 +107,6 @@ export const profileTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="audio-settings"]',
     title: 'Audio Settings',
     message: 'Enable word-by-word audio to hear the pronunciation of each word in puzzles.',
-    arrow: 'curved-down',
     placement: 'bottom',
   },
   {
@@ -127,7 +114,6 @@ export const profileTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="account-section"]',
     title: 'Manage Your Account',
     message: 'Update your email, password, and other account settings in this section.',
-    arrow: 'curved-down',
     placement: 'bottom',
   },
 ];
@@ -141,7 +127,6 @@ export const billingTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="subscription-status"]',
     title: 'Subscription Status',
     message: 'View your current plan, trial status, and subscription details here.',
-    arrow: 'curved-down',
     placement: 'bottom',
   },
   {
@@ -149,7 +134,6 @@ export const billingTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="plan-options"]',
     title: 'Choose Your Plan',
     message: 'Explore monthly, yearly, and lifetime plans to continue your learning journey.',
-    arrow: 'curved-down',
     placement: 'bottom',
   },
   {
@@ -157,7 +141,6 @@ export const billingTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="manage-subscription"]',
     title: 'Manage Subscription',
     message: 'Update your payment method, cancel, or modify your subscription anytime.',
-    arrow: 'curved-down',
     placement: 'bottom',
   },
 ];

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TutorialArrow, ArrowDirection } from './TutorialArrow';
 import { TutorialTooltip } from './TutorialTooltip';
 
 export interface TutorialStep {
@@ -10,7 +9,6 @@ export interface TutorialStep {
   target: string; // CSS selector or data-tutorial attribute
   title: string;
   message: string;
-  arrow?: ArrowDirection;
   placement?: 'top' | 'bottom' | 'left' | 'right';
   offset?: { x?: number; y?: number };
 }
@@ -140,39 +138,7 @@ export function TutorialOverlay({
     return { left, top, transform };
   };
 
-  // Calculate arrow position
-  const getArrowPosition = () => {
-    const isVerticalArrow = step.arrow?.includes('down') || step.arrow?.includes('up');
-    const arrowSize = isVerticalArrow ? 60 : 80;
-    const arrowWidth = isVerticalArrow ? 80 : 120;
-    const arrowHeight = isVerticalArrow ? 120 : 80;
-    
-    switch (placement) {
-      case 'top':
-        return {
-          left: targetRect.left + targetRect.width / 2 - arrowWidth / 2,
-          top: targetRect.top - arrowSize - 20,
-        };
-      case 'bottom':
-        return {
-          left: targetRect.left + targetRect.width / 2 - arrowWidth / 2,
-          top: targetRect.bottom + 20,
-        };
-      case 'left':
-        return {
-          left: targetRect.left - arrowSize - 20,
-          top: targetRect.top + targetRect.height / 2 - arrowHeight / 2,
-        };
-      case 'right':
-        return {
-          left: targetRect.right + 20,
-          top: targetRect.top + targetRect.height / 2 - arrowHeight / 2,
-        };
-    }
-  };
-
   const tooltipPosition = getTooltipPosition();
-  const arrowPosition = step.arrow ? getArrowPosition() : null;
 
   return (
     <AnimatePresence mode="wait">
@@ -265,25 +231,6 @@ export function TutorialOverlay({
           pointerEvents: 'none',
         }}
       />
-
-      {/* Arrow */}
-      {arrowPosition && step.arrow && (
-        <motion.div
-          key="arrow"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
-          className="fixed"
-          style={{
-            zIndex: 1000003,
-            left: arrowPosition.left + (offset.x || 0),
-            top: arrowPosition.top + (offset.y || 0),
-            pointerEvents: 'none',
-          }}
-        >
-          <TutorialArrow direction={step.arrow} />
-        </motion.div>
-      )}
 
       {/* Tooltip */}
       <motion.div
