@@ -13,6 +13,7 @@ import { SparkleAnimation } from '@/components/animations';
 import { TutorialWrapper, useTutorial } from '@/components/tutorial';
 import { dashboardTutorialSteps } from '@/lib/tutorial-configs';
 import { resetTutorial } from '@/lib/tutorial-manager';
+import { MushafFAB } from '@/components/mushaf';
 
 interface DashboardContentProps {
   userFirstName: string | null | undefined;
@@ -295,6 +296,9 @@ export default function DashboardContent({
           </div>
         </section>
       </main>
+
+      {/* Mushaf FAB - Opens Mushaf from the beginning */}
+      <MushafFAB />
 
       <BottomNav />
     </div>

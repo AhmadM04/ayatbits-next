@@ -92,7 +92,7 @@ export default function JuzContent({
       </main>
 
       {/* Mushaf FAB - Opens Mushaf at the start page for this Juz */}
-      <MushafFAB juzNumber={juzNumber} />
+      <MushafFAB juzNumber={juzNumber} size="large" />
 
       <BottomNav />
     </div>

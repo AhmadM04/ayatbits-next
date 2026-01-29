@@ -6,8 +6,10 @@ import { requireDashboardAccess } from '@/lib/dashboard-access';
 export default async function DashboardPage() {
   const user = await requireDashboardAccess();
   
-  // Fetch progress
-  const progress = await UserProgress.find({ userId: user._id });
+  // Fetch progress with populated puzzles to get juz information
+  const progress = await UserProgress.find({ userId: user._id })
+    .populate('puzzleId')
+    .lean() as any[];
   
   // Calculate stats
   const stats = {
@@ -17,6 +19,13 @@ export default async function DashboardPage() {
   };
 
   const trialDaysLeft = getTrialDaysRemaining(user);
+
+  // Get unique juz IDs from completed progress
+  const uniqueJuzIds = new Set(
+    progress
+      .filter(p => p.puzzleId && p.puzzleId.juzId) // Filter out any null/undefined puzzles
+      .map(p => p.puzzleId.juzId.toString())
+  );
 
   // Fetch juzs data
   const juzDocs = await Juz.find({}).sort({ number: 1 }).lean();
@@ -36,7 +45,7 @@ export default async function DashboardPage() {
       userFirstName={user.firstName?.split(' ')[0] || null}
       currentStreak={stats.currentStreak}
       completedPuzzles={stats.surahsCompleted}
-      juzsExplored={new Set(progress.map(p => p.juzNumber)).size}
+      juzsExplored={uniqueJuzIds.size}
       selectedTranslation={translationCode}
       trialDaysLeft={trialDaysLeft}
       subscriptionStatus={user.subscriptionStatus}
