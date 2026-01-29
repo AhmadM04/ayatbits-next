@@ -26,7 +26,7 @@ export type { ITrophy } from './models/Trophy';
 export type { IUserAchievement } from './models/Achievement';
 export type { IAdminGrantLog } from './models/AdminGrantLog';
 export type { IWaitlist } from './models/Waitlist';
-export { SubscriptionStatusEnum } from './models/User';
+export { SubscriptionStatusEnum, UserRole } from './models/User';
 export type { SubscriptionPlan } from './models/User';
 export { PuzzleType } from './models/Puzzle';
 export { ProgressStatus } from './models/UserProgress';

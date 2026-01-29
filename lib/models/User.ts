@@ -9,6 +9,11 @@ export enum SubscriptionStatusEnum {
   UNPAID = 'unpaid',
 }
 
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+}
+
 export type SubscriptionPlan = 'monthly' | 'yearly' | 'lifetime'; // Removed 'free'
 
 export type SubscriptionPlatform = 'web' | 'ios';
@@ -33,7 +38,8 @@ export interface IUser extends Document {
   selectedTranslation?: string;
   showTransliteration?: boolean;
   enableWordByWordAudio?: boolean;
-  isAdmin?: boolean;
+  role?: UserRole; // Role-based access control (admin or user)
+  isAdmin?: boolean; // DEPRECATED: Use 'role' field instead. Kept for backwards compatibility during migration.
   hasDirectAccess?: boolean; // Granted by admin to bypass subscription
   lastActivityDate?: Date;
   currentStreak?: number;
@@ -69,7 +75,12 @@ const userSchema = new mongoose.Schema<IUser>(
     selectedTranslation: { type: String, default: 'en.sahih' },
     showTransliteration: { type: Boolean, default: false },
     enableWordByWordAudio: { type: Boolean, default: false },
-    isAdmin: { type: Boolean, default: false },
+    role: { 
+      type: String, 
+      enum: Object.values(UserRole),
+      default: UserRole.USER,
+    },
+    isAdmin: { type: Boolean, default: false }, // DEPRECATED: Kept for backwards compatibility
     hasDirectAccess: { type: Boolean, default: false },
     subscriptionEndDate: { type: Date },
     trialEndsAt: { type: Date },
@@ -83,6 +94,19 @@ const userSchema = new mongoose.Schema<IUser>(
   },
   { timestamps: true }
 );
+
+// Middleware to sync role and isAdmin for backwards compatibility
+userSchema.pre('save', function(next) {
+  // Sync role -> isAdmin
+  if (this.isModified('role')) {
+    this.isAdmin = this.role === UserRole.ADMIN;
+  }
+  // Sync isAdmin -> role (for legacy code that still sets isAdmin)
+  else if (this.isModified('isAdmin')) {
+    this.role = this.isAdmin ? UserRole.ADMIN : UserRole.USER;
+  }
+  next();
+});
 
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { connectDB, User, SubscriptionStatusEnum } from '@/lib/db';
+import { connectDB, User, SubscriptionStatusEnum, UserRole } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -21,7 +21,7 @@ export async function GET() {
     }
 
     // Admins always have access
-    if (user.isAdmin) {
+    if (user.role === UserRole.ADMIN) {
       return NextResponse.json({ hasAccess: true, plan: 'admin' });
     }
 

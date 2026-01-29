@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 interface BillingSectionProps {
   user: {
-    isAdmin?: boolean;
+    role?: 'admin' | 'user';
     subscriptionStatus?: string;
     subscriptionEndDate?: string;
   };
@@ -27,7 +27,7 @@ export default function BillingSection({ user, stats }: BillingSectionProps) {
         </div>
       </div>
       
-      {!user.isAdmin ? (
+      {user.role !== 'admin' ? (
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 transition-colors hover:border-white/20">
             <div>

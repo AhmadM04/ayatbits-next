@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
-import { connectDB, User } from '@/lib/db';
+import { connectDB, User, UserRole } from '@/lib/db';
 import { checkSubscription } from '@/lib/subscription';
 
 export async function GET() {
@@ -41,7 +41,7 @@ export async function GET() {
           _id: dbUser._id,
           clerkIds: dbUser.clerkIds,
           email: dbUser.email,
-          isAdmin: dbUser.isAdmin,
+          role: dbUser.role,
           subscriptionStatus: dbUser.subscriptionStatus,
           subscriptionPlan: dbUser.subscriptionPlan,
           subscriptionEndDate: dbUser.subscriptionEndDate,
@@ -58,7 +58,7 @@ export async function GET() {
       access: {
         hasAccess,
         reason: !dbUser ? 'No DB user found' : 
-                dbUser.isAdmin ? 'Admin bypass' :
+                dbUser.role === UserRole.ADMIN ? 'Admin bypass' :
                 dbUser.subscriptionPlan === 'lifetime' && dbUser.subscriptionStatus === 'active' ? 'Lifetime access' :
                 dbUser.subscriptionStatus === 'active' && dbUser.subscriptionEndDate ? 'Active subscription' :
                 dbUser.trialEndsAt ? 'Trial period' :

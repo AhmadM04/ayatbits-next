@@ -29,7 +29,7 @@ export default async function BillingPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <BillingContent 
           user={{
-            isAdmin: user.isAdmin,
+            role: user.role,
             subscriptionStatus: user.subscriptionStatus,
             subscriptionPlan: user.subscriptionPlan,
             subscriptionEndDate: user.subscriptionEndDate?.toISOString(),

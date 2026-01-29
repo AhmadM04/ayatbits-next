@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 interface BillingContentProps {
   user: {
-    isAdmin?: boolean;
+    role?: 'admin' | 'user';
     subscriptionStatus?: string;
     subscriptionPlan?: string;
     subscriptionEndDate?: string;
@@ -41,7 +41,7 @@ export default function BillingContent({ user }: BillingContentProps) {
     }
   };
 
-  if (user.isAdmin) {
+  if (user.role === 'admin') {
     return (
       <div className="space-y-6">
         <div>

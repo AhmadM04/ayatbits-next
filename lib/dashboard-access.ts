@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { connectDB, User } from '@/lib/db';
+import { connectDB, User, UserRole } from '@/lib/db';
 import { checkSubscription } from './subscription';
 import { currentUser } from '@clerk/nextjs/server';
 import { logger } from './logger';
@@ -67,6 +67,7 @@ async function ensureDbUser(clerkUser: Awaited<ReturnType<typeof currentUser>>) 
 
     // 3) If still not found, create new
     if (!dbUser) {
+      const role = isAdminEmail(emailLower) ? UserRole.ADMIN : UserRole.USER;
       dbUser = await User.create({
         clerkIds: [clerkUser.id], // Store as array
         email: emailLower, // No fallback - validated above
@@ -74,13 +75,13 @@ async function ensureDbUser(clerkUser: Awaited<ReturnType<typeof currentUser>>) 
         lastName: clerkUser?.lastName,
         name: clerkUser?.fullName,
         imageUrl: clerkUser?.imageUrl,
-        isAdmin: isAdminEmail(emailLower),
+        role,
       });
     } else {
-    // 4) Keep admin flag in sync
+    // 4) Keep admin role in sync
     const shouldBeAdmin = isAdminEmail(emailLower);
-    if (shouldBeAdmin && !dbUser.isAdmin) {
-      dbUser.isAdmin = true;
+    if (shouldBeAdmin && dbUser.role !== UserRole.ADMIN) {
+      dbUser.role = UserRole.ADMIN;
     }
     
     // 5) Sync user profile data from Clerk (name, image, etc.)
@@ -136,7 +137,7 @@ export async function getAdminUser() {
   try {
     await connectDB();
     const dbUser = await ensureDbUser(user);
-    if (!dbUser?.isAdmin) return null;
+    if (dbUser?.role !== UserRole.ADMIN) return null;
     return dbUser;
   } catch (error) {
     console.error('Error getting admin user:', error);
@@ -165,7 +166,7 @@ export async function requireDashboardAccess() {
     console.log('[requireDashboardAccess] DB User found:', {
       email: dbUser.email,
       clerkIds: dbUser.clerkIds,
-      isAdmin: dbUser.isAdmin,
+      role: dbUser.role,
       hasDirectAccess: dbUser.hasDirectAccess,
       subscriptionPlan: dbUser.subscriptionPlan,
       subscriptionStatus: dbUser.subscriptionStatus,
@@ -174,7 +175,7 @@ export async function requireDashboardAccess() {
     });
 
     // Admins always have access without subscription checks
-    if (dbUser.isAdmin) {
+    if (dbUser.role === UserRole.ADMIN) {
       console.log('[requireDashboardAccess] Admin user - access granted');
       return dbUser;
     }

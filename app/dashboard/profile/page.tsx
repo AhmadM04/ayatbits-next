@@ -34,7 +34,7 @@ export default async function ProfilePage() {
   const userData = {
     firstName: user.firstName,
     email: user.email,
-    isAdmin: user.isAdmin,
+    role: user.role,
     subscriptionStatus: user.subscriptionStatus,
     subscriptionEndDate: user.subscriptionEndDate?.toISOString(),
   };

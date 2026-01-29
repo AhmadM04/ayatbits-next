@@ -6,7 +6,7 @@ interface ProfileContentProps {
   user: {
     firstName?: string;
     email?: string;
-    isAdmin?: boolean;
+    role?: 'admin' | 'user';
     subscriptionStatus?: string;
     subscriptionEndDate?: string;
   };
@@ -21,7 +21,7 @@ interface ProfileContentProps {
 
 export default function ProfileContent({ user, stats, trialDaysLeft }: ProfileContentProps) {
   // Admins don't need to see subscription info
-  const showSubscriptionBadge = !user.isAdmin;
+  const showSubscriptionBadge = user.role !== 'admin';
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -47,7 +47,7 @@ export default function ProfileContent({ user, stats, trialDaysLeft }: ProfileCo
                 : stats.planType}
             </div>
           )}
-          {user.isAdmin && (
+          {user.role === 'admin' && (
             <div className="px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 bg-purple-500/20 text-purple-400 border border-purple-500/30 transition-colors hover:bg-purple-500/25">
               <Crown className="w-4 h-4" />
               Admin

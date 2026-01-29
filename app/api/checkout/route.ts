@@ -1,7 +1,7 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { connectDB, User } from '@/lib/db';
+import { connectDB, User, UserRole } from '@/lib/db';
 import { checkSubscription } from '@/lib/subscription';
 import { logger } from '@/lib/logger';
 
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Check for admin status
-      if (dbUser.isAdmin) {
+      if (dbUser.role === UserRole.ADMIN) {
         logger.info('Checkout blocked - user is admin', {
           userId: user.id,
           email: dbUser.email,
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
     // Final access check right before creating Stripe session (double-check for race conditions)
     const finalCheck = await User.findOne({ clerkIds: user.id });
     if (finalCheck) {
-      if (finalCheck.hasDirectAccess || finalCheck.isAdmin || checkSubscription(finalCheck)) {
+      if (finalCheck.hasDirectAccess || finalCheck.role === UserRole.ADMIN || checkSubscription(finalCheck)) {
         logger.info('Checkout blocked - user gained access during checkout', {
           userId: user.id,
           route: '/api/checkout',

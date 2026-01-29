@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
-import { connectDB, User } from '@/lib/db';
+import { connectDB, User, UserRole } from '@/lib/db';
 import { checkSubscription } from '@/lib/subscription';
 
 /**
@@ -46,7 +46,7 @@ export async function GET() {
     }
 
     // Admins always have access (matches requireDashboardAccess logic)
-    const hasAccess = dbUser.isAdmin || checkSubscription(dbUser);
+    const hasAccess = dbUser.role === UserRole.ADMIN || checkSubscription(dbUser);
 
     return NextResponse.json({
       authenticated: true,
@@ -60,7 +60,7 @@ export async function GET() {
         _id: dbUser._id,
         clerkIds: dbUser.clerkIds,
         email: dbUser.email,
-        isAdmin: dbUser.isAdmin,
+        role: dbUser.role,
         hasDirectAccess: dbUser.hasDirectAccess,
         subscriptionStatus: dbUser.subscriptionStatus,
         subscriptionPlan: dbUser.subscriptionPlan,
@@ -73,7 +73,7 @@ export async function GET() {
       accessCheck: {
         hasAccess,
         checks: {
-          isAdmin: !!dbUser.isAdmin,
+          isAdmin: dbUser.role === UserRole.ADMIN,
           hasDirectAccess: !!dbUser.hasDirectAccess,
           isLifetime: dbUser.subscriptionPlan === 'lifetime' && dbUser.subscriptionStatus === 'active',
           hasActiveSubscription: !!(
