@@ -8,17 +8,8 @@ import { requireDashboardAccess } from '@/lib/dashboard-access';
 import { UserProfile } from '@clerk/nextjs';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import dynamic from 'next/dynamic';
-
-const TutorialWrapper = dynamic(
-  () => import('@/components/tutorial').then(mod => ({ default: mod.TutorialWrapper })),
-  { ssr: false }
-);
-
-const profileTutorialSteps = dynamic(
-  () => import('@/lib/tutorial-configs').then(mod => ({ default: mod.profileTutorialSteps })),
-  { ssr: false }
-);
+import { TutorialWrapper } from '@/components/tutorial';
+import { profileTutorialSteps } from '@/lib/tutorial-configs';
 
 export default async function ProfilePage() {
   const user = await requireDashboardAccess();
@@ -49,13 +40,11 @@ export default async function ProfilePage() {
     subscriptionStatus: user.subscriptionStatus,
     subscriptionEndDate: user.subscriptionEndDate?.toISOString(),
   };
-
-  const steps = await profileTutorialSteps;
   
   return (
     <TutorialWrapper
       sectionId="profile_settings"
-      steps={steps}
+      steps={profileTutorialSteps}
       delay={800}
     >
       <div className="min-h-screen bg-[#0a0a0a] text-white">

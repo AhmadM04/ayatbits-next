@@ -2,26 +2,16 @@ import { requireDashboardAccess } from '@/lib/dashboard-access';
 import BillingContent from './BillingContent';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import dynamic from 'next/dynamic';
-
-const TutorialWrapper = dynamic(
-  () => import('@/components/tutorial').then(mod => ({ default: mod.TutorialWrapper })),
-  { ssr: false }
-);
-
-const billingTutorialSteps = dynamic(
-  () => import('@/lib/tutorial-configs').then(mod => ({ default: mod.billingTutorialSteps })),
-  { ssr: false }
-);
+import { TutorialWrapper } from '@/components/tutorial';
+import { billingTutorialSteps } from '@/lib/tutorial-configs';
 
 export default async function BillingPage() {
   const user = await requireDashboardAccess();
-  const steps = await billingTutorialSteps;
 
   return (
     <TutorialWrapper
       sectionId="billing_overview"
-      steps={steps}
+      steps={billingTutorialSteps}
       delay={800}
     >
       <div className="min-h-screen bg-[#0a0a0a] text-white">
