@@ -23,7 +23,7 @@ export function TutorialArrow({
   direction = 'curved-down',
   className = '',
   style = {},
-  color = '#10b981',
+  color = 'white',
 }: TutorialArrowProps) {
   return (
     <motion.div
@@ -47,7 +47,7 @@ export function TutorialArrow({
         alt="Tutorial arrow"
         width={direction.includes('up') || direction.includes('down') ? 80 : 120}
         height={direction.includes('up') || direction.includes('down') ? 120 : 80}
-        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}
+        style={{ filter: 'drop-shadow(0 2px 8px rgba(255,255,255,0.3))' }}
       />
     </motion.div>
   );

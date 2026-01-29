@@ -93,7 +93,7 @@ export function TutorialOverlay({
 
   // Calculate tooltip position with viewport bounds checking
   const getTooltipPosition = () => {
-    const baseOffset = 24; // Gap between target and tooltip
+    const baseOffset = 48; // Gap between target and tooltip (increased for better spacing)
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     const tooltipWidth = 384; // max-w-sm = 24rem = 384px
@@ -202,7 +202,7 @@ export function TutorialOverlay({
         exit={{ opacity: 0, scale: 0.95 }}
         className="fixed"
         style={{
-          zIndex: 1000000,
+          zIndex: 1000001,
           left: targetRect.left - 12,
           top: targetRect.top - 12,
           width: targetRect.width + 24,
@@ -236,7 +236,7 @@ export function TutorialOverlay({
         }}
         className="fixed"
         style={{
-          zIndex: 999999,
+          zIndex: 1000001,
           left: targetRect.left - 16,
           top: targetRect.top - 16,
           width: targetRect.width + 32,
@@ -248,7 +248,7 @@ export function TutorialOverlay({
         }}
       />
       
-      {/* Clear overlay for the highlighted element - removes blur */}
+      {/* Clear overlay for the highlighted element - ensures it's visible and clickable */}
       <motion.div
         key="clear-area"
         initial={{ opacity: 0 }}
@@ -256,7 +256,7 @@ export function TutorialOverlay({
         exit={{ opacity: 0 }}
         className="fixed bg-transparent"
         style={{
-          zIndex: 1000000,
+          zIndex: 1000002,
           left: targetRect.left - 12,
           top: targetRect.top - 12,
           width: targetRect.width + 24,
@@ -275,7 +275,7 @@ export function TutorialOverlay({
           exit={{ opacity: 0, scale: 0.8 }}
           className="fixed"
           style={{
-            zIndex: 1000001,
+            zIndex: 1000003,
             left: arrowPosition.left + (offset.x || 0),
             top: arrowPosition.top + (offset.y || 0),
             pointerEvents: 'none',
@@ -293,7 +293,7 @@ export function TutorialOverlay({
         exit={{ opacity: 0, scale: 0.9 }}
         className="fixed"
         style={{
-          zIndex: 1000002,
+          zIndex: 1000004,
           left: tooltipPosition.left + (offset.x || 0),
           top: tooltipPosition.top + (offset.y || 0),
           transform: tooltipPosition.transform,
