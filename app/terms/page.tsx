@@ -1,24 +1,35 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
-        <div className="max-w-2xl mx-auto px-4">
-          <div className="flex items-center h-14 gap-3">
-            <Link
-              href="/dashboard/profile"
-              className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-400" />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+              <Image 
+                src="/ayatbits-logo.svg" 
+                alt="AyatBits" 
+                width={150} 
+                height={40}
+                priority
+                className="h-8 w-auto"
+              />
             </Link>
-            <h1 className="text-lg font-semibold">Terms of Service</h1>
+            <Link
+              href="/"
+              className="flex items-center gap-2 px-3 py-2 hover:bg-white/5 rounded-lg transition-colors text-sm text-gray-400 hover:text-white"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to Home</span>
+            </Link>
           </div>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-6">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-6">
           <p className="text-gray-500 text-sm mb-6">Last updated: December 2025</p>
 

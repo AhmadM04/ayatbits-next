@@ -157,7 +157,7 @@ export default function PricingContent() {
       <header className="fixed w-full top-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="hover:opacity-80 transition-opacity">
+            <Link href="/dashboard" className="hover:opacity-80 transition-opacity">
               <Image 
                 src="/ayatbits-logo.svg" 
                 alt="AyatBits" 

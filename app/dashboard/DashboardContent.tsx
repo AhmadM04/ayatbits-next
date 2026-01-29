@@ -111,9 +111,9 @@ export default function DashboardContent({
               <Image 
                 src="/ayatbits-logo.svg" 
                 alt="AyatBits" 
-                width={150} 
-                height={40}
-                className="h-7 w-auto"
+                width={180} 
+                height={48}
+                className="h-9 w-auto"
               />
             </Link>
             <div className="flex items-center gap-2 sm:gap-3">

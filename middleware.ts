@@ -16,6 +16,8 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)',
   '/pricing',
   '/waitlist',
+  '/terms',
+  '/faq',
   '/manifest.json',
   '/manifest',
   '/api/webhook/(.*)', // Webhooks should be publicly accessible
