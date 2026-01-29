@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ToastProvider } from "@/components/Toast";
 import { ThemeProvider } from "@/lib/theme-context";
 import { I18nProvider } from "@/lib/i18n";
+import { TutorialProvider } from "@/components/tutorial";
 import "./globals.css";
 import Script from "next/script";
 
@@ -246,7 +247,9 @@ export default function RootLayout({
           <ThemeProvider>
             <ToastProvider>
               <I18nProvider>
-                {children}
+                <TutorialProvider>
+                  {children}
+                </TutorialProvider>
               </I18nProvider>
             </ToastProvider>
           </ThemeProvider>

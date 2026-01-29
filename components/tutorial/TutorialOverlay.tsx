@@ -176,26 +176,30 @@ export function TutorialOverlay({
 
   return (
     <AnimatePresence mode="wait">
-      {/* Backdrop overlay - clickable to skip */}
+      {/* Backdrop overlay with blur - clickable to skip */}
       <motion.div
         key="backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onSkip}
-        className="fixed inset-0 bg-black/70 backdrop-blur-[2px]"
+        className="fixed inset-0 backdrop-blur-sm"
         style={{ 
           zIndex: 999999,
           pointerEvents: 'auto',
+          background: 'rgba(0, 0, 0, 0.85)',
         }}
       />
 
-      {/* Spotlight effect - makes highlighted element visible and clickable */}
+      {/* Spotlight cutout - makes highlighted element transparent and distinguishable */}
       <motion.div
         key="spotlight"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ 
+          opacity: 1, 
+          scale: 1,
+        }}
+        exit={{ opacity: 0, scale: 0.95 }}
         className="fixed"
         style={{
           zIndex: 1000000,
@@ -203,10 +207,61 @@ export function TutorialOverlay({
           top: targetRect.top - 12,
           width: targetRect.width + 24,
           height: targetRect.height + 24,
-          boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.75), 0 0 20px 4px rgba(16, 185, 129, 0.3)',
+          boxShadow: `
+            0 0 0 9999px rgba(0, 0, 0, 0.85),
+            inset 0 0 0 4px rgba(16, 185, 129, 0.8),
+            0 0 50px 15px rgba(16, 185, 129, 0.6),
+            0 0 100px 25px rgba(16, 185, 129, 0.3),
+            0 15px 60px rgba(0, 0, 0, 0.6)
+          `,
           borderRadius: '16px',
-          border: '2px solid rgba(16, 185, 129, 0.5)',
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          pointerEvents: 'none',
+          background: 'transparent',
+        }}
+      />
+      
+      {/* Pulsing glow effect for emphasis */}
+      <motion.div
+        key="pulse-glow"
+        initial={{ opacity: 0 }}
+        animate={{ 
+          opacity: [0.4, 0.8, 0.4],
+        }}
+        exit={{ opacity: 0 }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="fixed"
+        style={{
+          zIndex: 999999,
+          left: targetRect.left - 16,
+          top: targetRect.top - 16,
+          width: targetRect.width + 32,
+          height: targetRect.height + 32,
+          borderRadius: '18px',
+          border: '2px solid rgba(16, 185, 129, 0.5)',
+          boxShadow: '0 0 40px 10px rgba(16, 185, 129, 0.4)',
+          pointerEvents: 'none',
+        }}
+      />
+      
+      {/* Clear overlay for the highlighted element - removes blur */}
+      <motion.div
+        key="clear-area"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed bg-transparent"
+        style={{
+          zIndex: 1000000,
+          left: targetRect.left - 12,
+          top: targetRect.top - 12,
+          width: targetRect.width + 24,
+          height: targetRect.height + 24,
+          borderRadius: '16px',
           pointerEvents: 'none',
         }}
       />
