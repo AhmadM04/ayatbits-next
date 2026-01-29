@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Move } from 'lucide-react';
 
 interface TutorialTooltipProps {
   title: string;
@@ -28,26 +28,41 @@ export function TutorialTooltip({
 
   return (
     <motion.div
+      drag
+      dragMomentum={false}
+      dragElastic={0}
+      dragConstraints={{
+        top: -window.innerHeight / 2 + 100,
+        bottom: window.innerHeight / 2 - 100,
+        left: -window.innerWidth / 2 + 200,
+        right: window.innerWidth / 2 - 200,
+      }}
+      whileDrag={{ scale: 1.05, cursor: 'grabbing' }}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className="relative bg-gray-900 backdrop-blur-md rounded-2xl shadow-2xl border border-green-500/30 max-w-sm"
+      className="relative bg-gray-900 backdrop-blur-md rounded-2xl shadow-2xl border border-green-500/30 max-w-sm cursor-grab active:cursor-grabbing"
       style={{ 
         boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(16, 185, 129, 0.3)',
       }}
     >
+      {/* Drag handle indicator */}
+      <div className="absolute top-2 left-1/2 -translate-x-1/2 text-gray-500 pointer-events-none">
+        <Move size={16} className="opacity-50" />
+      </div>
+
       {/* Close button */}
       {showSkip && (
         <button
           onClick={onSkip}
-          className="absolute -top-2 -right-2 bg-gray-800 hover:bg-gray-700 text-white rounded-full p-1.5 transition-colors"
+          className="absolute -top-2 -right-2 bg-gray-800 hover:bg-gray-700 text-white rounded-full p-1.5 transition-colors z-10"
           aria-label="Skip tutorial"
         >
           <X size={16} />
         </button>
       )}
 
-      <div className="p-5">
+      <div className="p-5 pt-8">
         {/* Title */}
         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
           {title}
