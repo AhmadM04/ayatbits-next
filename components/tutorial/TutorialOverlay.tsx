@@ -176,18 +176,18 @@ export function TutorialOverlay({
 
   return (
     <AnimatePresence mode="wait">
-      {/* Backdrop overlay with blur - clickable to skip */}
+      {/* Backdrop overlay - clickable to skip (no blur to keep highlighted element clear) */}
       <motion.div
         key="backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onSkip}
-        className="fixed inset-0 backdrop-blur-sm"
+        className="fixed inset-0"
         style={{ 
           zIndex: 999999,
           pointerEvents: 'auto',
-          background: 'rgba(0, 0, 0, 0.85)',
+          background: 'rgba(0, 0, 0, 0.5)',
         }}
       />
 
