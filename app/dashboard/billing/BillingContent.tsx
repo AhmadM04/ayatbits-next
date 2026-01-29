@@ -108,7 +108,7 @@ export default function BillingContent({ user }: BillingContentProps) {
       </div>
 
       {/* Current Plan Card */}
-      <div className="bg-[#111] border border-white/10 rounded-2xl p-6">
+      <div className="bg-[#111] border border-white/10 rounded-2xl p-6" data-tutorial="subscription-status">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-purple-500/20 rounded-xl">
@@ -159,7 +159,7 @@ export default function BillingContent({ user }: BillingContentProps) {
       </div>
 
       {/* Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4" data-tutorial="plan-options">
         <Link
           href="/pricing"
           className="flex items-center justify-center gap-2 px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors"
@@ -175,6 +175,7 @@ export default function BillingContent({ user }: BillingContentProps) {
             onClick={handleOpenBillingPortal}
             disabled={isLoading}
             className="flex items-center justify-center gap-2 px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            data-tutorial="manage-subscription"
           >
             {isLoading ? (
               <>

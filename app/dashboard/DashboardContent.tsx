@@ -2,13 +2,17 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Flame, BookOpen, AlertTriangle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Flame, BookOpen, AlertTriangle, HelpCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
 import BottomNav from '@/components/BottomNav';
 import DailyQuote from '@/components/DailyQuote';
 import TrialBanner from '@/components/TrialBanner';
 import VerseSearch from '@/components/VerseSearch';
 import { SparkleAnimation } from '@/components/animations';
+import { TutorialWrapper, useTutorial } from '@/components/tutorial';
+import { dashboardTutorialSteps } from '@/lib/tutorial-configs';
+import { resetTutorial } from '@/lib/tutorial-manager';
 
 interface DashboardContentProps {
   userFirstName: string | null | undefined;
@@ -45,6 +49,9 @@ export default function DashboardContent({
   subscriptionEndDate,
   juzs,
 }: DashboardContentProps) {
+  const [showHelpMenu, setShowHelpMenu] = useState(false);
+  const { startTutorial } = useTutorial();
+  
   const showTrialBanner = subscriptionStatus === 'trialing' && trialDaysLeft && trialDaysLeft > 0;
   const needsSubscription = !subscriptionStatus || subscriptionStatus === 'inactive' || subscriptionStatus === 'INACTIVE';
   
@@ -58,9 +65,20 @@ export default function DashboardContent({
   }
   
   const showSubscriptionWarning = subscriptionDaysLeft !== null && subscriptionDaysLeft > 0 && subscriptionDaysLeft <= 7;
+  
+  const handleRestartTutorial = () => {
+    resetTutorial('dashboard_intro');
+    startTutorial('dashboard_intro', dashboardTutorialSteps);
+    setShowHelpMenu(false);
+  };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
+    <TutorialWrapper
+      sectionId="dashboard_intro"
+      steps={dashboardTutorialSteps}
+      delay={800}
+    >
+      <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
       {/* Trial Banner */}
       {showTrialBanner && <TrialBanner daysLeft={trialDaysLeft} />}
       
@@ -105,6 +123,7 @@ export default function DashboardContent({
               <Link 
                 href="/dashboard/achievements"
                 className="group flex items-center gap-1.5 text-orange-500 hover:bg-white/5 px-2 py-1.5 rounded-lg transition-colors"
+                data-tutorial="stats-cards"
               >
                 <motion.div
                   whileHover={{ scale: 1.2, rotate: [0, -10, 10, 0] }}
@@ -114,6 +133,44 @@ export default function DashboardContent({
                 </motion.div>
                 <span className="font-semibold text-sm">{Number.isNaN(currentStreak) ? 0 : (currentStreak ?? 0)}</span>
               </Link>
+              
+              {/* Help Button */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowHelpMenu(!showHelpMenu)}
+                  className="p-2 hover:bg-white/5 rounded-lg transition-colors text-gray-400 hover:text-white"
+                  aria-label="Help"
+                >
+                  <HelpCircle className="w-5 h-5" />
+                </button>
+                
+                <AnimatePresence>
+                  {showHelpMenu && (
+                    <>
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-20"
+                        onClick={() => setShowHelpMenu(false)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                        className="absolute right-0 top-12 bg-gray-900 border border-white/10 rounded-lg shadow-2xl p-2 min-w-[200px] z-30"
+                      >
+                        <button
+                          onClick={handleRestartTutorial}
+                          className="w-full text-left px-3 py-2 hover:bg-white/5 rounded-md text-sm transition-colors"
+                        >
+                          🎓 Restart Tutorial
+                        </button>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
               
               <Link 
                 href="/dashboard/profile" 
@@ -130,7 +187,7 @@ export default function DashboardContent({
 
       <main className="max-w-6xl mx-auto px-4 py-6">
         {/* Welcome Section */}
-        <div className="mb-6">
+        <div className="mb-6" data-tutorial="welcome-section">
           <h1 className="text-2xl font-bold mb-1">
             Welcome back, {userFirstName || 'Learner'}!
           </h1>
@@ -155,7 +212,7 @@ export default function DashboardContent({
         )}
 
         {/* Daily Quote */}
-        <div className="mb-6">
+        <div className="mb-6" data-tutorial="daily-quote">
           <DailyQuote translationEdition={selectedTranslation} />
         </div>
 
@@ -181,7 +238,7 @@ export default function DashboardContent({
             </motion.div>
             <h2 className="text-lg font-semibold">Select a Juz</h2>
           </motion.div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3" data-tutorial="juz-grid">
             {juzs.length === 0 ? (
               <div className="col-span-full text-center py-8 text-gray-500">
                 <p className="text-sm">No Juz available</p>
@@ -239,7 +296,10 @@ export default function DashboardContent({
         </section>
       </main>
 
-      <BottomNav />
+      <div data-tutorial="bottom-nav">
+        <BottomNav />
+      </div>
     </div>
+    </TutorialWrapper>
   );
 }

@@ -1,0 +1,16 @@
+<svg width="120" height="80" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M10 40 Q40 10, 80 35 L75 45" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M80 35 L70 30 L75 40 Z" fill="currentColor"/>
+  <style>
+    path {
+      filter: url(#wobble);
+    }
+  </style>
+  <defs>
+    <filter id="wobble">
+      <feTurbulence baseFrequency="0.02" numOctaves="2" result="turbulence" seed="1"/>
+      <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="1.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+

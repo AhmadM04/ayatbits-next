@@ -330,6 +330,7 @@ function AnswerArea({
   return (
     <div
       dir="rtl"
+      data-tutorial="answer-area"
       className={`
         min-h-[80px] w-full rounded-xl border-2 border-dashed p-3
         transition-all duration-300
@@ -381,7 +382,7 @@ function WordBank({
   onWordTap?: (token: WordToken) => void;
 }) {
   return (
-    <div className="mt-6" dir="rtl">
+    <div className="mt-6" dir="rtl" data-tutorial="word-bank">
       <p className="text-xs text-gray-500 text-center mb-3">
         Drag or tap words to place them
       </p>
@@ -1134,6 +1135,7 @@ export default function WordPuzzle({
                 ? 'Cannot use tips (too many mistakes)'
                 : 'Click to get a tip!'
             }
+            data-tutorial="hint-button"
           >
             <Lightbulb className={`w-3.5 h-3.5 ${usedTips >= availableTips ? 'text-gray-500' : 'text-green-400'}`} />
             <span className={`text-xs font-medium ${usedTips >= availableTips ? 'text-gray-500' : 'text-green-400'}`}>

@@ -8,6 +8,17 @@ import { requireDashboardAccess } from '@/lib/dashboard-access';
 import { UserProfile } from '@clerk/nextjs';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const TutorialWrapper = dynamic(
+  () => import('@/components/tutorial').then(mod => ({ default: mod.TutorialWrapper })),
+  { ssr: false }
+);
+
+const profileTutorialSteps = dynamic(
+  () => import('@/lib/tutorial-configs').then(mod => ({ default: mod.profileTutorialSteps })),
+  { ssr: false }
+);
 
 export default async function ProfilePage() {
   const user = await requireDashboardAccess();
@@ -39,8 +50,15 @@ export default async function ProfilePage() {
     subscriptionEndDate: user.subscriptionEndDate?.toISOString(),
   };
 
+  const steps = await profileTutorialSteps;
+  
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <TutorialWrapper
+      sectionId="profile_settings"
+      steps={steps}
+      delay={800}
+    >
+      <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-[#0a0a0a] border-b border-white/10">
         <div className="max-w-4xl mx-auto px-4">
@@ -103,7 +121,7 @@ export default async function ProfilePage() {
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
           </div>
 
-          <div className="bg-[#111] rounded-2xl border border-white/10 overflow-hidden">
+          <div className="bg-[#111] rounded-2xl border border-white/10 overflow-hidden" data-tutorial="account-section">
             <UserProfile 
               appearance={{
                 elements: {
@@ -140,5 +158,6 @@ export default async function ProfilePage() {
         </div>
       </div>
     </div>
+    </TutorialWrapper>
   );
 }

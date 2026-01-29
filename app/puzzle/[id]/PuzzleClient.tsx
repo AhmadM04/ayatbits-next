@@ -9,6 +9,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SuccessAnimation, SparkleAnimation } from '@/components/animations';
+import { TutorialWrapper } from '@/components/tutorial';
+import { puzzleTutorialSteps } from '@/lib/tutorial-configs';
 
 interface PuzzleClientProps {
   puzzle: {
@@ -202,7 +204,12 @@ export default function PuzzleClient({
   }, [backUrl, router]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
+    <TutorialWrapper
+      sectionId="puzzle_guide"
+      steps={puzzleTutorialSteps}
+      delay={1000}
+    >
+      <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
       {/* Success Transition Overlay */}
       <AnimatePresence>
         {showSuccessTransition && (
@@ -287,9 +294,11 @@ export default function PuzzleClient({
             <div className="flex items-center gap-3 min-w-0">
               <Link
                 href={backUrl}
-                className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors flex-shrink-0"
+                className="flex items-center gap-2 p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors flex-shrink-0 group"
+                title="Back to Mushaf view"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-400" />
+                <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-gray-300" />
+                <span className="hidden sm:inline text-sm text-gray-400 group-hover:text-gray-300">Mushaf</span>
               </Link>
               <div className="min-w-0">
                 <h1 className="text-base font-semibold text-white truncate">
@@ -309,6 +318,7 @@ export default function PuzzleClient({
                     : 'bg-white/5 text-gray-400 hover:bg-white/10'
                 }`}
                 title={showTransliteration ? 'Hide transliteration' : 'Show transliteration'}
+                data-tutorial="audio-button"
               >
                 <Languages className="w-5 h-5" />
               </button>
@@ -329,7 +339,7 @@ export default function PuzzleClient({
 
       {/* Main content - Cleaner padding for mobile */}
       <main className="flex-1 max-w-3xl mx-auto w-full px-3 sm:px-4 py-4 sm:py-6 pb-8">
-        <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 sm:p-6">
+        <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 sm:p-6" data-tutorial="puzzle-container">
           <WordPuzzle
             ayahText={ayahText}
             surahNumber={puzzle.surah?.number}
@@ -346,5 +356,6 @@ export default function PuzzleClient({
         </div>
       </main>
     </div>
+    </TutorialWrapper>
   );
 }

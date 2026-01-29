@@ -26,7 +26,7 @@ export default function ProfileContent({ user, stats, trialDaysLeft }: ProfileCo
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Profile Header */}
-      <div className="bg-[#111] border border-white/10 rounded-2xl p-6 md:col-span-2 transition-colors hover:border-white/20">
+      <div className="bg-[#111] border border-white/10 rounded-2xl p-6 md:col-span-2 transition-colors hover:border-white/20" data-tutorial="profile-stats">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex-1 min-w-0">
             <h2 className="text-2xl font-bold text-white mb-2">

@@ -74,7 +74,7 @@ export default function TranslationSelector({ initialTranslation = 'en.sahih' }:
   };
 
   return (
-    <div className="bg-[#111] border border-white/10 rounded-2xl p-6 transition-colors hover:border-white/20">
+    <div className="bg-[#111] border border-white/10 rounded-2xl p-6 transition-colors hover:border-white/20" data-tutorial="translation-selector">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
           <Globe className="w-6 h-6 text-blue-400" />

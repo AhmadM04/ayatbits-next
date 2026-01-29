@@ -52,7 +52,7 @@ export default function AudioSettings({ initialEnabled = false }: AudioSettingsP
   };
 
   return (
-    <div className="bg-[#111] border border-white/10 rounded-2xl p-6 transition-colors hover:border-white/20">
+    <div className="bg-[#111] border border-white/10 rounded-2xl p-6 transition-colors hover:border-white/20" data-tutorial="audio-settings">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-3 bg-purple-500/20 rounded-xl border border-purple-500/30">
           <Volume2 className="w-6 h-6 text-purple-400" />
