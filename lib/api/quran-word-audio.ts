@@ -80,11 +80,11 @@ export async function fetchWordSegments(
           wordAudioUrl = `https://verses.quran.com/${wordAudioUrl}`;
         }
         
-        // Debug: Log word mapping
-        console.log(`Word ${index}: API position=${word.position}, text=${word.text_uthmani}, audioURL=${wordAudioUrl}`);
+        // Debug: Log word mapping (API position is 1-based, index is 0-based)
+        console.log(`Word ${index}: API position=${word.position} (1-based), text=${word.text_uthmani}, audioURL=${wordAudioUrl}`);
         
         return {
-          position: index, // Use sequential array index for easy lookup
+          position: index, // Use 0-based array index for easy lookup
           text: word.text_uthmani || word.text,
           audioUrl: wordAudioUrl,
           startTime: 0, // Not needed for individual word audio

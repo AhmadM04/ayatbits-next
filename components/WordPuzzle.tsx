@@ -565,17 +565,27 @@ export default function WordPuzzle({
 
   // Handler for word click in answer area
   const handleAnswerWordClick = useCallback((wordIndex: number) => {
-    console.log('🎯 handleAnswerWordClick called with puzzle index:', wordIndex);
-    console.log('📊 muqattaatOffset:', muqattaatOffset);
-    console.log('🎵 enableWordByWordAudio:', enableWordByWordAudio);
-    console.log('📚 originalTokens length:', originalTokens.length);
+    if (!enableWordByWordAudio) return;
     
-    // Adjust the word index to account for Muqatta'at letters being combined in the API
+    console.log('🎯 [WORD AUDIO] Word clicked at puzzle position:', wordIndex);
+    
+    // The puzzle uses 0-based indexing for word slots
+    // API segments also use 0-based array indexing
+    // But we need to account for Muqatta'at offset
     const adjustedIndex = wordIndex - muqattaatOffset;
-    console.log('🔄 Adjusted audio index:', adjustedIndex);
     
-    playWord(adjustedIndex);
-  }, [playWord, enableWordByWordAudio, originalTokens, muqattaatOffset]);
+    console.log('  - muqattaatOffset:', muqattaatOffset);
+    console.log('  - API array index:', adjustedIndex);
+    
+    if (adjustedIndex < 0) {
+      // Clicking on individual Muqatta'at letters - play the combined word
+      console.log('  ⚠️ Playing combined Muqatta\'at word at index 0');
+      playWord(0);
+    } else {
+      console.log('  ✓ Playing word at API index:', adjustedIndex);
+      playWord(adjustedIndex);
+    }
+  }, [playWord, enableWordByWordAudio, muqattaatOffset]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
