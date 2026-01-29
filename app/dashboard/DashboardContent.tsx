@@ -296,9 +296,7 @@ export default function DashboardContent({
         </section>
       </main>
 
-      <div data-tutorial="bottom-nav">
-        <BottomNav />
-      </div>
+      <BottomNav />
     </div>
     </TutorialWrapper>
   );
