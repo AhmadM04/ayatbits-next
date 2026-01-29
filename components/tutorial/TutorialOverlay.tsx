@@ -31,21 +31,35 @@ export function TutorialOverlay({
   isActive,
 }: TutorialOverlayProps) {
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+  const [mounted, setMounted] = useState(false);
   const step = steps[currentStep];
 
   useEffect(() => {
-    if (!isActive || !step) return;
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isActive || !step) {
+      setTargetRect(null);
+      return;
+    }
 
     const updatePosition = () => {
-      const element = document.querySelector(step.target);
+      const selector = step.target.startsWith('[data-tutorial') 
+        ? step.target 
+        : `[data-tutorial="${step.target}"]`;
+      
+      const element = document.querySelector(selector);
       if (element) {
         const rect = element.getBoundingClientRect();
         setTargetRect(rect);
+      } else {
+        console.warn(`Tutorial target not found: ${step.target}`);
       }
     };
 
-    // Initial position
-    updatePosition();
+    // Initial position with small delay to ensure DOM is ready
+    setTimeout(updatePosition, 100);
 
     // Update on scroll/resize
     window.addEventListener('scroll', updatePosition, true);
@@ -72,67 +86,87 @@ export function TutorialOverlay({
     return () => window.removeEventListener('keydown', handleEscape);
   }, [isActive, onSkip, onNext]);
 
-  if (!isActive || !step || !targetRect) return null;
+  if (!mounted || !isActive || !step || !targetRect) return null;
 
   const placement = step.placement || 'bottom';
   const offset = step.offset || {};
 
-  // Calculate tooltip position
+  // Calculate tooltip position with viewport bounds checking
   const getTooltipPosition = () => {
-    const baseOffset = 20; // Gap between target and tooltip
+    const baseOffset = 24; // Gap between target and tooltip
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const tooltipWidth = 384; // max-w-sm = 24rem = 384px
+    
+    let left = targetRect.left + targetRect.width / 2;
+    let top = targetRect.top;
+    let transform = 'translate(-50%, -100%)';
     
     switch (placement) {
       case 'top':
-        return {
-          left: targetRect.left + targetRect.width / 2,
-          top: targetRect.top - baseOffset,
-          transform: 'translate(-50%, -100%)',
-        };
+        top = targetRect.top - baseOffset;
+        transform = 'translate(-50%, -100%)';
+        break;
       case 'bottom':
-        return {
-          left: targetRect.left + targetRect.width / 2,
-          top: targetRect.bottom + baseOffset,
-          transform: 'translate(-50%, 0)',
-        };
+        top = targetRect.bottom + baseOffset;
+        transform = 'translate(-50%, 0)';
+        break;
       case 'left':
-        return {
-          left: targetRect.left - baseOffset,
-          top: targetRect.top + targetRect.height / 2,
-          transform: 'translate(-100%, -50%)',
-        };
+        left = targetRect.left - baseOffset;
+        top = targetRect.top + targetRect.height / 2;
+        transform = 'translate(-100%, -50%)';
+        break;
       case 'right':
-        return {
-          left: targetRect.right + baseOffset,
-          top: targetRect.top + targetRect.height / 2,
-          transform: 'translate(0, -50%)',
-        };
+        left = targetRect.right + baseOffset;
+        top = targetRect.top + targetRect.height / 2;
+        transform = 'translate(0, -50%)';
+        break;
     }
+    
+    // Keep tooltip within viewport bounds
+    if (left < tooltipWidth / 2 + 20) {
+      left = tooltipWidth / 2 + 20;
+    } else if (left > viewportWidth - tooltipWidth / 2 - 20) {
+      left = viewportWidth - tooltipWidth / 2 - 20;
+    }
+    
+    if (top < 20) {
+      top = 20;
+      transform = transform.replace('-100%', '0');
+    } else if (top > viewportHeight - 200) {
+      top = viewportHeight - 200;
+    }
+    
+    return { left, top, transform };
   };
 
   // Calculate arrow position
   const getArrowPosition = () => {
-    const arrowOffset = step.arrow?.includes('down') || step.arrow?.includes('up') ? 60 : 80;
+    const isVerticalArrow = step.arrow?.includes('down') || step.arrow?.includes('up');
+    const arrowSize = isVerticalArrow ? 60 : 80;
+    const arrowWidth = isVerticalArrow ? 80 : 120;
+    const arrowHeight = isVerticalArrow ? 120 : 80;
     
     switch (placement) {
       case 'top':
         return {
-          left: targetRect.left + targetRect.width / 2 - 40,
-          top: targetRect.top - arrowOffset,
+          left: targetRect.left + targetRect.width / 2 - arrowWidth / 2,
+          top: targetRect.top - arrowSize - 20,
         };
       case 'bottom':
         return {
-          left: targetRect.left + targetRect.width / 2 - 40,
-          top: targetRect.bottom + 10,
+          left: targetRect.left + targetRect.width / 2 - arrowWidth / 2,
+          top: targetRect.bottom + 20,
         };
       case 'left':
         return {
-          left: targetRect.left - arrowOffset,
-          top: targetRect.top + targetRect.height / 2 - 40,
+          left: targetRect.left - arrowSize - 20,
+          top: targetRect.top + targetRect.height / 2 - arrowHeight / 2,
         };
       case 'right':
         return {
-          left: targetRect.right + 10,
-          top: targetRect.top + targetRect.height / 2 - 40,
+          left: targetRect.right + 20,
+          top: targetRect.top + targetRect.height / 2 - arrowHeight / 2,
         };
     }
   };
@@ -141,54 +175,74 @@ export function TutorialOverlay({
   const arrowPosition = step.arrow ? getArrowPosition() : null;
 
   return (
-    <AnimatePresence>
-      {/* Backdrop overlay */}
+    <AnimatePresence mode="wait">
+      {/* Backdrop overlay - clickable to skip */}
       <motion.div
+        key="backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onSkip}
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-        style={{ zIndex: 9999 }}
+        className="fixed inset-0 bg-black/70 backdrop-blur-[2px]"
+        style={{ 
+          zIndex: 999999,
+          pointerEvents: 'auto',
+        }}
       />
 
-      {/* Spotlight effect */}
-      <div
-        className="fixed pointer-events-none"
+      {/* Spotlight effect - makes highlighted element visible and clickable */}
+      <motion.div
+        key="spotlight"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed"
         style={{
-          zIndex: 10000,
-          left: targetRect.left - 8,
-          top: targetRect.top - 8,
-          width: targetRect.width + 16,
-          height: targetRect.height + 16,
-          boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.6)',
-          borderRadius: '12px',
-          transition: 'all 0.3s ease-out',
+          zIndex: 1000000,
+          left: targetRect.left - 12,
+          top: targetRect.top - 12,
+          width: targetRect.width + 24,
+          height: targetRect.height + 24,
+          boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.75), 0 0 20px 4px rgba(16, 185, 129, 0.3)',
+          borderRadius: '16px',
+          border: '2px solid rgba(16, 185, 129, 0.5)',
+          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          pointerEvents: 'none',
         }}
       />
 
       {/* Arrow */}
       {arrowPosition && step.arrow && (
-        <div
+        <motion.div
+          key="arrow"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
           className="fixed"
           style={{
-            zIndex: 10001,
+            zIndex: 1000001,
             left: arrowPosition.left + (offset.x || 0),
             top: arrowPosition.top + (offset.y || 0),
+            pointerEvents: 'none',
           }}
         >
           <TutorialArrow direction={step.arrow} />
-        </div>
+        </motion.div>
       )}
 
       {/* Tooltip */}
-      <div
+      <motion.div
+        key="tooltip"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
         className="fixed"
         style={{
-          zIndex: 10001,
+          zIndex: 1000002,
           left: tooltipPosition.left + (offset.x || 0),
           top: tooltipPosition.top + (offset.y || 0),
           transform: tooltipPosition.transform,
+          pointerEvents: 'auto',
         }}
       >
         <TutorialTooltip
@@ -199,7 +253,7 @@ export function TutorialOverlay({
           onNext={onNext}
           onSkip={onSkip}
         />
-      </div>
+      </motion.div>
     </AnimatePresence>
   );
 }
