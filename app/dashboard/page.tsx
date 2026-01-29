@@ -1,4 +1,4 @@
-import { UserProgress, Juz } from '@/lib/db';
+import { UserProgress, Juz, Puzzle } from '@/lib/db';
 import DashboardContent from './DashboardContent';
 import { getTrialDaysRemaining } from '@/lib/subscription';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
@@ -6,37 +6,80 @@ import { requireDashboardAccess } from '@/lib/dashboard-access';
 export default async function DashboardPage() {
   const user = await requireDashboardAccess();
   
-  // Fetch progress with populated puzzles to get juz information
-  const progress = await UserProgress.find({ userId: user._id })
-    .populate('puzzleId')
-    .lean() as any[];
+  // Fetch all completed progress with populated puzzle data
+  const completedProgress = await UserProgress.find({ 
+    userId: user._id, 
+    status: 'COMPLETED' 
+  }).populate('puzzleId').lean() as any[];
   
+  // Get completed puzzle IDs
+  const completedPuzzleIds = new Set(
+    completedProgress
+      .map((p: any) => p.puzzleId?._id?.toString())
+      .filter(Boolean)
+  );
+
+  // Calculate surahs completed
+  // Group puzzles by surah and check if all puzzles in each surah are completed
+  const uniqueSurahIds = new Set(
+    completedProgress
+      .map((p: any) => p.puzzleId?.surahId?.toString())
+      .filter(Boolean)
+  );
+
+  let surahsCompleted = 0;
+  for (const surahId of uniqueSurahIds) {
+    const surahPuzzles = await Puzzle.find({ surahId }).lean();
+    const allCompleted = surahPuzzles.every((puzzle: any) => 
+      completedPuzzleIds.has(puzzle._id.toString())
+    );
+    if (allCompleted && surahPuzzles.length > 0) {
+      surahsCompleted++;
+    }
+  }
+
   // Calculate stats
   const stats = {
-    surahsCompleted: progress.filter(p => p.progress === 100).length,
-    totalAyahs: progress.reduce((acc, curr) => acc + (curr.completedAyahs?.length || 0), 0),
-    currentStreak: 0, // Implement streak logic if needed
+    surahsCompleted,
+    totalAyahs: completedPuzzleIds.size, // Total unique puzzles completed
+    currentStreak: user.currentStreak || 0,
   };
 
   const trialDaysLeft = getTrialDaysRemaining(user);
 
-  // Get unique juz IDs from completed progress
+  // Get unique juz IDs that user has interacted with
   const uniqueJuzIds = new Set(
-    progress
-      .filter(p => p.puzzleId && p.puzzleId.juzId) // Filter out any null/undefined puzzles
-      .map(p => p.puzzleId.juzId.toString())
+    completedProgress
+      .filter((p: any) => p.puzzleId && p.puzzleId.juzId)
+      .map((p: any) => p.puzzleId.juzId.toString())
   );
 
-  // Fetch juzs data
+  // Fetch all juzs and calculate their progress
   const juzDocs = await Juz.find({}).sort({ number: 1 }).lean();
-  const juzs = juzDocs.map((j: any) => ({
-    _id: j._id.toString(),
-    number: j.number,
-    name: j.name,
-    _count: { puzzles: 0 },
-    progress: 0,
-    completedPuzzles: 0,
-  }));
+  
+  const juzs = await Promise.all(
+    juzDocs.map(async (j: any) => {
+      // Get all puzzles for this juz
+      const juzPuzzles = await Puzzle.find({ juzId: j._id }).lean();
+      const totalPuzzles = juzPuzzles.length;
+      
+      // Count completed puzzles for this juz
+      const juzCompletedPuzzles = juzPuzzles.filter((puzzle: any) => 
+        completedPuzzleIds.has(puzzle._id.toString())
+      ).length;
+      
+      const progress = totalPuzzles > 0 ? (juzCompletedPuzzles / totalPuzzles) * 100 : 0;
+      
+      return {
+        _id: j._id.toString(),
+        number: j.number,
+        name: j.name,
+        _count: { puzzles: totalPuzzles },
+        progress: Math.round(progress),
+        completedPuzzles: juzCompletedPuzzles,
+      };
+    })
+  );
 
   const translationCode = user.selectedTranslation || 'en.sahih';
 

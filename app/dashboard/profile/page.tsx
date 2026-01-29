@@ -15,21 +15,44 @@ export default async function ProfilePage() {
   const user = await requireDashboardAccess();
   const trialDaysLeft = getTrialDaysRemaining(user);
 
-  // Fetch user stats
-  const progress = await UserProgress.find({ userId: user._id });
+  // Fetch user stats - get all completed progress
+  const completedProgress = await UserProgress.find({ 
+    userId: user._id, 
+    status: 'COMPLETED' 
+  }).populate('puzzleId').lean() as any[];
+
+  // Count total puzzles solved
+  const puzzlesSolved = completedProgress.length;
+
+  // Calculate surahs completed
+  // Group puzzles by surah and check if all puzzles in each surah are completed
+  const completedPuzzleIds = new Set(completedProgress.map((p: any) => p.puzzleId?._id?.toString()).filter(Boolean));
   
-  // Calculate completed puzzles safely
-  const completedPuzzleIds = progress.flatMap(p => p.completedPuzzles || []);
-  const completedPuzzles = completedPuzzleIds.length > 0 
-    ? await Puzzle.countDocuments({ _id: { $in: completedPuzzleIds } })
-    : 0;
+  // Get all unique surahs from completed puzzles
+  const uniqueSurahIds = new Set(
+    completedProgress
+      .map((p: any) => p.puzzleId?.surahId?.toString())
+      .filter(Boolean)
+  );
+
+  // For each surah, check if all its puzzles are completed
+  let surahsCompleted = 0;
+  for (const surahId of uniqueSurahIds) {
+    const surahPuzzles = await Puzzle.find({ surahId }).lean();
+    const allCompleted = surahPuzzles.every((puzzle: any) => 
+      completedPuzzleIds.has(puzzle._id.toString())
+    );
+    if (allCompleted && surahPuzzles.length > 0) {
+      surahsCompleted++;
+    }
+  }
 
   const stats = {
     joinedDate: user.createdAt,
     // fallback to 'trial' if plan is undefined, since 'free' is removed
     planType: user.subscriptionPlan || 'trial', 
-    surahsCompleted: progress.filter(p => p.progress === 100).length,
-    puzzlesSolved: completedPuzzles,
+    surahsCompleted,
+    puzzlesSolved,
   };
 
   // Prepare user data with subscription info
