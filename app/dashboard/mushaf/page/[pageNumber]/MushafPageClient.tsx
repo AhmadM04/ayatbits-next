@@ -14,6 +14,8 @@ import {
 } from '@/components/mushaf';
 import { HarakatModal, HarakatLegend } from '@/components/arabic';
 import { type HarakatDefinition } from '@/lib/harakat-utils';
+import { TutorialWrapper } from '@/components/tutorial';
+import { mushafTutorialSteps } from '@/lib/tutorial-configs';
 
 interface MushafPageClientProps {
   pageNumber: number;
@@ -141,36 +143,39 @@ export default function MushafPageClient({
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
-        <div className="max-w-3xl mx-auto px-4">
-          <div className="flex items-center justify-between h-14">
-            {/* Back Button */}
-            <Link
-              href="/dashboard"
-              className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-400" />
-            </Link>
+    <TutorialWrapper sectionId="mushaf_reading" steps={mushafTutorialSteps} delay={1000}>
+      <div className="min-h-screen bg-[#0a0a0a] text-white" data-tutorial="mushaf-page">
+        {/* Header */}
+        <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
+          <div className="max-w-3xl mx-auto px-4">
+            <div className="flex items-center justify-between h-14">
+              {/* Back Button */}
+              <Link
+                href="/dashboard"
+                className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-400" />
+              </Link>
 
-            {/* Page Navigation */}
-            <PageNavigation
-              currentPage={pageNumber}
-              totalPages={totalPages}
-              currentJuz={currentJuz}
-            />
+              {/* Page Navigation */}
+              <div data-tutorial="page-navigation">
+                <PageNavigation
+                  currentPage={pageNumber}
+                  totalPages={totalPages}
+                  currentJuz={currentJuz}
+                />
+              </div>
 
-            {/* Home Button */}
-            <Link
-              href="/dashboard"
-              className="p-2 -mr-2 hover:bg-white/5 rounded-lg transition-colors"
-            >
-              <Home className="w-5 h-5 text-gray-400" />
-            </Link>
+              {/* Home Button */}
+              <Link
+                href="/dashboard"
+                className="p-2 -mr-2 hover:bg-white/5 rounded-lg transition-colors"
+              >
+                <Home className="w-5 h-5 text-gray-400" />
+              </Link>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
       {/* Main Content with Swipe Support */}
       <motion.main
@@ -180,6 +185,7 @@ export default function MushafPageClient({
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.2}
         onDragEnd={handleDragEnd}
+        data-tutorial="page-content"
       >
         {/* Page Info Badge */}
         <div className="flex items-center justify-center gap-3 mb-6">
@@ -206,6 +212,7 @@ export default function MushafPageClient({
               className="text-2xl sm:text-3xl leading-[2.5] font-arabic text-right"
               dir="rtl"
               style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
+              data-tutorial="ayah-row"
             >
               {renderVerses()}
             </div>
@@ -280,11 +287,14 @@ export default function MushafPageClient({
       />
 
       {/* Harakat Legend (Floating Help Button) */}
-      <HarakatLegend 
-        variant="floating" 
-        onHarakatSelect={handleHarakatClick}
-      />
-    </div>
+      <div data-tutorial="harakat-legend">
+        <HarakatLegend 
+          variant="floating" 
+          onHarakatSelect={handleHarakatClick}
+        />
+      </div>
+      </div>
+    </TutorialWrapper>
   );
 }
 

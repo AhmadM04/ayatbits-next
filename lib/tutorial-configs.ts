@@ -146,6 +146,110 @@ export const billingTutorialSteps: TutorialStep[] = [
 ];
 
 /**
+ * Mushaf Reading Tutorial Configuration
+ */
+export const mushafTutorialSteps: TutorialStep[] = [
+  {
+    id: 'mushaf-intro',
+    target: '[data-tutorial="mushaf-page"]',
+    title: 'Welcome to Mushaf View! 📖',
+    message: 'Read the Quran in traditional Mushaf format, page by page with beautiful Arabic script.',
+    placement: 'bottom',
+  },
+  {
+    id: 'mushaf-navigation',
+    target: '[data-tutorial="page-navigation"]',
+    title: 'Navigate Pages',
+    message: 'Jump to any page or Juz quickly using the page selector.',
+    placement: 'bottom',
+  },
+  {
+    id: 'mushaf-swipe',
+    target: '[data-tutorial="page-content"]',
+    title: 'Swipe to Navigate',
+    message: 'Swipe left/right or use arrow keys to move between pages. Long press any ayah for options.',
+    placement: 'top',
+  },
+  {
+    id: 'mushaf-ayah-actions',
+    target: '[data-tutorial="ayah-row"]',
+    title: 'Ayah Actions',
+    message: 'Tap any ayah to see options: view translation, start puzzle, or add to liked collection.',
+    placement: 'top',
+  },
+  {
+    id: 'mushaf-harakat-help',
+    target: '[data-tutorial="harakat-legend"]',
+    title: 'Learn Harakat',
+    message: 'Need help with Arabic pronunciation marks? Tap the help button to see the harakat guide.',
+    placement: 'left',
+    offset: { x: -20 },
+  },
+];
+
+/**
+ * Achievements/Trophies Tutorial Configuration
+ */
+export const achievementsTutorialSteps: TutorialStep[] = [
+  {
+    id: 'achievements-intro',
+    target: '[data-tutorial="achievements-header"]',
+    title: 'Your Trophies! 🏆',
+    message: 'Track your achievements and unlock trophies as you progress in your Quran journey.',
+    placement: 'bottom',
+  },
+  {
+    id: 'achievements-stats',
+    target: '[data-tutorial="stats-overview"]',
+    title: 'Your Stats',
+    message: 'See your total puzzles completed, best streak, and unlocked trophies at a glance.',
+    placement: 'bottom',
+  },
+  {
+    id: 'achievements-unlocked',
+    target: '[data-tutorial="unlocked-section"]',
+    title: 'Unlocked Trophies',
+    message: 'View all the achievements you\'ve earned. Each trophy celebrates your dedication!',
+    placement: 'bottom',
+  },
+  {
+    id: 'achievements-progress',
+    target: '[data-tutorial="progress-section"]',
+    title: 'Work In Progress',
+    message: 'Track your progress toward locked achievements. Keep learning to unlock them all!',
+    placement: 'bottom',
+  },
+];
+
+/**
+ * Liked Collection Tutorial Configuration
+ */
+export const likedTutorialSteps: TutorialStep[] = [
+  {
+    id: 'liked-intro',
+    target: '[data-tutorial="liked-header"]',
+    title: 'Your Favorites! ❤️',
+    message: 'All your liked ayahs are saved here. Build your personal collection of meaningful verses.',
+    placement: 'bottom',
+  },
+  {
+    id: 'liked-list',
+    target: '[data-tutorial="liked-list"]',
+    title: 'Browse Your Collection',
+    message: 'Each ayah shows the surah name, ayah number, and Juz. Tap to read the full verse.',
+    placement: 'bottom',
+  },
+  {
+    id: 'liked-actions',
+    target: '[data-tutorial="liked-actions"]',
+    title: 'Quick Actions',
+    message: 'Visit the ayah in Mushaf view or remove it from your collection with a tap.',
+    placement: 'left',
+    offset: { x: -20 },
+  },
+];
+
+/**
  * Helper function to get tutorial steps by section
  */
 export function getTutorialSteps(section: string): TutorialStep[] {
@@ -158,6 +262,12 @@ export function getTutorialSteps(section: string): TutorialStep[] {
       return profileTutorialSteps;
     case 'billing_overview':
       return billingTutorialSteps;
+    case 'mushaf_reading':
+      return mushafTutorialSteps;
+    case 'achievements_trophies':
+      return achievementsTutorialSteps;
+    case 'liked_collection':
+      return likedTutorialSteps;
     default:
       return [];
   }

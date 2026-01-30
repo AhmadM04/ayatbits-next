@@ -6,7 +6,10 @@ export type TutorialSection =
   | 'dashboard_intro'
   | 'puzzle_guide'
   | 'profile_settings'
-  | 'billing_overview';
+  | 'billing_overview'
+  | 'mushaf_reading'
+  | 'achievements_trophies'
+  | 'liked_collection';
 
 interface TutorialState {
   [key: string]: boolean;

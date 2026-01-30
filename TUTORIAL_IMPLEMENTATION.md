@@ -61,6 +61,24 @@ const TutorialProvider = dynamic(
 2. Plan options
 3. Manage subscription
 
+#### Mushaf Reading Tutorial (5 steps)
+1. Mushaf view introduction
+2. Page navigation
+3. Swipe gestures
+4. Ayah actions (tap/long-press)
+5. Harakat help guide
+
+#### Achievements/Trophies Tutorial (4 steps)
+1. Achievements introduction
+2. Stats overview
+3. Unlocked trophies section
+4. Progress tracking
+
+#### Liked Collection Tutorial (3 steps)
+1. Liked ayahs introduction
+2. Browse collection
+3. Quick actions (visit/remove)
+
 ### 4. **localStorage Integration**
 - Tutorial completion tracked per section
 - Persistent across sessions
@@ -96,6 +114,9 @@ const TutorialProvider = dynamic(
 - ✅ `app/puzzle/[id]/PuzzleClient.tsx` - Added puzzle tutorial
 - ✅ `app/dashboard/profile/page.tsx` - Added profile tutorial
 - ✅ `app/dashboard/billing/page.tsx` - Added billing tutorial
+- ✅ `app/dashboard/mushaf/page/[pageNumber]/MushafPageClient.tsx` - Added mushaf tutorial
+- ✅ `app/dashboard/achievements/AchievementsContent.tsx` - Added achievements tutorial
+- ✅ `app/dashboard/liked/LikedAyahsContent.tsx` - Added liked collection tutorial
 - ✅ `components/WordPuzzle.tsx` - Added data-tutorial attributes
 
 #### New Files Created
@@ -162,6 +183,24 @@ To test the implementation:
    - Navigate through all 3 steps
    - Verify localStorage: `ayatbits_tutorials.billing_overview = true`
 
+5. **Mushaf Reading Tutorial**
+   - Visit any mushaf page (e.g., `/dashboard/mushaf/page/1`) for the first time
+   - Should see tutorial after 1000ms
+   - Navigate through all 5 steps
+   - Verify localStorage: `ayatbits_tutorials.mushaf_reading = true`
+
+6. **Achievements Tutorial**
+   - Visit `/dashboard/achievements` for the first time
+   - Should see tutorial after 800ms
+   - Navigate through all 4 steps
+   - Verify localStorage: `ayatbits_tutorials.achievements_trophies = true`
+
+7. **Liked Collection Tutorial**
+   - Visit `/dashboard/liked` for the first time
+   - Should see tutorial after 800ms
+   - Navigate through all 3 steps
+   - Verify localStorage: `ayatbits_tutorials.liked_collection = true`
+
 5. **Help Button**
    - Click help button (?) in dashboard header
    - Click "Restart Tutorial"
@@ -212,9 +251,18 @@ The tutorial system is designed to:
 
 ## 🎉 Conclusion
 
-The onboarding tutorial system has been successfully implemented with:
+The onboarding tutorial system has been successfully implemented with **7 complete tutorials**:
+1. ✅ Dashboard (5 steps)
+2. ✅ Puzzle (5 steps)
+3. ✅ Profile (4 steps)
+4. ✅ Billing (3 steps)
+5. ✅ Mushaf Reading (5 steps)
+6. ✅ Achievements/Trophies (4 steps)
+7. ✅ Liked Collection (3 steps)
+
+**System Features:**
 - **Performance**: Lazy loaded, minimal bundle impact
-- **UX**: Non-intrusive, hand-drawn style arrows
+- **UX**: Non-intrusive, hand-drawn style arrows with transparency and drag support
 - **Accessibility**: Keyboard navigation, screen reader support
 - **Maintainability**: Easy to add new tutorials
 - **Flexibility**: localStorage-based, can be reset anytime

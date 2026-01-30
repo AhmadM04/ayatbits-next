@@ -3,6 +3,7 @@
 // MODIFIED: 2026-01-18 - Added harakat coloring
 // MODIFIED: 2026-01-18 - Migrated to Quran.com API for consistent Uthmani text
 // MODIFIED: 2026-01-18 - Fixed word-by-word audio index for Muqatta'at letters
+// MODIFIED: 2026-01-30 - Fixed auto-play audio index offset bug (was off by 2 on Muqatta'at surahs)
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
@@ -992,12 +993,12 @@ export default function WordPuzzle({
       // Auto-play word audio if enabled
       if (enableWordByWordAudio) {
         console.log('[PLACEMENT] 🔊 Auto-playing word audio for position:', slotPosition);
-        playWord(slotPosition);
+        handleAnswerWordClick(slotPosition);
       }
       
       return true;
     },
-    [originalTokens, placedTokens, onWordCorrect, registerMistake, enableWordByWordAudio, playWord]
+    [originalTokens, placedTokens, onWordCorrect, registerMistake, enableWordByWordAudio, handleAnswerWordClick]
   );
 
   const handleDragStart = useCallback(

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { ArrowLeft, Lock, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
+import { TutorialWrapper } from '@/components/tutorial';
+import { achievementsTutorialSteps } from '@/lib/tutorial-configs';
 
 interface Achievement {
   id: string;
@@ -76,32 +78,33 @@ export default function AchievementsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
-        <div className="max-w-2xl mx-auto px-4">
-          <div className="flex items-center h-14 gap-3">
-            <Link
-              href="/dashboard"
-              className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-400" />
-            </Link>
-            <div>
-              <h1 className="text-lg font-semibold">Achievements</h1>
-              <p className="text-xs text-gray-500">
-                {stats?.totalUnlocked || 0} of {stats?.totalAchievements || 0} unlocked
-              </p>
+    <TutorialWrapper sectionId="achievements_trophies" steps={achievementsTutorialSteps} delay={800}>
+      <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
+        {/* Header */}
+        <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
+          <div className="max-w-2xl mx-auto px-4">
+            <div className="flex items-center h-14 gap-3" data-tutorial="achievements-header">
+              <Link
+                href="/dashboard"
+                className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-400" />
+              </Link>
+              <div>
+                <h1 className="text-lg font-semibold">Achievements</h1>
+                <p className="text-xs text-gray-500">
+                  {stats?.totalUnlocked || 0} of {stats?.totalAchievements || 0} unlocked
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
       <main className="max-w-2xl mx-auto px-4 py-6">
         <>
           {/* Stats Overview */}
           {stats && (
-            <div className="grid grid-cols-3 gap-3 mb-8">
+            <div className="grid grid-cols-3 gap-3 mb-8" data-tutorial="stats-overview">
               <motion.div 
                 className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-center"
                 whileHover={{ scale: 1.02, borderColor: 'rgba(34, 197, 94, 0.3)' }}
@@ -137,7 +140,7 @@ export default function AchievementsContent() {
 
           {/* Unlocked Achievements */}
           {unlockedAchievements.length > 0 && (
-            <div className="mb-8">
+            <div className="mb-8" data-tutorial="unlocked-section">
               <h2 className="text-sm font-semibold text-gray-400 mb-3 flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-500" />
                 Unlocked ({unlockedAchievements.length})
@@ -175,7 +178,7 @@ export default function AchievementsContent() {
 
           {/* Locked Achievements */}
           {lockedAchievements.length > 0 && (
-            <div>
+            <div data-tutorial="progress-section">
               <h2 className="text-sm font-semibold text-gray-400 mb-3 flex items-center gap-2">
                 <Lock className="w-4 h-4" />
                 In Progress ({lockedAchievements.length})
@@ -222,6 +225,7 @@ export default function AchievementsContent() {
       </main>
 
       <BottomNav />
-    </div>
+      </div>
+    </TutorialWrapper>
   );
 }

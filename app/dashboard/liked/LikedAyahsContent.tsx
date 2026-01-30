@@ -6,6 +6,8 @@ import { ArrowLeft, Heart, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import { HarakatColoredText } from '@/components/arabic';
+import { TutorialWrapper } from '@/components/tutorial';
+import { likedTutorialSteps } from '@/lib/tutorial-configs';
 
 interface LikedAyah {
   id: string;
@@ -74,24 +76,25 @@ export default function LikedAyahsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
-        <div className="max-w-2xl mx-auto px-4">
-          <div className="flex items-center h-14 gap-3">
-            <Link
-              href="/dashboard"
-              className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-400" />
-            </Link>
-            <div>
-              <h1 className="text-lg font-semibold">Liked Ayahs</h1>
-              <p className="text-xs text-gray-500">{likedAyahs.length} ayahs saved</p>
+    <TutorialWrapper sectionId="liked_collection" steps={likedTutorialSteps} delay={800}>
+      <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
+        {/* Header */}
+        <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
+          <div className="max-w-2xl mx-auto px-4">
+            <div className="flex items-center h-14 gap-3" data-tutorial="liked-header">
+              <Link
+                href="/dashboard"
+                className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-400" />
+              </Link>
+              <div>
+                <h1 className="text-lg font-semibold">Liked Ayahs</h1>
+                <p className="text-xs text-gray-500">{likedAyahs.length} ayahs saved</p>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
       <main className="max-w-2xl mx-auto px-4 py-6">
         {isLoading ? (
@@ -113,7 +116,7 @@ export default function LikedAyahsContent() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3" data-tutorial="liked-list">
             {likedAyahs.map((ayah, index) => (
               <motion.div
                 key={ayah.id}
@@ -131,7 +134,7 @@ export default function LikedAyahsContent() {
                       Ayah {ayah.ayahNumber} • Juz {ayah.juzNumber}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2" data-tutorial="liked-actions">
                     <Link
                       href={`/dashboard/juz/${ayah.juzNumber}/surah/${ayah.surahNumber}?ayah=${ayah.ayahNumber}`}
                       className="p-2 hover:bg-white/5 rounded-lg transition-colors text-gray-400"
@@ -160,7 +163,8 @@ export default function LikedAyahsContent() {
       </main>
 
       <BottomNav />
-    </div>
+      </div>
+    </TutorialWrapper>
   );
 }
 
