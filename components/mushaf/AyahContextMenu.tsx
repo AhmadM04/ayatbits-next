@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Volume2, Heart, Languages, Share2, X } from 'lucide-react';
+import { Play, Volume2, Heart, Languages, Share2, X, BookText } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { MushafVerse } from './AyahRow';
 
@@ -28,6 +28,11 @@ export default function AyahContextMenu({
   const [translation, setTranslation] = useState<string | null>(null);
   const [isLoadingTranslation, setIsLoadingTranslation] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
+  const [tafsir, setTafsir] = useState<string | null>(null);
+  const [tafsirResource, setTafsirResource] = useState<string>('Tafsir Ibn Kathir');
+  const [isLoadingTafsir, setIsLoadingTafsir] = useState(false);
+  const [showTafsir, setShowTafsir] = useState(false);
+  const [isTafsirFallback, setIsTafsirFallback] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Reset state when verse changes
@@ -35,6 +40,8 @@ export default function AyahContextMenu({
     setIsLiked(verse?.isLiked || false);
     setTranslation(null);
     setShowTranslation(false);
+    setTafsir(null);
+    setShowTafsir(false);
     setIsPlaying(false);
     if (audioRef.current) {
       audioRef.current.pause();
@@ -168,6 +175,41 @@ export default function AyahContextMenu({
       setIsLoadingTranslation(false);
     }
   }, [verse, translation, showTranslation, selectedTranslation]);
+
+  const handleShowTafsir = useCallback(async () => {
+    if (!verse) return;
+
+    if (showTafsir) {
+      setShowTafsir(false);
+      return;
+    }
+
+    if (tafsir) {
+      setShowTafsir(true);
+      return;
+    }
+
+    try {
+      setIsLoadingTafsir(true);
+      const response = await fetch(
+        `/api/verse/tafsir?surah=${verse.surahNumber}&ayah=${verse.ayahNumber}&language=${selectedTranslation}`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        setTafsir(data.tafsir || 'Tafsir not available');
+        setTafsirResource(data.resource || 'Tafsir Ibn Kathir');
+        setIsTafsirFallback(data.isFallback || false);
+        setShowTafsir(true);
+      }
+    } catch (error) {
+      console.error('Failed to fetch tafsir:', error);
+      setTafsir('Failed to load tafsir');
+      setShowTafsir(true);
+    } finally {
+      setIsLoadingTafsir(false);
+    }
+  }, [verse, tafsir, showTafsir, selectedTranslation]);
 
   const handleShare = useCallback(async () => {
     if (!verse) return;
@@ -330,13 +372,35 @@ export default function AyahContextMenu({
                   </div>
                 </button>
 
+                {/* Show Tafsir */}
+                <button
+                  onClick={handleShowTafsir}
+                  disabled={isLoadingTafsir}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-500/10 transition-colors text-left"
+                  data-tutorial="tafsir-button"
+                >
+                  <div className={`p-2 rounded-lg ${showTafsir ? 'bg-purple-500/30' : 'bg-purple-500/20'}`}>
+                    {isLoadingTafsir ? (
+                      <div className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <BookText className="w-5 h-5 text-purple-400" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium text-white">
+                      {showTafsir ? 'Hide Tafsir' : 'Show Tafsir'}
+                    </p>
+                    <p className="text-xs text-gray-500">View explanation</p>
+                  </div>
+                </button>
+
                 {/* Share */}
                 <button
                   onClick={handleShare}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-500/10 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-amber-500/10 transition-colors text-left"
                 >
-                  <div className="p-2 rounded-lg bg-purple-500/20">
-                    <Share2 className="w-5 h-5 text-purple-400" />
+                  <div className="p-2 rounded-lg bg-amber-500/20">
+                    <Share2 className="w-5 h-5 text-amber-400" />
                   </div>
                   <div>
                     <p className="font-medium text-white">Share</p>
@@ -358,6 +422,38 @@ export default function AyahContextMenu({
                       <p className="text-sm text-gray-300 leading-relaxed">
                         {translation}
                       </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Tafsir Display */}
+              <AnimatePresence>
+                {showTafsir && tafsir && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="border-t border-white/5 overflow-hidden"
+                  >
+                    <div className="p-4 bg-purple-500/5 max-h-80 overflow-y-auto">
+                      <div className="flex items-center gap-2 mb-2">
+                        <BookText className="w-3.5 h-3.5 text-purple-400" />
+                        <span className="text-xs font-medium text-purple-400 uppercase tracking-wide">
+                          {tafsirResource}
+                        </span>
+                      </div>
+                      {isTafsirFallback && (
+                        <div className="mb-2 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg p-2">
+                          ℹ️ Showing English tafsir (native tafsir not available in your language)
+                        </div>
+                      )}
+                      <div 
+                        className="text-sm text-gray-300 leading-relaxed prose prose-sm prose-invert max-w-none
+                          prose-p:my-2 prose-strong:text-white prose-strong:font-semibold
+                          prose-em:text-gray-300"
+                        dangerouslySetInnerHTML={{ __html: tafsir }}
+                      />
                     </div>
                   </motion.div>
                 )}

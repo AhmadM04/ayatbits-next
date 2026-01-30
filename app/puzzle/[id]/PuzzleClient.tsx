@@ -4,13 +4,14 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import WordPuzzle from '@/components/WordPuzzle';
 import { useToast } from '@/components/Toast';
 import { apiPost, apiDelete, getErrorMessage, NetworkError } from '@/lib/api-client';
-import { ArrowLeft, Heart, Languages } from 'lucide-react';
+import { ArrowLeft, Heart, Languages, BookText } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SuccessAnimation, SparkleAnimation } from '@/components/animations';
 import { TutorialWrapper } from '@/components/tutorial';
 import { puzzleTutorialSteps } from '@/lib/tutorial-configs';
+import TafsirDisplay from '@/components/TafsirDisplay';
 
 interface PuzzleClientProps {
   puzzle: {
@@ -51,6 +52,12 @@ export default function PuzzleClient({
   const [transliteration, setTransliteration] = useState(initialTransliteration);
   const [wordTransliterations, setWordTransliterations] = useState<Array<{ text: string; transliteration: string }>>(initialWordTransliterations);
   const [isLoadingTransliteration, setIsLoadingTransliteration] = useState(false);
+  const [showTafsir, setShowTafsir] = useState(false);
+  const [tafsir, setTafsir] = useState<string | null>(null);
+  const [tafsirResource, setTafsirResource] = useState<string>('Tafsir Ibn Kathir');
+  const [tafsirLanguage, setTafsirLanguage] = useState<string>('English');
+  const [isTafsirFallback, setIsTafsirFallback] = useState(false);
+  const [isLoadingTafsir, setIsLoadingTafsir] = useState(false);
   const { showToast } = useToast();
   const router = useRouter();
   
@@ -120,6 +127,32 @@ export default function PuzzleClient({
       });
     } catch (error) {
       console.error('Failed to save transliteration preference:', error);
+    }
+  };
+
+  const handleToggleTafsir = async () => {
+    const newValue = !showTafsir;
+    setShowTafsir(newValue);
+
+    // If enabling and we don't have tafsir yet, fetch it
+    if (newValue && !tafsir && puzzle.surah?.number && puzzle.content?.ayahNumber) {
+      setIsLoadingTafsir(true);
+      try {
+        const response = await fetch(
+          `/api/verse/tafsir?surah=${puzzle.surah.number}&ayah=${puzzle.content.ayahNumber}&language=en`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setTafsir(data.tafsir || '');
+          setTafsirResource(data.resource || 'Tafsir Ibn Kathir');
+          setTafsirLanguage(data.language || 'English');
+          setIsTafsirFallback(data.isFallback || false);
+        }
+      } catch (error) {
+        showToast('Failed to load tafsir', 'error');
+      } finally {
+        setIsLoadingTafsir(false);
+      }
     }
   };
 
@@ -323,6 +356,18 @@ export default function PuzzleClient({
                 <Languages className="w-5 h-5" />
               </button>
               <button
+                onClick={handleToggleTafsir}
+                className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
+                  showTafsir
+                    ? 'bg-purple-500/20 text-purple-400'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                }`}
+                title={showTafsir ? 'Hide tafsir' : 'Show tafsir'}
+                data-tutorial="tafsir-button"
+              >
+                <BookText className="w-5 h-5" />
+              </button>
+              <button
                 onClick={handleToggleLike}
                 className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
                   isLiked
@@ -339,20 +384,44 @@ export default function PuzzleClient({
 
       {/* Main content - Cleaner padding for mobile */}
       <main className="flex-1 max-w-3xl mx-auto w-full px-3 sm:px-4 py-4 sm:py-6 pb-8">
-        <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 sm:p-6" data-tutorial="puzzle-container">
-          <WordPuzzle
-            ayahText={ayahText}
-            surahNumber={puzzle.surah?.number}
-            ayahNumber={puzzle.content?.ayahNumber}
-            onSolved={(isCorrect) => {
-              console.log('🔵 WordPuzzle onSolved callback invoked!', { isCorrect });
-              handleSolved(isCorrect);
-            }}
-            onMistakeLimitExceeded={handleMistakeLimitExceeded}
-            transliteration={showTransliteration ? transliteration : ''}
-            wordTransliterations={showTransliteration ? wordTransliterations : []}
-            isLoadingTransliteration={isLoadingTransliteration}
-          />
+        <div className="space-y-4">
+          <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 sm:p-6" data-tutorial="puzzle-container">
+            <WordPuzzle
+              ayahText={ayahText}
+              surahNumber={puzzle.surah?.number}
+              ayahNumber={puzzle.content?.ayahNumber}
+              onSolved={(isCorrect) => {
+                console.log('🔵 WordPuzzle onSolved callback invoked!', { isCorrect });
+                handleSolved(isCorrect);
+              }}
+              onMistakeLimitExceeded={handleMistakeLimitExceeded}
+              transliteration={showTransliteration ? transliteration : ''}
+              wordTransliterations={showTransliteration ? wordTransliterations : []}
+              isLoadingTransliteration={isLoadingTransliteration}
+            />
+          </div>
+
+          {/* Tafsir Display */}
+          <AnimatePresence>
+            {showTafsir && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <TafsirDisplay
+                  surahNumber={puzzle.surah?.number || 1}
+                  ayahNumber={puzzle.content?.ayahNumber || 1}
+                  tafsir={tafsir}
+                  resource={tafsirResource}
+                  language={tafsirLanguage}
+                  isFallback={isTafsirFallback}
+                  isLoading={isLoadingTafsir}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </main>
     </div>
