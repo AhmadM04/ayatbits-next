@@ -107,40 +107,58 @@ export async function fetchTafsir(
   languageCode: string = 'en',
   options?: RequestInit
 ): Promise<TafsirResponse> {
-  const resourceId = getTafsirResourceId(languageCode);
-  const ayahKey = `${surahNumber}:${ayahNumber}`;
-  
-  const response = await fetch(
-    `${QURAN_FOUNDATION_API}/quran/tafsirs/${resourceId}?verse_key=${ayahKey}`,
-    options
-  );
+  try {
+    const resourceId = getTafsirResourceId(languageCode);
+    const ayahKey = `${surahNumber}:${ayahNumber}`;
+    
+    const url = `${QURAN_FOUNDATION_API}/quran/tafsirs/${resourceId}?verse_key=${ayahKey}`;
+    console.log('Fetching tafsir from:', url);
+    
+    const response = await fetch(url, options);
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch tafsir from QuranFoundation API');
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unable to read error response');
+      console.error('Tafsir API error:', response.status, errorText);
+      throw new Error(`Failed to fetch tafsir from QuranFoundation API: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log('Tafsir API response structure:', {
+      hasTafsirs: !!data.tafsirs,
+      tafsirCount: data.tafsirs?.length || 0,
+      firstTafsir: data.tafsirs?.[0] ? 'exists' : 'missing'
+    });
+    
+    const tafsirData = data.tafsirs?.[0];
+    
+    if (!tafsirData) {
+      throw new Error(`Tafsir not found for verse ${surahNumber}:${ayahNumber} (resource ${resourceId})`);
+    }
+
+    if (!tafsirData.text) {
+      console.warn('Tafsir data found but text is empty:', tafsirData);
+      throw new Error(`Tafsir text is empty for verse ${surahNumber}:${ayahNumber}`);
+    }
+
+    const tafsirInfo = getTafsirInfo(resourceId);
+    const isNative = hasNativeTafsir(languageCode);
+
+    return {
+      data: {
+        text: tafsirData.text || '',
+        resource_name: tafsirInfo.name,
+        language_name: tafsirInfo.language,
+        resource_id: resourceId,
+      },
+      meta: {
+        isFallback: !isNative,
+        originalLanguage: languageCode,
+      },
+    };
+  } catch (error: any) {
+    console.error('Error in fetchTafsir:', error);
+    throw error;
   }
-
-  const data = await response.json();
-  const tafsirData = data.tafsirs?.[0];
-  
-  if (!tafsirData) {
-    throw new Error('Tafsir not found for this verse');
-  }
-
-  const tafsirInfo = getTafsirInfo(resourceId);
-  const isNative = hasNativeTafsir(languageCode);
-
-  return {
-    data: {
-      text: tafsirData.text || '',
-      resource_name: tafsirInfo.name,
-      language_name: tafsirInfo.language,
-      resource_id: resourceId,
-    },
-    meta: {
-      isFallback: !isNative,
-      originalLanguage: languageCode,
-    },
-  };
 }
 
 /**

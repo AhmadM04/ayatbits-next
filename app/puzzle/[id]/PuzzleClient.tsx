@@ -152,9 +152,15 @@ export default function PuzzleClient({
           setTafsirResource(data.resource || 'Tafsir Ibn Kathir');
           setTafsirLanguage(data.language || 'English');
           setIsTafsirFallback(data.isFallback || false);
+        } else {
+          // Handle error responses
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          console.error('Failed to fetch tafsir:', response.status, errorData);
+          showToast(`Failed to load tafsir: ${errorData.error || response.statusText}`, 'error');
         }
       } catch (error) {
-        showToast('Failed to load tafsir', 'error');
+        console.error('Tafsir fetch error:', error);
+        showToast('Failed to load tafsir. Please try again later.', 'error');
       } finally {
         setIsLoadingTafsir(false);
       }

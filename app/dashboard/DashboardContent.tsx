@@ -9,6 +9,7 @@ import BottomNav from '@/components/BottomNav';
 import DailyQuote from '@/components/DailyQuote';
 import TrialBanner from '@/components/TrialBanner';
 import VerseSearch from '@/components/VerseSearch';
+import LanguageSelector from '@/components/LanguageSelector';
 import { SparkleAnimation } from '@/components/animations';
 import { TutorialWrapper, useTutorial } from '@/components/tutorial';
 import { dashboardTutorialSteps } from '@/lib/tutorial-configs';
@@ -134,6 +135,9 @@ export default function DashboardContent({
                 </motion.div>
                 <span className="font-semibold text-sm">{Number.isNaN(currentStreak) ? 0 : (currentStreak ?? 0)}</span>
               </Link>
+              
+              {/* Language Selector */}
+              <LanguageSelector />
               
               {/* Help Button */}
               <div className="relative">

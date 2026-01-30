@@ -38,19 +38,31 @@ export async function GET(request: NextRequest) {
           { next: { revalidate: 86400 } }
         );
         
-        // Sanitize HTML content
-        result.data.text = sanitizeTafsirHtml(result.data.text);
+        // Validate response structure
+        if (!result || !result.data) {
+          throw new Error('Invalid tafsir response structure');
+        }
+        
+        // Sanitize HTML content if it exists
+        if (result.data.text) {
+          result.data.text = sanitizeTafsirHtml(result.data.text);
+        }
         
         return result;
       },
       CACHE_TTL.DAY // Cache for 24 hours
     );
 
+    // Validate final data structure before returning
+    if (!tafsirData || !tafsirData.data || !tafsirData.data.text) {
+      throw new Error('Tafsir data not available for this verse');
+    }
+
     return NextResponse.json(
       {
         tafsir: tafsirData.data.text,
-        resource: tafsirData.data.resource_name,
-        language: tafsirData.data.language_name,
+        resource: tafsirData.data.resource_name || 'Unknown',
+        language: tafsirData.data.language_name || 'Unknown',
         isFallback: tafsirData.meta?.isFallback || false,
       },
       {

@@ -210,10 +210,16 @@ export default function AyahContextMenu({
         setTafsirResource(data.resource || 'Tafsir Ibn Kathir');
         setIsTafsirFallback(data.isFallback || false);
         setShowTafsir(true);
+      } else {
+        // Handle error responses
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Failed to fetch tafsir:', response.status, errorData);
+        setTafsir(`Failed to load tafsir: ${errorData.error || response.statusText}`);
+        setShowTafsir(true);
       }
     } catch (error) {
       console.error('Failed to fetch tafsir:', error);
-      setTafsir('Failed to load tafsir');
+      setTafsir('Failed to load tafsir. Please try again later.');
       setShowTafsir(true);
     } finally {
       setIsLoadingTafsir(false);

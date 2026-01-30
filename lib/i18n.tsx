@@ -1,8 +1,8 @@
 'use client';
 
-import { createContext, useContext, ReactNode, useMemo, useCallback } from 'react';
+import { createContext, useContext, ReactNode, useMemo, useCallback, useState, useEffect } from 'react';
 
-// Hardcoded English strings
+// English strings
 const EN_MESSAGES: Record<string, Record<string, string>> = {
   common: {
     search: 'Search',
@@ -81,6 +81,171 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
   },
 };
 
+// Arabic strings
+const AR_MESSAGES: Record<string, Record<string, string>> = {
+  common: {
+    search: 'بحث',
+    home: 'الرئيسية',
+    liked: 'المفضلة',
+    profile: 'الملف الشخصي',
+    award: 'الجوائز',
+    awards: 'الجوائز',
+    resume: 'استئناف',
+    startLearning: 'ابدأ التعلم',
+    surah: 'سورة',
+    ayah: 'آية',
+  },
+  dashboard: {
+    welcome: 'مرحباً بعودتك، {name}!',
+    continueJourney: 'واصل رحلتك القرآنية',
+    selectJuz: 'اختر جزءاً',
+    noJuzsFound: 'لا توجد أجزاء متاحة',
+    learner: 'متعلم',
+  },
+  achievements: {
+    title: 'الإنجازات',
+    description: 'تتبع تقدمك واحصل على المكافآت',
+    streak: 'سلسلة الأيام',
+    puzzlesSolved: 'الألغاز المحلولة',
+    puzzles: 'ألغاز',
+    bestStreak: 'أفضل سلسلة',
+    trophies: 'الجوائز',
+    surahsCompleted: 'السور المكتملة',
+    juzsExplored: 'الأجزاء المستكشفة',
+    badges: 'الشارات',
+    locked: 'مقفل',
+    unlocked: 'مفتوح ({count})',
+    unlockedOf: '{unlocked} من {total} مفتوحة',
+    inProgress: 'قيد التقدم ({count})',
+  },
+  navigation: {
+    home: 'الرئيسية',
+    search: 'بحث',
+    liked: 'المفضلة',
+    profile: 'الملف الشخصي',
+    resume: 'استئناف',
+  },
+  search: {
+    placeholder: 'سورة:آية (مثال، 2:255)',
+    noResults: 'لا توجد نتائج',
+    invalidFormat: 'تنسيق غير صحيح. استخدم سورة:آية (مثال، 2:255)',
+    surahNotFound: 'السورة غير موجودة',
+    notAvailable: 'هذه الآية غير متاحة بعد',
+    goToDashboard: 'الذهاب إلى لوحة التحكم',
+    examples: 'أمثلة',
+    startLearning: 'ابدأ التعلم',
+  },
+  liked: {
+    title: 'الآيات المفضلة',
+    empty: 'لا توجد آيات مفضلة بعد',
+    emptyDescription: 'ستظهر الآيات التي تعجبك هنا',
+    noLikedYet: 'لا توجد آيات مفضلة بعد',
+    tapHeartToSave: 'اضغط على أيقونة القلب على أي آية لحفظها هنا',
+    ayahsSaved: '{count} آيات محفوظة',
+    ayahInfo: 'آية {ayahNumber} • جزء {juzNumber}',
+  },
+  ayah: {
+    previous: 'السابق',
+    next: 'التالي',
+    select: 'اختر آية',
+  },
+  juz: {
+    surahs: 'سور في هذا الجزء',
+    progress: 'التقدم',
+    ayahs: 'آيات',
+  },
+  profile: {
+    selectTranslation: 'اختر الترجمة',
+    translationDescription: 'اختر ترجمة القرآن المفضلة لديك',
+  },
+};
+
+// Russian strings
+const RU_MESSAGES: Record<string, Record<string, string>> = {
+  common: {
+    search: 'Поиск',
+    home: 'Главная',
+    liked: 'Избранное',
+    profile: 'Профиль',
+    award: 'Награды',
+    awards: 'Награды',
+    resume: 'Продолжить',
+    startLearning: 'Начать обучение',
+    surah: 'Сура',
+    ayah: 'Аят',
+  },
+  dashboard: {
+    welcome: 'С возвращением, {name}!',
+    continueJourney: 'Продолжите свой путь с Кораном',
+    selectJuz: 'Выберите джуз',
+    noJuzsFound: 'Джузы не найдены',
+    learner: 'Ученик',
+  },
+  achievements: {
+    title: 'Достижения',
+    description: 'Отслеживайте свой прогресс и получайте награды',
+    streak: 'Серия дней',
+    puzzlesSolved: 'Решено головоломок',
+    puzzles: 'Головоломки',
+    bestStreak: 'Лучшая серия',
+    trophies: 'Трофеи',
+    surahsCompleted: 'Завершено сур',
+    juzsExplored: 'Изучено джузов',
+    badges: 'Значки',
+    locked: 'Закрыто',
+    unlocked: 'Открыто ({count})',
+    unlockedOf: '{unlocked} из {total} открыто',
+    inProgress: 'В процессе ({count})',
+  },
+  navigation: {
+    home: 'Главная',
+    search: 'Поиск',
+    liked: 'Избранное',
+    profile: 'Профиль',
+    resume: 'Продолжить',
+  },
+  search: {
+    placeholder: 'Сура:Аят (например, 2:255)',
+    noResults: 'Результаты не найдены',
+    invalidFormat: 'Неверный формат. Используйте Сура:Аят (например, 2:255)',
+    surahNotFound: 'Сура не найдена',
+    notAvailable: 'Этот аят пока недоступен',
+    goToDashboard: 'Перейти на панель',
+    examples: 'Примеры',
+    startLearning: 'Начать обучение',
+  },
+  liked: {
+    title: 'Избранные аяты',
+    empty: 'Пока нет избранных аятов',
+    emptyDescription: 'Избранные аяты появятся здесь',
+    noLikedYet: 'Пока нет избранных аятов',
+    tapHeartToSave: 'Нажмите на значок сердца на любом аяте, чтобы сохранить его здесь',
+    ayahsSaved: '{count} аятов сохранено',
+    ayahInfo: 'Аят {ayahNumber} • Джуз {juzNumber}',
+  },
+  ayah: {
+    previous: 'Предыдущий',
+    next: 'Следующий',
+    select: 'Выбрать аят',
+  },
+  juz: {
+    surahs: 'Суры в этом джузе',
+    progress: 'Прогресс',
+    ayahs: 'аяты',
+  },
+  profile: {
+    selectTranslation: 'Выбрать перевод',
+    translationDescription: 'Выберите предпочитаемый перевод Корана',
+  },
+};
+
+// Message map for locale-based lookup
+const MESSAGES_MAP: Record<string, Record<string, Record<string, string>>> = {
+  en: EN_MESSAGES,
+  ar: AR_MESSAGES,
+  ru: RU_MESSAGES,
+};
+
 type MessagePath = string;
 
 interface I18nContextType {
@@ -128,21 +293,44 @@ interface I18nProviderProps {
 }
 
 export function I18nProvider({ children }: I18nProviderProps) {
+  const [currentLocale, setCurrentLocale] = useState<Locale>('en');
+
+  // Load locale from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedLocale = localStorage.getItem('ayatbits-ui-locale') as Locale;
+      if (savedLocale && (savedLocale === 'en' || savedLocale === 'ar' || savedLocale === 'ru')) {
+        setCurrentLocale(savedLocale);
+      }
+    }
+  }, []);
+
   const t = useCallback((key: MessagePath, params?: Record<string, string | number>): string => {
-    const value = getNestedValue(EN_MESSAGES as Record<string, unknown>, key);
+    const messages = MESSAGES_MAP[currentLocale] || EN_MESSAGES;
+    const value = getNestedValue(messages as Record<string, unknown>, key);
     
     if (!value) {
       return key;
     }
     
     return interpolate(value, params);
+  }, [currentLocale]);
+
+  const setLocale = useCallback((newLocale: string) => {
+    const locale = newLocale as Locale;
+    if (locale === 'en' || locale === 'ar' || locale === 'ru') {
+      setCurrentLocale(locale);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ayatbits-ui-locale', locale);
+      }
+    }
   }, []);
 
   const value = useMemo(() => ({
-    locale: 'en',
+    locale: currentLocale,
     t,
-    setLocale: () => {},
-  }), [t]);
+    setLocale,
+  }), [currentLocale, t, setLocale]);
 
   return (
     <I18nContext.Provider value={value}>
@@ -159,7 +347,7 @@ export function useI18n() {
   if (!context) {
     // Return fallback implementation when outside provider
     return {
-      locale: 'en',
+      locale: 'en' as Locale,
       t: (key: string, params?: Record<string, string | number>): string => {
         const value = getNestedValue(EN_MESSAGES as Record<string, unknown>, key);
         if (!value) return key;
@@ -178,5 +366,5 @@ export function useI18nSafe() {
   return useI18n();
 }
 
-export type Locale = 'en';
+export type Locale = 'en' | 'ar' | 'ru';
 export type Messages = Record<string, any>;
