@@ -570,12 +570,16 @@ export default function WordPuzzle({
       // Clicking on a Muqatta'at letter - all letters map to the first API word (index 0)
       apiIndex = 0;
       console.log('  ℹ️ Clicked on Muqatta\'at letter - playing combined word at API index:', apiIndex);
+    } else if (muqattaatTokens > 0) {
+      // Word after Muqatta'at letters
+      // The Muqatta'at letters (e.g., 3 letters) in puzzle map to 1 word in API (index 0)
+      // So puzzle position 3 = API position 1, puzzle position 4 = API position 2, etc.
+      apiIndex = wordIndex - muqattaatTokens + 1;
+      console.log('  ✓ Word after Muqatta\'at - puzzle pos:', wordIndex, '→ API index:', apiIndex);
     } else {
-      // Regular word or after Muqatta'at
-      // Convert: puzzle position → logical word position → API index
-      const logicalPosition = wordIndex - muqattaatTokens + (muqattaatTokens > 0 ? 1 : 0);
-      apiIndex = logicalPosition;
-      console.log('  ✓ Logical word position:', logicalPosition, '→ API index:', apiIndex);
+      // No Muqatta'at - direct 1:1 mapping
+      apiIndex = wordIndex;
+      console.log('  ✓ Regular word - puzzle pos:', wordIndex, '→ API index:', apiIndex);
     }
     
     playWord(apiIndex);
