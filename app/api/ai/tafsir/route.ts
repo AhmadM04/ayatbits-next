@@ -233,11 +233,24 @@ Keep the response concise, respectful, and academically grounded.`;
 
   } catch (error: any) {
     console.error('AI Tafsir Error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      status: error.status,
+      statusText: error.statusText,
+    });
     
     // Handle Gemini-specific errors
-    if (error.message?.includes('API key')) {
+    if (error.message?.includes('API key') || error.message?.includes('API_KEY')) {
       return NextResponse.json(
-        { error: 'AI service configuration error' },
+        { error: 'AI service configuration error. Please check API key.' },
+        { status: 503 }
+      );
+    }
+
+    if (error.message?.includes('billing') || error.message?.includes('BILLING')) {
+      return NextResponse.json(
+        { error: 'Gemini API billing not enabled. Please enable billing in Google Cloud Console.' },
         { status: 503 }
       );
     }
@@ -250,7 +263,7 @@ Keep the response concise, respectful, and academically grounded.`;
     }
 
     return NextResponse.json(
-      { error: 'Failed to generate tafsir. Please try again.' },
+      { error: `Failed to generate tafsir: ${error.message || 'Unknown error'}` },
       { status: 500 }
     );
   }
