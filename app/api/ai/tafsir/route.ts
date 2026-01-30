@@ -178,7 +178,7 @@ Keep the response concise, respectful, and academically grounded.`;
     // 9. Call Gemini API with safety settings
     console.log('Creating Gemini model...');
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
+      model: 'gemini-pro',
       safetySettings: [
         {
           category: HarmCategory.HARM_CATEGORY_HARASSMENT,
