@@ -73,15 +73,16 @@ export async function fetchWordSegments(
     const segments: WordSegment[] = data.verse.words
       .filter(word => word.char_type_name === 'word') // Filter out non-word characters
       .map((word, index) => {
-        let wordAudioUrl = word.audio_url || '';
+        // Reconstruct the audio URL based on the filtered index position
+        // The API's audio_url can be incorrect because it includes pause marks in positions
+        // Format: wbw/{surah}_{ayah}_{wordNumber}.mp3 (all zero-padded to 3 digits)
+        const paddedSurah = surahNumber.toString().padStart(3, '0');
+        const paddedAyah = ayahNumber.toString().padStart(3, '0');
+        const paddedWord = (index + 1).toString().padStart(3, '0'); // 1-based word number
+        const wordAudioUrl = `https://verses.quran.com/wbw/${paddedSurah}_${paddedAyah}_${paddedWord}.mp3`;
         
-        // Fix relative URLs - Quran.com returns relative paths that need the base URL
-        if (wordAudioUrl && !wordAudioUrl.startsWith('http')) {
-          wordAudioUrl = `https://verses.quran.com/${wordAudioUrl}`;
-        }
-        
-        // Debug: Log word mapping (API position is 1-based, index is 0-based)
-        console.log(`Word ${index}: API position=${word.position} (1-based), text=${word.text_uthmani}, audioURL=${wordAudioUrl}`);
+        // Debug: Log word mapping
+        console.log(`Word ${index}: text=${word.text_uthmani}, audioURL=${wordAudioUrl}`);
         
         return {
           position: index, // Use 0-based array index for easy lookup
