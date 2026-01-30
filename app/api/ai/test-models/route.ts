@@ -11,14 +11,19 @@ export async function GET() {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     
-    // Try to list models
+    // Try to create a model and send a simple test message
     try {
-      const models = await genAI.listModels();
+      const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+      const result = await model.generateContent('Say "Hello"');
+      const response = await result.response;
+      const text = response.text();
+      
       return NextResponse.json({
         success: true,
         apiKeyExists: true,
         apiKeyLength: apiKey.length,
-        models: models,
+        message: 'API key is working! Model responded.',
+        testResponse: text,
       });
     } catch (modelError: any) {
       return NextResponse.json({
@@ -26,7 +31,8 @@ export async function GET() {
         apiKeyExists: true,
         apiKeyLength: apiKey.length,
         error: modelError.message,
-        details: modelError,
+        status: modelError.status,
+        statusText: modelError.statusText,
       });
     }
   } catch (error: any) {
