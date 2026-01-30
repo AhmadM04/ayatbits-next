@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import { TutorialWrapper } from '@/components/tutorial';
 import { achievementsTutorialSteps } from '@/lib/tutorial-configs';
+import { useI18n } from '@/lib/i18n';
 
 interface Achievement {
   id: string;
@@ -32,6 +33,7 @@ interface Stats {
 }
 
 export default function AchievementsContent() {
+  const { t } = useI18n();
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -91,9 +93,9 @@ export default function AchievementsContent() {
                 <ArrowLeft className="w-5 h-5 text-gray-400" />
               </Link>
               <div>
-                <h1 className="text-lg font-semibold">Achievements</h1>
+                <h1 className="text-lg font-semibold">{t('achievements.title')}</h1>
                 <p className="text-xs text-gray-500">
-                  {stats?.totalUnlocked || 0} of {stats?.totalAchievements || 0} unlocked
+                  {t('achievements.unlockedOf', { unlocked: stats?.totalUnlocked || 0, total: stats?.totalAchievements || 0 })}
                 </p>
               </div>
             </div>
@@ -113,7 +115,7 @@ export default function AchievementsContent() {
                 <div className="text-2xl font-bold text-green-500">
                   {stats.completedPuzzles}
                 </div>
-                <div className="text-xs text-gray-500">Puzzles</div>
+                <div className="text-xs text-gray-500">{t('achievements.puzzles')}</div>
               </motion.div>
               <motion.div 
                 className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-center"
@@ -123,7 +125,7 @@ export default function AchievementsContent() {
                 <div className="text-2xl font-bold text-orange-500">
                   {stats.longestStreak}
                 </div>
-                <div className="text-xs text-gray-500">Best Streak</div>
+                <div className="text-xs text-gray-500">{t('achievements.bestStreak')}</div>
               </motion.div>
               <motion.div 
                 className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-center"
@@ -133,7 +135,7 @@ export default function AchievementsContent() {
                 <div className="text-2xl font-bold text-purple-500">
                   {stats.totalUnlocked}
                 </div>
-                <div className="text-xs text-gray-500">Trophies</div>
+                <div className="text-xs text-gray-500">{t('achievements.trophies')}</div>
               </motion.div>
             </div>
           )}
@@ -143,7 +145,7 @@ export default function AchievementsContent() {
             <div className="mb-8" data-tutorial="unlocked-section">
               <h2 className="text-sm font-semibold text-gray-400 mb-3 flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-500" />
-                Unlocked ({unlockedAchievements.length})
+                {t('achievements.unlocked', { count: unlockedAchievements.length })}
               </h2>
               <div className="grid grid-cols-2 gap-3">
                 {unlockedAchievements.map((achievement, index) => (
@@ -181,7 +183,7 @@ export default function AchievementsContent() {
             <div data-tutorial="progress-section">
               <h2 className="text-sm font-semibold text-gray-400 mb-3 flex items-center gap-2">
                 <Lock className="w-4 h-4" />
-                In Progress ({lockedAchievements.length})
+                {t('achievements.inProgress', { count: lockedAchievements.length })}
               </h2>
               <div className="space-y-3">
                 {lockedAchievements.map((achievement, index) => (

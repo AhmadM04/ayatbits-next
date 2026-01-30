@@ -15,6 +15,7 @@ import { TutorialWrapper, useTutorial } from '@/components/tutorial';
 import { dashboardTutorialSteps } from '@/lib/tutorial-configs';
 import { resetTutorial } from '@/lib/tutorial-manager';
 import { MushafFAB } from '@/components/mushaf';
+import { useI18n } from '@/lib/i18n';
 
 interface DashboardContentProps {
   userFirstName: string | null | undefined;
@@ -53,6 +54,7 @@ export default function DashboardContent({
 }: DashboardContentProps) {
   const [showHelpMenu, setShowHelpMenu] = useState(false);
   const { startTutorial } = useTutorial();
+  const { t } = useI18n();
   
   const showTrialBanner = subscriptionStatus === 'trialing' && trialDaysLeft && trialDaysLeft > 0;
   const needsSubscription = !subscriptionStatus || subscriptionStatus === 'inactive' || subscriptionStatus === 'INACTIVE';
@@ -169,7 +171,7 @@ export default function DashboardContent({
                           onClick={handleRestartTutorial}
                           className="w-full text-left px-3 py-2 hover:bg-white/5 rounded-md text-sm transition-colors"
                         >
-                          🎓 Restart Tutorial
+                          🎓 {t('dashboard.restartTutorial')}
                         </button>
                       </motion.div>
                     </>
@@ -194,10 +196,10 @@ export default function DashboardContent({
         {/* Welcome Section */}
         <div className="mb-6" data-tutorial="welcome-section">
           <h1 className="text-2xl font-bold mb-1">
-            Welcome back, {userFirstName || 'Learner'}!
+            {t('dashboard.welcome', { name: userFirstName || t('dashboard.learner') })}
           </h1>
           <p className="text-gray-500 text-sm">
-            Continue your Quranic journey
+            {t('dashboard.continueJourney')}
           </p>
         </div>
 
@@ -241,12 +243,12 @@ export default function DashboardContent({
             >
               <BookOpen className="w-5 h-5 text-green-500" />
             </motion.div>
-            <h2 className="text-lg font-semibold">Select a Juz</h2>
+            <h2 className="text-lg font-semibold">{t('dashboard.selectJuz')}</h2>
           </motion.div>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3" data-tutorial="juz-grid">
             {juzs.length === 0 ? (
               <div className="col-span-full text-center py-8 text-gray-500">
-                <p className="text-sm">No Juz available</p>
+                <p className="text-sm">{t('dashboard.noJuzsFound')}</p>
               </div>
             ) : (
               juzs.map((juz, index) => (

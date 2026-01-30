@@ -12,6 +12,7 @@ import { SuccessAnimation, SparkleAnimation } from '@/components/animations';
 import { TutorialWrapper } from '@/components/tutorial';
 import { puzzleTutorialSteps } from '@/lib/tutorial-configs';
 import TafsirDisplay from '@/components/TafsirDisplay';
+import { useI18n } from '@/lib/i18n';
 
 interface PuzzleClientProps {
   puzzle: {
@@ -46,6 +47,7 @@ export default function PuzzleClient({
   initialShowTransliteration = false,
   initialWordTransliterations = [],
 }: PuzzleClientProps) {
+  const { t } = useI18n();
   const [isLiked, setIsLiked] = useState(initialIsLiked);
   const [showSuccessTransition, setShowSuccessTransition] = useState(false);
   const [showTransliteration, setShowTransliteration] = useState(initialShowTransliteration);
@@ -82,10 +84,10 @@ export default function PuzzleClient({
         await apiPost(`/api/puzzles/${puzzle.id}/like`);
       }
       setIsLiked(!isLiked);
-      showToast(isLiked ? 'Removed from favorites' : 'Added to favorites', 'success');
+      showToast(isLiked ? t('puzzle.removedFromFavorites') : t('puzzle.addedToFavorites'), 'success');
     } catch (error) {
       if (error instanceof NetworkError) {
-        showToast('Network error. Please check your connection.', 'error');
+        showToast(t('puzzle.networkError'), 'error');
       } else {
         showToast(getErrorMessage(error), 'error');
       }
@@ -117,7 +119,7 @@ export default function PuzzleClient({
           setTransliteration(translitData.transliteration || '');
         }
       } catch (error) {
-        showToast('Failed to load transliteration', 'error');
+        showToast(t('puzzle.failedToLoadTransliteration'), 'error');
       } finally {
         setIsLoadingTransliteration(false);
       }
@@ -156,11 +158,11 @@ export default function PuzzleClient({
           // Handle error responses
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
           console.error('Failed to fetch tafsir:', response.status, errorData);
-          showToast(`Failed to load tafsir: ${errorData.error || response.statusText}`, 'error');
+          showToast(`${t('puzzle.failedToLoadTafsir')}: ${errorData.error || response.statusText}`, 'error');
         }
       } catch (error) {
         console.error('Tafsir fetch error:', error);
-        showToast('Failed to load tafsir. Please try again later.', 'error');
+        showToast(t('puzzle.failedToLoadTafsir'), 'error');
       } finally {
         setIsLoadingTafsir(false);
       }
@@ -192,8 +194,8 @@ export default function PuzzleClient({
           const data = await response.json();
           if (data.requiresPro) {
             setRequiresPro(true);
-            setAiError('AI Tafsir is a Pro feature. Upgrade to access.');
-            showToast('AI Tafsir is a Pro feature', 'error');
+            setAiError(t('puzzle.aiTafsirPro'));
+            showToast(t('puzzle.aiTafsirPro'), 'error');
           } else {
             setAiError(data.error || 'Access denied');
             showToast(data.error || 'Access denied', 'error');
@@ -210,17 +212,17 @@ export default function PuzzleClient({
 
         if (!response.ok) {
           const errorData = await response.json();
-          setAiError(errorData.error || 'Failed to generate AI tafsir');
-          showToast(errorData.error || 'Failed to generate AI tafsir', 'error');
+          setAiError(errorData.error || t('puzzle.failedToLoadTafsir'));
+          showToast(errorData.error || t('puzzle.failedToLoadTafsir'), 'error');
           return;
         }
 
         const data = await response.json();
         setAiTafsir(data.tafsir);
-        showToast('AI Tafsir generated successfully', 'success');
+        showToast(t('puzzle.aiTafsirGenerated'), 'success');
       } catch (error) {
-        setAiError('Network error. Please try again.');
-        showToast('Failed to load AI tafsir', 'error');
+        setAiError(t('puzzle.networkError'));
+        showToast(t('puzzle.failedToLoadTafsir'), 'error');
       } finally {
         setIsLoadingAiTafsir(false);
       }
@@ -259,7 +261,7 @@ export default function PuzzleClient({
       score: 100,
     }).catch((error) => {
       if (error instanceof NetworkError) {
-        showToast('Failed to save progress.', 'error');
+        showToast(t('puzzle.failedToSaveProgress'), 'error');
       } else {
         console.error('Failed to save progress:', error);
       }
@@ -384,7 +386,7 @@ export default function PuzzleClient({
                 transition={{ delay: 0.5 }}
                 className="text-green-400 text-base"
               >
-                {isLastAyahInSurah ? '🎉 Surah completed!' : '✨ Moving to next ayah...'}
+                {isLastAyahInSurah ? `🎉 ${t('puzzle.surahCompleted')}` : `✨ ${t('puzzle.movingToNext')}`}
               </motion.p>
             </motion.div>
           </motion.div>
@@ -399,7 +401,7 @@ export default function PuzzleClient({
               <Link
                 href={backUrl}
                 className="flex items-center gap-2 p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors flex-shrink-0 group"
-                title="Back to Mushaf view"
+                title={t('puzzle.backToMushaf')}
               >
                 <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-gray-300" />
                 <span className="hidden sm:inline text-sm text-gray-400 group-hover:text-gray-300">Mushaf</span>
@@ -421,7 +423,7 @@ export default function PuzzleClient({
                     ? 'bg-teal-500/20 text-teal-400'
                     : 'bg-white/5 text-gray-400 hover:bg-white/10'
                 }`}
-                title={showTransliteration ? 'Hide transliteration' : 'Show transliteration'}
+                title={showTransliteration ? t('puzzle.hideTransliteration') : t('puzzle.showTransliteration')}
                 data-tutorial="audio-button"
               >
                 <Languages className="w-5 h-5" />
@@ -433,7 +435,7 @@ export default function PuzzleClient({
                     ? 'bg-purple-500/20 text-purple-400'
                     : 'bg-white/5 text-gray-400 hover:bg-white/10'
                 }`}
-                title={showTafsir ? 'Hide tafsir' : 'Show tafsir'}
+                title={showTafsir ? t('puzzle.hideTafsir') : t('puzzle.showTafsir')}
                 data-tutorial="tafsir-button"
               >
                 <BookText className="w-5 h-5" />
@@ -445,7 +447,7 @@ export default function PuzzleClient({
                     ? 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-400'
                     : 'bg-white/5 text-gray-400 hover:bg-white/10'
                 }`}
-                title={showAiTafsir ? 'Hide AI tafsir' : 'Show AI tafsir (Pro)'}
+                title={showAiTafsir ? t('puzzle.hideAiTafsir') : t('puzzle.showAiTafsir')}
                 data-tutorial="ai-tafsir-button"
               >
                 {isLoadingAiTafsir ? (
@@ -528,7 +530,7 @@ export default function PuzzleClient({
                 <div className="bg-gradient-to-br from-pink-500/5 to-purple-500/5 border border-pink-500/20 rounded-2xl p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="w-4 h-4 text-pink-400" />
-                    <span className="text-sm font-semibold text-pink-400">AI-Generated Tafsir</span>
+                    <span className="text-sm font-semibold text-pink-400">{t('puzzle.aiGeneratedTafsir')}</span>
                     <span className="px-1.5 py-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded text-[10px] font-bold text-white">
                       PRO
                     </span>

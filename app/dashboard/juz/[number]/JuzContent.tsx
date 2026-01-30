@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import { MushafFAB } from '@/components/mushaf';
+import { useI18n } from '@/lib/i18n';
 
 interface JuzContentProps {
   juzName: string;
@@ -24,6 +25,7 @@ export default function JuzContent({
   surahs,
   juzNumber,
 }: JuzContentProps) {
+  const { t } = useI18n();
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
@@ -40,7 +42,7 @@ export default function JuzContent({
             <div>
               <h1 className="text-lg font-semibold">{juzName}</h1>
               <p className="text-xs text-gray-500">
-                {surahs.length} Surahs
+                {t('juz.surahsCount', { count: surahs.length })}
               </p>
             </div>
           </div>
@@ -68,7 +70,7 @@ export default function JuzContent({
                     <div className="text-sm text-gray-500" dir="rtl">{surah.nameArabic}</div>
                     {surah.startAyahNumber > 1 && (
                       <div className="text-xs text-blue-400 mt-1">
-                        Ayah {surah.startAyahNumber}
+                        {t('juz.ayah')} {surah.startAyahNumber}
                       </div>
                     )}
                   </div>
@@ -83,7 +85,7 @@ export default function JuzContent({
                   />
                 </div>
                 <div className="text-xs text-gray-600">
-                  {surah.completedCount}/{surah.puzzleCount} puzzles
+                  {surah.completedCount}/{surah.puzzleCount} {t('achievements.puzzles').toLowerCase()}
                 </div>
               </Link>
             );

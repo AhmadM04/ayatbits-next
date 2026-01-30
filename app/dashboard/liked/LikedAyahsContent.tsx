@@ -8,6 +8,7 @@ import BottomNav from '@/components/BottomNav';
 import { HarakatColoredText } from '@/components/arabic';
 import { TutorialWrapper } from '@/components/tutorial';
 import { likedTutorialSteps } from '@/lib/tutorial-configs';
+import { useI18n } from '@/lib/i18n';
 
 interface LikedAyah {
   id: string;
@@ -22,6 +23,7 @@ interface LikedAyah {
 }
 
 export default function LikedAyahsContent() {
+  const { t } = useI18n();
   const [likedAyahs, setLikedAyahs] = useState<LikedAyah[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
@@ -89,8 +91,8 @@ export default function LikedAyahsContent() {
                 <ArrowLeft className="w-5 h-5 text-gray-400" />
               </Link>
               <div>
-                <h1 className="text-lg font-semibold">Liked Ayahs</h1>
-                <p className="text-xs text-gray-500">{likedAyahs.length} ayahs saved</p>
+                <h1 className="text-lg font-semibold">{t('liked.title')}</h1>
+                <p className="text-xs text-gray-500">{t('liked.ayahsSaved', { count: likedAyahs.length })}</p>
               </div>
             </div>
           </div>
@@ -104,15 +106,15 @@ export default function LikedAyahsContent() {
         ) : likedAyahs.length === 0 ? (
           <div className="text-center py-20">
             <Heart className="w-16 h-16 text-gray-700 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No liked ayahs yet</h2>
+            <h2 className="text-xl font-semibold mb-2">{t('liked.noLikedYet')}</h2>
             <p className="text-gray-500 text-sm mb-6">
-              Tap the heart icon on any ayah to save it here
+              {t('liked.tapHeartToSave')}
             </p>
             <Link
               href="/dashboard"
               className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
             >
-              Start Learning
+              {t('search.startLearning')}
             </Link>
           </div>
         ) : (
@@ -131,7 +133,7 @@ export default function LikedAyahsContent() {
                       {ayah.surahNameArabic || ayah.surahNameEnglish}
                     </div>
                     <div className="text-xs text-gray-500">
-                      Ayah {ayah.ayahNumber} • Juz {ayah.juzNumber}
+                      {t('liked.ayahInfo', { ayahNumber: ayah.ayahNumber, juzNumber: ayah.juzNumber })}
                     </div>
                   </div>
                   <div className="flex items-center gap-2" data-tutorial="liked-actions">

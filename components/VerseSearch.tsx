@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Search, X, Sparkles, Loader2, BookOpen } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useI18n } from '@/lib/i18n';
 
 // Complete mapping of all 114 surahs to their primary juz
 const SURAH_TO_JUZ: { [key: number]: number } = {
@@ -124,6 +125,7 @@ const SURAH_TO_JUZ: { [key: number]: number } = {
 };
 
 export default function VerseSearch() {
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState('');
@@ -164,13 +166,13 @@ export default function VerseSearch() {
     const result = parseQuery(query);
     
     if (!result) {
-      setError('Invalid format. Use Surah:Ayah (e.g., 2:255)');
+      setError(t('search.invalidFormat'));
       return;
     }
 
     // Validate surah number
     if (result.surah < 1 || result.surah > 114) {
-      setError('Surah not found');
+      setError(t('search.surahNotFound'));
       return;
     }
 
@@ -290,7 +292,7 @@ export default function VerseSearch() {
                       setError('');
                     }}
                     onKeyDown={handleKeyDown}
-                    placeholder="Surah:Ayah (e.g., 2:255)"
+                    placeholder={t('search.placeholder')}
                     className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-base"
                   />
                   {query && (
@@ -319,14 +321,14 @@ export default function VerseSearch() {
                       }}
                       className="mt-2 text-xs text-gray-400 hover:text-white underline"
                     >
-                      Go to Dashboard
+                      {t('search.goToDashboard')}
                     </button>
                   </div>
                 )}
 
                 {/* Quick Actions */}
                 <div className="p-3">
-                  <p className="text-xs text-gray-500 mb-2 px-1">Examples:</p>
+                  <p className="text-xs text-gray-500 mb-2 px-1">{t('search.examples')}:</p>
                   <div className="flex flex-wrap gap-2">
                     {['1', '2:255', '36', '67:1'].map((example) => (
                       <button
