@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import WordPuzzle from '@/components/WordPuzzle';
 import { useToast } from '@/components/Toast';
 import { apiPost, apiDelete, getErrorMessage, NetworkError } from '@/lib/api-client';
-import { ArrowLeft, Heart, Languages, BookText } from 'lucide-react';
+import { ArrowLeft, Heart, Languages, BookText, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -58,6 +58,11 @@ export default function PuzzleClient({
   const [tafsirLanguage, setTafsirLanguage] = useState<string>('English');
   const [isTafsirFallback, setIsTafsirFallback] = useState(false);
   const [isLoadingTafsir, setIsLoadingTafsir] = useState(false);
+  const [showAiTafsir, setShowAiTafsir] = useState(false);
+  const [aiTafsir, setAiTafsir] = useState<string | null>(null);
+  const [isLoadingAiTafsir, setIsLoadingAiTafsir] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [requiresPro, setRequiresPro] = useState(false);
   const { showToast } = useToast();
   const router = useRouter();
   
@@ -152,6 +157,66 @@ export default function PuzzleClient({
         showToast('Failed to load tafsir', 'error');
       } finally {
         setIsLoadingTafsir(false);
+      }
+    }
+  };
+
+  const handleToggleAiTafsir = async () => {
+    const newValue = !showAiTafsir;
+    setShowAiTafsir(newValue);
+
+    // If enabling and we don't have AI tafsir yet, fetch it
+    if (newValue && !aiTafsir && puzzle.surah?.number && puzzle.content?.ayahNumber) {
+      setIsLoadingAiTafsir(true);
+      setAiError(null);
+      try {
+        const response = await fetch('/api/ai/tafsir', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            surahNumber: puzzle.surah.number,
+            ayahNumber: puzzle.content.ayahNumber,
+            ayahText: ayahText,
+            translation: '',
+            translationCode: 'en.sahih',
+          }),
+        });
+
+        if (response.status === 403) {
+          const data = await response.json();
+          if (data.requiresPro) {
+            setRequiresPro(true);
+            setAiError('AI Tafsir is a Pro feature. Upgrade to access.');
+            showToast('AI Tafsir is a Pro feature', 'error');
+          } else {
+            setAiError(data.error || 'Access denied');
+            showToast(data.error || 'Access denied', 'error');
+          }
+          return;
+        }
+
+        if (response.status === 429) {
+          const data = await response.json();
+          setAiError(data.error || 'Rate limit exceeded');
+          showToast(data.error || 'Rate limit exceeded', 'error');
+          return;
+        }
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          setAiError(errorData.error || 'Failed to generate AI tafsir');
+          showToast(errorData.error || 'Failed to generate AI tafsir', 'error');
+          return;
+        }
+
+        const data = await response.json();
+        setAiTafsir(data.tafsir);
+        showToast('AI Tafsir generated successfully', 'success');
+      } catch (error) {
+        setAiError('Network error. Please try again.');
+        showToast('Failed to load AI tafsir', 'error');
+      } finally {
+        setIsLoadingAiTafsir(false);
       }
     }
   };
@@ -368,6 +433,27 @@ export default function PuzzleClient({
                 <BookText className="w-5 h-5" />
               </button>
               <button
+                onClick={handleToggleAiTafsir}
+                className={`p-2 rounded-lg transition-colors flex-shrink-0 relative ${
+                  showAiTafsir
+                    ? 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-400'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                }`}
+                title={showAiTafsir ? 'Hide AI tafsir' : 'Show AI tafsir (Pro)'}
+                data-tutorial="ai-tafsir-button"
+              >
+                {isLoadingAiTafsir ? (
+                  <div className="w-5 h-5 border-2 border-pink-400 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    <span className="absolute -top-1 -right-1 px-1 py-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded text-[8px] font-bold text-white">
+                      PRO
+                    </span>
+                  </>
+                )}
+              </button>
+              <button
                 onClick={handleToggleLike}
                 className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
                   isLiked
@@ -419,6 +505,56 @@ export default function PuzzleClient({
                   isFallback={isTafsirFallback}
                   isLoading={isLoadingTafsir}
                 />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* AI Tafsir Display */}
+          <AnimatePresence>
+            {showAiTafsir && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mt-4"
+              >
+                <div className="bg-gradient-to-br from-pink-500/5 to-purple-500/5 border border-pink-500/20 rounded-2xl p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sparkles className="w-4 h-4 text-pink-400" />
+                    <span className="text-sm font-semibold text-pink-400">AI-Generated Tafsir</span>
+                    <span className="px-1.5 py-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded text-[10px] font-bold text-white">
+                      PRO
+                    </span>
+                  </div>
+                  
+                  {aiError ? (
+                    <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                      {aiError}
+                      {requiresPro && (
+                        <Link 
+                          href="/pricing" 
+                          className="block mt-2 text-pink-400 hover:text-pink-300 font-medium underline"
+                        >
+                          View Pro Plans →
+                        </Link>
+                      )}
+                    </div>
+                  ) : aiTafsir ? (
+                    <>
+                      <div className="mb-3 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg p-2.5">
+                        ⚠️ AI-generated content. Please consult traditional scholars for authoritative guidance.
+                      </div>
+                      <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
+                        {aiTafsir}
+                      </div>
+                    </>
+                  ) : isLoadingAiTafsir ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="w-8 h-8 border-2 border-pink-400 border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  ) : null}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

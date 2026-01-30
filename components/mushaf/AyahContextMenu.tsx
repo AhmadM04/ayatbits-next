@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Volume2, Heart, Languages, Share2, X, BookText } from 'lucide-react';
+import { Play, Volume2, Heart, Languages, Share2, X, BookText, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { MushafVerse } from './AyahRow';
 
@@ -33,6 +33,11 @@ export default function AyahContextMenu({
   const [isLoadingTafsir, setIsLoadingTafsir] = useState(false);
   const [showTafsir, setShowTafsir] = useState(false);
   const [isTafsirFallback, setIsTafsirFallback] = useState(false);
+  const [aiTafsir, setAiTafsir] = useState<string | null>(null);
+  const [isLoadingAiTafsir, setIsLoadingAiTafsir] = useState(false);
+  const [showAiTafsir, setShowAiTafsir] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [requiresPro, setRequiresPro] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Reset state when verse changes
@@ -42,6 +47,10 @@ export default function AyahContextMenu({
     setShowTranslation(false);
     setTafsir(null);
     setShowTafsir(false);
+    setAiTafsir(null);
+    setShowAiTafsir(false);
+    setAiError(null);
+    setRequiresPro(false);
     setIsPlaying(false);
     if (audioRef.current) {
       audioRef.current.pause();
@@ -210,6 +219,82 @@ export default function AyahContextMenu({
       setIsLoadingTafsir(false);
     }
   }, [verse, tafsir, showTafsir, selectedTranslation]);
+
+  const handleShowAiTafsir = useCallback(async () => {
+    if (!verse) return;
+
+    if (showAiTafsir) {
+      setShowAiTafsir(false);
+      return;
+    }
+
+    if (aiTafsir) {
+      setShowAiTafsir(true);
+      return;
+    }
+
+    try {
+      setIsLoadingAiTafsir(true);
+      setAiError(null);
+      
+      // Fetch translation first if not already loaded
+      let translationText = translation;
+      if (!translationText) {
+        const transResponse = await fetch(
+          `/api/verse/translation?surah=${verse.surahNumber}&ayah=${verse.ayahNumber}&translation=${selectedTranslation}`
+        );
+        if (transResponse.ok) {
+          const transData = await transResponse.json();
+          translationText = transData.translation;
+        }
+      }
+
+      // Call AI Tafsir API
+      const response = await fetch('/api/ai/tafsir', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          surahNumber: verse.surahNumber,
+          ayahNumber: verse.ayahNumber,
+          ayahText: verse.text,
+          translation: translationText,
+          translationCode: selectedTranslation,
+        }),
+      });
+
+      if (response.status === 403) {
+        const data = await response.json();
+        if (data.requiresPro) {
+          setRequiresPro(true);
+          setAiError('AI Tafsir is a Pro feature. Upgrade to access.');
+        } else {
+          setAiError(data.error || 'Access denied');
+        }
+        return;
+      }
+
+      if (response.status === 429) {
+        const data = await response.json();
+        setAiError(data.error || 'Rate limit exceeded');
+        return;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setAiError(errorData.error || 'Failed to generate AI tafsir');
+        return;
+      }
+
+      const data = await response.json();
+      setAiTafsir(data.tafsir);
+      setShowAiTafsir(true);
+    } catch (error) {
+      console.error('Failed to fetch AI tafsir:', error);
+      setAiError('Network error. Please try again.');
+    } finally {
+      setIsLoadingAiTafsir(false);
+    }
+  }, [verse, aiTafsir, showAiTafsir, selectedTranslation, translation]);
 
   const handleShare = useCallback(async () => {
     if (!verse) return;
@@ -394,6 +479,35 @@ export default function AyahContextMenu({
                   </div>
                 </button>
 
+                {/* AI Tafsir */}
+                <button
+                  onClick={handleShowAiTafsir}
+                  disabled={isLoadingAiTafsir}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-pink-500/10 transition-colors text-left"
+                  data-tutorial="ai-tafsir-button"
+                >
+                  <div className={`p-2 rounded-lg ${showAiTafsir ? 'bg-pink-500/30' : 'bg-pink-500/20'}`}>
+                    {isLoadingAiTafsir ? (
+                      <div className="w-5 h-5 border-2 border-pink-400 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Sparkles className="w-5 h-5 text-pink-400" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-white">
+                        {showAiTafsir ? 'Hide AI Tafsir' : 'AI Tafsir'}
+                      </p>
+                      <span className="px-1.5 py-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded text-[10px] font-bold text-white">
+                        PRO
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      {requiresPro ? 'Upgrade to Pro' : 'AI-powered explanation'}
+                    </p>
+                  </div>
+                </button>
+
                 {/* Share */}
                 <button
                   onClick={handleShare}
@@ -454,6 +568,54 @@ export default function AyahContextMenu({
                           prose-em:text-gray-300"
                         dangerouslySetInnerHTML={{ __html: tafsir }}
                       />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* AI Tafsir Display */}
+              <AnimatePresence>
+                {showAiTafsir && (aiTafsir || aiError) && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="border-t border-white/5 overflow-hidden"
+                  >
+                    <div className="p-4 bg-gradient-to-br from-pink-500/5 to-purple-500/5 max-h-80 overflow-y-auto">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Sparkles className="w-3.5 h-3.5 text-pink-400" />
+                        <span className="text-xs font-medium text-pink-400 uppercase tracking-wide">
+                          AI-Generated Tafsir
+                        </span>
+                        <span className="px-1.5 py-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded text-[9px] font-bold text-white">
+                          PRO
+                        </span>
+                      </div>
+                      
+                      {aiError ? (
+                        <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                          {aiError}
+                          {requiresPro && (
+                            <a 
+                              href="/pricing" 
+                              className="block mt-2 text-pink-400 hover:text-pink-300 font-medium"
+                              onClick={onClose}
+                            >
+                              View Pro Plans →
+                            </a>
+                          )}
+                        </div>
+                      ) : aiTafsir && (
+                        <>
+                          <div className="mb-2 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg p-2">
+                            ⚠️ AI-generated content. Please consult traditional scholars for authoritative guidance.
+                          </div>
+                          <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
+                            {aiTafsir}
+                          </div>
+                        </>
+                      )}
                     </div>
                   </motion.div>
                 )}
