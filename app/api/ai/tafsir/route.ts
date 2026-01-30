@@ -64,10 +64,17 @@ function sanitizeInput(input: string): string {
 
 export async function POST(req: NextRequest) {
   try {
+    // Debug logging
+    console.log('=== AI Tafsir API Called ===');
+    console.log('API Key exists:', !!process.env.GEMINI_API_KEY);
+    console.log('API Key length:', process.env.GEMINI_API_KEY?.length);
+    console.log('genAI initialized:', !!genAI);
+    
     // 1. Check if Gemini is configured
     if (!genAI) {
+      console.error('genAI not initialized - API key missing');
       return NextResponse.json(
-        { error: 'AI service not configured' },
+        { error: 'AI service not configured - API key missing' },
         { status: 503 }
       );
     }
@@ -169,6 +176,7 @@ Please provide a brief, authentic tafsir focusing on:
 Keep the response concise, respectful, and academically grounded.`;
 
     // 9. Call Gemini API with safety settings
+    console.log('Creating Gemini model...');
     const model = genAI.getGenerativeModel({ 
       model: 'gemini-1.5-flash',
       safetySettings: [
@@ -191,6 +199,7 @@ Keep the response concise, respectful, and academically grounded.`;
       ],
     });
 
+    console.log('Starting chat...');
     const chat = model.startChat({
       history: [
         {
@@ -210,9 +219,12 @@ Keep the response concise, respectful, and academically grounded.`;
       },
     });
 
+    console.log('Sending message to Gemini...');
     const result = await chat.sendMessage(userPrompt);
+    console.log('Received response from Gemini');
     const response = await result.response;
     const tafsirText = response.text();
+    console.log('Tafsir generated successfully, length:', tafsirText.length);
 
     // 10. Post-process response for additional safety
     if (detectJailbreak(tafsirText)) {
