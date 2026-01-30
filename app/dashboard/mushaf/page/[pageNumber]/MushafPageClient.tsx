@@ -16,6 +16,7 @@ import { HarakatModal, HarakatLegend } from '@/components/arabic';
 import { type HarakatDefinition } from '@/lib/harakat-utils';
 import { TutorialWrapper } from '@/components/tutorial';
 import { mushafTutorialSteps } from '@/lib/tutorial-configs';
+import { useI18n } from '@/lib/i18n';
 
 interface MushafPageClientProps {
   pageNumber: number;
@@ -36,6 +37,7 @@ export default function MushafPageClient({
   totalPages,
   selectedTranslation,
 }: MushafPageClientProps) {
+  const { t } = useI18n();
   const router = useRouter();
   const [selectedVerse, setSelectedVerse] = useState<MushafVerse | null>(null);
   const [showContextMenu, setShowContextMenu] = useState(false);
@@ -190,10 +192,10 @@ export default function MushafPageClient({
         {/* Page Info Badge */}
         <div className="flex items-center justify-center gap-3 mb-6">
           <span className="px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-xs text-green-400">
-            Juz {currentJuz}
+            {t('mushaf.juz')} {currentJuz}
           </span>
           <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-gray-400">
-            Page {pageNumber}
+            {t('mushaf.page')} {pageNumber}
           </span>
         </div>
 
@@ -243,13 +245,13 @@ export default function MushafPageClient({
                 }
               `}
             >
-              <span className="text-sm">Previous</span>
+              <span className="text-sm">{t('mushaf.previous')}</span>
             </button>
 
             {/* Page Indicator */}
             <div className="text-center">
               <span className="text-sm text-gray-400">
-                {pageNumber} / {totalPages}
+                {t('mushaf.page')} {pageNumber} / {totalPages}
               </span>
             </div>
 
@@ -265,7 +267,7 @@ export default function MushafPageClient({
                 }
               `}
             >
-              <span className="text-sm">Next</span>
+              <span className="text-sm">{t('mushaf.next')}</span>
             </button>
           </div>
         </div>

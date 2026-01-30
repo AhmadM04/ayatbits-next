@@ -11,6 +11,7 @@ import AyahSelectorClient from './AyahSelectorClient';
 import LikeButton from './LikeButton';
 import AyahTextDisplay from './AyahTextDisplay';
 import BismillahDisplay from './BismillahDisplay';
+import VerseNavButtons from './VerseNavButtons';
 import { cleanAyahText, extractBismillah, shouldShowBismillahSeparately } from '@/lib/ayah-utils';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
 import { fetchTranslation, fetchTransliteration } from '@/lib/quran-api-adapter';
@@ -166,22 +167,7 @@ export default async function SurahVersePage({
             </div>
           </div>
 
-          {/* Ayah Selector Button */}
-          <div className="flex items-center justify-center mb-4">
-            <button
-              id="search-ayah-button"
-              className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all"
-            >
-              <span className="text-sm font-medium text-green-400">
-                Ayah {selectedAyah} of {totalAyahs}
-              </span>
-              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Ayah Selector Modal */}
+          {/* Ayah Selector with Modal */}
           <AyahSelectorClient
             puzzles={puzzles.map((p: any) => ({
               id: p._id.toString(),
@@ -254,37 +240,16 @@ export default async function SurahVersePage({
                 initialShowTransliteration={dbUser.showTransliteration || false}
               />
 
-              {/* Start Puzzle Button - Redesigned */}
-              <Link
-                href={`/puzzle/${currentPuzzle._id.toString()}`}
-                className="group flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 rounded-2xl font-bold text-lg shadow-lg shadow-green-500/20 hover:shadow-green-500/30 transition-all active:scale-[0.98]"
-              >
-                <Play className="w-6 h-6 fill-current" />
-                <span>Start Puzzle</span>
-              </Link>
-
-              {/* Navigation Links */}
-              <div className="flex items-center justify-center gap-4 pt-2">
-                {previousPuzzle && (
-                  <Link
-                    href={`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${previousPuzzle.content?.ayahNumber}`}
-                    className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
-                  >
-                    ← Previous
-                  </Link>
-                )}
-                {previousPuzzle && nextPuzzle && (
-                  <span className="text-gray-700">•</span>
-                )}
-                {nextPuzzle && (
-                  <Link
-                    href={`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${nextPuzzle.content?.ayahNumber}`}
-                    className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
-                  >
-                    Next →
-                  </Link>
-                )}
-              </div>
+              {/* Start Puzzle & Navigation Buttons */}
+              <VerseNavButtons
+                puzzleId={currentPuzzle._id.toString()}
+                juzNumber={parseInt(juzNumber)}
+                surahNumber={parseInt(surahNumber)}
+                previousAyah={previousPuzzle?.content?.ayahNumber}
+                nextAyah={nextPuzzle?.content?.ayahNumber}
+                selectedAyah={selectedAyah}
+                totalAyahs={totalAyahs}
+              />
             </div>
           ) : (
             <div className="text-center py-12">

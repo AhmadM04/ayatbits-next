@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Volume2, Heart, Languages, Share2, X, BookText, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { MushafVerse } from './AyahRow';
+import { useI18n } from '@/lib/i18n';
 
 interface AyahContextMenuProps {
   verse: MushafVerse | null;
@@ -19,6 +20,7 @@ export default function AyahContextMenu({
   onClose,
   selectedTranslation,
 }: AyahContextMenuProps) {
+  const { t } = useI18n();
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -390,7 +392,7 @@ export default function AyahContextMenu({
                     <Play className={`w-5 h-5 ${verse.puzzleId ? 'text-green-400' : 'text-gray-500'}`} />
                   </div>
                   <div>
-                    <p className="font-medium">Practice Puzzle</p>
+                    <p className="font-medium">{t('mushaf.practice')}</p>
                     <p className="text-xs text-gray-500">
                       {verse.puzzleId 
                         ? (verse.isCompleted ? 'Completed - Practice again' : 'Learn this ayah')
@@ -414,7 +416,7 @@ export default function AyahContextMenu({
                     )}
                   </div>
                   <div>
-                    <p className="font-medium text-white">{isPlaying ? 'Stop Audio' : 'Play Audio'}</p>
+                    <p className="font-medium text-white">{t('mushaf.playAudio')}</p>
                     <p className="text-xs text-gray-500">Listen to recitation</p>
                   </div>
                 </button>
@@ -435,7 +437,7 @@ export default function AyahContextMenu({
                     <Heart className={`w-5 h-5 text-red-400 ${isLiked ? 'fill-current' : ''}`} />
                   </div>
                   <div>
-                    <p className="font-medium">{isLiked ? 'Unlike' : 'Like'}</p>
+                    <p className="font-medium">{t('mushaf.likeAyah')}</p>
                     <p className="text-xs text-gray-500">
                       {verse.puzzleId ? 'Save to your favorites' : 'Not available'}
                     </p>
@@ -457,7 +459,7 @@ export default function AyahContextMenu({
                   </div>
                   <div>
                     <p className="font-medium text-white">
-                      {showTranslation ? 'Hide Translation' : 'Show Translation'}
+                      {t('mushaf.viewTranslation')}
                     </p>
                     <p className="text-xs text-gray-500">View meaning</p>
                   </div>
@@ -479,7 +481,7 @@ export default function AyahContextMenu({
                   </div>
                   <div>
                     <p className="font-medium text-white">
-                      {showTafsir ? 'Hide Tafsir' : 'Show Tafsir'}
+                      {t('mushaf.readTafsir')}
                     </p>
                     <p className="text-xs text-gray-500">View explanation</p>
                   </div>

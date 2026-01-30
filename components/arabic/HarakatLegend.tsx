@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, HelpCircle, X } from 'lucide-react';
 import { getHarakatByCategory, type HarakatDefinition } from '@/lib/harakat-utils';
+import { useI18n } from '@/lib/i18n';
 
 interface HarakatLegendProps {
   variant?: 'inline' | 'floating';
@@ -14,6 +15,7 @@ export default function HarakatLegend({
   variant = 'inline',
   onHarakatSelect 
 }: HarakatLegendProps) {
+  const { t } = useI18n();
   const [isExpanded, setIsExpanded] = useState(false);
   const categories = getHarakatByCategory();
 
@@ -62,7 +64,7 @@ export default function HarakatLegend({
                 <div className="sticky top-0 bg-[#0f0f0f] border-b border-white/5 p-4 flex items-center justify-between">
                   <div>
                     <h3 className="text-lg font-semibold text-white">
-                      Harakat Guide
+                      {t('mushaf.harakatGuide')}
                     </h3>
                     <p className="text-sm text-gray-500">
                       Arabic diacritical marks
@@ -71,6 +73,7 @@ export default function HarakatLegend({
                   <button
                     onClick={() => setIsExpanded(false)}
                     className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                    aria-label={t('mushaf.closeGuide')}
                   >
                     <X className="w-5 h-5 text-gray-400" />
                   </button>
@@ -106,7 +109,7 @@ export default function HarakatLegend({
         <div className="flex items-center gap-2">
           <HelpCircle className="w-4 h-4 text-purple-400" />
           <span className="text-sm font-medium text-gray-300">
-            Harakat Color Guide
+            {t('mushaf.harakatGuide')}
           </span>
         </div>
         <motion.div

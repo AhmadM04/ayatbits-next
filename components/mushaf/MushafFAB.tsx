@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getStartPageForJuz } from '@/lib/mushaf-utils';
+import { useI18n } from '@/lib/i18n';
 
 interface MushafFABProps {
   juzNumber?: number;
@@ -11,6 +12,7 @@ interface MushafFABProps {
 }
 
 export default function MushafFAB({ juzNumber, size = 'default' }: MushafFABProps) {
+  const { t } = useI18n();
   const startPage = juzNumber ? getStartPageForJuz(juzNumber) : 1;
   const isLarge = size === 'large';
 
@@ -39,14 +41,14 @@ export default function MushafFAB({ juzNumber, size = 'default' }: MushafFABProp
             ? 'text-sm sm:text-base md:text-lg' 
             : 'text-sm'
         }`}>
-          Read Mushaf
+          {t('wordPuzzle.readMushaf')}
         </span>
       </Link>
       
       {/* Tooltip on hover */}
       <div className="absolute right-0 bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
         <div className="bg-[#1a1a1a] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-gray-300 whitespace-nowrap">
-          {juzNumber ? `Open page ${startPage} (Juz ${juzNumber})` : `Open page ${startPage}`}
+          {juzNumber ? `${t('mushaf.page')} ${startPage} (${t('mushaf.juz')} ${juzNumber})` : `${t('mushaf.page')} ${startPage}`}
         </div>
       </div>
     </motion.div>

@@ -34,6 +34,7 @@ import { useToast } from '@/components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWordAudio } from '@/lib/hooks/useWordAudio';
 import { HarakatColoredText } from '@/components/arabic';
+import { useI18n } from '@/lib/i18n';
 
 interface WordPuzzleProps {
   ayahText: string;
@@ -316,6 +317,7 @@ function AnswerArea({
   enableWordAudio = false,
   onWordClick,
   playingWordIndex,
+  t,
 }: {
   correctTokens: WordToken[];
   placedTokens: Map<number, WordToken>;
@@ -327,6 +329,7 @@ function AnswerArea({
   enableWordAudio?: boolean;
   onWordClick?: (wordIndex: number) => void;
   playingWordIndex?: number | null;
+  t: (key: string, params?: Record<string, any>) => string;
 }) {
   return (
     <div
@@ -360,7 +363,7 @@ function AnswerArea({
       </div>
       {placedTokens.size === 0 && (
         <p className="text-gray-500 text-xs text-center mt-3">
-          Drop each word in its correct slot
+          {t('wordPuzzle.dropEachWord')}
         </p>
       )}
     </div>
@@ -374,6 +377,7 @@ function WordBank({
   isFadingHint,
   showTransliteration,
   onWordTap,
+  t,
 }: {
   bank: WordToken[];
   shakingIds: Set<string>;
@@ -381,11 +385,12 @@ function WordBank({
   isFadingHint: boolean;
   showTransliteration: boolean;
   onWordTap?: (token: WordToken) => void;
+  t: (key: string, params?: Record<string, any>) => string;
 }) {
   return (
     <div className="mt-6" dir="rtl" data-tutorial="word-bank">
       <p className="text-xs text-gray-500 text-center mb-3">
-        Drag or tap words to place them
+        {t('wordPuzzle.dragOrTap')}
       </p>
       <div className="flex flex-wrap justify-center gap-2">
         <AnimatePresence mode="popLayout">
@@ -424,6 +429,7 @@ export default function WordPuzzle({
   wordTransliterations = [],
   isLoadingTransliteration = false,
 }: WordPuzzleProps) {
+  const { t } = useI18n();
   const { showToast } = useToast();
   const [mounted, setMounted] = useState(false);
   
@@ -1102,7 +1108,7 @@ export default function WordPuzzle({
               : 'bg-[#1a1a1a] border-white/10'
           }`}>
             <span className={`text-xs font-medium ${hasExceededMistakeLimit ? 'text-red-400' : 'text-gray-400'}`}>
-              Mistakes: {mistakeCount}/{MAX_MISTAKES}
+              {t('wordPuzzle.mistakes')}: {mistakeCount}/{MAX_MISTAKES}
             </span>
           </div>
           
@@ -1147,7 +1153,7 @@ export default function WordPuzzle({
           >
             <Lightbulb className={`w-3.5 h-3.5 ${usedTips >= availableTips ? 'text-gray-500' : 'text-green-400'}`} />
             <span className={`text-xs font-medium ${usedTips >= availableTips ? 'text-gray-500' : 'text-green-400'}`}>
-              Tips: {usedTips}/{availableTips}
+              {t('wordPuzzle.tips')}: {usedTips}/{availableTips}
             </span>
           </motion.button>
           
@@ -1225,7 +1231,7 @@ export default function WordPuzzle({
             <div className="flex items-center gap-1.5 flex-1">
               <Volume2 className="w-3.5 h-3.5 text-gray-500" />
               <span className="text-xs text-gray-400">
-                {isLoadingAudio ? 'Loading...' : isPlayingRecitation ? 'Playing recitation' : 'Listen to recitation'}
+                {isLoadingAudio ? 'Loading...' : isPlayingRecitation ? t('wordPuzzle.listen') : t('wordPuzzle.listen')}
               </span>
             </div>
           </div>
@@ -1267,6 +1273,7 @@ export default function WordPuzzle({
                   : currentWordIndex;
               }
             })() : null}
+            t={t}
           />
           <WordBank
             bank={bank}
@@ -1275,6 +1282,7 @@ export default function WordPuzzle({
             isFadingHint={isFadingHint}
             showTransliteration={wordTransliterations.length > 0}
             onWordTap={handleWordTap}
+            t={t}
           />
 
           <DragOverlay dropAnimation={dropAnimation}>

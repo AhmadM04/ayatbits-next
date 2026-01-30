@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import { Volume2, Loader2, Check } from 'lucide-react';
 import { useToast } from '@/components/Toast';
+import { useI18n } from '@/lib/i18n';
 
 interface AudioSettingsProps {
   initialEnabled?: boolean;
 }
 
 export default function AudioSettings({ initialEnabled = false }: AudioSettingsProps) {
+  const { t } = useI18n();
   const [enabled, setEnabled] = useState(initialEnabled);
   const [isLoading, setIsLoading] = useState(false);
   const { showToast } = useToast();
@@ -36,17 +38,17 @@ export default function AudioSettings({ initialEnabled = false }: AudioSettingsP
         setEnabled(newValue);
         showToast(
           newValue 
-            ? 'Word-by-word audio enabled' 
-            : 'Word-by-word audio disabled',
+            ? t('tutorial.audioEnabled')
+            : t('tutorial.audioDisabled'),
           'success'
         );
       } else {
-        showToast(data.error || 'Failed to update audio settings', 'error');
+        showToast(data.error || t('tutorial.failedToUpdateAudio'), 'error');
       }
     } catch (error) {
       console.error('Audio settings update error:', error);
-      showToast('Failed to update audio settings', 'error');
-    } finally {
+      showToast(t('tutorial.failedToUpdateAudio'), 'error');
+    } finally{
       setIsLoading(false);
     }
   };
@@ -58,16 +60,16 @@ export default function AudioSettings({ initialEnabled = false }: AudioSettingsP
           <Volume2 className="w-6 h-6 text-purple-400" />
         </div>
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-white">Word-by-Word Audio</h3>
-          <p className="text-sm text-gray-400">Click on any word to hear its pronunciation</p>
+          <h3 className="text-lg font-semibold text-white">{t('tutorial.wordByWordAudio')}</h3>
+          <p className="text-sm text-gray-400">{t('tutorial.wordByWordAudioMsg')}</p>
         </div>
       </div>
 
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-gray-300 mb-1 font-medium">Enable word audio playback</p>
+          <p className="text-sm text-gray-300 mb-1 font-medium">{t('tutorial.enableWordAudio')}</p>
           <p className="text-xs text-gray-500">
-            When enabled, you can click individual words to hear their recitation
+            {t('tutorial.enableWordAudioMsg')}
           </p>
         </div>
         
@@ -99,7 +101,7 @@ export default function AudioSettings({ initialEnabled = false }: AudioSettingsP
       {/* Additional info */}
       <div className="mt-4 pt-4 border-t border-white/10">
         <p className="text-xs text-gray-500">
-          This feature uses the Quran.com API to provide word-level audio recitation by Sheikh Alafasy.
+          {t('tutorial.audioApiInfo')}
         </p>
       </div>
     </div>
