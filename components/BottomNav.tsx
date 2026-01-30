@@ -64,7 +64,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav data-tutorial="bottom-nav" className="fixed bottom-0 left-0 right-0 bg-[#111]/95 backdrop-blur-md border-t border-white/5 safe-area-bottom" style={{ zIndex: 1000000 }}>
+    <nav data-tutorial="bottom-nav" className="fixed bottom-0 left-0 right-0 bg-[#111]/95 backdrop-blur-md border-t border-white/5 safe-area-bottom pb-2" style={{ zIndex: 1000000 }}>
       <div className="max-w-lg mx-auto px-1 sm:px-2">
         <div className="flex items-center justify-around h-16">
           {navItems.map((item) => {
@@ -79,7 +79,7 @@ export default function BottomNav() {
                 <Link
                   key={item.href}
                   href={resumeUrl}
-                  className="relative -mt-6 flex-shrink-0"
+                  className="relative -mt-8 flex-shrink-0"
                 >
                   <motion.div
                     whileTap={{ scale: 0.95 }}
@@ -92,7 +92,7 @@ export default function BottomNav() {
                     )}
                   </motion.div>
                   {displayName && (
-                    <div className="absolute -bottom-4 sm:-bottom-5 left-1/2 -translate-x-1/2 w-full max-w-[60px] sm:max-w-none">
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[60px] sm:max-w-none">
                       <span className="text-[8px] sm:text-[10px] text-gray-500 block text-center truncate">
                         {displayName}
                       </span>

@@ -81,7 +81,7 @@ export default async function SurahVersePage({
     );
     initialTranslation = translationData.data?.text || '';
   } catch (error) {
-    console.error('Failed to pre-fetch translation:', error);
+    // Translation fetch failed
   }
 
   // Fetch transliteration if user preference is enabled
@@ -95,7 +95,7 @@ export default async function SurahVersePage({
       );
       initialTransliteration = transliterationData.data?.text || '';
     } catch (error) {
-      console.error('Failed to pre-fetch transliteration:', error);
+      // Transliteration fetch failed
     }
   }
 
@@ -111,7 +111,7 @@ export default async function SurahVersePage({
       mushafPageNumber = pageData.verse?.page_number || null;
     }
   } catch (error) {
-    console.error('Failed to fetch page number:', error);
+    // Page number fetch failed
   }
 
   const totalAyahs = puzzles.length;

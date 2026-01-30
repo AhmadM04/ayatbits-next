@@ -65,7 +65,6 @@ export default function TranslationDisplay({
           setTranslation(undefined);
         }
       } catch (error) {
-        console.error('Error fetching translation:', error);
         setTranslation(undefined);
       } finally {
         setIsLoading(false);

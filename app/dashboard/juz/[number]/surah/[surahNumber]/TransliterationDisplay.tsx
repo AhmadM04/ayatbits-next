@@ -38,7 +38,7 @@ export default function TransliterationDisplay({
             }
           }
         } catch (error) {
-          console.error('Error fetching transliteration:', error);
+          // Transliteration fetch failed
         } finally {
           setIsLoading(false);
         }
