@@ -513,26 +513,32 @@ export default function WordPuzzle({
     fetchSettings();
   }, []);
 
-  // Calculate Muqatta'at offset for word audio index mapping
-  // When an ayah starts with Muqatta'at letters (like "الم"), the puzzle tokenizer
-  // splits them into individual tokens [ا, ل, م], but the Quran.com API keeps them
-  // as one word. This creates an index mismatch that we need to correct.
-  // Example: ayah "الم ذَٰلِكَ" → Puzzle: [ا, ل, م, ذَٰلِكَ] vs API: [الم, ذَٰلِكَ]
-  // When clicking token 3 (ذَٰلِكَ), we need to request API word 1, not word 3.
-  const muqattaatOffset = useMemo(() => {
-    // Check if first token is part of Muqatta'at
-    if (originalTokens.length === 0) return 0;
+  // Calculate offset values for word audio index mapping
+  // We need to account for TWO types of index mismatches:
+  // 
+  // 1. BISMILLAH: Removed from puzzle but present in API (4 words)
+  // 2. MUQATTA'AT: Split into individual letters in puzzle but kept as one word in API
+  const { bismillahOffset, muqattaatTokens } = useMemo(() => {
+    if (originalTokens.length === 0) return { bismillahOffset: 0, muqattaatTokens: 0 };
     
+    // STEP 1: Check for Bismillah
+    // Bismillah is removed from puzzle text for first ayah of most surahs (except Al-Fatiha and At-Tawbah)
+    const hasBismillah = ayahNumber === 1 && surahNumber !== 1 && surahNumber !== 9;
+    const bismillahWordCount = hasBismillah ? 4 : 0;
+    
+    if (hasBismillah) {
+      console.log('🕌 [WORD AUDIO] Bismillah detected - API has 4 extra words at start');
+    }
+    
+    // STEP 2: Check for Muqatta'at
     const firstWord = ayahText.trim().split(/\s+/)[0] || '';
     
-    // Check if the first word is a Muqatta'at using the same logic as tokenizeAyah
     const MUQATTAAT_PATTERNS = [
       'الم', 'المص', 'الر', 'المر', 'كهيعص', 'طه', 'طسم', 'طس', 'يس', 'ص', 'حم', 'حم عسق', 'عسق', 'ق', 'ن',
       'الٓمٓ', 'الٓمٓصٓ', 'الٓرٰ', 'الٓمٓرٰ', 'كٓهيعٓصٓ', 'طٰهٰ', 'طٰسٓمٓ', 'طٰسٓ', 'يٰسٓ', 'صٓ', 'حٰمٓ', 'قٓ', 'نٓ',
       'الۤمۤ', 'الۤمۤصۤ', 'الۤرٰ', 'الۤمۤرٰ',
     ];
     
-    // Simple normalization for pattern matching
     const normalizeForPattern = (text: string) => {
       return text.replace(/[\u064B-\u065F\u0670\u0610-\u061A\u06D6-\u06ED]/g, '').trim();
     };
@@ -542,51 +548,51 @@ export default function WordPuzzle({
       pattern => normalizeForPattern(pattern) === normalizedFirst
     );
     
-    if (!isMuqattaat) return 0;
-    
-    // Count how many letters the Muqatta'at was split into
-    // This is the number of consecutive tokens at the start that belong to the Muqatta'at
     let muqattaatLetterCount = 0;
-    for (const token of originalTokens) {
-      // Muqatta'at letters are single characters (after normalization)
-      const isBaseLetter = /^[\u0621-\u063A\u0641-\u064A]/.test(token.text);
-      const isSingleLetter = token.text.replace(/[\u064B-\u065F\u0670\u0610-\u061A\u06D6-\u06ED]/g, '').length === 1;
-      
-      if (isBaseLetter && isSingleLetter) {
-        muqattaatLetterCount++;
-      } else {
-        break; // Stop at first non-letter token
+    if (isMuqattaat) {
+      // Count how many letters the Muqatta'at was split into
+      for (const token of originalTokens) {
+        const isBaseLetter = /^[\u0621-\u063A\u0641-\u064A]/.test(token.text);
+        const isSingleLetter = token.text.replace(/[\u064B-\u065F\u0670\u0610-\u061A\u06D6-\u06ED]/g, '').length === 1;
+        
+        if (isBaseLetter && isSingleLetter) {
+          muqattaatLetterCount++;
+        } else {
+          break;
+        }
       }
+      console.log(`🔤 [WORD AUDIO] Muqatta'at detected - ${muqattaatLetterCount} puzzle tokens for 1 API word`);
     }
     
-    // The offset is (number of letters - 1) because the API has 1 word for all letters
-    // e.g., if "الم" is split into [ا, ل, م], that's 3 letters -> offset of 2
-    return Math.max(0, muqattaatLetterCount - 1);
-  }, [originalTokens, ayahText]);
+    console.log(`📊 [WORD AUDIO] Bismillah offset: ${bismillahWordCount}, Muqatta'at tokens: ${muqattaatLetterCount}`);
+    return { bismillahOffset: bismillahWordCount, muqattaatTokens: muqattaatLetterCount };
+  }, [originalTokens, ayahText, ayahNumber, surahNumber]);
 
   // Handler for word click in answer area
   const handleAnswerWordClick = useCallback((wordIndex: number) => {
     if (!enableWordByWordAudio) return;
     
     console.log('🎯 [WORD AUDIO] Word clicked at puzzle position:', wordIndex);
+    console.log('  - Bismillah offset:', bismillahOffset);
+    console.log('  - Muqatta\'at tokens:', muqattaatTokens);
     
-    // The puzzle uses 0-based indexing for word slots
-    // API segments also use 0-based array indexing
-    // But we need to account for Muqatta'at offset
-    const adjustedIndex = wordIndex - muqattaatOffset;
+    // Convert puzzle position to API word index
+    let apiIndex: number;
     
-    console.log('  - muqattaatOffset:', muqattaatOffset);
-    console.log('  - API array index:', adjustedIndex);
-    
-    if (adjustedIndex < 0) {
-      // Clicking on individual Muqatta'at letters - play the combined word
-      console.log('  ⚠️ Playing combined Muqatta\'at word at index 0');
-      playWord(0);
+    if (muqattaatTokens > 0 && wordIndex < muqattaatTokens) {
+      // Clicking on a Muqatta'at letter - play the combined word at API position after Bismillah
+      apiIndex = bismillahOffset;
+      console.log('  ℹ️ Clicked on Muqatta\'at letter - playing combined word at API index:', apiIndex);
     } else {
-      console.log('  ✓ Playing word at API index:', adjustedIndex);
-      playWord(adjustedIndex);
+      // Regular word or after Muqatta'at
+      // Convert: puzzle position → logical word position → API index
+      const logicalPosition = wordIndex - muqattaatTokens + (muqattaatTokens > 0 ? 1 : 0);
+      apiIndex = bismillahOffset + logicalPosition;
+      console.log('  ✓ Logical word position:', logicalPosition, '→ API index:', apiIndex);
     }
-  }, [playWord, enableWordByWordAudio, muqattaatOffset]);
+    
+    playWord(apiIndex);
+  }, [playWord, enableWordByWordAudio, bismillahOffset, muqattaatTokens]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -1258,7 +1264,19 @@ export default function WordPuzzle({
             showTransliteration={wordTransliterations.length > 0}
             enableWordAudio={enableWordByWordAudio}
             onWordClick={handleAnswerWordClick}
-            playingWordIndex={currentWordIndex !== null ? currentWordIndex + muqattaatOffset : null}
+            playingWordIndex={currentWordIndex !== null ? (() => {
+              // Convert API word index to puzzle position
+              if (muqattaatTokens > 0 && currentWordIndex === bismillahOffset) {
+                // Playing the Muqatta'at word - highlight the last Muqatta'at letter
+                return muqattaatTokens - 1;
+              } else {
+                // Playing a regular word or word after Muqatta'at
+                const logicalOffset = currentWordIndex - bismillahOffset;
+                return muqattaatTokens > 0 
+                  ? muqattaatTokens - 1 + logicalOffset
+                  : logicalOffset;
+              }
+            })() : null}
           />
           <WordBank
             bank={bank}
