@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Globe, Loader2, Check } from 'lucide-react';
 import { useToast } from '@/components/Toast';
+import { useI18n } from '@/lib/i18n';
 
 interface TranslationSelectorProps {
   initialTranslation?: string;
@@ -36,6 +37,7 @@ const translationOptions = Object.entries(translationNames).map(([code, name]) =
 }));
 
 export default function TranslationSelector({ initialTranslation = 'en.sahih' }: TranslationSelectorProps) {
+  const { t } = useI18n();
   const [selectedTranslation, setSelectedTranslation] = useState(initialTranslation);
   const [isLoading, setIsLoading] = useState(false);
   const { showToast } = useToast();
@@ -61,13 +63,13 @@ export default function TranslationSelector({ initialTranslation = 'en.sahih' }:
 
       if (response.ok) {
         setSelectedTranslation(translationCode);
-        showToast('Translation preference updated', 'success');
+        showToast(t('tutorial.translationUpdated'), 'success');
       } else {
-        showToast(data.error || 'Failed to update translation', 'error');
+        showToast(data.error || t('tutorial.failedToUpdate'), 'error');
       }
     } catch (error) {
       console.error('Translation update error:', error);
-      showToast('Failed to update translation', 'error');
+      showToast(t('tutorial.failedToUpdate'), 'error');
     } finally {
       setIsLoading(false);
     }
@@ -80,8 +82,8 @@ export default function TranslationSelector({ initialTranslation = 'en.sahih' }:
           <Globe className="w-6 h-6 text-blue-400" />
         </div>
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-white">Translation Preference</h3>
-          <p className="text-sm text-gray-400">Choose your preferred translation language</p>
+          <h3 className="text-lg font-semibold text-white">{t('tutorial.translationPreference')}</h3>
+          <p className="text-sm text-gray-400">{t('tutorial.translationPreferenceMsg')}</p>
         </div>
       </div>
 
