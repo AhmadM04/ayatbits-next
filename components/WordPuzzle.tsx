@@ -716,9 +716,6 @@ export default function WordPuzzle({
       ayahText: ayahText.substring(0, 50)
     });
     
-    return () => {
-      console.log('[PUZZLE] Component unmounting/cleanup');
-    };
     const initialBank = shuffleArray(originalTokens);
     setBank(initialBank);
     setPlacedTokens(new Map());
@@ -735,6 +732,10 @@ export default function WordPuzzle({
     setIsLoading(false);
     
     console.log('[PUZZLE] Initial state set with', originalTokens.length, 'tokens, bank length:', initialBank.length);
+    
+    return () => {
+      console.log('[PUZZLE] Component unmounting/cleanup');
+    };
   }, []); // ONLY on mount - never reset automatically
 
   useEffect(() => {
