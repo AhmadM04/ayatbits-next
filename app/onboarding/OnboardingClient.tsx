@@ -399,14 +399,18 @@ export default function OnboardingClient({
 
             {/* Navigation Buttons */}
             <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10">
-              <button
-                onClick={handleBack}
-                disabled={currentStep === 1 || isSubmitting}
-                className="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-white transition-colors disabled:opacity-0 disabled:pointer-events-none"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                {t('onboarding.back')}
-              </button>
+              {currentStep > 1 ? (
+                <button
+                  onClick={handleBack}
+                  disabled={isSubmitting}
+                  className="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  {t('onboarding.back')}
+                </button>
+              ) : (
+                <div></div>
+              )}
 
               {currentStep < totalSteps ? (
                 <button
