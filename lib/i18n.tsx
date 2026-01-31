@@ -3,7 +3,7 @@
 import { createContext, useContext, ReactNode, useMemo, useCallback, useState, useEffect } from 'react';
 
 // English strings
-const EN_MESSAGES: Record<string, Record<string, string>> = {
+const EN_MESSAGES: Record<string, Record<string, any>> = {
   common: {
     search: 'Search',
     home: 'Home',
@@ -223,6 +223,18 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
     billingAndSubscription: 'Billing & Subscription',
     adminAccount: 'Admin Account',
     fullAccessGranted: 'Full access granted',
+    puzzleIntro: 'Welcome to Puzzle Mode! 🧩',
+    puzzleIntroMsg: 'Complete the verse by dragging words from the bank to the correct positions.',
+    wordBank: 'Word Bank',
+    wordBankMsg: 'All the words you need are here. Drag them to the answer area or tap to place them.',
+    answerArea: 'Answer Area',
+    answerAreaMsg: 'Drop words here in the correct order. Tap any word to hear its pronunciation.',
+    needHelp: 'Need Help?',
+    needHelpMsg: 'Stuck? Use the hint button to reveal the next word. You have 3 hints per puzzle.',
+    listenLearn: 'Listen & Learn',
+    listenLearnMsg: 'Toggle transliteration to see pronunciation, or tap tafsir to understand the deeper meaning.',
+    understandAyah: 'Understand the Ayah',
+    understandAyahMsg: 'View tafsir (explanation) to understand the deeper meaning and context of the verse you\'re learning.',
   },
   wordPuzzle: {
     tips: 'Tips',
@@ -347,10 +359,181 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
     allRightsReserved: 'All rights reserved.',
     companyInfo: 'AyatBits is a product of HIYA FOR EDUCATION AND TUTORING OU, registered in Estonia.',
   },
+  settings: {
+    title: 'Settings',
+    subscription: 'Subscription',
+    lifetimeAccess: 'Lifetime Access',
+    proMonthly: 'Pro Monthly',
+    proYearly: 'Pro Yearly',
+    trial: 'Trial ({days} days left)',
+    canceled: 'Canceled',
+    inactive: 'Inactive',
+    manageBilling: 'Manage Billing',
+    manageBillingDesc: 'Update payment, cancel, view invoices',
+    viewPlans: 'View Plans',
+    viewPlansDesc: 'Upgrade or change your plan',
+    accountSettings: 'Account Settings',
+    accountSettingsDesc: 'Email, password, security',
+    privacySecurity: 'Privacy & Security',
+    privacySecurityDesc: 'Two-factor authentication, sessions',
+    helpSupport: 'Help & Support',
+    helpSupportDesc: 'Get help or send feedback',
+    faq: 'FAQ',
+    faqDesc: 'Frequently asked questions',
+    termsOfService: 'Terms of Service',
+    termsOfServiceDesc: 'Legal terms and privacy policy',
+    clearData: 'Clear Learning Data',
+    clearDataDesc: 'Reset your progress and start fresh',
+    clearDataTitle: 'Clear All Data?',
+    clearDataMessage: 'This will permanently delete all your learning progress, streaks, and liked verses.',
+    clearDataWarning: 'This action cannot be undone. Your subscription will remain active.',
+    clearDataConfirm: 'Clear Data',
+    clearDataClerkInfo: 'To delete your entire account:',
+    manageViaClerk: 'Manage account settings →',
+    signOutTitle: 'Sign Out?',
+    signOutMessage: 'Are you sure you want to sign out? You\'ll need to sign in again to continue learning.',
+  },
+  verse: {
+    ayahNumber: 'Ayah {number}',
+    readyToStartPuzzle: 'Ready to Start Puzzle',
+    selectAyah: 'Select Ayah',
+    enterAyahNumber: 'Enter ayah number ({min}-{max})...',
+    ayahFound: 'Ayah found!',
+    ayahNotFound: 'Ayah not found in this section.',
+    goToAyah: 'Go to Ayah',
+    englishTranslation: 'Translation',
+    verseOfTheDay: 'Verse of the Day',
+    playRecitation: 'Play recitation',
+    openAyah: 'Open ayah',
+  },
+  trophies: {
+    first_puzzle: {
+      name: 'First Step',
+      description: 'Complete your first puzzle',
+    },
+    puzzle_10: {
+      name: 'Getting Started',
+      description: 'Complete 10 puzzles',
+    },
+    puzzle_50: {
+      name: 'Dedicated Learner',
+      description: 'Complete 50 puzzles',
+    },
+    puzzle_100: {
+      name: 'Century',
+      description: 'Complete 100 puzzles',
+    },
+    puzzle_500: {
+      name: 'Scholar',
+      description: 'Complete 500 puzzles',
+    },
+    streak_3: {
+      name: 'Consistent',
+      description: 'Achieve a 3-day streak',
+    },
+    streak_7: {
+      name: 'Week Warrior',
+      description: 'Achieve a 7-day streak',
+    },
+    streak_30: {
+      name: 'Monthly Master',
+      description: 'Achieve a 30-day streak',
+    },
+    juz_1: {
+      name: 'First Juz',
+      description: 'Complete all puzzles in one Juz',
+    },
+    juz_5: {
+      name: 'Five Juz',
+      description: 'Complete 5 Juz',
+    },
+    surah_fatiha: {
+      name: 'The Opening',
+      description: 'Complete Surah Al-Fatiha',
+    },
+    liked_10: {
+      name: 'Collector',
+      description: 'Like 10 ayahs',
+    },
+  },
+  auth: {
+    signIn: 'Sign In',
+    signUp: 'Sign Up',
+    welcomeBack: 'Welcome Back',
+    createAccount: 'Create Account',
+    signInDescription: 'Sign in to continue your Quran learning journey',
+    signUpDescription: 'Join thousands of learners mastering the Quran',
+    email: 'Email',
+    password: 'Password',
+    forgotPassword: 'Forgot password?',
+    noAccount: 'Don\'t have an account?',
+    haveAccount: 'Already have an account?',
+    orContinueWith: 'Or continue with',
+  },
+  faq: {
+    title: 'Frequently Asked Questions',
+    subtitle: 'Got Questions?',
+    description: 'Find answers to common questions about AyatBits below.',
+    stillHaveQuestions: 'Still have questions?',
+    contactSupport: 'Contact Support',
+    q1: 'What is AyatBits?',
+    a1: 'AyatBits is an interactive Quran learning app that uses word puzzles to help you memorize and understand the Quran. By arranging words in the correct order, you actively engage with each ayah, making memorization more effective and enjoyable.',
+    q2: 'How does the puzzle system work?',
+    a2: 'Each puzzle presents you with the words of an ayah in a shuffled order. Your task is to drag or tap the words to arrange them in the correct sequence. This active engagement helps reinforce your memory of the verse structure and word order.',
+    q3: 'What happens if I make mistakes?',
+    a3: 'You have 3 attempts per puzzle. If you exceed the mistake limit, you\'ll be prompted to review the ayah before trying again. This ensures you understand the verse before moving on.',
+    q4: 'How do streaks work?',
+    a4: 'Your streak increases by 1 for each consecutive day you complete at least one puzzle. If you miss a day, your streak resets to zero. Streaks help motivate consistent daily practice.',
+    q5: 'What translations are available?',
+    a5: 'We offer 18+ translations including English (Sahih International, Pickthall, Yusuf Ali), Arabic Tafsir, French, German, Spanish, Turkish, Urdu, Indonesian, Malay, Bengali, Hindi, Russian, Chinese, Japanese, and Dutch.',
+    q6: 'Can I use AyatBits offline?',
+    a6: 'Currently, AyatBits requires an internet connection to load puzzles and save your progress. We\'re working on offline functionality for future updates.',
+    q7: 'How is my progress saved?',
+    a7: 'Your progress is automatically saved to your account. Every puzzle you complete, ayah you like, and streak you build is stored securely. You can access your progress from any device by signing in.',
+    q8: 'What is the 7-day free trial?',
+    a8: 'New users get full access to all features for 7 days at no cost. After the trial, you can choose a subscription plan to continue learning.',
+    q9: 'Can I cancel my subscription anytime?',
+    a9: 'Yes, you can cancel your subscription at any time. Your access will continue until the end of your current billing period.',
+    q10: 'How do I contact support?',
+    a10: 'You can reach our support team at hello@ayatbits.com. We typically respond within 24-48 hours.',
+  },
+  tos: {
+    title: 'Terms of Service',
+    lastUpdated: 'Last updated: December 2025',
+    section1Title: '1. Acceptance of Terms',
+    section1Content: 'By accessing and using AyatBits ("the Service"), you accept and agree to be bound by the terms and conditions of this agreement. If you do not agree to these terms, please do not use the Service.',
+    section2Title: '2. Description of Service',
+    section2Content: 'AyatBits is an educational platform designed to help users learn, memorize, and understand the Quran through interactive word puzzles. The Service includes access to Quranic text, translations, audio recitations, and gamified learning features.',
+    section3Title: '3. User Accounts',
+    section3Content: 'You are responsible for maintaining the confidentiality of your account credentials. You agree to accept responsibility for all activities that occur under your account. You must notify us immediately of any unauthorized use of your account.',
+    section4Title: '4. Subscription and Payments',
+    section4Content: 'Some features of AyatBits require a paid subscription. By subscribing, you agree to pay the applicable fees. Subscriptions automatically renew unless cancelled before the renewal date. You will be charged automatically on each billing cycle unless you cancel before the renewal date. Refunds are provided in accordance with our refund policy.',
+    section5Title: '5. Free Trial',
+    section5Content: 'New users are eligible for a 7-day free trial. The trial provides full access to all premium features. To start your trial, you must provide valid payment information. IMPORTANT: If you do not cancel your subscription before the trial period ends, you will automatically be charged for the subscription plan you selected. You can cancel anytime during the trial period to avoid being charged.',
+    section6Title: '6. Acceptable Use',
+    section6Content: 'You agree to use the Service only for lawful purposes and in accordance with these Terms. You agree not to:',
+    section6List1: 'Use the Service in any way that violates applicable laws',
+    section6List2: 'Attempt to gain unauthorized access to our systems',
+    section6List3: 'Share your account credentials with others',
+    section6List4: 'Reproduce, distribute, or create derivative works from our content',
+    section6List5: 'Use automated systems to access the Service',
+    section7Title: '7. Intellectual Property',
+    section7Content: 'The Service and its original content, features, and functionality are owned by AyatBits and are protected by international copyright, trademark, and other intellectual property laws. The Quranic text is in the public domain.',
+    section8Title: '8. Privacy Policy',
+    section8Content: 'Your privacy is important to us. We collect and use personal information as described in our Privacy Policy. By using the Service, you consent to our collection and use of your information as described therein.',
+    section9Title: '9. Disclaimer of Warranties',
+    section9Content: 'The Service is provided "as is" without warranties of any kind. We do not guarantee that the Service will be uninterrupted, secure, or error-free. We make no warranties regarding the accuracy of any Quranic content or translations.',
+    section10Title: '10. Limitation of Liability',
+    section10Content: 'To the maximum extent permitted by law, AyatBits shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of the Service.',
+    section11Title: '11. Changes to Terms',
+    section11Content: 'We reserve the right to modify these terms at any time. We will notify users of significant changes via email or in-app notification. Continued use of the Service after changes constitutes acceptance of the new terms.',
+    section12Title: '12. Contact Us',
+    section12Content: 'If you have any questions about these Terms, please contact us at',
+  },
 };
 
 // Arabic strings
-const AR_MESSAGES: Record<string, Record<string, string>> = {
+const AR_MESSAGES: Record<string, Record<string, any>> = {
   common: {
     search: 'بحث',
     home: 'الرئيسية',
@@ -570,6 +753,18 @@ const AR_MESSAGES: Record<string, Record<string, string>> = {
     billingAndSubscription: 'الفواتير والاشتراك',
     adminAccount: 'حساب المدير',
     fullAccessGranted: 'تم منح الوصول الكامل',
+    puzzleIntro: 'مرحباً بك في وضع اللغز! 🧩',
+    puzzleIntroMsg: 'أكمل الآية عن طريق سحب الكلمات من البنك إلى المواضع الصحيحة.',
+    wordBank: 'بنك الكلمات',
+    wordBankMsg: 'جميع الكلمات التي تحتاجها موجودة هنا. اسحبها إلى منطقة الإجابة أو انقر لوضعها.',
+    answerArea: 'منطقة الإجابة',
+    answerAreaMsg: 'ضع الكلمات هنا بالترتيب الصحيح. انقر على أي كلمة لسماع نطقها.',
+    needHelp: 'هل تحتاج مساعدة؟',
+    needHelpMsg: 'عالق؟ استخدم زر التلميح لكشف الكلمة التالية. لديك 3 تلميحات لكل لغز.',
+    listenLearn: 'استمع وتعلم',
+    listenLearnMsg: 'بدّل الكتابة الصوتية لرؤية النطق، أو انقر على التفسير لفهم المعنى الأعمق.',
+    understandAyah: 'افهم الآية',
+    understandAyahMsg: 'اعرض التفسير (الشرح) لفهم المعنى والسياق الأعمق للآية التي تتعلمها.',
   },
   wordPuzzle: {
     tips: 'نصائح',
@@ -694,10 +889,181 @@ const AR_MESSAGES: Record<string, Record<string, string>> = {
     allRightsReserved: 'جميع الحقوق محفوظة.',
     companyInfo: 'آيات بتس منتج من HIYA FOR EDUCATION AND TUTORING OU، مسجلة في إستونيا.',
   },
+  settings: {
+    title: 'الإعدادات',
+    subscription: 'الاشتراك',
+    lifetimeAccess: 'وصول مدى الحياة',
+    proMonthly: 'برو شهري',
+    proYearly: 'برو سنوي',
+    trial: 'تجربة ({days} يوم متبقي)',
+    canceled: 'ملغى',
+    inactive: 'غير نشط',
+    manageBilling: 'إدارة الفواتير',
+    manageBillingDesc: 'تحديث الدفع، الإلغاء، عرض الفواتير',
+    viewPlans: 'عرض الخطط',
+    viewPlansDesc: 'ترقية أو تغيير خطتك',
+    accountSettings: 'إعدادات الحساب',
+    accountSettingsDesc: 'البريد الإلكتروني، كلمة المرور، الأمان',
+    privacySecurity: 'الخصوصية والأمان',
+    privacySecurityDesc: 'المصادقة الثنائية، الجلسات',
+    helpSupport: 'المساعدة والدعم',
+    helpSupportDesc: 'احصل على مساعدة أو أرسل ملاحظات',
+    faq: 'الأسئلة الشائعة',
+    faqDesc: 'الأسئلة المتكررة',
+    termsOfService: 'شروط الخدمة',
+    termsOfServiceDesc: 'الشروط القانونية وسياسة الخصوصية',
+    clearData: 'مسح بيانات التعلم',
+    clearDataDesc: 'إعادة تعيين تقدمك والبدء من جديد',
+    clearDataTitle: 'مسح جميع البيانات؟',
+    clearDataMessage: 'سيؤدي هذا إلى حذف جميع تقدمك في التعلم والسلاسل والآيات المحفوظة نهائياً.',
+    clearDataWarning: 'لا يمكن التراجع عن هذا الإجراء. سيظل اشتراكك نشطاً.',
+    clearDataConfirm: 'مسح البيانات',
+    clearDataClerkInfo: 'لحذف حسابك بالكامل:',
+    manageViaClerk: 'إدارة إعدادات الحساب ←',
+    signOutTitle: 'تسجيل الخروج؟',
+    signOutMessage: 'هل أنت متأكد من رغبتك في تسجيل الخروج؟ ستحتاج إلى تسجيل الدخول مرة أخرى لمتابعة التعلم.',
+  },
+  verse: {
+    ayahNumber: 'الآية {number}',
+    readyToStartPuzzle: 'ابدأ اللغز',
+    selectAyah: 'اختر آية',
+    enterAyahNumber: 'أدخل رقم الآية ({min}-{max})...',
+    ayahFound: 'تم العثور على الآية!',
+    ayahNotFound: 'لم يتم العثور على الآية في هذا القسم.',
+    goToAyah: 'اذهب إلى الآية',
+    englishTranslation: 'الترجمة',
+    verseOfTheDay: 'آية اليوم',
+    playRecitation: 'تشغيل التلاوة',
+    openAyah: 'فتح الآية',
+  },
+  trophies: {
+    first_puzzle: {
+      name: 'الخطوة الأولى',
+      description: 'أكمل لغزك الأول',
+    },
+    puzzle_10: {
+      name: 'البداية',
+      description: 'أكمل 10 ألغاز',
+    },
+    puzzle_50: {
+      name: 'متعلم متفاني',
+      description: 'أكمل 50 لغزاً',
+    },
+    puzzle_100: {
+      name: 'المئة',
+      description: 'أكمل 100 لغز',
+    },
+    puzzle_500: {
+      name: 'العالم',
+      description: 'أكمل 500 لغز',
+    },
+    streak_3: {
+      name: 'ثابت',
+      description: 'حقق سلسلة 3 أيام',
+    },
+    streak_7: {
+      name: 'محارب الأسبوع',
+      description: 'حقق سلسلة 7 أيام',
+    },
+    streak_30: {
+      name: 'سيد الشهر',
+      description: 'حقق سلسلة 30 يوماً',
+    },
+    juz_1: {
+      name: 'الجزء الأول',
+      description: 'أكمل جميع ألغاز جزء واحد',
+    },
+    juz_5: {
+      name: 'خمسة أجزاء',
+      description: 'أكمل 5 أجزاء',
+    },
+    surah_fatiha: {
+      name: 'الفاتحة',
+      description: 'أكمل سورة الفاتحة',
+    },
+    liked_10: {
+      name: 'جامع',
+      description: 'أحب 10 آيات',
+    },
+  },
+  auth: {
+    signIn: 'تسجيل الدخول',
+    signUp: 'إنشاء حساب',
+    welcomeBack: 'مرحباً بعودتك',
+    createAccount: 'إنشاء حساب',
+    signInDescription: 'سجل دخولك لمتابعة رحلة تعلم القرآن',
+    signUpDescription: 'انضم إلى آلاف المتعلمين الذين يتقنون القرآن',
+    email: 'البريد الإلكتروني',
+    password: 'كلمة المرور',
+    forgotPassword: 'نسيت كلمة المرور؟',
+    noAccount: 'ليس لديك حساب؟',
+    haveAccount: 'لديك حساب بالفعل؟',
+    orContinueWith: 'أو تابع باستخدام',
+  },
+  faq: {
+    title: 'الأسئلة الشائعة',
+    subtitle: 'هل لديك أسئلة؟',
+    description: 'ابحث عن إجابات للأسئلة الشائعة حول آيات بتس أدناه.',
+    stillHaveQuestions: 'لا تزال لديك أسئلة؟',
+    contactSupport: 'تواصل مع الدعم',
+    q1: 'ما هو آيات بتس؟',
+    a1: 'آيات بتس هو تطبيق تفاعلي لتعلم القرآن يستخدم ألغاز الكلمات لمساعدتك على حفظ وفهم القرآن. من خلال ترتيب الكلمات بالترتيب الصحيح، تتفاعل بنشاط مع كل آية، مما يجعل الحفظ أكثر فعالية ومتعة.',
+    q2: 'كيف يعمل نظام الألغاز؟',
+    a2: 'يقدم كل لغز كلمات الآية بترتيب عشوائي. مهمتك هي سحب أو النقر على الكلمات لترتيبها بالتسلسل الصحيح. هذا التفاعل النشط يساعد على تعزيز ذاكرتك لهيكل الآية وترتيب الكلمات.',
+    q3: 'ماذا يحدث إذا ارتكبت أخطاء؟',
+    a3: 'لديك 3 محاولات لكل لغز. إذا تجاوزت حد الأخطاء، سيُطلب منك مراجعة الآية قبل المحاولة مرة أخرى. هذا يضمن فهمك للآية قبل المتابعة.',
+    q4: 'كيف تعمل السلاسل؟',
+    a4: 'تزداد سلسلتك بمقدار 1 لكل يوم متتالي تكمل فيه لغزاً واحداً على الأقل. إذا فاتك يوم، تُعاد سلسلتك إلى الصفر. تساعد السلاسل على تحفيز الممارسة اليومية المستمرة.',
+    q5: 'ما الترجمات المتاحة؟',
+    a5: 'نقدم أكثر من 18 ترجمة تشمل الإنجليزية (صحيح إنترناشونال، بيكتال، يوسف علي)، التفسير العربي، الفرنسية، الألمانية، الإسبانية، التركية، الأردية، الإندونيسية، الملايوية، البنغالية، الهندية، الروسية، الصينية، اليابانية، والهولندية.',
+    q6: 'هل يمكنني استخدام آيات بتس بدون إنترنت؟',
+    a6: 'حالياً، يتطلب آيات بتس اتصالاً بالإنترنت لتحميل الألغاز وحفظ تقدمك. نحن نعمل على وظيفة العمل بدون اتصال للتحديثات المستقبلية.',
+    q7: 'كيف يتم حفظ تقدمي؟',
+    a7: 'يتم حفظ تقدمك تلقائياً في حسابك. كل لغز تكمله، وآية تحفظها، وسلسلة تبنيها يتم تخزينها بأمان. يمكنك الوصول إلى تقدمك من أي جهاز عند تسجيل الدخول.',
+    q8: 'ما هي التجربة المجانية لمدة 7 أيام؟',
+    a8: 'يحصل المستخدمون الجدد على وصول كامل لجميع الميزات لمدة 7 أيام بدون تكلفة. بعد انتهاء التجربة، يمكنك اختيار خطة اشتراك لمواصلة التعلم.',
+    q9: 'هل يمكنني إلغاء اشتراكي في أي وقت؟',
+    a9: 'نعم، يمكنك إلغاء اشتراكك في أي وقت. سيستمر وصولك حتى نهاية فترة الفوترة الحالية.',
+    q10: 'كيف أتواصل مع الدعم؟',
+    a10: 'يمكنك التواصل مع فريق الدعم على hello@ayatbits.com. نرد عادةً خلال 24-48 ساعة.',
+  },
+  tos: {
+    title: 'شروط الخدمة',
+    lastUpdated: 'آخر تحديث: ديسمبر 2025',
+    section1Title: '1. قبول الشروط',
+    section1Content: 'بالدخول إلى آيات بتس ("الخدمة") واستخدامها، فإنك تقبل وتوافق على الالتزام بشروط وأحكام هذه الاتفاقية. إذا كنت لا توافق على هذه الشروط، يرجى عدم استخدام الخدمة.',
+    section2Title: '2. وصف الخدمة',
+    section2Content: 'آيات بتس هي منصة تعليمية مصممة لمساعدة المستخدمين على تعلم وحفظ وفهم القرآن من خلال ألغاز الكلمات التفاعلية. تشمل الخدمة الوصول إلى النص القرآني والترجمات والتلاوات الصوتية وميزات التعلم التفاعلي.',
+    section3Title: '3. حسابات المستخدمين',
+    section3Content: 'أنت مسؤول عن الحفاظ على سرية بيانات اعتماد حسابك. أنت توافق على تحمل المسؤولية عن جميع الأنشطة التي تحدث تحت حسابك. يجب عليك إخطارنا فوراً بأي استخدام غير مصرح به لحسابك.',
+    section4Title: '4. الاشتراك والمدفوعات',
+    section4Content: 'تتطلب بعض ميزات آيات بتس اشتراكاً مدفوعاً. بالاشتراك، توافق على دفع الرسوم المطبقة. تتجدد الاشتراكات تلقائياً ما لم يتم إلغاؤها قبل تاريخ التجديد. سيتم خصم المبلغ تلقائياً في كل دورة فوترة ما لم تقم بالإلغاء قبل تاريخ التجديد. يتم تقديم المبالغ المستردة وفقاً لسياسة الاسترداد الخاصة بنا.',
+    section5Title: '5. التجربة المجانية',
+    section5Content: 'المستخدمون الجدد مؤهلون للحصول على تجربة مجانية لمدة 7 أيام. توفر التجربة وصولاً كاملاً لجميع الميزات المميزة. لبدء التجربة، يجب عليك تقديم معلومات دفع صالحة. مهم: إذا لم تقم بإلغاء اشتراكك قبل انتهاء فترة التجربة، سيتم خصم رسوم خطة الاشتراك التي اخترتها تلقائياً. يمكنك الإلغاء في أي وقت خلال فترة التجربة لتجنب الخصم.',
+    section6Title: '6. الاستخدام المقبول',
+    section6Content: 'توافق على استخدام الخدمة فقط لأغراض قانونية ووفقاً لهذه الشروط. توافق على عدم:',
+    section6List1: 'استخدام الخدمة بأي طريقة تنتهك القوانين المعمول بها',
+    section6List2: 'محاولة الوصول غير المصرح به إلى أنظمتنا',
+    section6List3: 'مشاركة بيانات اعتماد حسابك مع الآخرين',
+    section6List4: 'نسخ أو توزيع أو إنشاء أعمال مشتقة من محتوانا',
+    section6List5: 'استخدام أنظمة آلية للوصول إلى الخدمة',
+    section7Title: '7. الملكية الفكرية',
+    section7Content: 'الخدمة ومحتواها الأصلي وميزاتها ووظائفها مملوكة لآيات بتس ومحمية بموجب قوانين حقوق النشر والعلامات التجارية وقوانين الملكية الفكرية الدولية الأخرى. النص القرآني في الملك العام.',
+    section8Title: '8. سياسة الخصوصية',
+    section8Content: 'خصوصيتك مهمة بالنسبة لنا. نجمع ونستخدم المعلومات الشخصية كما هو موصوف في سياسة الخصوصية الخاصة بنا. باستخدام الخدمة، توافق على جمعنا واستخدامنا لمعلوماتك كما هو موصوف فيها.',
+    section9Title: '9. إخلاء المسؤولية عن الضمانات',
+    section9Content: 'يتم تقديم الخدمة "كما هي" بدون ضمانات من أي نوع. نحن لا نضمن أن الخدمة ستكون غير منقطعة أو آمنة أو خالية من الأخطاء. نحن لا نقدم أي ضمانات بشأن دقة أي محتوى قرآني أو ترجمات.',
+    section10Title: '10. تحديد المسؤولية',
+    section10Content: 'إلى أقصى حد يسمح به القانون، لن تكون آيات بتس مسؤولة عن أي أضرار غير مباشرة أو عرضية أو خاصة أو تبعية أو عقابية ناتجة عن استخدامك للخدمة.',
+    section11Title: '11. التغييرات في الشروط',
+    section11Content: 'نحتفظ بالحق في تعديل هذه الشروط في أي وقت. سنقوم بإخطار المستخدمين بالتغييرات الهامة عبر البريد الإلكتروني أو الإشعار داخل التطبيق. الاستمرار في استخدام الخدمة بعد التغييرات يشكل قبولاً للشروط الجديدة.',
+    section12Title: '12. اتصل بنا',
+    section12Content: 'إذا كان لديك أي أسئلة حول هذه الشروط، يرجى التواصل معنا على',
+  },
 };
 
 // Russian strings
-const RU_MESSAGES: Record<string, Record<string, string>> = {
+const RU_MESSAGES: Record<string, Record<string, any>> = {
   common: {
     search: 'Поиск',
     home: 'Главная',
@@ -917,6 +1283,18 @@ const RU_MESSAGES: Record<string, Record<string, string>> = {
     billingAndSubscription: 'Оплата и подписка',
     adminAccount: 'Аккаунт администратора',
     fullAccessGranted: 'Полный доступ предоставлен',
+    puzzleIntro: 'Добро пожаловать в режим головоломок! 🧩',
+    puzzleIntroMsg: 'Завершите аят, перетаскивая слова из банка в правильные позиции.',
+    wordBank: 'Банк слов',
+    wordBankMsg: 'Все необходимые слова здесь. Перетащите их в область ответа или нажмите, чтобы разместить.',
+    answerArea: 'Область ответа',
+    answerAreaMsg: 'Размещайте слова здесь в правильном порядке. Нажмите на любое слово, чтобы услышать его произношение.',
+    needHelp: 'Нужна помощь?',
+    needHelpMsg: 'Застряли? Используйте кнопку подсказки, чтобы открыть следующее слово. У вас есть 3 подсказки на головоломку.',
+    listenLearn: 'Слушайте и учитесь',
+    listenLearnMsg: 'Переключите транслитерацию для просмотра произношения или нажмите тафсир для понимания глубокого смысла.',
+    understandAyah: 'Поймите аят',
+    understandAyahMsg: 'Просмотрите тафсир (объяснение), чтобы понять более глубокий смысл и контекст аята, который вы изучаете.',
   },
   wordPuzzle: {
     tips: 'Подсказки',
@@ -1040,6 +1418,177 @@ const RU_MESSAGES: Record<string, Record<string, string>> = {
     waitlistLink: 'Список ожидания',
     allRightsReserved: 'Все права защищены.',
     companyInfo: 'AyatBits — продукт HIYA FOR EDUCATION AND TUTORING OU, зарегистрированной в Эстонии.',
+  },
+  settings: {
+    title: 'Настройки',
+    subscription: 'Подписка',
+    lifetimeAccess: 'Пожизненный доступ',
+    proMonthly: 'Про Ежемесячно',
+    proYearly: 'Про Ежегодно',
+    trial: 'Пробный период ({days} дней осталось)',
+    canceled: 'Отменена',
+    inactive: 'Неактивна',
+    manageBilling: 'Управление оплатой',
+    manageBillingDesc: 'Обновить оплату, отменить, просмотреть счета',
+    viewPlans: 'Просмотреть планы',
+    viewPlansDesc: 'Улучшить или изменить план',
+    accountSettings: 'Настройки аккаунта',
+    accountSettingsDesc: 'Email, пароль, безопасность',
+    privacySecurity: 'Конфиденциальность и безопасность',
+    privacySecurityDesc: 'Двухфакторная аутентификация, сессии',
+    helpSupport: 'Помощь и поддержка',
+    helpSupportDesc: 'Получить помощь или отправить отзыв',
+    faq: 'ЧаВо',
+    faqDesc: 'Часто задаваемые вопросы',
+    termsOfService: 'Условия использования',
+    termsOfServiceDesc: 'Юридические условия и политика конфиденциальности',
+    clearData: 'Очистить данные',
+    clearDataDesc: 'Сбросить прогресс',
+    clearDataTitle: 'Удалить все данные?',
+    clearDataMessage: 'Это навсегда удалит ваш прогресс, серии и сохранённые аяты.',
+    clearDataWarning: 'Это действие нельзя отменить.',
+    clearDataConfirm: 'Удалить',
+    clearDataClerkInfo: 'Чтобы удалить аккаунт:',
+    manageViaClerk: 'Настройки аккаунта →',
+    signOutTitle: 'Выйти?',
+    signOutMessage: 'Вы уверены, что хотите выйти?',
+  },
+  verse: {
+    ayahNumber: 'Аят {number}',
+    readyToStartPuzzle: 'Готов начать головоломку',
+    selectAyah: 'Выберите аят',
+    enterAyahNumber: 'Введите номер аята ({min}-{max})...',
+    ayahFound: 'Аят найден!',
+    ayahNotFound: 'Аят не найден в этом разделе.',
+    goToAyah: 'Перейти к аяту',
+    englishTranslation: 'Перевод',
+    verseOfTheDay: 'Аят дня',
+    playRecitation: 'Воспроизвести чтение',
+    openAyah: 'Открыть аят',
+  },
+  trophies: {
+    first_puzzle: {
+      name: 'Первый шаг',
+      description: 'Завершите первую головоломку',
+    },
+    puzzle_10: {
+      name: 'Начало',
+      description: 'Завершите 10 головоломок',
+    },
+    puzzle_50: {
+      name: 'Усердный ученик',
+      description: 'Завершите 50 головоломок',
+    },
+    puzzle_100: {
+      name: 'Сотня',
+      description: 'Завершите 100 головоломок',
+    },
+    puzzle_500: {
+      name: 'Учёный',
+      description: 'Завершите 500 головоломок',
+    },
+    streak_3: {
+      name: 'Постоянный',
+      description: 'Достигните серии в 3 дня',
+    },
+    streak_7: {
+      name: 'Воин недели',
+      description: 'Достигните серии в 7 дней',
+    },
+    streak_30: {
+      name: 'Мастер месяца',
+      description: 'Достигните серии в 30 дней',
+    },
+    juz_1: {
+      name: 'Первый Джуз',
+      description: 'Завершите все головоломки одного Джуза',
+    },
+    juz_5: {
+      name: 'Пять Джузов',
+      description: 'Завершите 5 Джузов',
+    },
+    surah_fatiha: {
+      name: 'Открывающая',
+      description: 'Завершите Суру Аль-Фатиха',
+    },
+    liked_10: {
+      name: 'Коллекционер',
+      description: 'Понравьте 10 аятов',
+    },
+  },
+  auth: {
+    signIn: 'Войти',
+    signUp: 'Регистрация',
+    welcomeBack: 'С возвращением',
+    createAccount: 'Создать аккаунт',
+    signInDescription: 'Войдите, чтобы продолжить изучение Корана',
+    signUpDescription: 'Присоединяйтесь к тысячам учеников, изучающих Коран',
+    email: 'Электронная почта',
+    password: 'Пароль',
+    forgotPassword: 'Забыли пароль?',
+    noAccount: 'Нет аккаунта?',
+    haveAccount: 'Уже есть аккаунт?',
+    orContinueWith: 'Или продолжить с',
+  },
+  faq: {
+    title: 'Часто задаваемые вопросы',
+    subtitle: 'Есть вопросы?',
+    description: 'Найдите ответы на часто задаваемые вопросы об AyatBits ниже.',
+    stillHaveQuestions: 'Остались вопросы?',
+    contactSupport: 'Связаться с поддержкой',
+    q1: 'Что такое AyatBits?',
+    a1: 'AyatBits - это интерактивное приложение для изучения Корана, использующее словесные головоломки для запоминания и понимания Корана.',
+    q2: 'Как работает система головоломок?',
+    a2: 'Каждая головоломка представляет слова аята в перемешанном порядке. Ваша задача - расположить слова в правильной последовательности.',
+    q3: 'Что происходит, если я делаю ошибки?',
+    a3: 'У вас есть 3 попытки на каждую головоломку. Если вы превысите лимит ошибок, вам будет предложено повторить аят.',
+    q4: 'Как работают серии?',
+    a4: 'Ваша серия увеличивается на 1 за каждый последовательный день, когда вы завершаете хотя бы одну головоломку.',
+    q5: 'Какие переводы доступны?',
+    a5: 'Мы предлагаем более 18 переводов, включая английский, арабский тафсир, французский, немецкий, испанский, турецкий, урду и другие.',
+    q6: 'Могу ли я использовать AyatBits офлайн?',
+    a6: 'В настоящее время AyatBits требует подключения к интернету. Мы работаем над офлайн-функциональностью.',
+    q7: 'Как сохраняется мой прогресс?',
+    a7: 'Ваш прогресс автоматически сохраняется в вашем аккаунте и доступен с любого устройства.',
+    q8: 'Что такое 7-дневная бесплатная пробная версия?',
+    a8: 'Новые пользователи получают полный доступ ко всем функциям на 7 дней бесплатно.',
+    q9: 'Могу ли я отменить подписку в любое время?',
+    a9: 'Да, вы можете отменить подписку в любое время. Доступ сохранится до конца текущего периода оплаты.',
+    q10: 'Как связаться с поддержкой?',
+    a10: 'Вы можете связаться с нами по адресу hello@ayatbits.com. Мы обычно отвечаем в течение 24-48 часов.',
+  },
+  tos: {
+    title: 'Условия использования',
+    lastUpdated: 'Последнее обновление: Декабрь 2025',
+    section1Title: '1. Принятие условий',
+    section1Content: 'Получая доступ к AyatBits («Сервису») и используя его, вы принимаете и соглашаетесь соблюдать условия настоящего соглашения. Если вы не согласны с этими условиями, пожалуйста, не используйте Сервис.',
+    section2Title: '2. Описание сервиса',
+    section2Content: 'AyatBits — это образовательная платформа, предназначенная для помощи пользователям в изучении, запоминании и понимании Корана с помощью интерактивных словесных головоломок. Сервис включает доступ к тексту Корана, переводам, аудио-чтению и игровым функциям обучения.',
+    section3Title: '3. Учетные записи',
+    section3Content: 'Вы несете ответственность за сохранность учетных данных вашей учетной записи. Вы соглашаетесь нести ответственность за все действия, происходящие под вашей учетной записью. Вы должны немедленно уведомить нас о любом несанкционированном использовании вашей учетной записи.',
+    section4Title: '4. Подписка и платежи',
+    section4Content: 'Некоторые функции AyatBits требуют платной подписки. Подписываясь, вы соглашаетесь оплачивать применимые сборы. Подписки автоматически продлеваются, если не отменены до даты продления. С вас будет автоматически взиматься плата в каждом платежном цикле, если вы не отмените подписку до даты продления. Возвраты предоставляются в соответствии с нашей политикой возврата.',
+    section5Title: '5. Бесплатная пробная версия',
+    section5Content: 'Новые пользователи имеют право на 7-дневную бесплатную пробную версию. Пробная версия предоставляет полный доступ ко всем премиум-функциям. Для начала пробного периода необходимо указать действительную платежную информацию. ВАЖНО: Если вы не отмените подписку до окончания пробного периода, с вас автоматически будет взята плата за выбранный план подписки. Вы можете отменить в любое время в течение пробного периода, чтобы избежать списания средств.',
+    section6Title: '6. Допустимое использование',
+    section6Content: 'Вы соглашаетесь использовать сервис только в законных целях.',
+    section6List1: 'Не нарушать применимые законы',
+    section6List2: 'Не пытаться получить несанкционированный доступ',
+    section6List3: 'Не делиться учетными данными',
+    section6List4: 'Не копировать контент',
+    section6List5: 'Не использовать автоматизированные системы',
+    section7Title: '7. Интеллектуальная собственность',
+    section7Content: 'Сервис и его контент защищены законами об интеллектуальной собственности.',
+    section8Title: '8. Политика конфиденциальности',
+    section8Content: 'Мы собираем и используем информацию согласно нашей политике конфиденциальности.',
+    section9Title: '9. Отказ от гарантий',
+    section9Content: 'Сервис предоставляется как есть без каких-либо гарантий.',
+    section10Title: '10. Ограничение ответственности',
+    section10Content: 'AyatBits не несет ответственности за косвенные убытки.',
+    section11Title: '11. Изменения условий',
+    section11Content: 'Мы оставляем за собой право изменять эти условия в любое время.',
+    section12Title: '12. Свяжитесь с нами',
+    section12Content: 'По вопросам обращайтесь к нам по адресу',
   },
 };
 
