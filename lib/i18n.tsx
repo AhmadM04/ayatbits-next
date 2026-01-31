@@ -219,6 +219,8 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
     readTafsir: 'Read Tafsir',
     likeAyah: 'Like Ayah',
     copyText: 'Copy Text',
+    surah: 'Surah',
+    swipeInstruction: 'Swipe left/right or use arrows to navigate • Long press ayah for options',
   },
 };
 
@@ -439,6 +441,8 @@ const AR_MESSAGES: Record<string, Record<string, string>> = {
     readTafsir: 'قراءة التفسير',
     likeAyah: 'أعجبني الآية',
     copyText: 'نسخ النص',
+    surah: 'سورة',
+    swipeInstruction: 'اسحب يسارًا/يمينًا أو استخدم الأسهم للتنقل • اضغط مطولاً على الآية للخيارات',
   },
 };
 
@@ -659,6 +663,8 @@ const RU_MESSAGES: Record<string, Record<string, string>> = {
     readTafsir: 'Прочитать тафсир',
     likeAyah: 'Мне нравится аят',
     copyText: 'Скопировать текст',
+    surah: 'Сура',
+    swipeInstruction: 'Проведите влево/вправо или используйте стрелки для навигации • Долгое нажатие на аят для опций',
   },
 };
 

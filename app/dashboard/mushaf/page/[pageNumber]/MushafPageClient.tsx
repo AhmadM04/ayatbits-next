@@ -224,7 +224,7 @@ export default function MushafPageClient({
         {/* Swipe Hint */}
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-600">
-            Swipe left/right or use arrows to navigate • Long press ayah for options
+            {t('mushaf.swipeInstruction')}
           </p>
         </div>
       </motion.main>

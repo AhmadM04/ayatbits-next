@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { SURAH_NAMES_ARABIC } from '@/lib/mushaf-utils';
 import { HarakatColoredText } from '@/components/arabic';
+import { useI18n } from '@/lib/i18n';
 
 interface SurahHeaderProps {
   surahNumber: number;
@@ -13,6 +14,7 @@ interface SurahHeaderProps {
 const BISMILLAH = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
 
 export default function SurahHeader({ surahNumber, showBismillah = true }: SurahHeaderProps) {
+  const { t } = useI18n();
   const surahName = SURAH_NAMES_ARABIC[surahNumber] || `سورة ${surahNumber}`;
   
   // Surah 9 (At-Tawbah) doesn't have Bismillah
@@ -46,7 +48,7 @@ export default function SurahHeader({ surahNumber, showBismillah = true }: Surah
               سُورَةُ {surahName}
             </p>
             <p className="text-xs text-gray-500 text-center mt-1">
-              Surah {surahNumber}
+              {t('mushaf.surah')} {surahNumber}
             </p>
           </div>
         </div>

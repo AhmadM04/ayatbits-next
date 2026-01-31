@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { type HarakatDefinition } from '@/lib/harakat-utils';
 import { useI18n } from '@/lib/i18n';
+import { getHarakatSound, getHarakatDescription } from '@/lib/harakat-i18n';
 
 interface HarakatModalProps {
   definition: HarakatDefinition | null;
@@ -13,7 +14,7 @@ interface HarakatModalProps {
 }
 
 export default function HarakatModal({ definition, isOpen, onClose }: HarakatModalProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   // Close on escape key
   useEffect(() => {
@@ -128,7 +129,7 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
                   {t('harakat.sound').toUpperCase()}
                 </span>
                 <span className="text-base text-gray-200 text-right max-w-[60%]">
-                  {definition.sound}
+                  {getHarakatSound(definition.character, locale) || definition.sound}
                 </span>
               </div>
 
@@ -138,7 +139,7 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
                   {t('harakat.description').toUpperCase()}
                 </span>
                 <p className="text-sm text-gray-300 leading-relaxed">
-                  {definition.description}
+                  {getHarakatDescription(definition.character, locale) || definition.description}
                 </p>
               </div>
 
