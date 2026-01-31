@@ -252,7 +252,7 @@ Keep it brief (2-3 paragraphs), scholarly, and in clear ${targetLanguageName}.`;
 ${userPrompt}`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-1.5-flash',
       contents: fullPrompt,
     });
 
