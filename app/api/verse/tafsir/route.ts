@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchTafsir, sanitizeTafsirHtml } from '@/lib/tafsir-api';
+import { fetchTafsir, sanitizeTafsirHtml, TafsirType, getAvailableTafsirs } from '@/lib/tafsir-api';
 import { withCache, CACHE_TTL } from '@/lib/cache';
 
 export async function GET(request: NextRequest) {
@@ -7,7 +7,21 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const surah = searchParams.get('surah');
     const ayah = searchParams.get('ayah');
-    const language = searchParams.get('language') || 'en';
+    const translationCode = searchParams.get('translation') || 'en';
+    const tafsirType = searchParams.get('tafsir_type') as TafsirType | null;
+
+    // Special endpoint to get available tafsirs for a translation
+    if (searchParams.get('get_options') === 'true') {
+      const options = getAvailableTafsirs(translationCode);
+      return NextResponse.json(
+        { options },
+        {
+          headers: {
+            'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+          },
+        }
+      );
+    }
 
     if (!surah || !ayah) {
       return NextResponse.json(
@@ -26,7 +40,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const cacheKey = `verse-tafsir:${surah}:${ayah}:${language}`;
+    const cacheKey = `verse-tafsir:${surah}:${ayah}:${translationCode}:${tafsirType || 'default'}`;
 
     const tafsirData = await withCache(
       cacheKey,
@@ -34,7 +48,8 @@ export async function GET(request: NextRequest) {
         const result = await fetchTafsir(
           surahNum,
           ayahNum,
-          language,
+          translationCode,
+          tafsirType || undefined,
           { next: { revalidate: 86400 } }
         );
         
@@ -64,6 +79,7 @@ export async function GET(request: NextRequest) {
         resource: tafsirData.data.resource_name || 'Unknown',
         language: tafsirData.data.language_name || 'Unknown',
         isFallback: tafsirData.meta?.isFallback || false,
+        tafsirType: tafsirType || 'default',
       },
       {
         headers: {

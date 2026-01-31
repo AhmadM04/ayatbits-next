@@ -4,13 +4,14 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import WordPuzzle from '@/components/WordPuzzle';
 import { useToast } from '@/components/Toast';
 import { apiPost, apiDelete, getErrorMessage, NetworkError } from '@/lib/api-client';
-import { ArrowLeft, Heart, Languages, BookText, Sparkles } from 'lucide-react';
+import { ArrowLeft, Heart, Languages, BookText, Sparkles, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SuccessAnimation, SparkleAnimation } from '@/components/animations';
-import { TutorialWrapper } from '@/components/tutorial';
+import { TutorialWrapper, useTutorial } from '@/components/tutorial';
 import { puzzleTutorialSteps } from '@/lib/tutorial-configs';
+import { resetTutorial } from '@/lib/tutorial-manager';
 import TafsirDisplay from '@/components/TafsirDisplay';
 import { useI18n } from '@/lib/i18n';
 
@@ -48,6 +49,7 @@ export default function PuzzleClient({
   initialWordTransliterations = [],
 }: PuzzleClientProps) {
   const { t } = useI18n();
+  const { startTutorial } = useTutorial();
   const [isLiked, setIsLiked] = useState(initialIsLiked);
   const [showSuccessTransition, setShowSuccessTransition] = useState(false);
   const [showTransliteration, setShowTransliteration] = useState(initialShowTransliteration);
@@ -58,13 +60,17 @@ export default function PuzzleClient({
   const [tafsir, setTafsir] = useState<string | null>(null);
   const [tafsirResource, setTafsirResource] = useState<string>('Tafsir Ibn Kathir');
   const [tafsirLanguage, setTafsirLanguage] = useState<string>('English');
+  const [tafsirType, setTafsirType] = useState<string>('ibn_kathir');
+  const [availableTafsirs, setAvailableTafsirs] = useState<Array<{ type: string; name: string }>>([]);
   const [isTafsirFallback, setIsTafsirFallback] = useState(false);
   const [isLoadingTafsir, setIsLoadingTafsir] = useState(false);
+  const [userTranslation, setUserTranslation] = useState<string>('en.sahih');
   const [showAiTafsir, setShowAiTafsir] = useState(false);
   const [aiTafsir, setAiTafsir] = useState<string | null>(null);
   const [isLoadingAiTafsir, setIsLoadingAiTafsir] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [requiresPro, setRequiresPro] = useState(false);
+  const [showHelpMenu, setShowHelpMenu] = useState(false);
   const { showToast } = useToast();
   const router = useRouter();
   
@@ -75,6 +81,42 @@ export default function PuzzleClient({
   useEffect(() => {
     hasHandledCompletion.current = false;
   }, [puzzle.id]);
+
+  // Fetch user's selected translation and available tafsirs
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      try {
+        const response = await fetch('/api/user/settings');
+        if (response.ok) {
+          const data = await response.json();
+          setUserTranslation(data.translation || 'en.sahih');
+          
+          // Fetch available tafsirs for this translation
+          const tafsirOptionsResponse = await fetch(
+            `/api/verse/tafsir?get_options=true&translation=${data.translation || 'en.sahih'}`
+          );
+          if (tafsirOptionsResponse.ok) {
+            const tafsirOptionsData = await tafsirOptionsResponse.json();
+            setAvailableTafsirs(tafsirOptionsData.options || []);
+            // Set default tafsir type if available
+            if (tafsirOptionsData.options?.length > 0) {
+              setTafsirType(tafsirOptionsData.options[0].type);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch user settings:', error);
+      }
+    };
+
+    fetchUserSettings();
+  }, []);
+
+  const handleRestartTutorial = () => {
+    resetTutorial('puzzle_guide');
+    startTutorial('puzzle_guide', puzzleTutorialSteps);
+    setShowHelpMenu(false);
+  };
 
   const handleToggleLike = async () => {
     try {
@@ -143,30 +185,41 @@ export default function PuzzleClient({
 
     // If enabling and we don't have tafsir yet, fetch it
     if (newValue && !tafsir && puzzle.surah?.number && puzzle.content?.ayahNumber) {
-      setIsLoadingTafsir(true);
-      try {
-        const response = await fetch(
-          `/api/verse/tafsir?surah=${puzzle.surah.number}&ayah=${puzzle.content.ayahNumber}&language=en`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setTafsir(data.tafsir || '');
-          setTafsirResource(data.resource || 'Tafsir Ibn Kathir');
-          setTafsirLanguage(data.language || 'English');
-          setIsTafsirFallback(data.isFallback || false);
-        } else {
-          // Handle error responses
-          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-          console.error('Failed to fetch tafsir:', response.status, errorData);
-          showToast(`${t('puzzle.failedToLoadTafsir')}: ${errorData.error || response.statusText}`, 'error');
-        }
-      } catch (error) {
-        console.error('Tafsir fetch error:', error);
-        showToast(t('puzzle.failedToLoadTafsir'), 'error');
-      } finally {
-        setIsLoadingTafsir(false);
-      }
+      await fetchTafsirContent(tafsirType);
     }
+  };
+
+  const fetchTafsirContent = async (type: string) => {
+    if (!puzzle.surah?.number || !puzzle.content?.ayahNumber) return;
+
+    setIsLoadingTafsir(true);
+    try {
+      const response = await fetch(
+        `/api/verse/tafsir?surah=${puzzle.surah.number}&ayah=${puzzle.content.ayahNumber}&translation=${userTranslation}&tafsir_type=${type}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setTafsir(data.tafsir || '');
+        setTafsirResource(data.resource || 'Tafsir Ibn Kathir');
+        setTafsirLanguage(data.language || 'English');
+        setIsTafsirFallback(data.isFallback || false);
+        setTafsirType(type);
+      } else {
+        // Handle error responses
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Failed to fetch tafsir:', response.status, errorData);
+        showToast(`${t('puzzle.failedToLoadTafsir')}: ${errorData.error || response.statusText}`, 'error');
+      }
+    } catch (error) {
+      console.error('Tafsir fetch error:', error);
+      showToast(t('puzzle.failedToLoadTafsir'), 'error');
+    } finally {
+      setIsLoadingTafsir(false);
+    }
+  };
+
+  const handleTafsirTypeChange = async (type: string) => {
+    await fetchTafsirContent(type);
   };
 
   const handleToggleAiTafsir = async () => {
@@ -471,6 +524,33 @@ export default function PuzzleClient({
               >
                 <Heart className={`w-5 h-5 ${isLiked ? 'fill-red-400' : ''}`} />
               </button>
+              <div className="relative">
+                <button
+                  onClick={() => setShowHelpMenu(!showHelpMenu)}
+                  className="p-2 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 transition-colors flex-shrink-0"
+                  title={t('common.menu')}
+                >
+                  <HelpCircle className="w-5 h-5" />
+                </button>
+                <AnimatePresence>
+                  {showHelpMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 w-56 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
+                    >
+                      <button
+                        onClick={handleRestartTutorial}
+                        className="w-full px-4 py-3 text-left text-sm text-gray-300 hover:bg-white/5 transition-colors flex items-center gap-2"
+                      >
+                        🎓 {t('tutorial.restartTutorial')}
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </div>
@@ -512,6 +592,9 @@ export default function PuzzleClient({
                   language={tafsirLanguage}
                   isFallback={isTafsirFallback}
                   isLoading={isLoadingTafsir}
+                  availableTafsirs={availableTafsirs}
+                  selectedTafsirType={tafsirType}
+                  onTafsirTypeChange={handleTafsirTypeChange}
                 />
               </motion.div>
             )}

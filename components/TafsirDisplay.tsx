@@ -11,6 +11,9 @@ interface TafsirDisplayProps {
   language?: string;
   isFallback?: boolean;
   isLoading?: boolean;
+  availableTafsirs?: Array<{ type: string; name: string }>;
+  selectedTafsirType?: string;
+  onTafsirTypeChange?: (type: string) => void;
 }
 
 export default function TafsirDisplay({
@@ -21,17 +24,41 @@ export default function TafsirDisplay({
   language = 'English',
   isFallback = false,
   isLoading = false,
+  availableTafsirs = [],
+  selectedTafsirType = 'ibn_kathir',
+  onTafsirTypeChange,
 }: TafsirDisplayProps) {
   // Sanitize HTML content
   const sanitizedTafsir = tafsir ? DOMPurify.sanitize(tafsir) : '';
 
   return (
     <div className="bg-white/[0.02] rounded-xl p-4 border border-white/5">
-      <div className="flex items-center gap-2 mb-3">
-        <BookText className="w-3.5 h-3.5 text-purple-400" />
-        <span className="text-xs font-medium text-purple-400 uppercase tracking-wide">
-          {resource} - {language}
-        </span>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <BookText className="w-3.5 h-3.5 text-purple-400" />
+          <span className="text-xs font-medium text-purple-400 uppercase tracking-wide">
+            {resource} - {language}
+          </span>
+        </div>
+        
+        {/* Tafsir Type Selector - only show if multiple options available */}
+        {availableTafsirs.length > 1 && onTafsirTypeChange && (
+          <div className="flex items-center gap-2">
+            {availableTafsirs.map((option) => (
+              <button
+                key={option.type}
+                onClick={() => onTafsirTypeChange(option.type)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  selectedTafsirType === option.type
+                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-white/5'
+                }`}
+              >
+                {option.name}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       
       {isLoading ? (

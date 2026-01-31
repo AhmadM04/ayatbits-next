@@ -248,6 +248,53 @@ const EN_MESSAGES: Record<string, Record<string, any>> = {
     listenLearnMsg: 'Toggle transliteration to see pronunciation, or tap tafsir to understand the deeper meaning.',
     understandAyah: 'Understand the Ayah',
     understandAyahMsg: 'View tafsir (explanation) to understand the deeper meaning and context of the verse you\'re learning.',
+    // Profile tutorial
+    yourStats: 'Your Stats',
+    yourStatsMsg: 'View your account details, join date, and learning progress here.',
+    chooseTranslation: 'Choose Your Translation',
+    chooseTranslationMsg: 'Select from multiple English translations to enhance your understanding.',
+    audioSettings: 'Audio Settings',
+    audioSettingsMsg: 'Enable word-by-word audio to hear the pronunciation of each word in puzzles.',
+    manageAccountTitle: 'Manage Your Account',
+    manageAccountMsg: 'Update your email, password, and other account settings in this section.',
+    // Billing tutorial
+    subscriptionStatus: 'Subscription Status',
+    subscriptionStatusMsg: 'View your current plan, trial status, and subscription details here.',
+    choosePlan: 'Choose Your Plan',
+    choosePlanMsg: 'Explore monthly, yearly, and lifetime plans to continue your learning journey.',
+    manageSubscription: 'Manage Subscription',
+    manageSubscriptionMsg: 'Update your payment method, cancel, or modify your subscription anytime.',
+    // Mushaf tutorial
+    mushafIntro: 'Welcome to Mushaf View! 📖',
+    mushafIntroMsg: 'Read the Quran in traditional Mushaf format, page by page with beautiful Arabic script.',
+    navigatePages: 'Navigate Pages',
+    navigatePagesMsg: 'Jump to any page or Juz quickly using the page selector.',
+    swipeNavigate: 'Swipe to Navigate',
+    swipeNavigateMsg: 'Swipe left/right or use arrow keys to move between pages. Long press any ayah for options.',
+    ayahActions: 'Ayah Actions',
+    ayahActionsMsg: 'Long press any ayah to see options: practice puzzle, play audio, view translation, or read tafsir explanation.',
+    learnTafsir: 'Learn Tafsir',
+    learnTafsirMsg: 'Tap the tafsir button to read detailed explanations and context of any ayah from authentic sources.',
+    learnHarakat: 'Learn Harakat',
+    learnHarakatMsg: 'Need help with Arabic pronunciation marks? Tap the help button to see the harakat guide.',
+    // Achievements tutorial
+    yourTrophies: 'Your Trophies! 🏆',
+    yourTrophiesMsg: 'Track your achievements and unlock trophies as you progress in your Quran journey.',
+    yourStatsAchievements: 'Your Stats',
+    yourStatsAchievementsMsg: 'See your total puzzles completed, best streak, and unlocked trophies at a glance.',
+    unlockedTrophies: 'Unlocked Trophies',
+    unlockedTrophiesMsg: 'View all the achievements you\'ve earned. Each trophy celebrates your dedication!',
+    workInProgress: 'Work In Progress',
+    workInProgressMsg: 'Track your progress toward locked achievements. Keep learning to unlock them all!',
+    // Liked tutorial
+    yourFavorites: 'Your Favorites! ❤️',
+    yourFavoritesMsg: 'All your liked ayahs are saved here. Build your personal collection of meaningful verses.',
+    browseCollection: 'Browse Your Collection',
+    browseCollectionMsg: 'Each ayah shows the surah name, ayah number, and Juz. Tap to read the full verse.',
+    quickActions: 'Quick Actions',
+    quickActionsMsg: 'Visit the ayah in Mushaf view or remove it from your collection with a tap.',
+    // General
+    restartTutorial: 'Restart Tutorial',
   },
   wordPuzzle: {
     tips: 'Tips',
@@ -833,6 +880,53 @@ const AR_MESSAGES: Record<string, Record<string, any>> = {
     listenLearnMsg: 'بدّل الكتابة الصوتية لرؤية النطق، أو انقر على التفسير لفهم المعنى الأعمق.',
     understandAyah: 'افهم الآية',
     understandAyahMsg: 'اعرض التفسير (الشرح) لفهم المعنى والسياق الأعمق للآية التي تتعلمها.',
+    // Profile tutorial
+    yourStats: 'إحصائياتك',
+    yourStatsMsg: 'اعرض تفاصيل حسابك، تاريخ الانضمام، وتقدم التعلم هنا.',
+    chooseTranslation: 'اختر ترجمتك',
+    chooseTranslationMsg: 'اختر من بين ترجمات إنجليزية متعددة لتعزيز فهمك.',
+    audioSettings: 'إعدادات الصوت',
+    audioSettingsMsg: 'قم بتفعيل الصوت كلمة بكلمة لسماع نطق كل كلمة في الألغاز.',
+    manageAccountTitle: 'إدارة حسابك',
+    manageAccountMsg: 'قم بتحديث بريدك الإلكتروني وكلمة المرور وإعدادات الحساب الأخرى في هذا القسم.',
+    // Billing tutorial
+    subscriptionStatus: 'حالة الاشتراك',
+    subscriptionStatusMsg: 'اعرض خطتك الحالية، حالة التجربة، وتفاصيل الاشتراك هنا.',
+    choosePlan: 'اختر خطتك',
+    choosePlanMsg: 'استكشف الخطط الشهرية والسنوية ومدى الحياة لمواصلة رحلة التعلم.',
+    manageSubscription: 'إدارة الاشتراك',
+    manageSubscriptionMsg: 'قم بتحديث طريقة الدفع أو الإلغاء أو تعديل اشتراكك في أي وقت.',
+    // Mushaf tutorial
+    mushafIntro: 'مرحباً بك في عرض المصحف! 📖',
+    mushafIntroMsg: 'اقرأ القرآن بتنسيق المصحف التقليدي، صفحة بصفحة مع الخط العربي الجميل.',
+    navigatePages: 'تصفح الصفحات',
+    navigatePagesMsg: 'انتقل إلى أي صفحة أو جزء بسرعة باستخدام منتقي الصفحات.',
+    swipeNavigate: 'اسحب للتنقل',
+    swipeNavigateMsg: 'اسحب لليسار/اليمين أو استخدم مفاتيح الأسهم للانتقال بين الصفحات. اضغط مطولاً على أي آية للخيارات.',
+    ayahActions: 'إجراءات الآية',
+    ayahActionsMsg: 'اضغط مطولاً على أي آية لرؤية الخيارات: تمرين اللغز، تشغيل الصوت، عرض الترجمة، أو قراءة التفسير.',
+    learnTafsir: 'تعلم التفسير',
+    learnTafsirMsg: 'انقر على زر التفسير لقراءة شروحات مفصلة وسياق أي آية من مصادر موثوقة.',
+    learnHarakat: 'تعلم الحركات',
+    learnHarakatMsg: 'تحتاج مساعدة في علامات النطق العربية؟ انقر على زر المساعدة لرؤية دليل الحركات.',
+    // Achievements tutorial
+    yourTrophies: 'جوائزك! 🏆',
+    yourTrophiesMsg: 'تتبع إنجازاتك واحصل على الجوائز بينما تتقدم في رحلتك القرآنية.',
+    yourStatsAchievements: 'إحصائياتك',
+    yourStatsAchievementsMsg: 'شاهد مجموع الألغاز المكتملة، أفضل سلسلة، والجوائز المفتوحة في لمحة.',
+    unlockedTrophies: 'الجوائز المفتوحة',
+    unlockedTrophiesMsg: 'اعرض جميع الإنجازات التي حصلت عليها. كل جائزة تحتفي بتفانيك!',
+    workInProgress: 'قيد التقدم',
+    workInProgressMsg: 'تتبع تقدمك نحو الإنجازات المقفلة. استمر في التعلم لفتحها جميعاً!',
+    // Liked tutorial
+    yourFavorites: 'مفضلاتك! ❤️',
+    yourFavoritesMsg: 'جميع الآيات المفضلة لديك محفوظة هنا. ابنِ مجموعتك الشخصية من الآيات ذات المعنى.',
+    browseCollection: 'تصفح مجموعتك',
+    browseCollectionMsg: 'كل آية تُظهر اسم السورة، رقم الآية، والجزء. انقر لقراءة الآية كاملة.',
+    quickActions: 'إجراءات سريعة',
+    quickActionsMsg: 'قم بزيارة الآية في عرض المصحف أو احذفها من مجموعتك بنقرة.',
+    // General
+    restartTutorial: 'إعادة تشغيل البرنامج التعليمي',
   },
   wordPuzzle: {
     tips: 'نصائح',
@@ -1418,6 +1512,53 @@ const RU_MESSAGES: Record<string, Record<string, any>> = {
     listenLearnMsg: 'Переключите транслитерацию для просмотра произношения или нажмите тафсир для понимания глубокого смысла.',
     understandAyah: 'Поймите аят',
     understandAyahMsg: 'Просмотрите тафсир (объяснение), чтобы понять более глубокий смысл и контекст аята, который вы изучаете.',
+    // Profile tutorial
+    yourStats: 'Ваша статистика',
+    yourStatsMsg: 'Просмотрите детали аккаунта, дату присоединения и прогресс обучения здесь.',
+    chooseTranslation: 'Выберите перевод',
+    chooseTranslationMsg: 'Выберите из нескольких английских переводов для улучшения понимания.',
+    audioSettings: 'Настройки аудио',
+    audioSettingsMsg: 'Включите аудио по словам, чтобы слышать произношение каждого слова в головоломках.',
+    manageAccountTitle: 'Управление аккаунтом',
+    manageAccountMsg: 'Обновите свой email, пароль и другие настройки аккаунта в этом разделе.',
+    // Billing tutorial
+    subscriptionStatus: 'Статус подписки',
+    subscriptionStatusMsg: 'Просмотрите свой текущий план, статус пробного периода и детали подписки здесь.',
+    choosePlan: 'Выберите план',
+    choosePlanMsg: 'Изучите ежемесячные, годовые и пожизненные планы для продолжения обучения.',
+    manageSubscription: 'Управление подпиской',
+    manageSubscriptionMsg: 'Обновите способ оплаты, отмените или измените подписку в любое время.',
+    // Mushaf tutorial
+    mushafIntro: 'Добро пожаловать в Мусхаф! 📖',
+    mushafIntroMsg: 'Читайте Коран в традиционном формате Мусхафа, страница за страницей с красивым арабским шрифтом.',
+    navigatePages: 'Навигация по страницам',
+    navigatePagesMsg: 'Быстро переходите к любой странице или джузу с помощью селектора страниц.',
+    swipeNavigate: 'Свайп для навигации',
+    swipeNavigateMsg: 'Свайпайте влево/вправо или используйте клавиши со стрелками для перемещения между страницами. Долгое нажатие на аят для опций.',
+    ayahActions: 'Действия с аятом',
+    ayahActionsMsg: 'Долгое нажатие на любой аят для просмотра опций: практика головоломки, воспроизведение аудио, просмотр перевода или чтение тафсира.',
+    learnTafsir: 'Изучение тафсира',
+    learnTafsirMsg: 'Нажмите кнопку тафсира, чтобы прочитать подробные объяснения и контекст любого аята из достоверных источников.',
+    learnHarakat: 'Изучение харакатов',
+    learnHarakatMsg: 'Нужна помощь с арабскими знаками произношения? Нажмите кнопку помощи, чтобы увидеть руководство по харакатам.',
+    // Achievements tutorial
+    yourTrophies: 'Ваши трофеи! 🏆',
+    yourTrophiesMsg: 'Отслеживайте свои достижения и разблокируйте трофеи по мере прогресса в изучении Корана.',
+    yourStatsAchievements: 'Ваша статистика',
+    yourStatsAchievementsMsg: 'Увидьте общее количество завершенных головоломок, лучшую серию и разблокированные трофеи с первого взгляда.',
+    unlockedTrophies: 'Разблокированные трофеи',
+    unlockedTrophiesMsg: 'Просмотрите все достижения, которые вы заработали. Каждый трофей празднует вашу преданность!',
+    workInProgress: 'В процессе',
+    workInProgressMsg: 'Отслеживайте свой прогресс к заблокированным достижениям. Продолжайте учиться, чтобы разблокировать их все!',
+    // Liked tutorial
+    yourFavorites: 'Ваше избранное! ❤️',
+    yourFavoritesMsg: 'Все ваши любимые аяты сохранены здесь. Создайте свою личную коллекцию значимых аятов.',
+    browseCollection: 'Просмотр коллекции',
+    browseCollectionMsg: 'Каждый аят показывает название суры, номер аята и джуз. Нажмите, чтобы прочитать полный аят.',
+    quickActions: 'Быстрые действия',
+    quickActionsMsg: 'Посетите аят в Мусхафе или удалите его из коллекции одним нажатием.',
+    // General
+    restartTutorial: 'Перезапустить обучение',
   },
   wordPuzzle: {
     tips: 'Подсказки',
