@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { type HarakatDefinition } from '@/lib/harakat-utils';
 import { useI18n } from '@/lib/i18n';
-import { getHarakatSound, getHarakatDescription } from '@/lib/harakat-i18n';
+import { getHarakatName, getHarakatSound, getHarakatDescription } from '@/lib/harakat-i18n';
 
 interface HarakatModalProps {
   definition: HarakatDefinition | null;
@@ -104,7 +104,7 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
                 className="text-2xl font-bold mb-1"
                 style={{ color: definition.color }}
               >
-                {definition.nameEnglish}
+                {getHarakatName(definition.character, locale) || definition.nameEnglish}
               </h2>
               <p className="text-xl text-gray-300 font-arabic" dir="rtl">
                 {definition.nameArabic}

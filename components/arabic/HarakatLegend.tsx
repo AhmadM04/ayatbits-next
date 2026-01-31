@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, HelpCircle, X } from 'lucide-react';
 import { getHarakatByCategory, type HarakatDefinition } from '@/lib/harakat-utils';
 import { useI18n } from '@/lib/i18n';
+import { getHarakatName } from '@/lib/harakat-i18n';
 
 interface HarakatLegendProps {
   variant?: 'inline' | 'floating';
@@ -150,7 +151,15 @@ interface LegendContentProps {
 }
 
 function LegendContent({ categories, onSelect, compact = false }: LegendContentProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  
+  // Get translated category name
+  const getCategoryName = (englishName: string) => {
+    if (englishName === 'Short Vowels') return t('harakat.shortVowels');
+    if (englishName === 'Nunation (Tanween)') return t('harakat.nunation');
+    if (englishName === 'Other Marks') return t('harakat.otherMarks');
+    return englishName;
+  };
   
   return (
     <div className={compact ? 'pt-3 space-y-4' : 'space-y-6'}>
@@ -159,7 +168,7 @@ function LegendContent({ categories, onSelect, compact = false }: LegendContentP
           {/* Category Header */}
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-sm font-medium text-gray-400">
-              {category.name}
+              {getCategoryName(category.name)}
             </h4>
             <span className="text-xs text-gray-600 font-arabic" dir="rtl">
               {category.nameArabic}
@@ -193,7 +202,7 @@ function LegendContent({ categories, onSelect, compact = false }: LegendContentP
                     className={`block font-medium ${compact ? 'text-xs' : 'text-sm'} truncate`}
                     style={{ color: harakat.color }}
                   >
-                    {harakat.nameEnglish}
+                    {getHarakatName(harakat.character, locale) || harakat.nameEnglish}
                   </span>
                   {!compact && (
                     <span className="text-xs text-gray-500 truncate block">
