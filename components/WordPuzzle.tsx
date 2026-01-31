@@ -121,7 +121,11 @@ function DropSlot({
                 '0 0 0 rgba(16, 185, 129, 0)',
               ],
             }
-          : { opacity: 1, scale: 1 }
+          : { 
+              opacity: 1, 
+              scale: 1,
+              boxShadow: '0 0 0 rgba(16, 185, 129, 0)'
+            }
       }
       transition={
         isPlayingThis
@@ -149,7 +153,11 @@ function DropSlot({
                 repeat: Infinity,
               },
             }
-          : { delay: position * 0.02, duration: 0.3 }
+          : { 
+              delay: position * 0.02, 
+              duration: 0.3,
+              boxShadow: { duration: 0.3 }
+            }
       }
       onClick={handleWordClick}
       className={`

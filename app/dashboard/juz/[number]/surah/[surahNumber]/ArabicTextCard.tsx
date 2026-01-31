@@ -30,7 +30,7 @@ export default function ArabicTextCard({
       {/* Arabic Text Card with icons on top right */}
       <div
         className={`
-          bg-[#0f0f0f] border-2 border-dashed rounded-xl p-4 sm:p-5
+          bg-[#0f0f0f] border-2 rounded-xl p-4 sm:p-5
           transition-all duration-300
           ${isPlayingRecitation
             ? 'border-green-500/50 shadow-[0_0_30px_rgba(34,197,94,0.3)] ring-2 ring-green-500/20'
