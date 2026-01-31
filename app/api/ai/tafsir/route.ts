@@ -246,7 +246,7 @@ Keep it brief (2-3 paragraphs), scholarly, and in clear ${targetLanguageName}.`;
     // 9. Call Gemini API with safety settings
     console.log('Creating Gemini model...');
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-pro',
+      model: 'gemini-1.5-flash',
       safetySettings: [
         {
           category: HarmCategory.HARM_CATEGORY_HARASSMENT,
