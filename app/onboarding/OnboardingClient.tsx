@@ -97,6 +97,7 @@ export default function OnboardingClient({
       });
 
       if (response.ok) {
+        router.refresh();
         router.push('/dashboard');
       } else {
         showToast('Failed to skip onboarding', 'error');
@@ -152,6 +153,7 @@ export default function OnboardingClient({
 
       if (response.ok) {
         showToast('Profile completed!', 'success');
+        router.refresh();
         router.push('/dashboard');
       } else {
         showToast(data.error || 'Failed to save preferences', 'error');
