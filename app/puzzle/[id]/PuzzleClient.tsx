@@ -231,6 +231,20 @@ export default function PuzzleClient({
       setIsLoadingAiTafsir(true);
       setAiError(null);
       try {
+        // Fetch translation text for the verse in user's language
+        let translationText = '';
+        try {
+          const translationResponse = await fetch(
+            `/api/verse/translation?surah=${puzzle.surah.number}&ayah=${puzzle.content.ayahNumber}&translation=${userTranslation}`
+          );
+          if (translationResponse.ok) {
+            const translationData = await translationResponse.json();
+            translationText = translationData.translation || '';
+          }
+        } catch (error) {
+          console.error('Failed to fetch translation for AI tafsir:', error);
+        }
+
         const response = await fetch('/api/ai/tafsir', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -238,8 +252,9 @@ export default function PuzzleClient({
             surahNumber: puzzle.surah.number,
             ayahNumber: puzzle.content.ayahNumber,
             ayahText: ayahText,
-            translation: '',
-            translationCode: 'en.sahih',
+            translation: translationText,
+            translationCode: userTranslation,
+            targetLanguage: userTranslation, // Pass user's selected translation language
           }),
         });
 

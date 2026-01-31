@@ -11,20 +11,22 @@ export type TafsirType = 'ibn_kathir' | 'as_saadi' | 'jalalayn' | 'muyassar';
 
 // Tafsir resource IDs from Quran.com API v4
 // https://api.quran.com/api/v4/resources/tafsirs
+// Verified IDs:
+// - 169: Tafsir Ibn Kathir (English)
+// - 168: Tafsir al-Jalalayn (Arabic)
+// - 93: Tafsir As-Saadi (Arabic)
 const TAFSIR_RESOURCE_IDS = {
   // English
   ibn_kathir_en: 169,
-  as_saadi_en: 171,
   
   // Arabic
   jalalayn_ar: 168,
-  muyassar_ar: 171,
+  muyassar_ar: 168,
   ibn_kathir_ar: 169,
-  as_saadi_ar: 171,
+  as_saadi_ar: 93,
   
-  // Russian
+  // Russian - only Ibn Kathir available in English
   ibn_kathir_ru: 169, // Fallback to English
-  as_saadi_ru: 171,   // Fallback to English
   
   // Urdu
   ibn_kathir_ur: 169,
@@ -60,20 +62,20 @@ interface TafsirOptions {
 }
 
 const TRANSLATION_TAFSIR_MAP: Record<string, TafsirOptions> = {
-  // English translations
-  'en': { ibn_kathir: 169, as_saadi: 171, default: 169, language: 'English' },
-  'en.sahih': { ibn_kathir: 169, as_saadi: 171, default: 169, language: 'English' },
-  'en.pickthall': { ibn_kathir: 169, as_saadi: 171, default: 169, language: 'English' },
-  'en.yusufali': { ibn_kathir: 169, as_saadi: 171, default: 169, language: 'English' },
+  // English translations - only Ibn Kathir available in English
+  'en': { ibn_kathir: 169, default: 169, language: 'English' },
+  'en.sahih': { ibn_kathir: 169, default: 169, language: 'English' },
+  'en.pickthall': { ibn_kathir: 169, default: 169, language: 'English' },
+  'en.yusufali': { ibn_kathir: 169, default: 169, language: 'English' },
   
-  // Arabic translations
-  'ar': { ibn_kathir: 169, default: 168, language: 'Arabic' },
-  'ar.jalalayn': { default: 168, language: 'Arabic' },
-  'ar.tafseer': { default: 168, language: 'Arabic' },
+  // Arabic translations - Ibn Kathir, As-Saadi, and Jalalayn available
+  'ar': { ibn_kathir: 169, as_saadi: 93, default: 168, language: 'Arabic' },
+  'ar.jalalayn': { ibn_kathir: 169, as_saadi: 93, default: 168, language: 'Arabic' },
+  'ar.tafseer': { ibn_kathir: 169, as_saadi: 93, default: 168, language: 'Arabic' },
   
-  // Russian translations
-  'ru': { ibn_kathir: 169, as_saadi: 171, default: 169, language: 'Russian' },
-  'ru.kuliev': { ibn_kathir: 169, as_saadi: 171, default: 169, language: 'Russian' },
+  // Russian translations - only Ibn Kathir (English) available as fallback
+  'ru': { ibn_kathir: 169, default: 169, language: 'Russian' },
+  'ru.kuliev': { ibn_kathir: 169, default: 169, language: 'Russian' },
   
   // Urdu translations
   'ur': { ibn_kathir: 169, default: 169, language: 'Urdu' },
@@ -125,10 +127,11 @@ const TRANSLATION_TAFSIR_MAP: Record<string, TafsirOptions> = {
 };
 
 // Tafsir resource names for display
+// Note: Resource 169 is the Muhtasar (abridged) version of Ibn Kathir
 const TAFSIR_NAMES: Record<number, { name: string; type: string }> = {
-  169: { name: 'Tafsir Ibn Kathir', type: 'ibn_kathir' },
+  169: { name: 'Tafsir Ibn Kathir (Muhtasar)', type: 'ibn_kathir' },
   168: { name: 'Tafsir al-Jalalayn', type: 'jalalayn' },
-  171: { name: 'Tafsir As-Saadi', type: 'as_saadi' },
+  93: { name: 'Tafsir As-Saadi', type: 'as_saadi' },
 };
 
 interface TafsirResponse {
