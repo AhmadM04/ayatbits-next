@@ -13,9 +13,11 @@ export async function GET() {
     
     // Try multiple model names to find which one works
     const modelsToTry = [
+      'gemini-3-flash-preview',
       'gemini-1.5-flash',
       'gemini-1.5-pro',
       'gemini-pro',
+      'models/gemini-3-flash-preview',
       'models/gemini-1.5-flash',
       'models/gemini-1.5-pro',
       'models/gemini-pro',
