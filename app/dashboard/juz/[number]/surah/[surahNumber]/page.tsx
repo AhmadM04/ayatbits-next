@@ -2,16 +2,14 @@ import { currentUser } from '@clerk/nextjs/server';
 import { redirect, notFound } from 'next/navigation';
 import { connectDB, Surah, Juz, Puzzle, UserProgress, User, LikedAyat } from '@/lib/db';
 import Link from 'next/link';
-import { ArrowLeft, Play, Heart, CheckCircle, BookOpen } from 'lucide-react';
+import { ArrowLeft, BookOpen } from 'lucide-react';
 import VersePageClient from './VersePageClient';
 import TranslationDisplay from './TranslationDisplay';
 import TransliterationDisplay from './TransliterationDisplay';
-import AudioPlayer from './AudioPlayer';
 import AyahSelectorClient from './AyahSelectorClient';
-import LikeButton from './LikeButton';
-import AyahTextDisplay from './AyahTextDisplay';
 import BismillahDisplay from './BismillahDisplay';
 import VerseNavButtons from './VerseNavButtons';
+import ArabicTextCard from './ArabicTextCard';
 import { cleanAyahText, extractBismillah, shouldShowBismillahSeparately } from '@/lib/ayah-utils';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
 import { fetchTranslation, fetchTransliteration } from '@/lib/quran-api-adapter';
@@ -190,38 +188,18 @@ export default async function SurahVersePage({
                 />
               )}
 
-              {/* Arabic Text Card with icons on top right */}
-              <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 sm:p-5">
-                {/* Top icons row - explicitly right aligned */}
-                <div className="flex items-center gap-2 mb-3" style={{ justifyContent: 'flex-end' }}>
-                  {isMemorized && (
-                    <div className="w-7 h-7 rounded-full bg-green-500/20 flex items-center justify-center" title="Memorized">
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                    </div>
-                  )}
-                  <LikeButton
-                    puzzleId={currentPuzzle._id.toString()}
-                    isLiked={isLiked}
-                    compact
-                  />
-                </div>
-
-                {/* Arabic Text */}
-                <AyahTextDisplay
-                  ayahText={showBismillahSeparately ? remainingText : cleanAyahText(
-                    currentPuzzle.content?.ayahText || '',
-                    parseInt(surahNumber),
-                    selectedAyah
-                  )}
-                  surahNumber={parseInt(surahNumber)}
-                  ayahNumber={selectedAyah}
-                />
-              </div>
-
-              {/* Audio Player - Redesigned */}
-              <AudioPlayer
+              {/* Arabic Text Card with Audio Player */}
+              <ArabicTextCard
                 surahNumber={parseInt(surahNumber)}
                 ayahNumber={selectedAyah}
+                ayahText={showBismillahSeparately ? remainingText : cleanAyahText(
+                  currentPuzzle.content?.ayahText || '',
+                  parseInt(surahNumber),
+                  selectedAyah
+                )}
+                puzzleId={currentPuzzle._id.toString()}
+                isMemorized={isMemorized}
+                isLiked={isLiked}
               />
 
               {/* Translation */}
