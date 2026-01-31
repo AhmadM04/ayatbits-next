@@ -41,16 +41,21 @@ export function TutorialTooltip({
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       
-      // Use more conservative constraints for mobile
+      // Use more generous constraints for mobile to allow free movement
       const isMobile = vw < 768;
-      const tooltipWidth = isMobile ? vw * 0.9 : 384; // max-w-sm
+      const tooltipWidth = isMobile ? Math.min(vw * 0.9, 340) : 384; // max-w-sm
       const tooltipHeight = 250; // estimated height
       
+      // On mobile, allow dragging across most of the screen
+      // On desktop, keep more conservative bounds
+      const horizontalRange = isMobile ? vw * 0.45 : 300;
+      const verticalRange = isMobile ? vh * 0.4 : 250;
+      
       setDragConstraints({
-        top: Math.max(-vh / 2 + tooltipHeight / 2 + 20, -200),
-        bottom: Math.min(vh / 2 - tooltipHeight / 2 - 20, 200),
-        left: Math.max(-vw / 2 + tooltipWidth / 2 + 20, isMobile ? -vw / 4 : -200),
-        right: Math.min(vw / 2 - tooltipWidth / 2 - 20, isMobile ? vw / 4 : 200),
+        top: -verticalRange,
+        bottom: verticalRange,
+        left: -horizontalRange,
+        right: horizontalRange,
       });
     };
 
@@ -67,13 +72,14 @@ export function TutorialTooltip({
     <motion.div
       drag
       dragMomentum={false}
-      dragElastic={0}
+      dragElastic={0.1}
       dragConstraints={dragConstraints}
+      dragTransition={{ bounceStiffness: 300, bounceDamping: 20 }}
       whileDrag={{ scale: 1.05, cursor: 'grabbing' }}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className="relative bg-gray-900 backdrop-blur-md rounded-2xl shadow-2xl border border-green-500/30 max-w-sm cursor-grab active:cursor-grabbing touch-none"
+      className="relative bg-gray-900 backdrop-blur-md rounded-2xl shadow-2xl border border-green-500/30 w-[90vw] max-w-sm cursor-grab active:cursor-grabbing touch-none"
       style={{ 
         boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(16, 185, 129, 0.3)',
       }}

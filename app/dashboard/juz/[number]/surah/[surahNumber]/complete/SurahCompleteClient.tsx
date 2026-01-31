@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { TrophyAnimation, SparkleAnimation } from '@/components/animations';
+import { useI18n } from '@/lib/i18n';
 
 interface SurahCompleteClientProps {
   surah: {
@@ -63,6 +64,7 @@ export default function SurahCompleteClient({
   nextSurah,
   juzNumber,
 }: SurahCompleteClientProps) {
+  const { t } = useI18n();
   const [showContent, setShowContent] = useState(false);
   const [hasPlayedConfetti, setHasPlayedConfetti] = useState(false);
 
@@ -135,8 +137,8 @@ export default function SurahCompleteClient({
               <ArrowLeft className="w-5 h-5 text-gray-400" />
             </Link>
             <div className="flex-1">
-              <h1 className="text-lg font-semibold">Surah Completed!</h1>
-              <p className="text-xs text-gray-500">Juz {juz.number}</p>
+              <h1 className="text-lg font-semibold">{t('puzzle.surahCompleted')}</h1>
+              <p className="text-xs text-gray-500">{t('common.juz')} {juz.number}</p>
             </div>
           </div>
         </div>
@@ -191,7 +193,7 @@ export default function SurahCompleteClient({
               transition={{ delay: 0.3 }}
               className="text-3xl font-bold text-white mb-2"
             >
-              Mashallah!
+              {t('puzzle.mashallah')}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -199,7 +201,7 @@ export default function SurahCompleteClient({
               transition={{ delay: 0.4 }}
               className="text-gray-400 text-lg mb-1"
             >
-              You completed
+              {t('puzzle.youCompleted')}
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -222,7 +224,7 @@ export default function SurahCompleteClient({
             >
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <Award className="w-5 h-5 text-yellow-400" />
-                Achievements Unlocked
+                {t('puzzle.achievementsUnlocked')}
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {achievements.map((achievement, index) => (
@@ -254,13 +256,13 @@ export default function SurahCompleteClient({
             >
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <Book className="w-5 h-5 text-green-400" />
-                Juz {juz.number} Progress
+                {t('juz.juzProgress', { number: juz.number })}
               </h3>
               
               {/* Overall Progress */}
               <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 mb-4">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-gray-400">Overall Progress</span>
+                  <span className="text-gray-400">{t('juz.overallProgress')}</span>
                   <span className="text-green-400 font-semibold">
                     {Math.round(juzProgress.percentage)}%
                   </span>
@@ -274,7 +276,7 @@ export default function SurahCompleteClient({
                   />
                 </div>
                 <div className="text-sm text-gray-500">
-                  {juzProgress.completedPuzzles} / {juzProgress.totalPuzzles} ayahs completed
+                  {juzProgress.completedPuzzles} / {juzProgress.totalPuzzles} {t('juz.ayahsCompleted')}
                 </div>
                 
                 {juzProgress.isCompleted && (
@@ -286,7 +288,7 @@ export default function SurahCompleteClient({
                   >
                     <div className="flex items-center justify-center gap-2 text-green-400 font-semibold">
                       <Star className="w-5 h-5 fill-green-400" />
-                      Juz {juz.number} Completed!
+                      {t('juz.juzCompleted', { number: juz.number })}
                       <Star className="w-5 h-5 fill-green-400" />
                     </div>
                   </motion.div>
@@ -327,7 +329,7 @@ export default function SurahCompleteClient({
                         <div className={`text-sm font-medium ${s.isCompleted ? 'text-green-400' : 'text-gray-400'}`}>
                           {s.completedAyahs}/{s.totalAyahs}
                         </div>
-                        <div className="text-xs text-gray-600">ayahs</div>
+                        <div className="text-xs text-gray-600">{t('common.ayahs')}</div>
                       </div>
                       {!s.isCompleted && (
                         <Link
@@ -358,7 +360,7 @@ export default function SurahCompleteClient({
                   className="group relative flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-xl font-semibold transition-all overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                  <span className="relative z-10">Continue to {nextSurah.nameEnglish}</span>
+                  <span className="relative z-10">{t('puzzle.continueTo', { surah: nextSurah.nameEnglish })}</span>
                   <ChevronRight className="w-5 h-5 relative z-10" />
                 </Link>
               )}
@@ -368,14 +370,14 @@ export default function SurahCompleteClient({
                 className="flex items-center justify-center gap-2 w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl font-medium text-gray-300 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Back to Juz {juz.number}
+                {t('juz.backToJuz', { number: juz.number })}
               </Link>
               
               <Link
                 href="/dashboard"
                 className="flex items-center justify-center w-full py-3 text-gray-500 hover:text-gray-300 transition-colors"
               >
-                Return to Dashboard
+                {t('dashboard.returnToDashboard')}
               </Link>
             </motion.div>
           )}

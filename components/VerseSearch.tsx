@@ -237,7 +237,7 @@ export default function VerseSearch() {
         className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors"
       >
         <Search className="w-4 h-4 text-gray-400" />
-        <span className="text-sm text-gray-400 hidden sm:inline">Search</span>
+        <span className="text-sm text-gray-400 hidden sm:inline">{t('common.search')}</span>
       </button>
 
       {/* Search Modal - rendered at root level */}
@@ -268,7 +268,7 @@ export default function VerseSearch() {
               <div className="bg-[#111] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
                 {/* Header with close button */}
                 <div className="flex items-center justify-between p-3 border-b border-white/5">
-                  <span className="text-sm text-gray-400">Search Verse</span>
+                  <span className="text-sm text-gray-400">{t('search.searchVerse')}</span>
                   <button
                     onClick={() => {
                       setIsOpen(false);
@@ -360,7 +360,7 @@ export default function VerseSearch() {
                       ) : (
                         <>
                           <BookOpen className="w-4 h-4" />
-                          <span>Start learning</span>
+                          <span>{t('search.startLearning')}</span>
                           <Sparkles className="w-4 h-4" />
                         </>
                       )}

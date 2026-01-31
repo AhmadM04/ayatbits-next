@@ -23,6 +23,8 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
     notAvailable: 'Not available',
     listen: 'Listen',
     gotIt: 'Got it',
+    playing: 'Playing',
+    ayahs: 'ayahs',
   },
   dailyQuote: {
     verseOfTheDay: 'Verse of the Day',
@@ -73,6 +75,7 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
     noJuzsFound: 'No Juz available',
     learner: 'Learner',
     restartTutorial: 'Restart Tutorial',
+    returnToDashboard: 'Return to Dashboard',
   },
   achievements: {
     title: 'Achievements',
@@ -106,6 +109,7 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
     goToDashboard: 'Go to Dashboard',
     examples: 'Examples',
     startLearning: 'Start learning',
+    searchVerse: 'Search Verse',
   },
   liked: {
     title: 'Liked Ayahs',
@@ -128,6 +132,11 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
     ayahs: 'ayahs',
     ayah: 'Ayah',
     completed: 'Completed',
+    juzProgress: 'Juz {number} Progress',
+    overallProgress: 'Overall Progress',
+    ayahsCompleted: 'ayahs completed',
+    juzCompleted: 'Juz {number} Completed!',
+    backToJuz: 'Back to Juz {number}',
   },
   profile: {
     selectTranslation: 'Select Translation',
@@ -169,6 +178,10 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
     tryAgain: 'Try Again',
     correct: 'Correct!',
     incorrect: 'Not quite right',
+    mashallah: 'Mashallah!',
+    youCompleted: 'You completed',
+    achievementsUnlocked: 'Achievements Unlocked',
+    continueTo: 'Continue to {surah}',
   },
   tutorial: {
     dashboardWelcome: 'Welcome to Ayatbits! 👋',
@@ -262,6 +275,8 @@ const AR_MESSAGES: Record<string, Record<string, string>> = {
     notAvailable: 'غير متاح',
     listen: 'استمع',
     gotIt: 'فهمت',
+    playing: 'يتم التشغيل',
+    ayahs: 'آيات',
   },
   dailyQuote: {
     verseOfTheDay: 'آية اليوم',
@@ -312,6 +327,7 @@ const AR_MESSAGES: Record<string, Record<string, string>> = {
     noJuzsFound: 'لا توجد أجزاء متاحة',
     learner: 'متعلم',
     restartTutorial: 'إعادة تشغيل البرنامج التعليمي',
+    returnToDashboard: 'العودة إلى لوحة التحكم',
   },
   achievements: {
     title: 'الإنجازات',
@@ -345,6 +361,7 @@ const AR_MESSAGES: Record<string, Record<string, string>> = {
     goToDashboard: 'الذهاب إلى لوحة التحكم',
     examples: 'أمثلة',
     startLearning: 'ابدأ التعلم',
+    searchVerse: 'البحث عن آية',
   },
   liked: {
     title: 'الآيات المفضلة',
@@ -367,6 +384,11 @@ const AR_MESSAGES: Record<string, Record<string, string>> = {
     ayahs: 'آيات',
     ayah: 'آية',
     completed: 'مكتمل',
+    juzProgress: 'تقدم الجزء {number}',
+    overallProgress: 'التقدم الإجمالي',
+    ayahsCompleted: 'آيات مكتملة',
+    juzCompleted: 'اكتمل الجزء {number}!',
+    backToJuz: 'العودة إلى الجزء {number}',
   },
   profile: {
     selectTranslation: 'اختر الترجمة',
@@ -408,6 +430,10 @@ const AR_MESSAGES: Record<string, Record<string, string>> = {
     tryAgain: 'حاول مرة أخرى',
     correct: 'صحيح!',
     incorrect: 'ليس صحيحاً تماماً',
+    mashallah: 'ما شاء الله!',
+    youCompleted: 'لقد أكملت',
+    achievementsUnlocked: 'إنجازات تم فتحها',
+    continueTo: 'متابعة إلى {surah}',
   },
   tutorial: {
     dashboardWelcome: 'مرحباً بك في آياتبتس! 👋',
@@ -501,6 +527,8 @@ const RU_MESSAGES: Record<string, Record<string, string>> = {
     notAvailable: 'Недоступно',
     listen: 'Слушать',
     gotIt: 'Понятно',
+    playing: 'Воспроизведение',
+    ayahs: 'аяты',
   },
   dailyQuote: {
     verseOfTheDay: 'Аят дня',
@@ -551,6 +579,7 @@ const RU_MESSAGES: Record<string, Record<string, string>> = {
     noJuzsFound: 'Джузы не найдены',
     learner: 'Ученик',
     restartTutorial: 'Перезапустить обучение',
+    returnToDashboard: 'Вернуться на панель',
   },
   achievements: {
     title: 'Достижения',
@@ -584,6 +613,7 @@ const RU_MESSAGES: Record<string, Record<string, string>> = {
     goToDashboard: 'Перейти на панель',
     examples: 'Примеры',
     startLearning: 'Начать обучение',
+    searchVerse: 'Поиск аята',
   },
   liked: {
     title: 'Избранные аяты',
@@ -606,6 +636,11 @@ const RU_MESSAGES: Record<string, Record<string, string>> = {
     ayahs: 'аяты',
     ayah: 'Аят',
     completed: 'Завершено',
+    juzProgress: 'Прогресс джуза {number}',
+    overallProgress: 'Общий прогресс',
+    ayahsCompleted: 'аятов завершено',
+    juzCompleted: 'Джуз {number} завершён!',
+    backToJuz: 'Вернуться к джузу {number}',
   },
   profile: {
     selectTranslation: 'Выбрать перевод',
@@ -647,6 +682,10 @@ const RU_MESSAGES: Record<string, Record<string, string>> = {
     tryAgain: 'Попробуйте снова',
     correct: 'Правильно!',
     incorrect: 'Не совсем правильно',
+    mashallah: 'Машаллах!',
+    youCompleted: 'Вы завершили',
+    achievementsUnlocked: 'Достижения разблокированы',
+    continueTo: 'Перейти к {surah}',
   },
   tutorial: {
     dashboardWelcome: 'Добро пожаловать в Ayatbits! 👋',

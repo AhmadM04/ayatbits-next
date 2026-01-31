@@ -94,7 +94,8 @@ export function TutorialOverlay({
     const baseOffset = 48; // Gap between target and tooltip (increased for better spacing)
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const tooltipWidth = 384; // max-w-sm = 24rem = 384px
+    const isMobile = viewportWidth < 768;
+    const tooltipWidth = isMobile ? Math.min(viewportWidth * 0.9, 340) : 384; // max-w-sm = 24rem = 384px
     
     let left = targetRect.left + targetRect.width / 2;
     let top = targetRect.top;
@@ -121,18 +122,24 @@ export function TutorialOverlay({
         break;
     }
     
-    // Keep tooltip within viewport bounds
-    if (left < tooltipWidth / 2 + 20) {
-      left = tooltipWidth / 2 + 20;
-    } else if (left > viewportWidth - tooltipWidth / 2 - 20) {
-      left = viewportWidth - tooltipWidth / 2 - 20;
+    // Keep tooltip within viewport bounds with better mobile handling
+    const horizontalPadding = isMobile ? 20 : 40;
+    const minLeft = tooltipWidth / 2 + horizontalPadding;
+    const maxLeft = viewportWidth - tooltipWidth / 2 - horizontalPadding;
+    
+    if (left < minLeft) {
+      left = minLeft;
+    } else if (left > maxLeft) {
+      left = maxLeft;
     }
     
-    if (top < 20) {
-      top = 20;
+    // On mobile, ensure tooltip doesn't go off-screen vertically
+    const verticalPadding = isMobile ? 80 : 20;
+    if (top < verticalPadding) {
+      top = verticalPadding;
       transform = transform.replace('-100%', '0');
-    } else if (top > viewportHeight - 200) {
-      top = viewportHeight - 200;
+    } else if (top > viewportHeight - 250) {
+      top = Math.max(verticalPadding, viewportHeight - 250);
     }
     
     return { left, top, transform };

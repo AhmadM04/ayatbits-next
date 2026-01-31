@@ -3,6 +3,8 @@
  * This ensures consistency in Uthmani text across the app
  */
 
+import { cleanTranslationText } from './translation-utils';
+
 // Quran.com API base URL
 const QURAN_COM_API = 'https://api.quran.com/api/v4';
 
@@ -148,9 +150,13 @@ export async function fetchTranslation(
   const verse = data.verse;
   const translation = verse.translations?.[0];
 
+  // Clean translation text to remove HTML tags and footnote markers
+  const translationText = translation?.text || '';
+  const cleanedText = cleanTranslationText(translationText);
+
   return {
     data: {
-      text: translation?.text || '',
+      text: cleanedText,
       numberInSurah: verse.verse_number,
     },
   };

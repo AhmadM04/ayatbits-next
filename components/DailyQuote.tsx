@@ -10,6 +10,7 @@ import { useWordAudio } from '@/lib/hooks/useWordAudio';
 import { HarakatText, HarakatModal } from '@/components/arabic';
 import { type HarakatDefinition } from '@/lib/harakat-utils';
 import { useI18n } from '@/lib/i18n';
+import { cleanTranslationText } from '@/lib/translation-utils';
 
 interface DailyQuoteData {
   arabicText: string;
@@ -63,7 +64,12 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
           translationLength: data.data.translation?.length,
           translation: data.data.translation,
         });
-        setQuote(data.data);
+        // Clean translation text to remove HTML tags and footnotes
+        const cleanedData = {
+          ...data.data,
+          translation: cleanTranslationText(data.data.translation),
+        };
+        setQuote(cleanedData);
       }
       } catch (err) {
       if (err instanceof NetworkError) {

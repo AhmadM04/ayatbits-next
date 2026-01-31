@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Globe } from 'lucide-react';
+import { cleanTranslationText } from '@/lib/translation-utils';
 
 interface TranslationDisplayProps {
   surahNumber: number;
@@ -44,7 +45,8 @@ export default function TranslationDisplay({
   useEffect(() => {
     const fetchTranslation = async () => {
       if (initialTranslation) {
-        setTranslation(initialTranslation);
+        // Clean initial translation in case it has HTML tags (from cache)
+        setTranslation(cleanTranslationText(initialTranslation));
         setIsLoading(false);
         return;
       }
@@ -57,7 +59,8 @@ export default function TranslationDisplay({
         if (response.ok) {
           const data = await response.json();
           if (data.translation) {
-            setTranslation(data.translation);
+            // Clean translation text to remove any HTML tags
+            setTranslation(cleanTranslationText(data.translation));
           } else {
             setTranslation(undefined);
           }

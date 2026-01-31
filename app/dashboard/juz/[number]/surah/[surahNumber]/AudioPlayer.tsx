@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2 } from 'lucide-react';
 import { getAudioUrl as getQuranAudioUrl } from '@/lib/quran-api-adapter';
+import { useI18n } from '@/lib/i18n';
 
 interface AudioPlayerProps {
   surahNumber: number;
@@ -11,6 +12,7 @@ interface AudioPlayerProps {
 }
 
 export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }: AudioPlayerProps) {
+  const { t } = useI18n();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
@@ -133,7 +135,7 @@ export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }
           <div className="flex items-center gap-2">
             <Volume2 className="w-4 h-4 text-gray-500" />
             <span className="text-sm text-gray-400">
-              {isLoading ? 'Loading...' : isPlaying ? 'Playing' : 'Listen'}
+              {isLoading ? t('common.loading') : isPlaying ? t('common.playing') : t('common.listen')}
             </span>
           </div>
         </div>
