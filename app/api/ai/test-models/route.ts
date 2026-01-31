@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 
 export async function GET() {
   try {
@@ -9,15 +9,15 @@ export async function GET() {
       return NextResponse.json({ error: 'No API key' }, { status: 500 });
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const ai = new GoogleGenAI({ apiKey });
     
     // Try multiple model names to find which one works
     const modelsToTry = [
+      'gemini-2.0-flash-exp',
       'gemini-1.5-pro',
       'gemini-1.5-flash', 
       'gemini-pro',
-      'gemini-1.0-pro',
-      'models/gemini-pro',
+      'models/gemini-2.0-flash-exp',
       'models/gemini-1.5-pro',
     ];
 
@@ -25,10 +25,12 @@ export async function GET() {
 
     for (const modelName of modelsToTry) {
       try {
-        const model = genAI.getGenerativeModel({ model: modelName });
-        const result = await model.generateContent('Say "Hello"');
-        const response = await result.response;
-        const text = response.text();
+        const response = await ai.models.generateContent({
+          model: modelName,
+          contents: 'Say "Hello"',
+        });
+        
+        const text = response.text || '';
         
         results.push({
           model: modelName,
