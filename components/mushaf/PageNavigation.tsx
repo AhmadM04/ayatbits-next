@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, ChevronDown, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TOTAL_MUSHAF_PAGES, getJuzForPage } from '@/lib/mushaf-utils';
+import { useI18n } from '@/lib/i18n';
 
 interface PageNavigationProps {
   currentPage: number;
@@ -17,6 +18,7 @@ export default function PageNavigation({
   totalPages,
   currentJuz,
 }: PageNavigationProps) {
+  const { t } = useI18n();
   const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchValue, setSearchValue] = useState('');
@@ -114,8 +116,8 @@ export default function PageNavigation({
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
         >
           <div className="text-center">
-            <span className="text-white font-medium">Page {currentPage}</span>
-            <span className="text-gray-500 text-sm ml-2">of {totalPages}</span>
+            <span className="text-white font-medium">{t('common.page')} {currentPage}</span>
+            <span className="text-gray-500 text-sm ml-2">{t('common.of')} {totalPages}</span>
           </div>
           <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
         </button>
@@ -157,7 +159,7 @@ export default function PageNavigation({
 
               {/* Quick Select - Juz Based */}
               <div className="p-2 max-h-64 overflow-y-auto">
-                <p className="text-xs text-gray-500 px-2 py-1 mb-1">Quick Jump by Juz</p>
+                <p className="text-xs text-gray-500 px-2 py-1 mb-1">Quick Jump by {t('common.juz')}</p>
                 <div className="grid grid-cols-5 gap-1">
                   {Array.from({ length: 30 }, (_, i) => i + 1).map((juz) => {
                     const startPage = (juz - 1) * 20 + 1;
@@ -184,7 +186,7 @@ export default function PageNavigation({
               {/* Current Info */}
               <div className="p-3 border-t border-white/5 bg-white/[0.02]">
                 <p className="text-xs text-gray-500 text-center">
-                  Currently in Juz {currentJuz}
+                  Currently in {t('common.juz')} {currentJuz}
                 </p>
               </div>
             </motion.div>

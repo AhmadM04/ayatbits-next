@@ -4,6 +4,7 @@ import { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { type HarakatDefinition } from '@/lib/harakat-utils';
+import { useI18n } from '@/lib/i18n';
 
 interface HarakatModalProps {
   definition: HarakatDefinition | null;
@@ -12,6 +13,8 @@ interface HarakatModalProps {
 }
 
 export default function HarakatModal({ definition, isOpen, onClose }: HarakatModalProps) {
+  const { t } = useI18n();
+
   // Close on escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -112,7 +115,7 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
               {/* Transliteration */}
               <div className="flex items-center justify-between py-2 border-b border-white/5">
                 <span className="text-sm text-gray-500 uppercase tracking-wider">
-                  Transliteration
+                  {t('harakat.transliteration').toUpperCase()}
                 </span>
                 <span className="text-lg font-mono text-white">
                   {definition.transliteration}
@@ -122,7 +125,7 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
               {/* Sound */}
               <div className="flex items-start justify-between py-2 border-b border-white/5">
                 <span className="text-sm text-gray-500 uppercase tracking-wider">
-                  Sound
+                  {t('harakat.sound').toUpperCase()}
                 </span>
                 <span className="text-base text-gray-200 text-right max-w-[60%]">
                   {definition.sound}
@@ -132,7 +135,7 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
               {/* Description */}
               <div className="py-2 border-b border-white/5">
                 <span className="text-sm text-gray-500 uppercase tracking-wider block mb-2">
-                  Description
+                  {t('harakat.description').toUpperCase()}
                 </span>
                 <p className="text-sm text-gray-300 leading-relaxed">
                   {definition.description}
@@ -142,7 +145,7 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
               {/* Example Word */}
               <div className="py-2">
                 <span className="text-sm text-gray-500 uppercase tracking-wider block mb-2">
-                  Example
+                  {t('harakat.examples').toUpperCase()}
                 </span>
                 <p 
                   className="text-lg text-white font-arabic text-right"
@@ -160,7 +163,7 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
                 className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 
                            rounded-xl text-white font-medium transition-colors"
               >
-                Got it
+                {t('common.gotIt')}
               </button>
             </div>
           </motion.div>

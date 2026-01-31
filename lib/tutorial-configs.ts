@@ -2,47 +2,50 @@ import { TutorialStep } from '@/components/tutorial';
 
 /**
  * Dashboard Tutorial Configuration
+ * Note: title and message are now translation keys from lib/i18n.tsx
  */
 export const dashboardTutorialSteps: TutorialStep[] = [
   {
     id: 'dashboard-welcome',
     target: '[data-tutorial="welcome-section"]',
-    title: 'Welcome to Ayatbits! 👋',
-    message: 'Your personal dashboard for exploring the Quran through interactive puzzles.',
+    title: 'tutorial.dashboardWelcome',
+    message: 'tutorial.dashboardWelcomeMsg',
     placement: 'bottom',
   },
   {
     id: 'dashboard-stats',
     target: '[data-tutorial="stats-cards"]',
-    title: 'Track Your Progress',
-    message: 'Keep an eye on your streak, completed puzzles, and Juz explored here.',
+    title: 'tutorial.trackProgress',
+    message: 'tutorial.trackProgressMsg',
     placement: 'bottom',
   },
   {
     id: 'dashboard-quote',
     target: '[data-tutorial="daily-quote"]',
-    title: 'Daily Inspiration',
-    message: 'Get inspired with a new Quranic verse every day. Tap to hear the recitation!',
+    title: 'tutorial.dailyInspiration',
+    message: 'tutorial.dailyInspirationMsg',
     placement: 'bottom',
   },
   {
     id: 'dashboard-juz',
     target: '[data-tutorial="juz-grid"]',
-    title: 'Explore the Quran',
-    message: 'Choose any Juz to start solving puzzles and learning the Quran in a fun way.',
+    title: 'tutorial.exploreQuran',
+    message: 'tutorial.exploreQuranMsg',
     placement: 'bottom',
   },
   {
     id: 'dashboard-nav',
     target: '[data-tutorial="bottom-nav"]',
-    title: 'Easy Navigation',
-    message: 'Use the bottom navigation to quickly access your dashboard, search, and profile.',
+    title: 'tutorial.easyNavigation',
+    message: 'tutorial.easyNavigationMsg',
     placement: 'top',
   },
 ];
 
 /**
  * Puzzle Tutorial Configuration
+ * Note: These are legacy steps - translations are not yet added to i18n.tsx
+ * TODO: Add puzzle tutorial translations to i18n.tsx
  */
 export const puzzleTutorialSteps: TutorialStep[] = [
   {

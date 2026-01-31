@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Languages } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 interface TransliterationDisplayProps {
   surahNumber: number;
@@ -18,6 +19,7 @@ export default function TransliterationDisplay({
   initialShowTransliteration = false,
   onToggle,
 }: TransliterationDisplayProps) {
+  const { t } = useI18n();
   const [transliteration, setTransliteration] = useState<string | undefined>(initialTransliteration);
   const [isLoading, setIsLoading] = useState(false);
   const [showTransliteration, setShowTransliteration] = useState(initialShowTransliteration);
@@ -81,7 +83,7 @@ export default function TransliterationDisplay({
         }`}
       >
         <Languages className="w-4 h-4" />
-        {showTransliteration ? 'Hide Transliteration' : 'Show Transliteration'}
+        {showTransliteration ? t('transliteration.hide') : t('transliteration.show')}
       </button>
 
       {/* Transliteration Content */}
@@ -90,17 +92,17 @@ export default function TransliterationDisplay({
           <div className="flex items-center gap-2 mb-3">
             <Languages className="w-3.5 h-3.5 text-teal-400" />
             <span className="text-xs font-medium text-teal-400 uppercase tracking-wide">
-              Transliteration
+              {t('transliteration.label')}
             </span>
           </div>
           <p className="text-gray-300 text-base leading-relaxed italic">
             {isLoading ? (
               <span className="flex items-center gap-2">
                 <div className="h-3 w-3 animate-spin rounded-full border-2 border-teal-400 border-t-transparent" />
-                Loading transliteration...
+                {t('transliteration.loading')}
               </span>
             ) : (
-              transliteration || 'Transliteration not available'
+              transliteration || t('transliteration.notAvailable')
             )}
           </p>
         </div>

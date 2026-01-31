@@ -64,16 +64,16 @@ export default function HarakatLegend({
                 <div className="sticky top-0 bg-[#0f0f0f] border-b border-white/5 p-4 flex items-center justify-between">
                   <div>
                     <h3 className="text-lg font-semibold text-white">
-                      {t('mushaf.harakatGuide')}
+                      {t('harakat.guide')}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      Arabic diacritical marks
+                      {t('harakat.diacriticalMarks')}
                     </p>
                   </div>
                   <button
                     onClick={() => setIsExpanded(false)}
                     className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                    aria-label={t('mushaf.closeGuide')}
+                    aria-label={t('harakat.closeGuide')}
                   >
                     <X className="w-5 h-5 text-gray-400" />
                   </button>
@@ -109,7 +109,7 @@ export default function HarakatLegend({
         <div className="flex items-center gap-2">
           <HelpCircle className="w-4 h-4 text-purple-400" />
           <span className="text-sm font-medium text-gray-300">
-            {t('mushaf.harakatGuide')}
+            {t('harakat.guide')}
           </span>
         </div>
         <motion.div
@@ -150,6 +150,8 @@ interface LegendContentProps {
 }
 
 function LegendContent({ categories, onSelect, compact = false }: LegendContentProps) {
+  const { t } = useI18n();
+  
   return (
     <div className={compact ? 'pt-3 space-y-4' : 'space-y-6'}>
       {categories.map((category) => (
@@ -207,7 +209,7 @@ function LegendContent({ categories, onSelect, compact = false }: LegendContentP
 
       {/* Tip */}
       <p className="text-xs text-gray-600 pt-2 border-t border-white/5">
-        Tap any harakat in the text to see its details
+        {t('harakat.tapToSeeDetails')}
       </p>
     </div>
   );

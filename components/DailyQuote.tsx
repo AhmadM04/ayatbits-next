@@ -9,6 +9,7 @@ import { SparkleAnimation } from './animations';
 import { useWordAudio } from '@/lib/hooks/useWordAudio';
 import { HarakatText, HarakatModal } from '@/components/arabic';
 import { type HarakatDefinition } from '@/lib/harakat-utils';
+import { useI18n } from '@/lib/i18n';
 
 interface DailyQuoteData {
   arabicText: string;
@@ -27,6 +28,7 @@ interface DailyQuoteProps {
 }
 
 export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuoteProps) {
+  const { t } = useI18n();
   const [quote, setQuote] = useState<DailyQuoteData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,12 +65,12 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
         });
         setQuote(data.data);
       }
-    } catch (err) {
+      } catch (err) {
       if (err instanceof NetworkError) {
-        setError('Unable to load verse. Check your connection.');
+        setError(t('dailyQuote.unableToLoad'));
       } else {
         console.error('Failed to fetch daily quote:', err);
-        setError('Failed to load verse.');
+        setError(t('dailyQuote.failedToLoad'));
       }
     } finally {
       setIsLoading(false);
@@ -154,7 +156,7 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
       >
         <div className="flex items-center gap-2 mb-4">
           <Sparkles className="w-5 h-5 text-green-500" />
-          <span className="text-sm font-medium text-green-500">Verse of the Day</span>
+          <span className="text-sm font-medium text-green-500">{t('dailyQuote.verseOfTheDay')}</span>
         </div>
         <div className="flex items-center justify-center py-8">
           <SparkleAnimation size={80} loop={true} />
@@ -175,7 +177,7 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
           className="mt-3 flex items-center gap-2 text-sm text-orange-400 hover:text-orange-300 transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
-          Retry
+          {t('common.retry')}
         </button>
       </div>
     );
@@ -212,7 +214,7 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
             >
               <Sparkles className="w-5 h-5 text-green-400" />
             </motion.div>
-            <span className="text-sm font-medium text-green-400">Verse of the Day</span>
+            <span className="text-sm font-medium text-green-400">{t('dailyQuote.verseOfTheDay')}</span>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -222,14 +224,14 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
                   ? 'bg-green-500 text-white' 
                   : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
               }`}
-              title="Play recitation"
+              title={t('dailyQuote.playRecitation')}
             >
               <Volume2 className="w-4 h-4" />
             </button>
             <Link
               href={`/dashboard/juz/${quote.juzNumber}/surah/${quote.surahNumber}?ayah=${quote.ayahNumber}`}
               className="p-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"
-              title="Open ayah"
+              title={t('dailyQuote.openAyah')}
             >
               <ExternalLink className="w-4 h-4" />
             </Link>
@@ -315,7 +317,7 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
               </p>
             ) : (
               <p className="text-gray-500 text-xs sm:text-sm italic">
-                Translation not available
+                {t('dailyQuote.translationNotAvailable')}
               </p>
             )}
           </motion.div>
@@ -328,7 +330,7 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
               {quote.surahNameEnglish}
             </p>
             <p className="text-gray-500 text-xs">
-              Ayah {quote.ayahNumber} • Juz {quote.juzNumber}
+              {t('common.ayah')} {quote.ayahNumber} • {t('common.juz')} {quote.juzNumber}
             </p>
           </div>
           <p className="text-gray-600 text-xs" dir="rtl">
