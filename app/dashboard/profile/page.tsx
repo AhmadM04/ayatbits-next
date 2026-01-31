@@ -64,6 +64,12 @@ export default async function ProfilePage() {
     subscriptionStatus: user.subscriptionStatus,
     subscriptionEndDate: user.subscriptionEndDate?.toISOString(),
   };
+
+  // Check onboarding status
+  const onboardingStatus = {
+    completed: user.onboardingCompleted || false,
+    skipped: user.onboardingSkipped || false,
+  };
   
   return (
     <TutorialWrapper
@@ -78,6 +84,7 @@ export default async function ProfilePage() {
           trialDaysLeft={trialDaysLeft}
           initialTranslation={user.selectedTranslation || 'en.sahih'}
           initialAudioEnabled={user.enableWordByWordAudio || false}
+          onboardingStatus={onboardingStatus}
         />
       </div>
     </TutorialWrapper>

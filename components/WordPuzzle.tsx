@@ -849,10 +849,10 @@ export default function WordPuzzle({
       
       setTimeout(() => {
         if (next >= MAX_MISTAKES) {
-          showToast('Too many mistakes! Review the ayah again.', 'error', 2500);
+          showToast(t('wordPuzzle.tooManyMistakes'), 'error', 2500);
           setTimeout(() => onMistakeLimitExceeded?.(), 1200);
         } else {
-          showToast('Wrong position! Try again.', 'error', 1000);
+          showToast(t('wordPuzzle.wrongPosition'), 'error', 1000);
         }
       }, 0);
       
@@ -878,14 +878,14 @@ export default function WordPuzzle({
     // Check if tips are available
     if (usedTips >= availableTips) {
       console.log('[TIPS] No tips available - usedTips >= availableTips');
-      showToast('No tips available!', 'error', 2000);
+      showToast(t('wordPuzzle.noTipsAvailable'), 'error', 2000);
       return;
     }
 
     // Don't trigger if hint is already active
     if (activeHint) {
       console.log('[TIPS] Hint already active');
-      showToast('Tip already showing! Dismiss or use it first.', 'info', 2000);
+      showToast(t('wordPuzzle.tipAlreadyShowing'), 'info', 2000);
       return;
     }
 
@@ -901,7 +901,7 @@ export default function WordPuzzle({
     console.log('[TIPS] First empty slot:', firstEmptySlot);
     
     if (firstEmptySlot === -1) {
-      showToast('All slots are filled!', 'info', 2000);
+      showToast(t('wordPuzzle.allSlotsFilled'), 'info', 2000);
       return;
     }
 
@@ -931,10 +931,10 @@ export default function WordPuzzle({
       console.log('[TIPS] Setting activeHint:', hint);
       setActiveHint(hint);
       setUsedTips((prev) => prev + 1);
-      showToast('💡 Tip activated! Watch the highlighted word and slot.', 'success', 3000);
+      showToast(t('wordPuzzle.tipActivated'), 'success', 3000);
     } else {
       console.log('[TIPS] Could not find correct word in bank');
-      showToast('Unable to find the correct word. Try placing more words!', 'error', 2000);
+      showToast(t('wordPuzzle.unableToFindWord'), 'error', 2000);
     }
   }, [usedTips, availableTips, activeHint, originalTokens, placedTokens, bank, showToast]);
 
@@ -1173,7 +1173,7 @@ export default function WordPuzzle({
               title="Dismiss hint"
             >
               <X className="w-3.5 h-3.5" />
-              <span className="text-xs font-medium">Dismiss</span>
+              <span className="text-xs font-medium">{t('wordPuzzle.dismiss')}</span>
             </motion.button>
           )}
           

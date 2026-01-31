@@ -24,6 +24,12 @@ const isPublicRoute = createRouteMatcher([
   '/api/daily-quote', // Public API for daily quote
   '/api/waitlist/(.*)', // Allow waitlist API to be public
   '/api/check-access', // Allow check-access to handle its own auth (returns 401 if not authenticated)
+  '/api/user/onboarding', // Allow onboarding API to be accessible
+]);
+
+// Routes that should skip onboarding check (to avoid redirect loops)
+const isOnboardingRoute = createRouteMatcher([
+  '/onboarding',
 ]);
 
 // Routes that require stricter rate limiting
@@ -138,6 +144,38 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
   // For non-API routes, handle authentication
   if (!isPublicRoute(request)) {
     await auth.protect();
+    
+    // Check onboarding status for dashboard routes
+    // Skip if already on onboarding page to avoid redirect loops
+    if (pathname.startsWith('/dashboard') && !isOnboardingRoute(request)) {
+      const { userId } = await auth();
+      
+      if (userId) {
+        try {
+          // Check if user needs onboarding
+          const onboardingCheck = await fetch(
+            new URL('/api/user/onboarding', request.url),
+            {
+              headers: {
+                cookie: request.headers.get('cookie') || '',
+              },
+            }
+          );
+
+          if (onboardingCheck.ok) {
+            const data = await onboardingCheck.json();
+            
+            // Redirect to onboarding if not completed and not skipped
+            if (!data.onboardingCompleted && !data.onboardingSkipped) {
+              return NextResponse.redirect(new URL('/onboarding', request.url));
+            }
+          }
+        } catch (error) {
+          // If onboarding check fails, let user through to avoid blocking access
+          console.error('Onboarding check failed:', error);
+        }
+      }
+    }
   }
 });
 

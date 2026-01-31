@@ -11,6 +11,8 @@ import UserProfileSection from "@/components/UserProfileSection";
 import DemoPuzzle from "@/components/DemoPuzzle";
 import { QuranLoader } from "@/components/animations";
 import WaitlistForm from "@/components/WaitlistForm";
+import LanguageSelector from "@/components/LanguageSelector";
+import { useI18n } from "@/lib/i18n";
 
 // Floating Arabic letters/words for the background - Names of Allah (Asma ul Husna)
 const floatingArabicWords = [
@@ -104,6 +106,8 @@ function DashboardButton({ size, className = "" }: { size?: "default" | "sm" | "
 
 
 export default function Home() {
+  const { t } = useI18n();
+  
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
@@ -157,6 +161,9 @@ export default function Home() {
                   />
                 </Link>
                 <div className="flex items-center gap-3">
+                  {/* Language Selector */}
+                  <LanguageSelector />
+                  
                   <SignedOut>
                     <SignInButton mode="modal">
                       <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/20">
@@ -187,20 +194,19 @@ export default function Home() {
               >
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-sm mb-8">
                   <Sparkles className="w-4 h-4" />
-                  <span>Gamified Quranic Learning</span>
+                  <span>{t('landing.gamifiedLearning')}</span>
                 </div>
 
                 <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
-                  <span className="text-white">Master the Quran</span>
+                  <span className="text-white">{t('landing.heroTitle')}</span>
                   <br />
                   <span className="bg-gradient-to-r from-green-400 via-emerald-400 to-green-500 bg-clip-text text-transparent">
-                    One Puzzle at a Time
+                    {t('landing.heroTitle2')}
                   </span>
                 </h1>
 
                 <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-8">
-                  Join thousands of learners who are mastering Quranic verses through 
-                  interactive puzzles and engaging gameplay. Start your journey today!
+                  {t('landing.heroDescription')}
                 </p>
 
                 {/* Waitlist Section - Prominent Hero CTA */}
@@ -210,10 +216,10 @@ export default function Home() {
                     <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
                       <div className="text-center mb-6">
                         <h3 className="text-xl font-semibold text-white mb-2">
-                          Join the Waitlist
+                          {t('landing.waitlistTitle')}
                         </h3>
                         <p className="text-sm text-gray-400">
-                          Be the first to know when we launch. Get exclusive early access!
+                          {t('landing.waitlistDescription')}
                         </p>
                       </div>
                       
@@ -222,24 +228,24 @@ export default function Home() {
                       <div className="mt-6 flex flex-wrap justify-center gap-4 text-xs text-gray-500">
                         <div className="flex items-center gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                          <span>Free to join</span>
+                          <span>{t('landing.freeToJoin')}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                          <span>Early access perks</span>
+                          <span>{t('landing.earlyAccessPerks')}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                          <span>Launch updates</span>
+                          <span>{t('landing.launchUpdates')}</span>
                         </div>
                       </div>
                     </div>
                     
                     <div className="flex items-center justify-center gap-4 text-sm text-gray-500 mt-6">
-                      <span>Already have an account?</span>
+                      <span>{t('landing.alreadyHaveAccount')}</span>
                       <SignInButton mode="modal">
                         <button className="text-green-400 hover:text-green-300 underline">
-                          Sign In
+                          {t('landing.signIn')}
                         </button>
                       </SignInButton>
                     </div>
@@ -265,10 +271,10 @@ export default function Home() {
                 className="text-center mb-16"
               >
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                  Why <span className="text-green-500">AyatBits</span>?
+                  {t('landing.whyAyatBits')}
                 </h2>
                 <p className="text-gray-400 max-w-xl mx-auto">
-                  Combine the beauty of Quranic study with proven gamification techniques
+                  {t('landing.whySubtitle')}
                 </p>
               </motion.div>
 
@@ -276,20 +282,20 @@ export default function Home() {
                 {[
                   {
                     icon: Puzzle,
-                    title: "Word Puzzles",
-                    description: "Arrange scrambled words to reconstruct verses, reinforcing memorization through active recall.",
+                    title: t('landing.wordPuzzlesTitle'),
+                    description: t('landing.wordPuzzlesDesc'),
                     color: "green",
                   },
                   {
                     icon: Trophy,
-                    title: "Achievements & Streaks",
-                    description: "Unlock achievements, maintain daily streaks, and track your progress through all 30 Juz.",
+                    title: t('landing.achievementsTitle'),
+                    description: t('landing.achievementsDesc'),
                     color: "orange",
                   },
                   {
                     icon: Star,
-                    title: "Multiple Translations",
-                    description: "Study with 15+ translations in various languages to deepen your understanding.",
+                    title: t('landing.translationsTitle'),
+                    description: t('landing.translationsDesc'),
                     color: "purple",
                   },
                 ].map((feature, index) => (
@@ -321,10 +327,10 @@ export default function Home() {
             <section className="py-20 border-t border-white/5">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                 {[
-                  { value: "30", label: "Juz Available" },
-                  { value: "114", label: "Surahs" },
-                  { value: "6,236", label: "Verses" },
-                  { value: "15+", label: "Translations" },
+                  { value: "30", label: t('landing.juzAvailable') },
+                  { value: "114", label: t('landing.surahs') },
+                  { value: "6,236", label: t('landing.verses') },
+                  { value: "15+", label: t('landing.translations') },
                 ].map((stat, index) => (
                   <motion.div
                     key={stat.label}
@@ -351,31 +357,31 @@ export default function Home() {
                 className="text-center mb-16"
               >
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                  What Our <span className="text-green-500">Learners</span> Say
+                  {t('landing.whatLearnersSay')}
                 </h2>
                 <p className="text-gray-400 max-w-xl mx-auto">
-                  Real stories from people who are transforming their Quranic learning journey
+                  {t('landing.learnersSubtitle')}
                 </p>
               </motion.div>
 
               <div className="grid md:grid-cols-3 gap-6">
                 {[
                   {
-                    name: "Amina K.",
-                    role: "Student",
-                    text: "I finally memorized Surah Al-Mulk thanks to this! The puzzle format makes it so much easier to remember the order of words.",
+                    name: t('landing.testimonial1Name'),
+                    role: t('landing.testimonial1Role'),
+                    text: t('landing.testimonial1Text'),
                     rating: 5,
                   },
                   {
-                    name: "Omar T.",
-                    role: "Teacher",
-                    text: "As a Quran teacher, I recommend this to all my students. The gamification keeps them motivated and engaged every day.",
+                    name: t('landing.testimonial2Name'),
+                    role: t('landing.testimonial2Role'),
+                    text: t('landing.testimonial2Text'),
                     rating: 5,
                   },
                   {
-                    name: "Fatima R.",
-                    role: "Mother of 3",
-                    text: "My kids love the characters and streaks! It's turned Quran memorization into something they look forward to daily.",
+                    name: t('landing.testimonial3Name'),
+                    role: t('landing.testimonial3Role'),
+                    text: t('landing.testimonial3Text'),
                     rating: 5,
                   },
                 ].map((testimonial, index) => (
@@ -419,13 +425,13 @@ export default function Home() {
               >
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm mb-6">
                   <Puzzle className="w-4 h-4" />
-                  <span>Try It Now</span>
+                  <span>{t('landing.tryItNow')}</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                  Experience the <span className="text-green-500">Puzzle</span>
+                  {t('landing.experienceTitle')}
                 </h2>
                 <p className="text-gray-400 max-w-xl mx-auto">
-                  Watch how words come together to form a verse, or click to try it yourself!
+                  {t('landing.experienceSubtitle')}
                 </p>
               </motion.div>
 
@@ -454,16 +460,15 @@ export default function Home() {
                 
                 <div className="relative z-10 text-center">
                   <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
-                    Ready to Transform Your
+                    {t('landing.readyToTransform')}
                     <br />
                     <span className="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-                      Quranic Learning Journey?
+                      {t('landing.quranicJourney')}
                     </span>
                   </h2>
                   
                   <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto mb-10">
-                    Don't wait! Join thousands of learners who are already memorizing 
-                    the Quran the fun way. Start your journey today.
+                    {t('landing.dontWait')}
                   </p>
 
                   {/* Primary CTA */}
@@ -475,15 +480,15 @@ export default function Home() {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                       <div className="flex items-center gap-2 text-sm text-gray-400">
                         <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        <span>Free to join</span>
+                        <span>{t('landing.freeToJoin')}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-400">
                         <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        <span>No credit card required</span>
+                        <span>{t('landing.noCreditCard')}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-400">
                         <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        <span>Start immediately</span>
+                        <span>{t('landing.startImmediately')}</span>
                       </div>
                     </div>
                   </SignedOut>
@@ -512,15 +517,15 @@ export default function Home() {
                   />
                 </Link>
               <div className="flex gap-6 text-sm text-gray-500">
-                <Link href="/waitlist" className="hover:text-white transition-colors">Waitlist</Link>
-                <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-                <Link href="/faq" className="hover:text-white transition-colors">FAQ</Link>
-                <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
+                <Link href="/waitlist" className="hover:text-white transition-colors">{t('landing.waitlistLink')}</Link>
+                <Link href="/terms" className="hover:text-white transition-colors">{t('landing.termsLink')}</Link>
+                <Link href="/faq" className="hover:text-white transition-colors">{t('landing.faqLink')}</Link>
+                <Link href="/pricing" className="hover:text-white transition-colors">{t('landing.pricingLink')}</Link>
               </div>
                 <div className="text-sm text-gray-600 text-center sm:text-right">
-                  <p className="mb-1">© 2026 AyatBits. All rights reserved.</p>
+                  <p className="mb-1">© 2026 AyatBits. {t('landing.allRightsReserved')}</p>
                   <p className="text-xs text-gray-700">
-                    AyatBits is a product of HIYA FOR EDUCATION AND TUTORING OU, registered in Estonia.
+                    {t('landing.companyInfo')}
                   </p>
                 </div>
               </div>

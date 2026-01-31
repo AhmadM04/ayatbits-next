@@ -57,10 +57,11 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     }
   }, [currentStep, steps.length, skipTutorial]);
 
-  // Prevent body scroll when tutorial is active and cleanup
+  // Allow scrolling during tutorial but manage pointer events
   useEffect(() => {
     if (isActive) {
-      document.body.style.overflow = 'hidden';
+      // Don't prevent scrolling - users need to scroll to see all tutorial sections
+      document.body.style.overflow = '';
       document.body.style.pointerEvents = 'auto';
     } else {
       document.body.style.overflow = '';

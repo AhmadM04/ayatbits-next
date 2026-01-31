@@ -60,22 +60,39 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-bold text-white mb-2">6. Acceptable Use</h2>
+              <h2 className="text-lg font-bold text-white mb-2">6. Age Requirements & Parental Guidance</h2>
+              <div className="space-y-3">
+                <p>
+                  AyatBits is designed to be a safe educational platform suitable for users of all ages. However, certain features and requirements apply based on age:
+                </p>
+                <div className="pl-4 space-y-2">
+                  <p><strong className="text-white">Users Under 13:</strong> While our platform is safe for children under 13 to use for educational purposes, <strong className="text-orange-400">parental or guardian guidance is required</strong> for any purchases, subscriptions, or payment-related activities. We comply with applicable child protection laws including COPPA (Children's Online Privacy Protection Act).</p>
+                  <p><strong className="text-white">Users 13 and Above:</strong> May use the service independently, subject to these terms.</p>
+                  <p><strong className="text-white">Parents & Guardians:</strong> If you allow a child under 13 to use AyatBits, you are responsible for monitoring their usage and managing any subscription or payment activities on their behalf.</p>
+                </div>
+                <p>
+                  By creating an account or making a purchase for a user under 13, you confirm that you are the parent or legal guardian of that child and consent to their use of the service under your supervision.
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-bold text-white mb-2">7. Acceptable Use</h2>
               <p>Don't violate laws, attempt unauthorized access, share credentials, copy our content, or use automated systems to access the service.</p>
             </section>
 
             <section>
-              <h2 className="text-lg font-bold text-white mb-2">7. Intellectual Property</h2>
+              <h2 className="text-lg font-bold text-white mb-2">8. Intellectual Property</h2>
               <p>AyatBits content is protected by copyright. The Quranic text is in the public domain.</p>
             </section>
 
             <section>
-              <h2 className="text-lg font-bold text-white mb-2">8. Disclaimer</h2>
+              <h2 className="text-lg font-bold text-white mb-2">9. Disclaimer</h2>
               <p>The service is provided "as is" without warranties. We don't guarantee uninterrupted or error-free service.</p>
             </section>
 
             <section>
-              <h2 className="text-lg font-bold text-white mb-2">9. Company Information</h2>
+              <h2 className="text-lg font-bold text-white mb-2">10. Company Information</h2>
               <p>
                 AyatBits is a product of HIYA FOR EDUCATION AND TUTORING OU, registered in Estonia.
               </p>
@@ -85,7 +102,7 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-bold text-white mb-2">10. Contact</h2>
+              <h2 className="text-lg font-bold text-white mb-2">11. Contact</h2>
               <p>
                 Questions? Email us at{' '}
                 <a href="mailto:hello@ayatbits.com" className="text-green-500 hover:underline">

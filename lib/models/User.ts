@@ -46,6 +46,11 @@ export interface IUser extends Document {
   longestStreak?: number;
   lastPuzzleId?: mongoose.Types.ObjectId;
   totalPuzzlesCompleted?: number;
+  onboardingCompleted?: boolean;
+  onboardingSkipped?: boolean;
+  referralSource?: string;
+  ageRange?: string;
+  onboardingCompletedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -91,6 +96,11 @@ const userSchema = new mongoose.Schema<IUser>(
     longestStreak: { type: Number, default: 0 },
     lastPuzzleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Puzzle' },
     totalPuzzlesCompleted: { type: Number, default: 0 },
+    onboardingCompleted: { type: Boolean, default: false },
+    onboardingSkipped: { type: Boolean, default: false },
+    referralSource: { type: String },
+    ageRange: { type: String },
+    onboardingCompletedAt: { type: Date },
   },
   { timestamps: true }
 );

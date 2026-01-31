@@ -56,8 +56,30 @@ export function TutorialOverlay({
       }
     };
 
-    // Initial position with small delay to ensure DOM is ready
-    setTimeout(updatePosition, 100);
+    const scrollToElement = () => {
+      const selector = step.target.startsWith('[data-tutorial') 
+        ? step.target 
+        : `[data-tutorial="${step.target}"]`;
+      
+      const element = document.querySelector(selector);
+      if (element) {
+        // Scroll element into view with smooth animation
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center',
+        });
+        
+        // Update position after scroll completes
+        setTimeout(updatePosition, 600);
+      }
+    };
+
+    // Initial scroll and position with small delay to ensure DOM is ready
+    setTimeout(() => {
+      scrollToElement();
+      updatePosition();
+    }, 100);
 
     // Update on scroll/resize
     window.addEventListener('scroll', updatePosition, true);
@@ -149,7 +171,7 @@ export function TutorialOverlay({
 
   return (
     <AnimatePresence mode="wait">
-      {/* Backdrop overlay - clickable to skip (no blur to keep highlighted element clear) */}
+      {/* Backdrop overlay - clickable to skip, allows scrolling */}
       <motion.div
         key="backdrop"
         initial={{ opacity: 0 }}
@@ -161,6 +183,7 @@ export function TutorialOverlay({
           zIndex: 999999,
           pointerEvents: 'auto',
           background: 'rgba(0, 0, 0, 0.5)',
+          overflow: 'auto',
         }}
       />
 

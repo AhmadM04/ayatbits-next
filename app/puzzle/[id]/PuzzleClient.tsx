@@ -404,7 +404,7 @@ export default function PuzzleClient({
                 title={t('puzzle.backToMushaf')}
               >
                 <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-gray-300" />
-                <span className="hidden sm:inline text-sm text-gray-400 group-hover:text-gray-300">Mushaf</span>
+                <span className="hidden sm:inline text-sm text-gray-400 group-hover:text-gray-300"></span>
               </Link>
               <div className="min-w-0">
                 <h1 className="text-base font-semibold text-white truncate">
