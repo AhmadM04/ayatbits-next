@@ -271,11 +271,11 @@ Keep it brief (2-3 paragraphs), scholarly, and in clear ${targetLanguageName}.`;
 ${userPrompt}`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-flash',
       contents: fullPrompt,
     });
 
-    console.log('Received response from Gemini 2.0 Flash');
+    console.log('Received response from Gemini 2.5 Flash');
     const tafsirText = response.text || '';
     console.log('Tafsir generated successfully, length:', tafsirText.length);
 
@@ -295,7 +295,7 @@ ${userPrompt}`;
       targetLang,
       tafsirText,
       sourceText,
-      'gemini-2.0-flash-exp'
+      'gemini-2.5-flash'
     );
     console.log('Tafsir saved to cache for future requests');
 
