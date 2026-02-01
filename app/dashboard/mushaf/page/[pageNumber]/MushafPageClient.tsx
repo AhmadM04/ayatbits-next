@@ -211,9 +211,9 @@ export default function MushafPageClient({
           >
             {/* Arabic Text Container */}
             <div
-              className="text-2xl sm:text-3xl leading-[2.5] font-arabic text-right"
+              className="text-2xl sm:text-3xl leading-[2.5] font-arabic text-right break-words overflow-wrap-anywhere"
               dir="rtl"
-              style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
+              style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)', overflowWrap: 'anywhere', wordBreak: 'break-word' }}
               data-tutorial="ayah-row"
             >
               {renderVerses()}

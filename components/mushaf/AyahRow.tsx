@@ -84,10 +84,11 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
   return (
     <motion.span
       className={`
-        relative inline group cursor-pointer select-none
+        relative inline-block group cursor-pointer select-none max-w-full
         ${isHighlighted ? 'bg-green-500/20 rounded-lg px-1 -mx-1' : ''}
         ${isHolding ? 'bg-blue-500/20 rounded-lg px-1 -mx-1' : ''}
       `}
+      style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
@@ -123,12 +124,12 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
       {/* Arabic text with harakat coloring */}
       <HarakatText 
         text={verse.text} 
-        className="text-white"
+        className="text-white inline"
         onHarakatClick={handleHarakatClick}
       />
       
-      {/* Ayah number in Arabic numerals */}
-      <span className="text-green-400 mx-2 text-lg">
+      {/* Ayah number in Arabic numerals - with whitespace control */}
+      <span className="text-green-400 mx-2 text-lg inline-block whitespace-nowrap">
         ﴿{toArabicNumerals(verse.ayahNumber)}﴾
       </span>
       
