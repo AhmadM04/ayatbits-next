@@ -311,7 +311,7 @@ ${userPrompt}`;
       surahNumber,
       ayahNumber,
       cached: false,
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-flash',
     });
 
   } catch (error: any) {
