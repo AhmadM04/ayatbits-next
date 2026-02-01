@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ConditionalMotion, ConditionalAnimatePresence, useReducedMotion } from '@/components/ConditionalMotion';
 import { TutorialTooltip } from './TutorialTooltip';
 
 export interface TutorialStep {
@@ -168,11 +169,13 @@ export function TutorialOverlay({
   };
 
   const tooltipPosition = getTooltipPosition();
+  const shouldReduceMotion = useReducedMotion();
 
   return (
-    <AnimatePresence mode="wait">
+    <ConditionalAnimatePresence mode="wait">
       {/* Backdrop overlay - clickable to skip, allows scrolling */}
-      <motion.div
+      <ConditionalMotion
+        as="div"
         key="backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -188,7 +191,8 @@ export function TutorialOverlay({
       />
 
       {/* Spotlight cutout - makes highlighted element transparent and distinguishable */}
-      <motion.div
+      <ConditionalMotion
+        as="div"
         key="spotlight"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ 
@@ -217,35 +221,38 @@ export function TutorialOverlay({
         }}
       />
       
-      {/* Pulsing glow effect for emphasis */}
-      <motion.div
-        key="pulse-glow"
-        initial={{ opacity: 0 }}
-        animate={{ 
-          opacity: [0.4, 0.8, 0.4],
-        }}
-        exit={{ opacity: 0 }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="fixed"
-        style={{
-          zIndex: 1000001,
-          left: targetRect.left - 16,
-          top: targetRect.top - 16,
-          width: targetRect.width + 32,
-          height: targetRect.height + 32,
-          borderRadius: '18px',
-          border: '2px solid rgba(16, 185, 129, 0.5)',
-          boxShadow: '0 0 40px 10px rgba(16, 185, 129, 0.4)',
-          pointerEvents: 'none',
-        }}
-      />
+      {/* Pulsing glow effect for emphasis - skip when reduced motion */}
+      {!shouldReduceMotion && (
+        <motion.div
+          key="pulse-glow"
+          initial={{ opacity: 0 }}
+          animate={{ 
+            opacity: [0.4, 0.8, 0.4],
+          }}
+          exit={{ opacity: 0 }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="fixed"
+          style={{
+            zIndex: 1000001,
+            left: targetRect.left - 16,
+            top: targetRect.top - 16,
+            width: targetRect.width + 32,
+            height: targetRect.height + 32,
+            borderRadius: '18px',
+            border: '2px solid rgba(16, 185, 129, 0.5)',
+            boxShadow: '0 0 40px 10px rgba(16, 185, 129, 0.4)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
       
       {/* Clear overlay for the highlighted element - ensures it's visible and clickable */}
-      <motion.div
+      <ConditionalMotion
+        as="div"
         key="clear-area"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -263,7 +270,8 @@ export function TutorialOverlay({
       />
 
       {/* Tooltip */}
-      <motion.div
+      <ConditionalMotion
+        as="div"
         key="tooltip"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -285,8 +293,8 @@ export function TutorialOverlay({
           onNext={onNext}
           onSkip={onSkip}
         />
-      </motion.div>
-    </AnimatePresence>
+      </ConditionalMotion>
+    </ConditionalAnimatePresence>
   );
 }
 

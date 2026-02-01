@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Search, X, Sparkles, Loader2, BookOpen } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ConditionalMotion, ConditionalAnimatePresence } from '@/components/ConditionalMotion';
 import { useI18n } from '@/lib/i18n';
 
 // Complete mapping of all 114 surahs to their primary juz
@@ -241,11 +242,12 @@ export default function VerseSearch() {
       </button>
 
       {/* Search Modal - rendered at root level */}
-      <AnimatePresence>
+      <ConditionalAnimatePresence>
         {isOpen && (
           <>
             {/* Backdrop - truly fixed, covers entire viewport */}
-            <motion.div
+            <ConditionalMotion
+              as="div"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -259,7 +261,8 @@ export default function VerseSearch() {
             />
             
             {/* Modal */}
-            <motion.div
+            <ConditionalMotion
+              as="div"
               initial={{ opacity: 0, scale: 0.95, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
@@ -368,10 +371,10 @@ export default function VerseSearch() {
                   </div>
                 )}
               </div>
-            </motion.div>
+            </ConditionalMotion>
           </>
         )}
-      </AnimatePresence>
+      </ConditionalAnimatePresence>
     </>
   );
 }

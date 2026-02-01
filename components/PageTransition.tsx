@@ -1,6 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { ConditionalMotion, ConditionalAnimatePresence } from '@/components/ConditionalMotion';
 import { usePathname } from 'next/navigation';
 import { ReactNode } from 'react';
 
@@ -12,8 +13,9 @@ export default function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
+    <ConditionalAnimatePresence mode="wait">
+      <ConditionalMotion
+        as="div"
         key={pathname}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -25,8 +27,8 @@ export default function PageTransition({ children }: PageTransitionProps) {
         className="min-h-screen"
       >
         {children}
-      </motion.div>
-    </AnimatePresence>
+      </ConditionalMotion>
+    </ConditionalAnimatePresence>
   );
 }
 

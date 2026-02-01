@@ -272,7 +272,9 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
                               '0 0 0 rgba(16, 185, 129, 0)',
                             ],
                           }
-                        : {}
+                        : {
+                            boxShadow: '0 0 0 rgba(16, 185, 129, 0)',
+                          }
                     }
                     transition={
                       isPlayingWord && currentWordIndex === index
@@ -283,7 +285,8 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
                             },
                           }
                         : {
-                            duration: 0.2,
+                            duration: 0.3,
+                            boxShadow: { duration: 0.3 },
                           }
                     }
                     className={`inline-block cursor-pointer px-1 rounded transition-colors ${

@@ -32,6 +32,7 @@ import {
 import { calculateTipsForAyah } from '@/lib/tips-system';
 import { useToast } from '@/components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ConditionalMotion, ConditionalAnimatePresence, useReducedMotion } from '@/components/ConditionalMotion';
 import { useWordAudio } from '@/lib/hooks/useWordAudio';
 import { HarakatColoredText } from '@/components/arabic';
 import { useI18n } from '@/lib/i18n';
@@ -89,7 +90,8 @@ function DropSlot({
   const isPlayingThis = playingWordIndex === position;
 
   return (
-    <motion.div
+    <ConditionalMotion
+      as="div"
       ref={setNodeRef}
       initial={{ opacity: 0, scale: 0.8 }}
       animate={
@@ -159,6 +161,7 @@ function DropSlot({
               boxShadow: { duration: 0.3 }
             }
       }
+      fallbackClassName={isPlayingThis ? 'ring-2 ring-green-500' : isHinted ? 'ring-2 ring-green-500/50' : ''}
       onClick={handleWordClick}
       className={`
         relative min-w-[50px] min-h-[44px] px-3 py-2 rounded-lg
@@ -178,8 +181,9 @@ function DropSlot({
       `}
     >
       {placedToken ? (
-        <motion.div className="flex flex-col items-center group relative">
-          <motion.span
+        <ConditionalMotion as="div" className="flex flex-col items-center group relative">
+          <ConditionalMotion
+            as="span"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             className="text-base font-medium font-arabic text-green-400 flex items-center gap-1"
@@ -189,24 +193,25 @@ function DropSlot({
               <Volume2 className="w-3 h-3 text-green-400 opacity-0 group-hover:opacity-100 transition-opacity" />
             )}
             {!enableWordAudio && <CheckCircle2 className="w-3 h-3 text-green-400 hidden sm:block" />}
-          </motion.span>
+          </ConditionalMotion>
           {showTransliteration && placedToken.transliteration && (
-            <motion.span
+            <ConditionalMotion
+              as="span"
               initial={{ opacity: 0, y: -10 }}
               whileHover={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
               className="absolute top-full mt-1 text-xs text-gray-400 italic whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
             >
               {placedToken.transliteration}
-            </motion.span>
+            </ConditionalMotion>
           )}
-        </motion.div>
+        </ConditionalMotion>
       ) : (
         <span className="text-gray-600 text-xs">
           {isOver && isActive ? '✓' : (position + 1)}
         </span>
       )}
-    </motion.div>
+    </ConditionalMotion>
   );
 }
 
@@ -251,7 +256,8 @@ function DraggableWord({
   };
 
   return (
-    <motion.div
+    <ConditionalMotion
+      as="div"
       ref={setNodeRef}
       {...attributes}
       {...listeners}
@@ -301,16 +307,17 @@ function DraggableWord({
         <HarakatColoredText text={token.text} />
       </span>
       {showTransliteration && token.transliteration && !isOverlay && (
-        <motion.span
+        <ConditionalMotion
+          as="span"
           initial={{ opacity: 0, y: -10 }}
           whileHover={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
           className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs text-gray-400 italic whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
         >
           {token.transliteration}
-        </motion.span>
+        </ConditionalMotion>
       )}
-    </motion.div>
+    </ConditionalMotion>
   );
 }
 

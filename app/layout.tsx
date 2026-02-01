@@ -5,6 +5,7 @@ import { ToastProvider } from "@/components/Toast";
 import { ThemeProvider } from "@/lib/theme-context";
 import { I18nProvider } from "@/lib/i18n";
 import { TutorialProvider } from "@/components/tutorial";
+import { MotionProvider } from "@/lib/contexts/motion-context";
 import "./globals.css";
 import Script from "next/script";
 
@@ -245,13 +246,15 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0a] text-white`}
         >
           <ThemeProvider>
-            <ToastProvider>
-              <I18nProvider>
-                <TutorialProvider>
-                  {children}
-                </TutorialProvider>
-              </I18nProvider>
-            </ToastProvider>
+            <MotionProvider>
+              <ToastProvider>
+                <I18nProvider>
+                  <TutorialProvider>
+                    {children}
+                  </TutorialProvider>
+                </I18nProvider>
+              </ToastProvider>
+            </MotionProvider>
           </ThemeProvider>
         </body>
       </html>

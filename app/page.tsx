@@ -5,6 +5,7 @@ import Image from "next/image";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { ConditionalMotion, useReducedMotion } from "@/components/ConditionalMotion";
 import { Puzzle, Trophy, Flame, Star, Sparkles, CheckCircle2, Quote } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import UserProfileSection from "@/components/UserProfileSection";
@@ -107,6 +108,7 @@ function DashboardButton({ size, className = "" }: { size?: "default" | "sm" | "
 
 export default function Home() {
   const { t } = useI18n();
+  const shouldReduceMotion = useReducedMotion();
   
   return (
     <Suspense fallback={
@@ -122,27 +124,40 @@ export default function Home() {
           <div className="absolute top-1/2 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
           <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-green-600/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '0.5s' }} />
           
-          {/* Floating Arabic words - much more visible now */}
-          {floatingArabicWords.map((word, index) => (
-            <motion.div
-              key={index}
-              className="absolute text-4xl sm:text-5xl md:text-6xl font-arabic text-green-500/30 select-none pointer-events-none"
-              style={{ left: word.x, top: word.y }}
-              animate={{
-                y: [0, -30, 0],
-                opacity: [0.3, 0.5, 0.3],
-                rotate: [0, 5, 0],
-              }}
-              transition={{
-                duration: word.duration,
-                delay: word.delay,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            >
-              {word.text}
-            </motion.div>
-          ))}
+          {/* Floating Arabic words - skip animation when reduced motion */}
+          {!shouldReduceMotion ? (
+            floatingArabicWords.map((word, index) => (
+              <motion.div
+                key={index}
+                className="absolute text-4xl sm:text-5xl md:text-6xl font-arabic text-green-500/30 select-none pointer-events-none"
+                style={{ left: word.x, top: word.y }}
+                animate={{
+                  y: [0, -30, 0],
+                  opacity: [0.3, 0.5, 0.3],
+                  rotate: [0, 5, 0],
+                }}
+                transition={{
+                  duration: word.duration,
+                  delay: word.delay,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                {word.text}
+              </motion.div>
+            ))
+          ) : (
+            // Static version for reduced motion
+            floatingArabicWords.map((word, index) => (
+              <div
+                key={index}
+                className="absolute text-4xl sm:text-5xl md:text-6xl font-arabic text-green-500/30 select-none pointer-events-none opacity-30"
+                style={{ left: word.x, top: word.y }}
+              >
+                {word.text}
+              </div>
+            ))
+          )}
         </div>
 
         <div className="relative z-10">
@@ -187,7 +202,8 @@ export default function Home() {
           <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Hero Section with Integrated Waitlist */}
             <section className="py-20 md:py-32 text-center">
-              <motion.div
+              <ConditionalMotion
+                as="div"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
@@ -258,12 +274,13 @@ export default function Home() {
                     />
                   </SignedIn>
                 </div>
-              </motion.div>
+              </ConditionalMotion>
             </section>
 
             {/* Features Section */}
             <section id="features" className="py-20 border-t border-white/5">
-              <motion.div
+              <ConditionalMotion
+                as="div"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -276,7 +293,7 @@ export default function Home() {
                 <p className="text-gray-400 max-w-xl mx-auto">
                   {t('landing.whySubtitle')}
                 </p>
-              </motion.div>
+              </ConditionalMotion>
 
               <div className="grid md:grid-cols-3 gap-6">
                 {[
@@ -299,7 +316,8 @@ export default function Home() {
                     color: "purple",
                   },
                 ].map((feature, index) => (
-                  <motion.div
+                  <ConditionalMotion
+                    as="div"
                     key={feature.title}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -318,7 +336,7 @@ export default function Home() {
                     </div>
                     <h3 className="text-xl font-semibold mb-2 text-white">{feature.title}</h3>
                     <p className="text-gray-400 text-sm leading-relaxed">{feature.description}</p>
-                  </motion.div>
+                  </ConditionalMotion>
                 ))}
               </div>
             </section>
@@ -332,7 +350,8 @@ export default function Home() {
                   { value: "6,236", label: t('landing.verses') },
                   { value: "15+", label: t('landing.translations') },
                 ].map((stat, index) => (
-                  <motion.div
+                  <ConditionalMotion
+                    as="div"
                     key={stat.label}
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
@@ -342,7 +361,7 @@ export default function Home() {
                   >
                     <div className="text-3xl sm:text-4xl font-bold text-green-500 mb-1">{stat.value}</div>
                     <div className="text-sm text-gray-500">{stat.label}</div>
-                  </motion.div>
+                  </ConditionalMotion>
                 ))}
               </div>
             </section>
