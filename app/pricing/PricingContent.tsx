@@ -222,7 +222,7 @@ export default function PricingContent() {
     {
       tier: 'pro' as const,
       name: 'Pro Yearly',
-      price: '€100',
+      price: '€99.99',
       period: '/year',
       originalPrice: '€143.88',
       savings: 'Save 35%',
