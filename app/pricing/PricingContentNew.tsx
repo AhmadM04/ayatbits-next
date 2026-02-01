@@ -239,10 +239,11 @@ export default function PricingContent() {
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2">
               <Image
-                src="/logo.png"
-                alt="AyatBits Logo"
-                width={32}
-                height={32}
+                src="/ayatbits-logo.svg"
+                alt="AyatBits"
+                width={180}
+                height={48}
+                priority
                 className="h-8 w-auto"
               />
             </Link>

@@ -239,10 +239,11 @@ export default function PricingContent() {
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2">
               <Image
-                src="/logo.png"
-                alt="AyatBits Logo"
-                width={32}
-                height={32}
+                src="/ayatbits-logo.svg"
+                alt="AyatBits"
+                width={180}
+                height={48}
+                priority
                 className="h-8 w-auto"
               />
             </Link>
@@ -298,10 +299,15 @@ export default function PricingContent() {
                   value={voucherCode}
                   onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
                   onBlur={() => validateVoucher(voucherCode)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      validateVoucher(voucherCode);
+                    }
+                  }}
                   placeholder="Enter code (e.g., RAMADAN2026)"
                   className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
                 />
-                {voucherData && (
+                {voucherData ? (
                   <SignedIn>
                     <button
                       onClick={redeemVoucher}
@@ -312,17 +318,39 @@ export default function PricingContent() {
                       Redeem
                     </button>
                   </SignedIn>
+                ) : (
+                  <button
+                    onClick={() => validateVoucher(voucherCode)}
+                    disabled={validatingVoucher || !voucherCode.trim()}
+                    className="px-6 py-2 bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed border border-white/20 rounded-lg font-medium transition-colors"
+                  >
+                    {validatingVoucher ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Validate'}
+                  </button>
                 )}
               </div>
               {validatingVoucher && <p className="text-sm text-gray-400 mt-2">Validating...</p>}
               {voucherError && <p className="text-sm text-red-400 mt-2">{voucherError}</p>}
               {voucherData && (
-                <div className="mt-3 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
-                  <p className="text-sm text-purple-300">
-                    ✨ Valid! {voucherData.tier.toUpperCase()} tier for {voucherData.duration} month(s)
-                    {voucherData.description && ` - ${voucherData.description}`}
-                  </p>
-                </div>
+                <>
+                  <div className="mt-3 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                    <p className="text-sm text-purple-300">
+                      ✨ Valid! {voucherData.tier.toUpperCase()} tier for {voucherData.duration} month(s)
+                      {voucherData.description && ` - ${voucherData.description}`}
+                    </p>
+                  </div>
+                  <SignedOut>
+                    <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                      <p className="text-sm text-blue-300 mb-2">
+                        👉 Please sign in to redeem this voucher
+                      </p>
+                      <SignUpButton mode="modal">
+                        <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition-colors">
+                          Sign In / Sign Up
+                        </button>
+                      </SignUpButton>
+                    </div>
+                  </SignedOut>
+                </>
               )}
             </div>
           </motion.div>
