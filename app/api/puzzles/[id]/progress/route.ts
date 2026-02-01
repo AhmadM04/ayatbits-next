@@ -2,6 +2,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB, UserProgress, User } from '@/lib/db';
 import mongoose from 'mongoose';
+import { checkAndSendHighestStreakEmail } from '@/lib/email-triggers';
 
 async function updateStreak(userId: mongoose.Types.ObjectId) {
   const user = await User.findById(userId);
@@ -26,19 +27,30 @@ async function updateStreak(userId: mongoose.Types.ObjectId) {
     return;
   }
 
+  const previousLongestStreak = user.longestStreak || 0;
+
   // If last activity was yesterday, increment streak
   if (lastActivity && lastActivity.getTime() === yesterday.getTime()) {
     const newStreak = (user.currentStreak || 0) + 1;
+    const newLongestStreak = Math.max(previousLongestStreak, newStreak);
+    
     await User.findByIdAndUpdate(userId, {
       currentStreak: newStreak,
-      longestStreak: Math.max(user.longestStreak || 0, newStreak),
+      longestStreak: newLongestStreak,
       lastActivityDate: today,
     });
+
+    // Send email if new record (async, don't wait)
+    if (newStreak === newLongestStreak && newStreak > previousLongestStreak) {
+      checkAndSendHighestStreakEmail(userId).catch(err => 
+        console.error('Error sending highest streak email:', err)
+      );
+    }
   } else {
     // If last activity was more than 1 day ago or never, reset streak to 1
     await User.findByIdAndUpdate(userId, {
       currentStreak: 1,
-      longestStreak: Math.max(user.longestStreak || 0, 1),
+      longestStreak: Math.max(previousLongestStreak, 1),
       lastActivityDate: today,
     });
   }

@@ -127,6 +127,7 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
           $set: {
             subscriptionStatus: SubscriptionStatusEnum.ACTIVE,
             subscriptionPlan: 'lifetime',
+            subscriptionTier: 'pro',
             subscriptionEndDate: null, 
             trialEndsAt: null,
             hasDirectAccess: true,
@@ -139,6 +140,7 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
           $set: {
             subscriptionStatus: SubscriptionStatusEnum.ACTIVE,
             subscriptionPlan: 'monthly',
+            subscriptionTier: 'pro',
             subscriptionEndDate: addMonths(now, 1),
             trialEndsAt: null,
             hasDirectAccess: true,
@@ -151,6 +153,7 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
           $set: {
             subscriptionStatus: SubscriptionStatusEnum.ACTIVE,
             subscriptionPlan: 'monthly',
+            subscriptionTier: 'pro',
             subscriptionEndDate: addMonths(now, 3),
             trialEndsAt: null,
             hasDirectAccess: true,
@@ -163,6 +166,7 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
           $set: {
             subscriptionStatus: SubscriptionStatusEnum.ACTIVE,
             subscriptionPlan: 'monthly',
+            subscriptionTier: 'pro',
             subscriptionEndDate: addMonths(now, 6),
             trialEndsAt: null,
             hasDirectAccess: true,
@@ -175,6 +179,7 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
           $set: {
             subscriptionStatus: SubscriptionStatusEnum.ACTIVE,
             subscriptionPlan: 'yearly',
+            subscriptionTier: 'pro',
             subscriptionEndDate: addMonths(now, 12),
             trialEndsAt: null,
             hasDirectAccess: true,
@@ -190,7 +195,7 @@ export async function grantPremiumAccess(email: string, duration: GrantDuration)
             trialEndsAt: null,
             hasDirectAccess: false,
           },
-          $unset: { subscriptionPlan: 1 },
+          $unset: { subscriptionPlan: 1, subscriptionTier: 1 },
         };
         break;
       default:

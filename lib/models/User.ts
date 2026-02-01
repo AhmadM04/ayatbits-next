@@ -16,6 +16,8 @@ export enum UserRole {
 
 export type SubscriptionPlan = 'monthly' | 'yearly' | 'lifetime'; // Removed 'free'
 
+export type SubscriptionTier = 'basic' | 'pro';
+
 export type SubscriptionPlatform = 'web' | 'ios';
 
 export interface IUser extends Document {
@@ -29,6 +31,7 @@ export interface IUser extends Document {
   stripeCustomerId?: string;
   subscriptionStatus?: SubscriptionStatusEnum;
   subscriptionPlan?: SubscriptionPlan; // Optional: Undefined if no plan selected
+  subscriptionTier?: SubscriptionTier; // 'basic' or 'pro' tier
   subscriptionEndDate?: Date;
   trialEndsAt?: Date; // Specific field for the 7-day trial
   subscriptionPlatform?: SubscriptionPlatform; // Track where user subscribed
@@ -74,6 +77,11 @@ const userSchema = new mongoose.Schema<IUser>(
       type: String,
       enum: ['monthly', 'yearly', 'lifetime'],
       // No default value - user has no plan until they select one
+    },
+    subscriptionTier: {
+      type: String,
+      enum: ['basic', 'pro'],
+      // No default value - assigned when user subscribes or gets admin access
     },
     preferredLanguage: { type: String, default: 'en' },
     preferredTranslation: { type: String },

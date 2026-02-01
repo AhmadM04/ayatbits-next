@@ -45,6 +45,49 @@ export const checkSubscription = (user: IUser) => {
 export const checkSubscriptionAccess = checkSubscription;
 
 /**
+ * Gets the user's subscription tier.
+ * Returns 'basic' | 'pro' | null
+ */
+export const getUserTier = (user: IUser): 'basic' | 'pro' | null => {
+  // If user doesn't have active subscription, return null
+  if (!checkSubscription(user)) {
+    return null;
+  }
+
+  // If user has explicit tier set, return it
+  if (user.subscriptionTier) {
+    return user.subscriptionTier;
+  }
+
+  // Legacy users or admin-granted access default to basic
+  // (can be upgraded through migration script or admin panel)
+  return 'basic';
+};
+
+/**
+ * Checks if a user has Pro tier access.
+ * Pro tier includes word-by-word audio and AI tafsir features.
+ */
+export const checkProAccess = (user: IUser): boolean => {
+  // User must have active subscription first
+  if (!checkSubscription(user)) {
+    return false;
+  }
+
+  // Check for explicit Pro tier
+  if (user.subscriptionTier === 'pro') {
+    return true;
+  }
+
+  // Admin-granted access (hasDirectAccess) gets Pro features
+  if (user.hasDirectAccess) {
+    return true;
+  }
+
+  return false;
+};
+
+/**
  * Calculates total days left in the current plan (subscription or trial).
  * Returns Infinity for lifetime.
  */

@@ -1,6 +1,7 @@
 import AdminForm from './AdminForm';
 import WaitlistManagement from './WaitlistManagement';
 import UserDebugTools from './UserDebugTools';
+import VoucherManagement from './VoucherManagement';
 import { grantPremiumAccess, type GrantDuration } from '@/app/actions/admin';
 import { requireAdminUser } from '@/lib/dashboard-access';
 
@@ -55,6 +56,11 @@ export default async function AdminPage() {
           <h2 className="text-2xl font-bold mb-6">User Debug Tools</h2>
           <p className="text-gray-400 mb-4">Search for users and identify duplicate accounts</p>
           <UserDebugTools />
+        </section>
+
+        {/* Voucher Management Section */}
+        <section>
+          <VoucherManagement />
         </section>
 
         {/* Waitlist Management Section */}

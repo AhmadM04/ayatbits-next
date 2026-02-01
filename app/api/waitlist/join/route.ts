@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB, Waitlist } from '@/lib/db';
-import { sendWaitlistWelcomeEmail, notifyAdminWaitlistSignup } from '@/lib/email-service';
+import { sendWaitlistWelcomeEmail, notifyAdminWaitlistSignup } from '@/lib/aws-ses-service';
 import { getClientIP } from '@/lib/rate-limit';
 import { logger } from '@/lib/logger';
 

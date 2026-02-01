@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { connectDB, User } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { securityLogger } from '@/lib/security-logger';
+import { sendWelcomeNewMemberEmail } from '@/lib/aws-ses-service';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
   apiVersion: '2025-11-17.clover' as any,
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
-        const { clerkId: userId, plan } = session.metadata || {};
+        const { clerkId: userId, plan, tier } = session.metadata || {};
 
         if (userId && session.customer) {
           // Check if user has admin-granted access before updating
@@ -77,20 +78,35 @@ export async function POST(request: NextRequest) {
             break;
           }
 
-          await User.findOneAndUpdate(
+          const updatedUser = await User.findOneAndUpdate(
             { clerkIds: userId },
             {
               stripeCustomerId: session.customer as string,
               subscriptionStatus: 'active',
               subscriptionPlan: plan || 'monthly',
+              subscriptionTier: tier || 'basic',
               subscriptionPlatform: 'web',
-            }
+            },
+            { new: true }
           );
+          
           logger.info('Subscription activated', {
             userId,
             plan: plan || 'monthly',
+            tier: tier || 'basic',
             route: '/api/webhook/stripe',
           });
+
+          // Send welcome email (async, don't wait)
+          if (updatedUser && updatedUser.email) {
+            sendWelcomeNewMemberEmail({
+              email: updatedUser.email,
+              firstName: updatedUser.firstName || 'there',
+              subscriptionPlan: updatedUser.subscriptionPlan || 'monthly',
+            }).catch(err => 
+              logger.error('Error sending welcome member email', err)
+            );
+          }
         }
         break;
       }

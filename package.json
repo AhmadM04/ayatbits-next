@@ -14,6 +14,7 @@
     "db:migrate-clerkids": "tsx -r dotenv/config scripts/migrate-clerkids.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.980.0",
     "@clerk/nextjs": "^6.36.5",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",

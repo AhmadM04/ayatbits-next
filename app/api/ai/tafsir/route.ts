@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
 import { connectDB, User } from '@/lib/db';
-import { checkSubscription } from '@/lib/subscription';
+import { checkSubscription, checkProAccess } from '@/lib/subscription';
 import { GoogleGenAI } from '@google/genai';
 import { fetchTafsir } from '@/lib/tafsir-api';
+import { getCachedTafsir, saveTafsir } from '@/lib/tafsir-cache';
 
 // Rate limiting store (in production, use Redis)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
@@ -89,7 +90,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Check subscription (Pro only)
+    // 3. Check subscription (Pro only - AI Tafsir requires Pro tier)
     await connectDB();
     const dbUser = await User.findOne({ clerkIds: user.id });
     
@@ -100,12 +101,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const hasPro = checkSubscription(dbUser);
+    const hasPro = checkProAccess(dbUser);
     if (!hasPro) {
       return NextResponse.json(
         { 
-          error: 'This feature is only available for Pro subscribers',
-          requiresPro: true 
+          error: 'AI Tafsir is only available for Pro subscribers. Upgrade to Pro to access this feature.',
+          requiresPro: true,
+          featureName: 'AI Tafsir'
         },
         { status: 403 }
       );
@@ -130,7 +132,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 5.5. Fetch Arabic Ibn Kathir Muhtasar tafsir
+    // 5.5. Check cache first for instant loading
+    const targetLang = targetLanguage || translationCode || 'en';
+    const cached = await getCachedTafsir(surahNumber, ayahNumber, targetLang);
+    
+    if (cached) {
+      console.log('Tafsir cache hit - returning instantly');
+      return NextResponse.json({
+        tafsir: cached.tafsirText,
+        source: cached.source,
+        cached: true,
+        model: cached.aiModel,
+        surahNumber,
+        ayahNumber,
+      });
+    }
+
+    console.log('Tafsir cache miss - generating with AI');
+
+    // 5.6. Fetch Arabic Ibn Kathir Muhtasar tafsir
     console.log('Fetching Arabic Ibn Kathir tafsir...');
     let arabicTafsir = '';
     try {
@@ -185,7 +205,6 @@ export async function POST(req: NextRequest) {
       'ja': 'Japanese', 'ja.japanese': 'Japanese',
       'nl': 'Dutch', 'nl.dutch': 'Dutch',
     };
-    const targetLang = targetLanguage || translationCode || 'en';
     const targetLanguageName = languageNames[targetLang] || 'English';
 
     const systemPrompt = `You are a professional translator specializing in Islamic scholarly texts. Your role is STRICTLY limited to:
@@ -252,11 +271,11 @@ Keep it brief (2-3 paragraphs), scholarly, and in clear ${targetLanguageName}.`;
 ${userPrompt}`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-2.0-flash-exp',
       contents: fullPrompt,
     });
 
-    console.log('Received response from Gemini');
+    console.log('Received response from Gemini 2.0 Flash');
     const tafsirText = response.text || '';
     console.log('Tafsir generated successfully, length:', tafsirText.length);
 
@@ -268,10 +287,22 @@ ${userPrompt}`;
       );
     }
 
+    // 10.5. Save to cache for future instant loading
+    const sourceText = arabicTafsir ? `Tafsir Ibn Kathir (AI Translated to ${targetLanguageName})` : `AI-Generated Tafsir (${targetLanguageName})`;
+    await saveTafsir(
+      surahNumber,
+      ayahNumber,
+      targetLang,
+      tafsirText,
+      sourceText,
+      'gemini-2.0-flash-exp'
+    );
+    console.log('Tafsir saved to cache for future requests');
+
     // 11. Return tafsir
     return NextResponse.json({
       tafsir: tafsirText,
-      source: arabicTafsir ? `Tafsir Ibn Kathir (AI Translated to ${targetLanguageName})` : `AI-Generated Tafsir (${targetLanguageName})`,
+      source: sourceText,
       disclaimer: arabicTafsir 
         ? `This is an AI translation of Tafsir Ibn Kathir. Please consult traditional scholars for authoritative guidance.`
         : 'This is AI-generated content. Please consult traditional scholars for authoritative guidance.',
@@ -279,6 +310,8 @@ ${userPrompt}`;
       translatedTo: targetLanguageName,
       surahNumber,
       ayahNumber,
+      cached: false,
+      model: 'gemini-2.0-flash-exp',
     });
 
   } catch (error: any) {

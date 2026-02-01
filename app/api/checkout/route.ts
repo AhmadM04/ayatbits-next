@@ -84,7 +84,15 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { priceId } = body;
+    const { priceId, tier } = body;
+
+    // Validate tier
+    if (!tier || (tier !== 'basic' && tier !== 'pro')) {
+      return NextResponse.json(
+        { error: 'Invalid or missing tier. Must be "basic" or "pro"' },
+        { status: 400 }
+      );
+    }
 
     // Check if it's a valid Stripe price ID (not just a placeholder)
     // Real Stripe price IDs look like: price_1A2B3C4D5E6F7G8H
@@ -97,16 +105,36 @@ export async function POST(req: NextRequest) {
       lineItems = [{ price: priceId, quantity: 1 }];
     } else {
       // Fallback: create price on the fly (for development/when env vars not set)
-      const isYearly = priceId === 'price_yearly';
+      // Determine plan type from priceId placeholder
+      const isYearly = priceId.includes('yearly');
+      const isPro = tier === 'pro';
+      
+      // EUR pricing
+      const prices = {
+        basicMonthly: 599,  // €5.99
+        basicYearly: 4999,  // €49.99
+        proMonthly: 1199,   // €11.99
+        proYearly: 10000,   // €100
+      };
+
+      let amount: number;
+      if (isPro) {
+        amount = isYearly ? prices.proYearly : prices.proMonthly;
+      } else {
+        amount = isYearly ? prices.basicYearly : prices.basicMonthly;
+      }
+
       lineItems = [
         {
           price_data: {
-            currency: 'usd',
+            currency: 'eur',
             product_data: {
-              name: `AyatBits Pro - ${isYearly ? 'Yearly' : 'Monthly'}`,
-              description: 'Unlimited access to all puzzles and features',
+              name: `AyatBits ${tier === 'pro' ? 'Pro' : 'Basic'} - ${isYearly ? 'Yearly' : 'Monthly'}`,
+              description: tier === 'pro' 
+                ? 'Full access with AI Tafsir and word-by-word audio'
+                : 'Access to all puzzles and basic features',
             },
-            unit_amount: isYearly ? 4999 : 599, // $49.99 or $5.99
+            unit_amount: amount,
             recurring: {
               interval: isYearly ? 'year' : 'month',
             },
@@ -144,11 +172,13 @@ export async function POST(req: NextRequest) {
       customer_email: user.emailAddresses[0]?.emailAddress,
       metadata: {
         clerkId: user.id,
+        tier: tier,
       },
       subscription_data: {
         trial_period_days: 7,
         metadata: {
           clerkId: user.id,
+          tier: tier,
         },
       },
     };

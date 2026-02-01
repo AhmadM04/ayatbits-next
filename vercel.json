@@ -9,6 +9,16 @@
         }
       ]
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/emails/trigger-checks?type=all",
+      "schedule": "0 20 * * *"
+    },
+    {
+      "path": "/api/emails/trigger-checks?type=monthly",
+      "schedule": "0 9 1 * *"
+    }
   ]
 }
 
