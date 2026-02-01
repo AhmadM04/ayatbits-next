@@ -465,6 +465,149 @@ export default function Home() {
               </motion.div>
             </section>
 
+            {/* Pricing Section */}
+            <section id="pricing" className="py-20 border-t border-white/5">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-center mb-16"
+              >
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                  {t('pricing.title')}
+                </h2>
+                <p className="text-gray-400 max-w-xl mx-auto">
+                  {t('pricing.subtitle')}
+                </p>
+              </motion.div>
+
+              <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
+                {/* Basic Plan */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                  className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-8 hover:border-green-500/30 transition-all duration-300"
+                >
+                  <div className="mb-6">
+                    <h3 className="text-2xl font-bold text-white mb-2">{t('pricing.basic')}</h3>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl font-bold">€5.99</span>
+                      <span className="text-gray-500">{t('pricing.perMonth')}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">{t('pricing.trialIncluded')}</p>
+                  </div>
+
+                  <ul className="space-y-3 mb-8">
+                    {[
+                      'All 30 Juzs & 114 Surahs',
+                      'Unlimited puzzles',
+                      '18+ translations',
+                      'Progress tracking & streaks',
+                      'Audio recitations',
+                      'Transliterations',
+                    ].map((feature, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-300 text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <SignedOut>
+                    <SignUpButton mode="modal">
+                      <button className="w-full py-3 rounded-xl font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all">
+                        {t('pricing.startFreeTrial')}
+                      </button>
+                    </SignUpButton>
+                  </SignedOut>
+                  <SignedIn>
+                    <Link href="/pricing">
+                      <button className="w-full py-3 rounded-xl font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all">
+                        {t('pricing.startFreeTrial')}
+                      </button>
+                    </Link>
+                  </SignedIn>
+                </motion.div>
+
+                {/* Pro Plan */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  className="relative bg-gradient-to-b from-green-600/20 to-transparent border-2 border-green-500/50 rounded-2xl p-8"
+                >
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <div className="flex items-center gap-1.5 px-3 py-1 bg-green-600 rounded-full text-xs font-semibold">
+                      <Sparkles className="w-3 h-3" />
+                      {t('pricing.bestValue')}
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                      {t('pricing.pro')}
+                      <Sparkles className="w-5 h-5 text-green-400" />
+                    </h3>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl font-bold">€11.99</span>
+                      <span className="text-gray-500">{t('pricing.perMonth')}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">{t('pricing.trialIncluded')}</p>
+                  </div>
+
+                  <ul className="space-y-3 mb-8">
+                    {[
+                      'All 30 Juzs & 114 Surahs',
+                      'Unlimited puzzles',
+                      '18+ translations',
+                      'Progress tracking & streaks',
+                      'Audio recitations',
+                      'Transliterations',
+                      '✨ AI Tafsir (Ibn Kathir)',
+                      '✨ Word-by-word audio',
+                      'Priority support',
+                    ].map((feature, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-300 text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <SignedOut>
+                    <SignUpButton mode="modal">
+                      <button className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white transition-all">
+                        {t('pricing.startFreeTrial')}
+                      </button>
+                    </SignUpButton>
+                  </SignedOut>
+                  <SignedIn>
+                    <Link href="/pricing">
+                      <button className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white transition-all">
+                        {t('pricing.startFreeTrial')}
+                      </button>
+                    </Link>
+                  </SignedIn>
+                </motion.div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="mt-8 text-center"
+              >
+                <p className="text-gray-500 text-sm">
+                  7-day free trial • Cancel anytime • Secure payment via Stripe
+                </p>
+              </motion.div>
+            </section>
+
             {/* Final CTA Section - Strong Call to Action */}
             <section className="py-20 border-t border-white/5">
               <motion.div

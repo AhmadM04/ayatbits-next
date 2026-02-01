@@ -234,7 +234,17 @@
     "alreadyHaveAccess": "You already have access!",
     "redirecting": "Redirecting you to the dashboard...",
     "subscriptionRequired": "Subscription required to continue",
-    "ayatbitsPro": "AyatBits Pro"
+    "ayatbitsPro": "AyatBits Pro",
+    "feature1": "All 30 Juzs & 114 Surahs",
+    "feature2": "Unlimited puzzles",
+    "feature3": "18+ translations",
+    "feature4": "Progress tracking & streaks",
+    "feature5": "Audio recitations",
+    "feature6": "Transliterations",
+    "feature7": "✨ AI Tafsir (Ibn Kathir)",
+    "feature8": "✨ Word-by-word audio",
+    "feature9": "Priority support",
+    "securePayment": "7-day free trial • Cancel anytime • Secure payment via Stripe"
   },
   "landing": {
     "heroTitle": "Master the Quran",

@@ -41,6 +41,7 @@ export default async function BillingPage() {
             subscriptionPlan: user.subscriptionPlan,
             subscriptionEndDate: user.subscriptionEndDate?.toISOString(),
             stripeCustomerId: user.stripeCustomerId,
+            hasDirectAccess: user.hasDirectAccess,
           }}
         />
       </div>

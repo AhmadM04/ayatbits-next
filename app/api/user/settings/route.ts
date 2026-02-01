@@ -1,8 +1,8 @@
-import { auth } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import User from '@/lib/models/User';
-import { checkProAccess } from '@/lib/subscription';
+import { checkProAccess, findUserRobust } from '@/lib/subscription';
 
 export const dynamic = 'force-dynamic'; // Disable caching
 export const revalidate = 0;
@@ -19,8 +19,12 @@ export async function GET() {
     }
 
     await connectDB();
+    
+    // Get email for robust lookup
+    const clerkUser = await currentUser();
+    const userEmail = clerkUser?.emailAddresses?.[0]?.emailAddress;
 
-    const user = await User.findOne({ clerkIds: userId }).lean() as any;
+    const user = await findUserRobust(userId, userEmail);
     const hasProAccess = user ? checkProAccess(user) : false;
 
     return NextResponse.json(
@@ -82,16 +86,26 @@ export async function PATCH(request: Request) {
 
     // Check Pro access if trying to enable word-by-word audio
     if (enableWordByWordAudio === true) {
-      const user = await User.findOne({ clerkIds: userId });
+      // Get email for robust lookup
+      const clerkUser = await currentUser();
+      const userEmail = clerkUser?.emailAddresses?.[0]?.emailAddress;
+      
+      const user = await findUserRobust(userId, userEmail);
       if (!user) {
         return NextResponse.json(
-          { error: 'User not found' },
+          { error: 'User not found. Please try signing out and back in.' },
           { status: 404 }
         );
       }
 
       const hasPro = checkProAccess(user);
       if (!hasPro) {
+        console.log('Word-by-word audio access denied for user', {
+          clerkId: userId,
+          email: user.email,
+          hasDirectAccess: user.hasDirectAccess,
+          subscriptionTier: user.subscriptionTier,
+        });
         return NextResponse.json(
           { 
             error: 'Word-by-word audio is only available for Pro subscribers. Upgrade to Pro to access this feature.',

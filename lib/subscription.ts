@@ -1,6 +1,68 @@
 import { SubscriptionStatusEnum, type IUser } from '@/lib/models/User';
+import { User } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 const DAY_IN_MS = 86_400_000;
+
+/**
+ * Finds a user by Clerk ID with fallback to email lookup.
+ * This is useful when admin grants access to users who haven't signed in yet,
+ * or when Clerk ID hasn't been synced properly.
+ * 
+ * @param clerkId - The Clerk user ID
+ * @param email - Optional email address for fallback lookup
+ * @returns User document or null
+ */
+export const findUserRobust = async (clerkId: string, email?: string): Promise<IUser | null> => {
+  try {
+    // 1. Try by Clerk ID first (most common case)
+    let user = await User.findOne({ clerkIds: clerkId });
+    
+    if (user) {
+      return user;
+    }
+    
+    // 2. If not found and email provided, try by email
+    if (email) {
+      const emailLower = email.toLowerCase();
+      user = await User.findOne({ 
+        email: { $regex: new RegExp(`^${emailLower}$`, 'i') } 
+      });
+      
+      if (user) {
+        // Found by email! This means Clerk ID needs to be synced
+        logger.info('User found by email but not by clerkId - syncing clerkId', {
+          clerkId,
+          email: emailLower,
+          existingClerkIds: user.clerkIds || [],
+        });
+        
+        // Add clerkId to user for future lookups
+        if (!user.clerkIds) {
+          user.clerkIds = [];
+        }
+        if (!user.clerkIds.includes(clerkId)) {
+          user.clerkIds.push(clerkId);
+          await user.save();
+          logger.info('ClerkId synced successfully', {
+            clerkId,
+            email: emailLower,
+          });
+        }
+        
+        return user;
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    logger.error('Error in findUserRobust', error instanceof Error ? error : undefined, {
+      clerkId,
+      email,
+    });
+    return null;
+  }
+};
 
 /**
  * Checks if a user has a valid active subscription or lifetime access.

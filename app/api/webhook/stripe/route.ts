@@ -39,45 +39,22 @@ export async function POST(request: NextRequest) {
         const { clerkId: userId, plan, tier } = session.metadata || {};
 
         if (userId && session.customer) {
-          // Check if user has admin-granted access before updating
+          // Check if user has admin-granted access
           const existingUser = await User.findOne({ clerkIds: userId });
           
+          // Allow subscription for users with hasDirectAccess (they may want to support or prepare for expiry)
           if (existingUser?.hasDirectAccess) {
-            logger.warn('User with admin access attempted Stripe checkout', {
+            logger.info('User with admin-granted access subscribed via Stripe (support/upgrade)', {
               userId,
               email: existingUser.email,
+              hasDirectAccess: true,
+              existingPlan: existingUser.subscriptionPlan,
               route: '/api/webhook/stripe',
               event: 'checkout.session.completed',
             });
-            
-            // Save customer ID for reference, but don't overwrite subscription details
-            await User.findOneAndUpdate(
-              { clerkIds: userId },
-              {
-                stripeCustomerId: session.customer as string,
-              }
-            );
-
-            // Cancel the Stripe subscription immediately so they're not charged
-            try {
-              if (session.subscription) {
-                await stripe.subscriptions.cancel(session.subscription as string);
-                logger.info('Canceled Stripe subscription for user with admin access', {
-                  userId,
-                  subscriptionId: session.subscription,
-                  route: '/api/webhook/stripe',
-                });
-              }
-            } catch (error) {
-              logger.error('Failed to cancel subscription', error as Error, {
-                userId,
-                route: '/api/webhook/stripe',
-              });
-            }
-            
-            break;
           }
 
+          // Update subscription details while preserving hasDirectAccess flag
           const updatedUser = await User.findOneAndUpdate(
             { clerkIds: userId },
             {
@@ -86,6 +63,7 @@ export async function POST(request: NextRequest) {
               subscriptionPlan: plan || 'monthly',
               subscriptionTier: tier || 'basic',
               subscriptionPlatform: 'web',
+              // Note: hasDirectAccess remains unchanged if it exists
             },
             { new: true }
           );
@@ -115,18 +93,8 @@ export async function POST(request: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         
-        // Check if user has admin-granted access before updating
-        const existingUser = await User.findOne({ stripeCustomerId: customerId });
-        
-        if (existingUser?.hasDirectAccess) {
-          logger.warn('Skipping subscription update for user with admin access', {
-            customerId,
-            route: '/api/webhook/stripe',
-            event: 'customer.subscription.updated',
-          });
-          break;
-        }
-        
+        // Allow subscription updates for users with admin-granted access
+        // They can maintain both hasDirectAccess AND a Stripe subscription
         await User.findOneAndUpdate(
           { stripeCustomerId: customerId },
           {
@@ -146,16 +114,17 @@ export async function POST(request: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         
-        // Check if user has admin-granted access before updating
         const existingUser = await User.findOne({ stripeCustomerId: customerId });
         
+        // If user has hasDirectAccess, mark Stripe subscription as canceled but they keep admin-granted access
         if (existingUser?.hasDirectAccess) {
-          logger.warn('Skipping subscription deletion for user with admin access', {
+          logger.info('Stripe subscription canceled but user retains admin-granted access', {
             customerId,
+            email: existingUser.email,
+            hasDirectAccess: true,
             route: '/api/webhook/stripe',
             event: 'customer.subscription.deleted',
           });
-          break;
         }
         
         await User.findOneAndUpdate(
@@ -173,26 +142,29 @@ export async function POST(request: NextRequest) {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId = invoice.customer as string;
         
-        // Check if user has admin-granted access before updating
         const existingUser = await User.findOne({ stripeCustomerId: customerId });
         
-        if (existingUser?.hasDirectAccess) {
-          logger.warn('Skipping payment failure update for user with admin access', {
-            customerId,
-            route: '/api/webhook/stripe',
-            event: 'invoice.payment_failed',
-          });
-          break;
-        }
-        
+        // Mark as past_due even if they have hasDirectAccess (they're trying to pay)
+        // If payment keeps failing, they'll still have admin-granted access as fallback
         await User.findOneAndUpdate(
           { stripeCustomerId: customerId },
           { subscriptionStatus: 'past_due' }
         );
-        logger.warn('Subscription marked as past due', {
-          customerId,
-          route: '/api/webhook/stripe',
-        });
+        
+        if (existingUser?.hasDirectAccess) {
+          logger.warn('Payment failed but user has admin-granted access as fallback', {
+            customerId,
+            email: existingUser.email,
+            hasDirectAccess: true,
+            route: '/api/webhook/stripe',
+            event: 'invoice.payment_failed',
+          });
+        } else {
+          logger.warn('Subscription marked as past due', {
+            customerId,
+            route: '/api/webhook/stripe',
+          });
+        }
         break;
       }
     }

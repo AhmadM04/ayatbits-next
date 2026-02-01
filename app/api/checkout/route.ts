@@ -31,22 +31,6 @@ export async function POST(req: NextRequest) {
     const dbUser = await User.findOne({ clerkIds: user.id });
     
     if (dbUser) {
-      // Explicit check for admin-granted access
-      if (dbUser.hasDirectAccess) {
-        logger.info('Checkout blocked - user has admin access', {
-          userId: user.id,
-          email: dbUser.email,
-          route: '/api/checkout',
-        });
-        return NextResponse.json(
-          { 
-            error: 'You already have lifetime access granted by admin', 
-            redirect: '/dashboard' 
-          },
-          { status: 400 }
-        );
-      }
-
       // Check for admin status
       if (dbUser.role === UserRole.ADMIN) {
         logger.info('Checkout blocked - user is admin', {
@@ -63,10 +47,10 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Check for active subscription or trial
-      const hasAccess = checkSubscription(dbUser);
-      if (hasAccess) {
-        logger.info('Checkout blocked - user already has access', {
+      // Only block if they have an active Stripe subscription
+      // Allow users with hasDirectAccess to optionally subscribe for support or when grant expires
+      if (dbUser.stripeCustomerId && checkSubscription(dbUser) && !dbUser.hasDirectAccess) {
+        logger.info('Checkout blocked - user has active subscription', {
           userId: user.id,
           email: dbUser.email,
           route: '/api/checkout',
@@ -75,7 +59,7 @@ export async function POST(req: NextRequest) {
         });
         return NextResponse.json(
           { 
-            error: 'You already have access to AyatBits Pro', 
+            error: 'You already have an active subscription', 
             redirect: '/dashboard' 
           },
           { status: 400 }
@@ -147,14 +131,31 @@ export async function POST(req: NextRequest) {
     // Final access check right before creating Stripe session (double-check for race conditions)
     const finalCheck = await User.findOne({ clerkIds: user.id });
     if (finalCheck) {
-      if (finalCheck.hasDirectAccess || finalCheck.role === UserRole.ADMIN || checkSubscription(finalCheck)) {
-        logger.info('Checkout blocked - user gained access during checkout', {
+      // Allow users with hasDirectAccess to optionally subscribe for support or when grant expires
+      // Only block admins (who always have access anyway) and users with active Stripe subscriptions
+      if (finalCheck.role === UserRole.ADMIN) {
+        logger.info('Checkout blocked - user is admin', {
           userId: user.id,
           route: '/api/checkout',
         });
         return NextResponse.json(
           { 
-            error: 'You already have access to AyatBits Pro', 
+            error: 'Admins have automatic access', 
+            redirect: '/dashboard' 
+          },
+          { status: 400 }
+        );
+      }
+      
+      // Only block if they have an active Stripe subscription (not just admin grants)
+      if (finalCheck.stripeCustomerId && checkSubscription(finalCheck)) {
+        logger.info('Checkout blocked - user has active Stripe subscription', {
+          userId: user.id,
+          route: '/api/checkout',
+        });
+        return NextResponse.json(
+          { 
+            error: 'You already have an active subscription', 
             redirect: '/dashboard' 
           },
           { status: 400 }

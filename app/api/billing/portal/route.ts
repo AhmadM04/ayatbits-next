@@ -26,9 +26,24 @@ export async function POST() {
     await connectDB();
 
     const dbUser = await User.findOne({ clerkIds: user.id });
+    
     if (!dbUser?.stripeCustomerId) {
+      // Different messaging based on whether user has admin-granted access
+      if (dbUser?.hasDirectAccess) {
+        return NextResponse.json(
+          { 
+            error: 'You have admin-granted access. Subscribe to manage billing through Stripe.',
+            redirect: '/pricing'
+          },
+          { status: 400 }
+        );
+      }
+      
       return NextResponse.json(
-        { error: 'No billing account found. Please subscribe first.' },
+        { 
+          error: 'No billing account found. Please subscribe first.',
+          redirect: '/pricing'
+        },
         { status: 400 }
       );
     }

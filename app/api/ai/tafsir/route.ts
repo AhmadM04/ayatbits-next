@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
-import { connectDB, User } from '@/lib/db';
-import { checkSubscription, checkProAccess } from '@/lib/subscription';
+import { connectDB } from '@/lib/db';
+import { checkProAccess, findUserRobust } from '@/lib/subscription';
 import { GoogleGenAI } from '@google/genai';
 import { fetchTafsir } from '@/lib/tafsir-api';
 import { getCachedTafsir, saveTafsir } from '@/lib/tafsir-cache';
@@ -92,17 +92,32 @@ export async function POST(req: NextRequest) {
 
     // 3. Check subscription (Pro only - AI Tafsir requires Pro tier)
     await connectDB();
-    const dbUser = await User.findOne({ clerkIds: user.id });
+    
+    // Use robust user lookup that handles admin-granted access by email
+    const userEmail = user.emailAddresses?.[0]?.emailAddress;
+    const dbUser = await findUserRobust(user.id, userEmail);
     
     if (!dbUser) {
+      console.error('User not found in database', {
+        clerkId: user.id,
+        email: userEmail,
+      });
       return NextResponse.json(
-        { error: 'User not found' },
+        { error: 'User not found. Please try signing out and back in.' },
         { status: 404 }
       );
     }
 
     const hasPro = checkProAccess(dbUser);
     if (!hasPro) {
+      console.log('Pro access denied for user', {
+        clerkId: user.id,
+        email: dbUser.email,
+        hasDirectAccess: dbUser.hasDirectAccess,
+        subscriptionTier: dbUser.subscriptionTier,
+        subscriptionStatus: dbUser.subscriptionStatus,
+        subscriptionPlan: dbUser.subscriptionPlan,
+      });
       return NextResponse.json(
         { 
           error: 'AI Tafsir is only available for Pro subscribers. Upgrade to Pro to access this feature.',

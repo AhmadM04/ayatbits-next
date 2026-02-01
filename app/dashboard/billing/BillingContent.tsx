@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CreditCard, ExternalLink, Loader2, CheckCircle2, XCircle, Calendar, Crown } from 'lucide-react';
+import { CreditCard, ExternalLink, Loader2, CheckCircle2, XCircle, Calendar, Crown, Gift, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import Link from 'next/link';
 
@@ -12,6 +12,7 @@ interface BillingContentProps {
     subscriptionPlan?: string;
     subscriptionEndDate?: string;
     stripeCustomerId?: string;
+    hasDirectAccess?: boolean;
   };
 }
 
@@ -64,7 +65,54 @@ export default function BillingContent({ user }: BillingContentProps) {
     );
   }
 
+  // Calculate days until expiry for admin-granted access
+  const getDaysUntilExpiry = () => {
+    if (!user.subscriptionEndDate) return null;
+    const now = new Date();
+    const expiry = new Date(user.subscriptionEndDate);
+    const diffTime = expiry.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const daysUntilExpiry = getDaysUntilExpiry();
+  const isLifetimeGrant = user.hasDirectAccess && user.subscriptionPlan === 'lifetime';
+  const isTemporaryGrant = user.hasDirectAccess && !isLifetimeGrant;
+  const isExpiringSoon = isTemporaryGrant && daysUntilExpiry !== null && daysUntilExpiry <= 30;
+  const hasBothGrantAndStripe = user.hasDirectAccess && user.stripeCustomerId;
+
   const getStatusBadge = () => {
+    // Admin-granted lifetime access
+    if (isLifetimeGrant) {
+      return (
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
+          <Crown className="w-4 h-4" />
+          <span className="text-sm font-medium">Lifetime Access</span>
+        </div>
+      );
+    }
+
+    // Temporary grant expiring soon
+    if (isExpiringSoon) {
+      return (
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
+          <AlertCircle className="w-4 h-4" />
+          <span className="text-sm font-medium">Expiring Soon</span>
+        </div>
+      );
+    }
+
+    // Temporary grant with time remaining
+    if (isTemporaryGrant) {
+      return (
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+          <Gift className="w-4 h-4" />
+          <span className="text-sm font-medium">Admin Granted</span>
+        </div>
+      );
+    }
+
+    // Regular subscription statuses
     const status = user.subscriptionStatus || 'trial';
     const plan = user.subscriptionPlan || 'trial';
 
@@ -123,18 +171,68 @@ export default function BillingContent({ user }: BillingContentProps) {
         </div>
 
         <div className="space-y-4">
+          {/* Grant-specific messaging */}
+          {isLifetimeGrant && (
+            <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-xl">
+              <p className="text-sm text-purple-300 mb-2 font-medium">
+                🏆 You have lifetime access granted by admin
+              </p>
+              <p className="text-sm text-gray-400">
+                Subscribe to support AyatBits and get priority support, or simply continue enjoying your lifetime access!
+              </p>
+            </div>
+          )}
+
+          {isExpiringSoon && daysUntilExpiry !== null && (
+            <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
+              <p className="text-sm text-orange-300 mb-2 font-medium">
+                ⚠️ Your access expires in {daysUntilExpiry} day{daysUntilExpiry !== 1 ? 's' : ''}
+              </p>
+              <p className="text-sm text-gray-400">
+                Subscribe now for uninterrupted access to AyatBits Pro features!
+              </p>
+            </div>
+          )}
+
+          {isTemporaryGrant && !isExpiringSoon && daysUntilExpiry !== null && (
+            <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+              <p className="text-sm text-blue-300 mb-2 font-medium">
+                ✅ You have admin-granted access
+              </p>
+              <p className="text-sm text-gray-400">
+                Your access is valid until {new Date(user.subscriptionEndDate!).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}. Subscribe anytime to ensure continuous access.
+              </p>
+            </div>
+          )}
+
+          {hasBothGrantAndStripe && (
+            <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-xl">
+              <p className="text-sm text-green-300 mb-2 font-medium">
+                ✨ You have both admin-granted access and an active subscription
+              </p>
+              <p className="text-sm text-gray-400">
+                Thank you for supporting AyatBits! Manage your Stripe subscription below.
+              </p>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 bg-white/5 rounded-xl">
               <p className="text-sm text-gray-400 mb-1">Plan Type</p>
               <p className="text-lg font-medium text-white capitalize">
                 {user.subscriptionPlan || 'Trial'}
+                {user.hasDirectAccess && ' (Admin)'}
               </p>
             </div>
             {user.subscriptionEndDate && (
               <div className="p-4 bg-white/5 rounded-xl">
                 <p className="text-sm text-gray-400 mb-1">
                   {user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing'
-                    ? 'Renews on'
+                    ? user.stripeCustomerId ? 'Renews on' : 'Expires on'
                     : 'Expires on'}
                 </p>
                 <p className="text-lg font-medium text-white">
@@ -148,7 +246,7 @@ export default function BillingContent({ user }: BillingContentProps) {
             )}
           </div>
 
-          {!user.stripeCustomerId && (
+          {!user.stripeCustomerId && !user.hasDirectAccess && (
             <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
               <p className="text-sm text-orange-400">
                 No billing account found. Subscribe to a plan to access billing management.
@@ -162,12 +260,22 @@ export default function BillingContent({ user }: BillingContentProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4" data-tutorial="plan-options">
         <Link
           href="/pricing"
-          className="flex items-center justify-center gap-2 px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors"
+          className={`flex items-center justify-center gap-2 px-6 py-4 text-white rounded-xl font-medium transition-colors ${
+            isExpiringSoon 
+              ? 'bg-orange-600 hover:bg-orange-700 animate-pulse' 
+              : isLifetimeGrant 
+              ? 'bg-purple-600 hover:bg-purple-700' 
+              : 'bg-green-600 hover:bg-green-700'
+          }`}
         >
           <Crown className="w-5 h-5" />
-          {user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing'
-            ? 'Change Plan'
-            : 'Upgrade Plan'}
+          {isLifetimeGrant 
+            ? 'Support Us' 
+            : isExpiringSoon 
+            ? 'Subscribe Now' 
+            : user.stripeCustomerId 
+            ? 'Change Plan' 
+            : 'Subscribe'}
         </Link>
 
         {user.stripeCustomerId ? (
@@ -191,7 +299,9 @@ export default function BillingContent({ user }: BillingContentProps) {
           </button>
         ) : (
           <div className="flex items-center justify-center px-6 py-4 bg-white/5 border border-white/10 text-gray-500 rounded-xl">
-            <span className="text-sm">Subscribe to manage billing</span>
+            <span className="text-sm">
+              {user.hasDirectAccess ? 'No Stripe subscription yet' : 'Subscribe to manage billing'}
+            </span>
           </div>
         )}
       </div>
