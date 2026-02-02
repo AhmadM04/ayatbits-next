@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
         const { clerkId: userId, plan, tier } = session.metadata || {};
 
-        if (userId && session.customer) {
+        if (userId && session.customer && session.subscription) {
           // Check if user has admin-granted access
           const existingUser = await User.findOne({ clerkIds: userId });
           
@@ -54,15 +54,25 @@ export async function POST(request: NextRequest) {
             });
           }
 
+          // Fetch the subscription details from Stripe to get the end date
+          const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+          // @ts-ignore - Stripe SDK type definition issue with current_period_end
+          const subscriptionEndDate = new Date((subscription.current_period_end as number) * 1000);
+
+          // Determine subscription status (trialing or active)
+          // @ts-ignore - Stripe SDK type definition issue
+          const subscriptionStatus = subscription.status === 'trialing' ? 'trialing' : 'active';
+
           // Update subscription details while preserving hasDirectAccess flag
           const updatedUser = await User.findOneAndUpdate(
             { clerkIds: userId },
             {
               stripeCustomerId: session.customer as string,
-              subscriptionStatus: 'active',
+              subscriptionStatus: subscriptionStatus,
               subscriptionPlan: plan || 'monthly',
               subscriptionTier: tier || 'basic',
               subscriptionPlatform: 'web',
+              subscriptionEndDate: subscriptionEndDate,
               // Note: hasDirectAccess remains unchanged if it exists
             },
             { new: true }
@@ -72,6 +82,8 @@ export async function POST(request: NextRequest) {
             userId,
             plan: plan || 'monthly',
             tier: tier || 'basic',
+            status: subscriptionStatus,
+            endDate: subscriptionEndDate.toISOString(),
             route: '/api/webhook/stripe',
           });
 
@@ -93,6 +105,13 @@ export async function POST(request: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         
+        // Calculate subscription end date
+        // @ts-ignore - Stripe SDK type definition issue with current_period_end
+        const subscriptionEndDate = new Date((subscription.current_period_end as number) * 1000);
+        
+        // Determine subscription plan from interval
+        const subscriptionPlan = subscription.items.data[0]?.plan?.interval === 'year' ? 'yearly' : 'monthly';
+        
         // Allow subscription updates for users with admin-granted access
         // They can maintain both hasDirectAccess AND a Stripe subscription
         await User.findOneAndUpdate(
@@ -100,11 +119,15 @@ export async function POST(request: NextRequest) {
           {
             subscriptionStatus: subscription.status === 'active' ? 'active' : 
                                subscription.status === 'trialing' ? 'trialing' : 'inactive',
+            subscriptionEndDate: subscriptionEndDate,
+            subscriptionPlan: subscriptionPlan,
           }
         );
         logger.info('Subscription status updated', {
           customerId,
           status: subscription.status,
+          plan: subscriptionPlan,
+          endDate: subscriptionEndDate.toISOString(),
           route: '/api/webhook/stripe',
         });
         break;

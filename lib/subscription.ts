@@ -81,9 +81,10 @@ export const checkSubscription = (user: IUser) => {
     return true;
   }
 
-  // Active Subscription (Monthly/Yearly)
+  // Active Subscription (Monthly/Yearly) or Trialing
   if (
-    user.subscriptionStatus === SubscriptionStatusEnum.ACTIVE &&
+    (user.subscriptionStatus === SubscriptionStatusEnum.ACTIVE ||
+     user.subscriptionStatus === SubscriptionStatusEnum.TRIALING) &&
     user.subscriptionEndDate &&
     new Date(user.subscriptionEndDate).getTime() + DAY_IN_MS > Date.now()
   ) {

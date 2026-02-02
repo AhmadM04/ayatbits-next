@@ -82,6 +82,10 @@ export async function POST(req: NextRequest) {
     // Real Stripe price IDs look like: price_1A2B3C4D5E6F7G8H
     const isValidStripePriceId = priceId && priceId.startsWith('price_') && priceId.length > 20;
 
+    // Determine plan type (monthly/yearly) from priceId
+    const isYearly = priceId.includes('yearly') || priceId.includes('year');
+    const plan = isYearly ? 'yearly' : 'monthly';
+
     // If priceId is provided and valid, use it; otherwise create a price on the fly
     let lineItems: any[];
     if (isValidStripePriceId) {
@@ -89,8 +93,6 @@ export async function POST(req: NextRequest) {
       lineItems = [{ price: priceId, quantity: 1 }];
     } else {
       // Fallback: create price on the fly (for development/when env vars not set)
-      // Determine plan type from priceId placeholder
-      const isYearly = priceId.includes('yearly');
       const isPro = tier === 'pro';
       
       // EUR pricing
@@ -174,12 +176,14 @@ export async function POST(req: NextRequest) {
       metadata: {
         clerkId: user.id,
         tier: tier,
+        plan: plan,
       },
       subscription_data: {
         trial_period_days: 7,
         metadata: {
           clerkId: user.id,
           tier: tier,
+          plan: plan,
         },
       },
     };
