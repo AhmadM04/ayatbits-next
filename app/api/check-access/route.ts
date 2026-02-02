@@ -87,15 +87,16 @@ export async function GET() {
       });
     }
 
-    // Check active subscription
+    // Check active or trialing subscription
     if (
-      user.subscriptionStatus === SubscriptionStatusEnum.ACTIVE &&
+      (user.subscriptionStatus === SubscriptionStatusEnum.ACTIVE || 
+       user.subscriptionStatus === SubscriptionStatusEnum.TRIALING) &&
       user.subscriptionEndDate &&
       new Date(user.subscriptionEndDate) > new Date()
     ) {
       return NextResponse.json({ 
         hasAccess: true, 
-        plan: user.subscriptionPlan,
+        plan: user.subscriptionStatus === SubscriptionStatusEnum.TRIALING ? 'trial' : user.subscriptionPlan,
         tier: user.subscriptionTier || 'basic',
         hasPro: hasProTier,
         grantType: 'none',
@@ -104,7 +105,7 @@ export async function GET() {
       });
     }
 
-    // Check trial
+    // Check legacy trial field (for backward compatibility)
     if (
       user.trialEndsAt &&
       new Date(user.trialEndsAt) > new Date()

@@ -37,23 +37,9 @@ export async function POST(request: NextRequest) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
         const { clerkId: userId, plan, tier } = session.metadata || {};
+        const customerEmail = session.customer_details?.email || session.customer_email;
 
         if (userId && session.customer && session.subscription) {
-          // Check if user has admin-granted access
-          const existingUser = await User.findOne({ clerkIds: userId });
-          
-          // Allow subscription for users with hasDirectAccess (they may want to support or prepare for expiry)
-          if (existingUser?.hasDirectAccess) {
-            logger.info('User with admin-granted access subscribed via Stripe (support/upgrade)', {
-              userId,
-              email: existingUser.email,
-              hasDirectAccess: true,
-              existingPlan: existingUser.subscriptionPlan,
-              route: '/api/webhook/stripe',
-              event: 'checkout.session.completed',
-            });
-          }
-
           // Fetch the subscription details from Stripe to get the end date
           const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
           // @ts-ignore - Stripe SDK type definition issue with current_period_end
@@ -63,36 +49,90 @@ export async function POST(request: NextRequest) {
           // @ts-ignore - Stripe SDK type definition issue
           const subscriptionStatus = subscription.status === 'trialing' ? 'trialing' : 'active';
 
-          // Update subscription details while preserving hasDirectAccess flag
-          const updatedUser = await User.findOneAndUpdate(
-            { clerkIds: userId },
-            {
+          // Check if user exists - if not, create them
+          let existingUser = await User.findOne({ clerkIds: userId });
+          
+          if (!existingUser && customerEmail) {
+            // User doesn't exist yet - create them
+            // This can happen if they sign up and immediately checkout before accessing dashboard
+            logger.info('Creating user from Stripe checkout', {
+              userId,
+              email: customerEmail,
+              route: '/api/webhook/stripe',
+            });
+
+            existingUser = await User.create({
+              clerkIds: [userId],
+              email: customerEmail.toLowerCase(),
               stripeCustomerId: session.customer as string,
               subscriptionStatus: subscriptionStatus,
               subscriptionPlan: plan || 'monthly',
               subscriptionTier: tier || 'basic',
               subscriptionPlatform: 'web',
               subscriptionEndDate: subscriptionEndDate,
-              // Note: hasDirectAccess remains unchanged if it exists
-            },
-            { new: true }
-          );
-          
-          logger.info('Subscription activated', {
-            userId,
-            plan: plan || 'monthly',
-            tier: tier || 'basic',
-            status: subscriptionStatus,
-            endDate: subscriptionEndDate.toISOString(),
-            route: '/api/webhook/stripe',
-          });
+            });
+
+            logger.info('User created from Stripe checkout', {
+              userId,
+              email: customerEmail,
+              plan: plan || 'monthly',
+              tier: tier || 'basic',
+              status: subscriptionStatus,
+              route: '/api/webhook/stripe',
+            });
+          } else if (existingUser) {
+            // User exists - update their subscription
+            // Allow subscription for users with hasDirectAccess (they may want to support or prepare for expiry)
+            if (existingUser.hasDirectAccess) {
+              logger.info('User with admin-granted access subscribed via Stripe (support/upgrade)', {
+                userId,
+                email: existingUser.email,
+                hasDirectAccess: true,
+                existingPlan: existingUser.subscriptionPlan,
+                route: '/api/webhook/stripe',
+                event: 'checkout.session.completed',
+              });
+            }
+
+            // Update subscription details while preserving hasDirectAccess flag
+            existingUser = await User.findOneAndUpdate(
+              { clerkIds: userId },
+              {
+                stripeCustomerId: session.customer as string,
+                subscriptionStatus: subscriptionStatus,
+                subscriptionPlan: plan || 'monthly',
+                subscriptionTier: tier || 'basic',
+                subscriptionPlatform: 'web',
+                subscriptionEndDate: subscriptionEndDate,
+                // Note: hasDirectAccess remains unchanged if it exists
+              },
+              { new: true }
+            );
+
+            logger.info('Subscription activated for existing user', {
+              userId,
+              plan: plan || 'monthly',
+              tier: tier || 'basic',
+              status: subscriptionStatus,
+              endDate: subscriptionEndDate.toISOString(),
+              route: '/api/webhook/stripe',
+            });
+          } else {
+            // This should rarely happen - user not found and no email
+            logger.error('Cannot create user - no email available', undefined, {
+              userId,
+              sessionId: session.id,
+              route: '/api/webhook/stripe',
+            });
+            break;
+          }
 
           // Send welcome email (async, don't wait)
-          if (updatedUser && updatedUser.email) {
+          if (existingUser && existingUser.email) {
             sendWelcomeNewMemberEmail({
-              email: updatedUser.email,
-              firstName: updatedUser.firstName || 'there',
-              subscriptionPlan: updatedUser.subscriptionPlan || 'monthly',
+              email: existingUser.email,
+              firstName: existingUser.firstName || 'there',
+              subscriptionPlan: existingUser.subscriptionPlan || 'monthly',
             }).catch(err => 
               logger.error('Error sending welcome member email', err)
             );
