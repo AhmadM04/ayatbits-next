@@ -24,9 +24,22 @@ export default function PricingContent() {
   const router = useRouter();
   
   useEffect(() => {
+    console.log('[PricingContent] Component mounted');
     setMounted(true);
     // Check for voucher in URL
     const urlVoucher = searchParams.get('voucher');
+    const successParam = searchParams.get('success');
+    const canceledParam = searchParams.get('canceled');
+    
+    console.log('[PricingContent] URL params:', { urlVoucher, successParam, canceledParam });
+    
+    if (successParam === 'true') {
+      console.log('[PricingContent] 🎉 Success parameter detected - payment completed!');
+    }
+    if (canceledParam === 'true') {
+      console.log('[PricingContent] ❌ Canceled parameter detected - payment canceled');
+    }
+    
     if (urlVoucher) {
       setVoucherCode(urlVoucher);
       validateVoucher(urlVoucher);
@@ -41,33 +54,47 @@ export default function PricingContent() {
     if (!mounted) return;
     
     const checkAccess = async () => {
+      console.log('[PricingContent] Checking access...');
       try {
         const response = await fetch('/api/check-access', {
           cache: 'no-store',
           headers: { 'Cache-Control': 'no-cache' },
         });
         const data = await response.json();
+        console.log('[PricingContent] Access check response:', data);
         
         if (data.hasAccess) {
+          console.log('[PricingContent] ✅ User has access! Redirecting to dashboard...');
           setHasAccess(true);
-          setTimeout(() => router.push('/dashboard'), 1500);
+          setTimeout(() => {
+            console.log('[PricingContent] Navigating to dashboard now');
+            router.push('/dashboard');
+          }, 1500);
         } else {
+          console.log('[PricingContent] ❌ User does not have access');
           setHasAccess(false);
         }
       } catch (error) {
-        console.error('Error checking access:', error);
+        console.error('[PricingContent] Error checking access:', error);
         setHasAccess(false);
       } finally {
         setCheckingAccess(false);
       }
     };
 
+    console.log('[PricingContent] Starting access polling...');
     checkAccess();
     const pollInterval = setInterval(() => {
-      if (!hasAccess) checkAccess();
+      if (!hasAccess) {
+        console.log('[PricingContent] Polling access check...');
+        checkAccess();
+      }
     }, 2000);
 
-    return () => clearInterval(pollInterval);
+    return () => {
+      console.log('[PricingContent] Cleaning up access polling');
+      clearInterval(pollInterval);
+    };
   }, [mounted, hasAccess, router]);
 
   // Validate voucher
@@ -134,21 +161,26 @@ export default function PricingContent() {
 
   // Handle subscription
   const handleSubscribe = async (priceId: string, tier: 'basic' | 'pro') => {
+    console.log('[PricingContent] handleSubscribe called', { priceId, tier });
     setLoadingPlan(priceId);
     
     try {
+      console.log('[PricingContent] Checking access before checkout...');
       const accessCheck = await fetch('/api/check-access', {
         cache: 'no-store',
         headers: { 'Cache-Control': 'no-cache' },
       });
       const accessData = await accessCheck.json();
+      console.log('[PricingContent] Pre-checkout access check:', accessData);
       
       if (accessData.hasAccess) {
+        console.log('[PricingContent] User already has access, redirecting to dashboard');
         alert('You already have access to AyatBits!');
         window.location.href = '/dashboard';
         return;
       }
 
+      console.log('[PricingContent] Creating checkout session...');
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -156,18 +188,22 @@ export default function PricingContent() {
       });
       
       const data = await response.json();
+      console.log('[PricingContent] Checkout API response:', data);
       
       if (data.url) {
+        console.log('[PricingContent] Redirecting to Stripe checkout:', data.url);
         window.location.href = data.url;
       } else if (data.redirect) {
+        console.log('[PricingContent] Redirecting to:', data.redirect);
         alert(data.error || 'You already have access!');
         window.location.href = data.redirect;
       } else {
+        console.error('[PricingContent] No URL or redirect in response');
         setLoadingPlan(null);
         alert(data.error || 'Failed to start checkout. Please try again.');
       }
     } catch (error) {
-      console.error('Checkout error:', error);
+      console.error('[PricingContent] Checkout error:', error);
       setLoadingPlan(null);
       alert('An error occurred. Please try again.');
     }

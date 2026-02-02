@@ -13,17 +13,21 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_placeholder';
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('[stripe-webhook] 🔔 Webhook received');
     const body = await request.text();
     const signature = request.headers.get('stripe-signature');
 
     if (!signature) {
+      console.log('[stripe-webhook] ❌ Missing signature');
       return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
     }
 
     let event: Stripe.Event;
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      console.log('[stripe-webhook] ✅ Event verified:', event.type);
     } catch (err: any) {
+      console.error('[stripe-webhook] ❌ Signature verification failed:', err.message);
       securityLogger.logWebhookSignatureFailure({
         route: '/api/webhook/stripe',
         error: err.message,
@@ -32,15 +36,29 @@ export async function POST(request: NextRequest) {
     }
 
     await connectDB();
+    console.log('[stripe-webhook] ✅ Database connected');
 
     switch (event.type) {
       case 'checkout.session.completed': {
+        console.log('[stripe-webhook] 💳 Processing checkout.session.completed');
         const session = event.data.object as Stripe.Checkout.Session;
         const { clerkId: userId, plan, tier } = session.metadata || {};
         const customerEmail = session.customer_details?.email || session.customer_email;
+        
+        console.log('[stripe-webhook] Session details:', {
+          sessionId: session.id,
+          userId,
+          customerEmail,
+          plan,
+          tier,
+          customer: session.customer,
+          subscription: session.subscription,
+          paymentStatus: session.payment_status,
+        });
 
         if (userId && session.customer && session.subscription) {
           // Fetch the subscription details from Stripe to get the end date
+          console.log('[stripe-webhook] Fetching subscription details...');
           const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
           // @ts-ignore - Stripe SDK type definition issue with current_period_end
           const subscriptionEndDate = new Date((subscription.current_period_end as number) * 1000);
@@ -48,9 +66,16 @@ export async function POST(request: NextRequest) {
           // Determine subscription status (trialing or active)
           // @ts-ignore - Stripe SDK type definition issue
           const subscriptionStatus = subscription.status === 'trialing' ? 'trialing' : 'active';
+          
+          console.log('[stripe-webhook] Subscription info:', {
+            subscriptionId: subscription.id,
+            status: subscriptionStatus,
+            endDate: subscriptionEndDate.toISOString(),
+          });
 
           // Check if user exists - if not, create them
           let existingUser = await User.findOne({ clerkIds: userId });
+          console.log('[stripe-webhook] User lookup result:', existingUser ? 'Found' : 'Not found');
           
           if (!existingUser && customerEmail) {
             // User doesn't exist yet - create them
@@ -117,8 +142,10 @@ export async function POST(request: NextRequest) {
               endDate: subscriptionEndDate.toISOString(),
               route: '/api/webhook/stripe',
             });
+            console.log('[stripe-webhook] ✅ User subscription updated successfully');
           } else {
             // This should rarely happen - user not found and no email
+            console.error('[stripe-webhook] ❌ Cannot create user - no email available');
             logger.error('Cannot create user - no email available', undefined, {
               userId,
               sessionId: session.id,
@@ -129,14 +156,24 @@ export async function POST(request: NextRequest) {
 
           // Send welcome email (async, don't wait)
           if (existingUser && existingUser.email) {
+            console.log('[stripe-webhook] 📧 Sending welcome email to:', existingUser.email);
             sendWelcomeNewMemberEmail({
               email: existingUser.email,
               firstName: existingUser.firstName || 'there',
               subscriptionPlan: existingUser.subscriptionPlan || 'monthly',
-            }).catch(err => 
-              logger.error('Error sending welcome member email', err)
-            );
+            }).catch(err => {
+              console.error('[stripe-webhook] ❌ Error sending welcome email:', err);
+              logger.error('Error sending welcome member email', err);
+            });
           }
+          
+          console.log('[stripe-webhook] ✅ Checkout session completed successfully');
+        } else {
+          console.log('[stripe-webhook] ⚠️ Skipping - missing required data:', {
+            hasUserId: !!userId,
+            hasCustomer: !!session.customer,
+            hasSubscription: !!session.subscription,
+          });
         }
         break;
       }
