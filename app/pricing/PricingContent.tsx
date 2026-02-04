@@ -24,21 +24,9 @@ export default function PricingContent() {
   const router = useRouter();
   
   useEffect(() => {
-    console.log('[PricingContent] Component mounted');
     setMounted(true);
     // Check for voucher in URL
     const urlVoucher = searchParams.get('voucher');
-    const successParam = searchParams.get('success');
-    const canceledParam = searchParams.get('canceled');
-    
-    console.log('[PricingContent] URL params:', { urlVoucher, successParam, canceledParam });
-    
-    if (successParam === 'true') {
-      console.log('[PricingContent] 🎉 Success parameter detected - payment completed!');
-    }
-    if (canceledParam === 'true') {
-      console.log('[PricingContent] ❌ Canceled parameter detected - payment canceled');
-    }
     
     if (urlVoucher) {
       setVoucherCode(urlVoucher);
@@ -55,24 +43,19 @@ export default function PricingContent() {
     if (!mounted) return;
     
     const checkAccess = async () => {
-      console.log('[PricingContent] Checking access...');
       try {
         const response = await fetch('/api/check-access', {
           cache: 'no-store',
           headers: { 'Cache-Control': 'no-cache' },
         });
         const data = await response.json();
-        console.log('[PricingContent] Access check response:', data);
         
         if (data.hasAccess) {
-          console.log('[PricingContent] ✅ User has access! Redirecting to dashboard...');
           setHasAccess(true);
           setTimeout(() => {
-            console.log('[PricingContent] Navigating to dashboard now');
             router.push('/dashboard');
           }, 1500);
         } else {
-          console.log('[PricingContent] ❌ User does not have access');
           setHasAccess(false);
         }
       } catch (error) {
@@ -83,17 +66,14 @@ export default function PricingContent() {
       }
     };
 
-    console.log('[PricingContent] Starting access polling...');
     checkAccess();
     const pollInterval = setInterval(() => {
       if (!hasAccess) {
-        console.log('[PricingContent] Polling access check...');
         checkAccess();
       }
     }, 2000);
 
     return () => {
-      console.log('[PricingContent] Cleaning up access polling');
       clearInterval(pollInterval);
     };
   }, [mounted, hasAccess, router]);
@@ -137,7 +117,6 @@ export default function PricingContent() {
     if (!voucherData) return;
 
     setRedeemingVoucher(true);
-    console.log('[PricingContent] Redeeming voucher:', voucherCode);
 
     try {
       const response = await fetch('/api/vouchers/redeem', {
@@ -147,20 +126,17 @@ export default function PricingContent() {
       });
 
       const data = await response.json();
-      console.log('[PricingContent] Redemption response:', data);
 
       if (data.success) {
         alert(`🎉 Voucher redeemed! You now have ${data.granted.tier} access for ${data.granted.duration} month(s).`);
         
         // Force re-check access immediately with cache busting
-        console.log('[PricingContent] Forcing access re-check after redemption');
         setCheckingAccess(true);
         setHasAccess(null); // Reset to trigger re-check
         
         // Wait a moment for DB to propagate, then check access
         setTimeout(async () => {
           try {
-            console.log('[PricingContent] Checking access after redemption...');
             const accessResponse = await fetch('/api/check-access', {
               cache: 'no-store',
               headers: { 
@@ -169,14 +145,11 @@ export default function PricingContent() {
               },
             });
             const accessData = await accessResponse.json();
-            console.log('[PricingContent] Access check result:', accessData);
             
             if (accessData.hasAccess) {
-              console.log('[PricingContent] ✅ Access confirmed! Redirecting to dashboard...');
               setHasAccess(true);
               setTimeout(() => router.push('/dashboard'), 500);
             } else {
-              console.log('[PricingContent] ⚠️ No access detected yet, will continue polling');
               // If still no access, keep polling
               setHasAccess(false);
               setCheckingAccess(false);
@@ -201,26 +174,21 @@ export default function PricingContent() {
 
   // Handle subscription
   const handleSubscribe = async (priceId: string, tier: 'basic' | 'pro') => {
-    console.log('[PricingContent] handleSubscribe called', { priceId, tier });
     setLoadingPlan(priceId);
     
     try {
-      console.log('[PricingContent] Checking access before checkout...');
       const accessCheck = await fetch('/api/check-access', {
         cache: 'no-store',
         headers: { 'Cache-Control': 'no-cache' },
       });
       const accessData = await accessCheck.json();
-      console.log('[PricingContent] Pre-checkout access check:', accessData);
       
       if (accessData.hasAccess) {
-        console.log('[PricingContent] User already has access, redirecting to dashboard');
         alert('You already have access to AyatBits!');
         window.location.href = '/dashboard';
         return;
       }
 
-      console.log('[PricingContent] Creating checkout session...');
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -228,13 +196,10 @@ export default function PricingContent() {
       });
       
       const data = await response.json();
-      console.log('[PricingContent] Checkout API response:', data);
       
       if (data.url) {
-        console.log('[PricingContent] Redirecting to Stripe checkout:', data.url);
         window.location.href = data.url;
       } else if (data.redirect) {
-        console.log('[PricingContent] Redirecting to:', data.redirect);
         alert(data.error || 'You already have access!');
         window.location.href = data.redirect;
       } else {

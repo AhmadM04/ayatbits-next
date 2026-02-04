@@ -41,7 +41,6 @@ export default function PricingContent() {
         if (data.hasAccess) {
           setHasAccess(true);
           // Redirect users who already have access to dashboard
-          console.log('[Pricing] Access detected! Redirecting to dashboard...');
           setTimeout(() => {
             router.push('/dashboard');
           }, 1500);
@@ -62,7 +61,6 @@ export default function PricingContent() {
     // Poll every 2 seconds to detect when admin grants access (more responsive)
     const pollInterval = setInterval(() => {
       if (!hasAccess) {
-        console.log('[Pricing] Polling access status...');
         checkAccess();
       }
     }, 2000); // Reduced from 5000ms to 2000ms for faster detection
@@ -119,7 +117,6 @@ export default function PricingContent() {
       const accessData = await accessCheck.json();
       
       if (accessData.hasAccess) {
-        console.log('[Pricing] Access detected during checkout initiation - redirecting to dashboard');
         alert('You already have access to AyatBits Pro!');
         window.location.href = '/dashboard';
         return;

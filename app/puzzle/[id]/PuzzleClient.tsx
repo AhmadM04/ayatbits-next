@@ -33,6 +33,8 @@ interface PuzzleClientProps {
   initialTransliteration?: string;
   initialShowTransliteration?: boolean;
   initialWordTransliterations?: Array<{ text: string; transliteration: string }>;
+  initialAiTafsir?: string;
+  initialAiTafsirSource?: string;
 }
 
 export default function PuzzleClient({
@@ -47,6 +49,8 @@ export default function PuzzleClient({
   initialTransliteration = '',
   initialShowTransliteration = false,
   initialWordTransliterations = [],
+  initialAiTafsir = '',
+  initialAiTafsirSource = '',
 }: PuzzleClientProps) {
   const { t } = useI18n();
   const { startTutorial } = useTutorial();
@@ -66,7 +70,8 @@ export default function PuzzleClient({
   const [isLoadingTafsir, setIsLoadingTafsir] = useState(false);
   const [userTranslation, setUserTranslation] = useState<string>('en.sahih');
   const [showAiTafsir, setShowAiTafsir] = useState(false);
-  const [aiTafsir, setAiTafsir] = useState<string | null>(null);
+  const [aiTafsir, setAiTafsir] = useState<string | null>(initialAiTafsir || null);
+  const [aiTafsirSource, setAiTafsirSource] = useState<string>(initialAiTafsirSource);
   const [isLoadingAiTafsir, setIsLoadingAiTafsir] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [requiresPro, setRequiresPro] = useState(false);
@@ -226,6 +231,11 @@ export default function PuzzleClient({
     const newValue = !showAiTafsir;
     setShowAiTafsir(newValue);
 
+    // If enabling and we already have pre-generated AI tafsir, just show it
+    if (newValue && aiTafsir) {
+      return; // Already loaded, just toggle visibility
+    }
+
     // If enabling and we don't have AI tafsir yet, fetch it
     if (newValue && !aiTafsir && puzzle.surah?.number && puzzle.content?.ayahNumber) {
       setIsLoadingAiTafsir(true);
@@ -287,6 +297,7 @@ export default function PuzzleClient({
 
         const data = await response.json();
         setAiTafsir(data.tafsir);
+        setAiTafsirSource(data.source || '');
         showToast(t('puzzle.aiTafsirGenerated'), 'success');
       } catch (error) {
         setAiError(t('puzzle.networkError'));
@@ -298,30 +309,15 @@ export default function PuzzleClient({
   };
 
   const handleSolved = useCallback(async (isCorrect: boolean) => {
-    console.log('=== handleSolved CALLED ===', { 
-      isCorrect, 
-      hasHandled: hasHandledCompletion.current,
-      isLastAyahInSurah,
-      nextPuzzleId,
-      nextPuzzleAyahNumber,
-      puzzleId: puzzle.id,
-      puzzleSurah: puzzle.surah?.number,
-      puzzleJuz: puzzle.juz?.number,
-      currentAyah: puzzle.content?.ayahNumber
-    });
-    
     if (!isCorrect) {
-      console.log('Puzzle not correct, returning early');
       return;
     }
     
     if (hasHandledCompletion.current) {
-      console.log('Already handled completion, returning early');
       return;
     }
     
     hasHandledCompletion.current = true;
-    console.log('Setting hasHandledCompletion to true, proceeding with navigation logic');
 
     // Save progress (don't block on this)
     apiPost(`/api/puzzles/${puzzle.id}/progress`, {
@@ -363,12 +359,9 @@ export default function PuzzleClient({
       }
     }
     
-    console.log('🚀 Will navigate to:', targetUrl);
-    
     // Wait for success animation and word audio to complete before navigating
     // This allows the user to see the success animation and hear any playing word audio
     setTimeout(() => {
-      console.log('✈️ Navigating now to:', targetUrl);
       router.replace(targetUrl);
     }, 1800); // 1.8 seconds delay to allow word audio to finish
   }, [puzzle, nextPuzzleId, nextPuzzleAyahNumber, isLastAyahInSurah, router, showToast]);
@@ -580,7 +573,6 @@ export default function PuzzleClient({
               surahNumber={puzzle.surah?.number}
               ayahNumber={puzzle.content?.ayahNumber}
               onSolved={(isCorrect) => {
-                console.log('🔵 WordPuzzle onSolved callback invoked!', { isCorrect });
                 handleSolved(isCorrect);
               }}
               onMistakeLimitExceeded={handleMistakeLimitExceeded}
@@ -654,6 +646,11 @@ export default function PuzzleClient({
                       <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
                         {aiTafsir}
                       </div>
+                      {aiTafsirSource && (
+                        <div className="mt-3 text-xs text-gray-500 italic">
+                          Source: {aiTafsirSource}
+                        </div>
+                      )}
                     </>
                   ) : isLoadingAiTafsir ? (
                     <div className="flex items-center justify-center py-8">

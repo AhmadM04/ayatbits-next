@@ -5,7 +5,9 @@ import mongoose from 'mongoose';
 import PuzzleClient from './PuzzleClient';
 import { cleanAyahText } from '@/lib/ayah-utils';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
-import { fetchTransliteration } from '@/lib/quran-api-adapter';
+import { fetchTransliteration, fetchTranslation } from '@/lib/quran-api-adapter';
+import { generateAiTafsir } from '@/lib/ai-tafsir-generator';
+import { checkProAccess } from '@/lib/subscription';
 
 export default async function PuzzlePage({
   params,
@@ -115,6 +117,48 @@ export default async function PuzzlePage({
     }
   }
 
+  // Pre-generate AI Tafsir if user has Pro access (for instant display on click)
+  let initialAiTafsir = '';
+  let initialAiTafsirSource = '';
+  
+  const hasPro = checkProAccess(dbUser);
+  if (hasPro) {
+    try {
+      // Get user's selected translation
+      const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
+      const targetLang = selectedTranslation.split('.')[0] || 'en';
+      
+      // Fetch translation text for better AI tafsir context
+      let translationText = '';
+      try {
+        const translationData = await fetchTranslation(
+          surahNum,
+          ayahNum,
+          selectedTranslation,
+          { next: { revalidate: 86400 } }
+        );
+        translationText = translationData.data?.text || '';
+      } catch (error) {
+        console.error('Failed to fetch translation for AI tafsir:', error);
+      }
+      
+      // Generate or retrieve cached AI tafsir
+      const tafsirResult = await generateAiTafsir({
+        surahNumber: surahNum,
+        ayahNumber: ayahNum,
+        ayahText: rawAyahText,
+        translation: translationText,
+        targetLanguage: targetLang,
+      });
+      
+      initialAiTafsir = tafsirResult.tafsirText;
+      initialAiTafsirSource = tafsirResult.source;
+    } catch (error) {
+      console.error('Failed to pre-generate AI tafsir:', error);
+      // Continue without AI tafsir - user can still generate it manually
+    }
+  }
+
   // Check if liked
   const likedAyat = await LikedAyat.findOne({
     userId: dbUser._id,
@@ -164,6 +208,8 @@ export default async function PuzzlePage({
       initialTransliteration={initialTransliteration}
       initialWordTransliterations={initialWordTransliterations}
       initialShowTransliteration={dbUser.showTransliteration || false}
+      initialAiTafsir={initialAiTafsir}
+      initialAiTafsirSource={initialAiTafsirSource}
     />
   );
 }
