@@ -6,7 +6,7 @@ import { securityLogger } from '@/lib/security-logger';
 import { sendWelcomeNewMemberEmail } from '@/lib/aws-ses-service';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
-  apiVersion: '2025-11-17.clover' as any,
+  apiVersion: '2026-01-28.clover' as any,
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_placeholder';

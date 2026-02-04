@@ -48,6 +48,7 @@ export default function PricingContent() {
   
   const isTrialFlow = mounted ? searchParams.get('trial') === 'true' : false;
   const reason = mounted ? searchParams.get('reason') : null;
+  const isProcessingPayment = mounted ? searchParams.get('success') === 'true' : false;
 
   // Check access
   useEffect(() => {
@@ -294,6 +295,23 @@ export default function PricingContent() {
 
       <main className="pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
+          {/* Processing Payment Banner */}
+          {isProcessingPayment && !hasAccess && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8 p-6 bg-blue-500/10 border border-blue-500/30 rounded-2xl text-center"
+            >
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
+                <h3 className="text-lg font-semibold text-blue-400">Processing your payment...</h3>
+              </div>
+              <p className="text-gray-300 mb-2">Payment successful! Setting up your account...</p>
+              <p className="text-sm text-gray-400">This usually takes 5-10 seconds</p>
+            </motion.div>
+          )}
+
+          {/* Access Granted Banner */}
           {hasAccess && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}

@@ -5,7 +5,7 @@ import { logger } from '@/lib/logger';
 import { getAdminUser } from '@/lib/dashboard-access';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-11-17.clover' as any,
+  apiVersion: '2026-01-28.clover' as any,
 });
 
 export async function POST(req: NextRequest) {
