@@ -59,3 +59,4 @@ export interface QuranComResponse {
   verse: QuranComVerse;
 }
 
+

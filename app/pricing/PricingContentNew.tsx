@@ -121,13 +121,43 @@ export default function PricingContent() {
 
       if (data.success) {
         alert(`🎉 Voucher redeemed! You now have ${data.granted.tier} access for ${data.granted.duration} month(s).`);
-        router.push('/dashboard');
+        
+        // Force re-check access immediately with cache busting
+        setCheckingAccess(true);
+        setHasAccess(null); // Reset to trigger re-check
+        
+        // Wait a moment for DB to propagate, then check access
+        setTimeout(async () => {
+          try {
+            const accessResponse = await fetch('/api/check-access', {
+              cache: 'no-store',
+              headers: { 
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+              },
+            });
+            const accessData = await accessResponse.json();
+            
+            if (accessData.hasAccess) {
+              setHasAccess(true);
+              setTimeout(() => router.push('/dashboard'), 500);
+            } else {
+              // If still no access, keep polling
+              setHasAccess(false);
+              setCheckingAccess(false);
+            }
+          } catch (error) {
+            console.error('Error checking access after redemption:', error);
+            setHasAccess(false);
+            setCheckingAccess(false);
+          }
+        }, 500);
       } else {
         alert(data.error || 'Failed to redeem voucher');
+        setRedeemingVoucher(false);
       }
     } catch (error) {
       alert('Failed to redeem voucher');
-    } finally {
       setRedeemingVoucher(false);
     }
   };

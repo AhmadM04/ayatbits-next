@@ -91,14 +91,40 @@ export async function POST(req: NextRequest) {
     const now = new Date();
     const endDate = addMonths(now, voucher.duration);
 
-    await User.findByIdAndUpdate(dbUser._id, {
-      $set: {
-        subscriptionStatus: SubscriptionStatusEnum.ACTIVE,
-        subscriptionPlan: voucher.duration >= 12 ? 'yearly' : 'monthly',
-        subscriptionTier: voucher.tier,
-        subscriptionEndDate: endDate,
-        trialEndsAt: null, // Clear trial if any
+    const updatedUser = await User.findByIdAndUpdate(
+      dbUser._id, 
+      {
+        $set: {
+          subscriptionStatus: SubscriptionStatusEnum.ACTIVE,
+          subscriptionPlan: voucher.duration >= 12 ? 'yearly' : 'monthly',
+          subscriptionTier: voucher.tier,
+          subscriptionEndDate: endDate,
+          trialEndsAt: null, // Clear trial if any
+        },
       },
+      { 
+        new: true, // Return updated document
+        runValidators: true, // Run schema validators
+      }
+    );
+
+    if (!updatedUser) {
+      logger.error('Failed to update user after voucher redemption', undefined, {
+        userId: dbUser._id.toString(),
+        voucherCode: voucher.code,
+      });
+      return NextResponse.json(
+        { success: false, error: 'Failed to update user subscription' },
+        { status: 500 }
+      );
+    }
+
+    // Log the update for debugging
+    logger.info('User subscription updated successfully', {
+      userId: user.id,
+      newStatus: updatedUser.subscriptionStatus,
+      newTier: updatedUser.subscriptionTier,
+      newEndDate: updatedUser.subscriptionEndDate?.toString(),
     });
 
     // 6. Increment voucher redemption count
@@ -151,4 +177,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
 

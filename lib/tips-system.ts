@@ -68,3 +68,4 @@ export function getTierDescription(wordCount: number): string {
   return `${tier.tier} (${tier.tips} tip${tier.tips > 1 ? 's' : ''} available)`;
 }
 
+

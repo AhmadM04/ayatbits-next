@@ -156,3 +156,4 @@ If users still can't access pro features after signing out/in:
 
 The new code will automatically sync Clerk IDs and log exactly why access was denied, making it much easier to debug.
 
+

@@ -137,6 +137,7 @@ export default function PricingContent() {
     if (!voucherData) return;
 
     setRedeemingVoucher(true);
+    console.log('[PricingContent] Redeeming voucher:', voucherCode);
 
     try {
       const response = await fetch('/api/vouchers/redeem', {
@@ -146,16 +147,54 @@ export default function PricingContent() {
       });
 
       const data = await response.json();
+      console.log('[PricingContent] Redemption response:', data);
 
       if (data.success) {
         alert(`🎉 Voucher redeemed! You now have ${data.granted.tier} access for ${data.granted.duration} month(s).`);
-        router.push('/dashboard');
+        
+        // Force re-check access immediately with cache busting
+        console.log('[PricingContent] Forcing access re-check after redemption');
+        setCheckingAccess(true);
+        setHasAccess(null); // Reset to trigger re-check
+        
+        // Wait a moment for DB to propagate, then check access
+        setTimeout(async () => {
+          try {
+            console.log('[PricingContent] Checking access after redemption...');
+            const accessResponse = await fetch('/api/check-access', {
+              cache: 'no-store',
+              headers: { 
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+              },
+            });
+            const accessData = await accessResponse.json();
+            console.log('[PricingContent] Access check result:', accessData);
+            
+            if (accessData.hasAccess) {
+              console.log('[PricingContent] ✅ Access confirmed! Redirecting to dashboard...');
+              setHasAccess(true);
+              setTimeout(() => router.push('/dashboard'), 500);
+            } else {
+              console.log('[PricingContent] ⚠️ No access detected yet, will continue polling');
+              // If still no access, keep polling
+              setHasAccess(false);
+              setCheckingAccess(false);
+            }
+          } catch (error) {
+            console.error('[PricingContent] Error checking access after redemption:', error);
+            setHasAccess(false);
+            setCheckingAccess(false);
+          }
+        }, 500);
       } else {
+        console.error('[PricingContent] Redemption failed:', data.error);
         alert(data.error || 'Failed to redeem voucher');
+        setRedeemingVoucher(false);
       }
     } catch (error) {
+      console.error('[PricingContent] Redemption error:', error);
       alert('Failed to redeem voucher');
-    } finally {
       setRedeemingVoucher(false);
     }
   };

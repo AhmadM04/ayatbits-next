@@ -173,3 +173,4 @@ export const SURAH_NAMES_ARABIC: { [num: number]: string } = {
   114: 'الناس',
 };
 
+

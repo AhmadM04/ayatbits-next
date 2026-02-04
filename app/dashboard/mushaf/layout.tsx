@@ -5,3 +5,4 @@ export default function MushafLayout({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+

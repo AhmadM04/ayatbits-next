@@ -5,3 +5,4 @@ export default function MushafIndexPage() {
   redirect('/dashboard/mushaf/page/1');
 }
 
+

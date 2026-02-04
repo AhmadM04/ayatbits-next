@@ -121,6 +121,10 @@ export async function GET() {
       console.log('[check-access] ✅ User has ACTIVE/TRIALING subscription - granting access', {
         status: user.subscriptionStatus,
         endDate: user.subscriptionEndDate,
+        currentDate: new Date(),
+        isEndDateValid: new Date(user.subscriptionEndDate) > new Date(),
+        tier: user.subscriptionTier,
+        plan: user.subscriptionPlan,
       });
       return NextResponse.json({ 
         hasAccess: true, 
@@ -150,7 +154,16 @@ export async function GET() {
       });
     }
 
-    console.log('[check-access] ❌ No valid access method found - denying access');
+    console.log('[check-access] ❌ No valid access method found - denying access', {
+      subscriptionStatus: user.subscriptionStatus,
+      subscriptionPlan: user.subscriptionPlan,
+      subscriptionTier: user.subscriptionTier,
+      subscriptionEndDate: user.subscriptionEndDate,
+      hasDirectAccess: user.hasDirectAccess,
+      trialEndsAt: user.trialEndsAt,
+      currentDate: new Date(),
+      isEndDateFuture: user.subscriptionEndDate ? new Date(user.subscriptionEndDate) > new Date() : false,
+    });
     return NextResponse.json({ 
       hasAccess: false, 
       hasPro: false,
