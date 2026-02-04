@@ -60,8 +60,48 @@ export async function POST(request: NextRequest) {
           // Fetch the subscription details from Stripe to get the end date
           console.log('[stripe-webhook] Fetching subscription details...');
           const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-          // @ts-ignore - Stripe SDK type definition issue with current_period_end
-          const subscriptionEndDate = new Date((subscription.current_period_end as number) * 1000);
+          
+          // Log raw subscription data for debugging
+          console.log('[stripe-webhook] Raw subscription data:', {
+            id: subscription.id,
+            status: subscription.status,
+            // @ts-ignore - Stripe SDK type definition issue with current_period_end
+            current_period_end: subscription.current_period_end,
+            // @ts-ignore - Stripe SDK type definition issue with current_period_end
+            current_period_end_type: typeof subscription.current_period_end,
+            trial_end: subscription.trial_end,
+          });
+          
+          // Safely handle date conversion with proper error handling
+          let subscriptionEndDate: Date;
+          try {
+            // @ts-ignore - Stripe SDK type definition issue with current_period_end
+            const timestamp = subscription.current_period_end;
+            if (!timestamp || timestamp === null || timestamp === undefined) {
+              throw new Error('current_period_end is null or undefined');
+            }
+            subscriptionEndDate = new Date((timestamp as number) * 1000);
+            
+            // Validate the date is valid
+            if (isNaN(subscriptionEndDate.getTime())) {
+              throw new Error('Invalid date from current_period_end: ' + timestamp);
+            }
+          } catch (dateError: any) {
+            console.error('[stripe-webhook] ❌ Error converting subscription end date:', dateError.message);
+            console.error('[stripe-webhook] Attempting fallback to trial_end or default');
+            
+            // Fallback 1: Try using trial_end
+            // @ts-ignore
+            const trialEnd = subscription.trial_end;
+            if (trialEnd && typeof trialEnd === 'number') {
+              console.log('[stripe-webhook] Using trial_end as fallback:', trialEnd);
+              subscriptionEndDate = new Date((trialEnd as number) * 1000);
+            } else {
+              // Fallback 2: Default to 7 days from now (standard trial period)
+              console.log('[stripe-webhook] Using 7-day default fallback');
+              subscriptionEndDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+            }
+          }
 
           // Determine subscription status (trialing or active)
           // @ts-ignore - Stripe SDK type definition issue
@@ -182,9 +222,25 @@ export async function POST(request: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         
-        // Calculate subscription end date
-        // @ts-ignore - Stripe SDK type definition issue with current_period_end
-        const subscriptionEndDate = new Date((subscription.current_period_end as number) * 1000);
+        // Calculate subscription end date with proper error handling
+        let subscriptionEndDate: Date;
+        try {
+          // @ts-ignore - Stripe SDK type definition issue with current_period_end
+          const timestamp = subscription.current_period_end;
+          if (!timestamp || timestamp === null || timestamp === undefined) {
+            throw new Error('current_period_end is null or undefined');
+          }
+          subscriptionEndDate = new Date((timestamp as number) * 1000);
+          
+          // Validate the date
+          if (isNaN(subscriptionEndDate.getTime())) {
+            throw new Error('Invalid date from current_period_end: ' + timestamp);
+          }
+        } catch (dateError: any) {
+          console.error('[stripe-webhook] ❌ Error in subscription.updated:', dateError.message);
+          // Fallback to 30 days from now for updated subscriptions
+          subscriptionEndDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+        }
         
         // Determine subscription plan from interval
         const subscriptionPlan = subscription.items.data[0]?.plan?.interval === 'year' ? 'yearly' : 'monthly';
