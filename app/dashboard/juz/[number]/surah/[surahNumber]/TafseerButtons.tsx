@@ -14,8 +14,6 @@ interface TafseerButtonsProps {
   ayahText: string;
   subscriptionPlan?: string;
   initialShowTransliteration?: boolean;
-  initialAiTafsir?: string;
-  initialAiTafsirSource?: string;
 }
 
 // Translation names and options
@@ -69,8 +67,6 @@ export default function TafseerButtons({
   ayahText,
   subscriptionPlan,
   initialShowTransliteration = false,
-  initialAiTafsir,
-  initialAiTafsirSource,
 }: TafseerButtonsProps) {
   const { t } = useI18n();
   const router = useRouter();
@@ -81,8 +77,8 @@ export default function TafseerButtons({
   const [tafsirResource, setTafsirResource] = useState<string>('Tafsir Ibn Kathir');
   const [isTafsirFallback, setIsTafsirFallback] = useState(false);
   const [isLoadingTafsir, setIsLoadingTafsir] = useState(false);
-  const [aiTafsir, setAiTafsir] = useState<string | null>(initialAiTafsir || null);
-  const [aiTafsirSource, setAiTafsirSource] = useState<string>(initialAiTafsirSource || '');
+  const [aiTafsir, setAiTafsir] = useState<string | null>(null);
+  const [aiTafsirSource, setAiTafsirSource] = useState<string>('');
   const [isLoadingAiTafsir, setIsLoadingAiTafsir] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [requiresPro, setRequiresPro] = useState(false);
@@ -108,8 +104,8 @@ export default function TafseerButtons({
     setShowTafsir(false);
     setShowAiTafsir(false);
     setTafsir(null);
-    setAiTafsir(initialAiTafsir || null);
-    setAiTafsirSource(initialAiTafsirSource || '');
+    setAiTafsir(null);
+    setAiTafsirSource('');
     setAiError(null);
     setRequiresPro(false);
     setTranslation(null);
@@ -117,7 +113,7 @@ export default function TafseerButtons({
     setWordTransliterations([]);
     setShowMobileMenu(false);
     setShowTranslationMenu(false);
-  }, [surahNumber, ayahNumber, initialAiTafsir, initialAiTafsirSource]);
+  }, [surahNumber, ayahNumber]);
 
   // Update current translation when prop changes
   useEffect(() => {
