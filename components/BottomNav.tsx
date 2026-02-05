@@ -108,6 +108,7 @@ export default function BottomNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                data-tutorial={item.labelKey === 'common.awards' ? 'awards-button' : undefined}
                 className={`flex flex-col items-center gap-0.5 sm:gap-1 py-2 px-1.5 sm:px-3 rounded-lg transition-colors min-w-0 flex-1 max-w-[70px] sm:max-w-none ${
                   isActive ? 'text-green-500' : 'text-gray-500'
                 }`}

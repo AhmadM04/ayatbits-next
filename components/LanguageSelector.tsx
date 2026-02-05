@@ -32,7 +32,7 @@ export default function LanguageSelector() {
   const locales: Locale[] = ['en', 'ar', 'ru'];
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef} data-tutorial="language-selector">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 hover:bg-white/5 rounded-lg transition-colors text-gray-400 hover:text-white flex items-center gap-1"

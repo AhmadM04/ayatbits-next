@@ -43,6 +43,17 @@ export const dashboardTutorialSteps: TutorialStep[] = [
 ];
 
 /**
+ * Language Selector Tutorial Step (for users with no streak)
+ */
+export const languageSelectorTutorialStep: TutorialStep = {
+  id: 'dashboard-language-selector',
+  target: '[data-tutorial="language-selector"]',
+  title: 'tutorial.switchLanguage',
+  message: 'tutorial.switchLanguageMsg',
+  placement: 'bottom',
+};
+
+/**
  * Puzzle Tutorial Configuration
  */
 export const puzzleTutorialSteps: TutorialStep[] = [

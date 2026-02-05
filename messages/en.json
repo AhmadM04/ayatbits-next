@@ -534,6 +534,7 @@
     "dashboardWelcomeMsg": "Your personal dashboard for exploring the Quran through interactive puzzles.",
     "trackProgress": "Track Your Progress",
     "trackProgressMsg": "Keep an eye on your streak, completed puzzles, and Juz explored here.",
+    "trackProgressAwardsMsg": "Check out your trophies and achievements here. Start solving puzzles to unlock them!",
     "dailyInspiration": "Daily Inspiration",
     "dailyInspirationMsg": "Get inspired with a new Quranic verse every day. Tap to hear the recitation!",
     "exploreQuran": "Explore the Quran",
@@ -633,7 +634,9 @@
     "aiTafsirMsg": "Get AI-powered explanations in English, Arabic, and Russian. Available for Pro subscribers only.",
     "viewTranslation": "View Translation",
     "viewTranslationMsg": "Read the verse meaning in your selected translation language.",
-    "restartTutorial": "Restart Tutorial"
+    "restartTutorial": "Restart Tutorial",
+    "switchLanguage": "Switch Interface Language",
+    "switchLanguageMsg": "Change the app interface language. Currently supports Arabic, English, and Russian. Your Quran translation is set separately in Profile settings."
   },
   "wordPuzzle": {
     "tips": "Tips",

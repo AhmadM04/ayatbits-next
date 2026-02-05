@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Flame, BookOpen, AlertTriangle, HelpCircle, Menu, X, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { SignOutButton } from '@clerk/nextjs';
 import BottomNav from '@/components/BottomNav';
 import DailyQuote from '@/components/DailyQuote';
@@ -12,8 +12,8 @@ import TrialBanner from '@/components/TrialBanner';
 import VerseSearch from '@/components/VerseSearch';
 import LanguageSelector from '@/components/LanguageSelector';
 import { SparkleAnimation } from '@/components/animations';
-import { TutorialWrapper, useTutorial } from '@/components/tutorial';
-import { dashboardTutorialSteps } from '@/lib/tutorial-configs';
+import { TutorialWrapper, useTutorial, TutorialStep } from '@/components/tutorial';
+import { dashboardTutorialSteps, languageSelectorTutorialStep } from '@/lib/tutorial-configs';
 import { resetTutorial } from '@/lib/tutorial-manager';
 import { MushafFAB } from '@/components/mushaf';
 import { useI18n } from '@/lib/i18n';
@@ -72,16 +72,39 @@ export default function DashboardContent({
   
   const showSubscriptionWarning = subscriptionDaysLeft !== null && subscriptionDaysLeft > 0 && subscriptionDaysLeft <= 7;
   
+  // Create dynamic tutorial steps based on whether user has a streak
+  const tutorialSteps = useMemo<TutorialStep[]>(() => {
+    // For users with 0 streak, show trophies button instead of streak button
+    if (currentStreak === 0) {
+      return [
+        dashboardTutorialSteps[0], // welcome-section
+        {
+          id: 'dashboard-awards',
+          target: '[data-tutorial="awards-button"]',
+          title: 'tutorial.trackProgress',
+          message: 'tutorial.trackProgressAwardsMsg',
+          placement: 'top',
+        },
+        languageSelectorTutorialStep, // language selector - NEW
+        dashboardTutorialSteps[2], // daily-quote
+        dashboardTutorialSteps[3], // juz-grid
+        dashboardTutorialSteps[4], // bottom-nav
+      ];
+    }
+    // For users with streak > 0, use the original steps
+    return dashboardTutorialSteps;
+  }, [currentStreak]);
+  
   const handleRestartTutorial = () => {
     resetTutorial('dashboard_intro');
-    startTutorial('dashboard_intro', dashboardTutorialSteps);
+    startTutorial('dashboard_intro', tutorialSteps);
     setShowHelpMenu(false);
   };
 
   return (
     <TutorialWrapper
       sectionId="dashboard_intro"
-      steps={dashboardTutorialSteps}
+      steps={tutorialSteps}
       delay={800}
     >
       <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
@@ -124,8 +147,10 @@ export default function DashboardContent({
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-2 sm:gap-3">
-              {/* Search */}
-              <VerseSearch />
+              {/* Search - Make it more prominent */}
+              <div className="min-w-[200px]">
+                <VerseSearch />
+              </div>
               
               {/* Streak with hover animation - only show if streak > 0 */}
               {currentStreak > 0 && (
@@ -227,65 +252,95 @@ export default function DashboardContent({
               exit={{ opacity: 0, height: 0 }}
               className="md:hidden border-t border-white/5 bg-[#0a0a0a]/98 backdrop-blur-md overflow-hidden"
             >
-              <div className="max-w-6xl mx-auto px-4 py-4 space-y-3">
-                {/* User Profile */}
-                <Link 
-                  href="/dashboard/profile"
-                  onClick={() => setShowMobileMenu(false)}
-                  className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-                    <span className="text-white font-semibold text-sm">
-                      {userFirstName?.[0] || 'U'}
-                    </span>
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-white">{userFirstName || 'User'}</div>
-                    <div className="text-xs text-gray-400">View Profile</div>
-                  </div>
-                </Link>
+              <div className="max-w-6xl mx-auto px-4 py-4 space-y-2">
+                {/* User Profile Section */}
+                <div className="mb-2">
+                  <Link 
+                    href="/dashboard/profile"
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-colors border border-white/5"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
+                      <span className="text-white font-bold text-base">
+                        {userFirstName?.[0] || 'U'}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-semibold text-white">{userFirstName || 'User'}</div>
+                      <div className="text-xs text-gray-400">View Profile</div>
+                    </div>
+                    <div className="text-gray-500">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </Link>
+                </div>
 
-                {/* Streak - only show if streak > 0 */}
+                {/* Stats Section */}
                 {currentStreak > 0 && (
                   <Link 
                     href="/dashboard/achievements"
                     onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors"
+                    className="flex items-center gap-3 p-3 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 hover:border-orange-500/30 rounded-xl transition-colors"
                   >
-                    <Flame className="w-5 h-5 text-orange-500" />
-                    <span className="text-sm text-white">Streak: {currentStreak} days</span>
+                    <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center">
+                      <Flame className="w-5 h-5 text-orange-500" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-xs text-gray-400">Current Streak</div>
+                      <div className="text-sm font-semibold text-white">{currentStreak} days 🔥</div>
+                    </div>
                   </Link>
                 )}
 
-                {/* Search */}
-                <div className="p-3">
-                  <VerseSearch />
+                {/* Divider */}
+                <div className="h-px bg-white/5 my-3" />
+
+                {/* Search Section */}
+                <div className="space-y-2">
+                  <div className="text-xs font-medium text-gray-500 px-1">Quick Access</div>
+                  <div className="w-full">
+                    <VerseSearch />
+                  </div>
                 </div>
 
                 {/* Language Selector */}
-                <div className="p-3">
+                <div className="w-full">
                   <LanguageSelector />
                 </div>
 
-                {/* Help */}
-                <button
-                  onClick={() => {
-                    handleRestartTutorial();
-                    setShowMobileMenu(false);
-                  }}
-                  className="w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors text-left"
-                >
-                  <HelpCircle className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm text-white">🎓 {t('dashboard.restartTutorial')}</span>
-                </button>
+                {/* Divider */}
+                <div className="h-px bg-white/5 my-3" />
 
-                {/* Logout */}
-                <SignOutButton>
-                  <button className="w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors text-left">
-                    <LogOut className="w-5 h-5 text-red-400" />
-                    <span className="text-sm text-white">Logout</span>
+                {/* Actions Section */}
+                <div className="space-y-1">
+                  <div className="text-xs font-medium text-gray-500 px-1 mb-2">Settings</div>
+                  
+                  {/* Help */}
+                  <button
+                    onClick={() => {
+                      handleRestartTutorial();
+                      setShowMobileMenu(false);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-colors text-left group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                      <HelpCircle className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <span className="text-sm text-white font-medium">🎓 {t('dashboard.restartTutorial')}</span>
                   </button>
-                </SignOutButton>
+
+                  {/* Logout */}
+                  <SignOutButton>
+                    <button className="w-full flex items-center gap-3 p-3 hover:bg-red-500/10 rounded-xl transition-colors text-left group border border-white/5 hover:border-red-500/20">
+                      <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
+                        <LogOut className="w-5 h-5 text-red-400" />
+                      </div>
+                      <span className="text-sm text-white font-medium">Logout</span>
+                    </button>
+                  </SignOutButton>
+                </div>
               </div>
             </motion.div>
           )}

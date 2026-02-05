@@ -235,10 +235,11 @@ export default function VerseSearch() {
       {/* Search Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors"
+        className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors w-full sm:w-auto"
       >
         <Search className="w-4 h-4 text-gray-400" />
-        <span className="text-sm text-gray-400 hidden sm:inline">{t('common.search')}</span>
+        <span className="text-sm text-gray-400 flex-1 text-left sm:flex-initial">{t('common.search')}</span>
+        <span className="text-xs text-gray-600 hidden sm:inline">⌘K</span>
       </button>
 
       {/* Search Modal - rendered at root level */}
