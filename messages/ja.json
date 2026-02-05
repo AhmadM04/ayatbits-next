@@ -23,7 +23,14 @@
     "startLearning": "始める",
     "settings": "設定",
     "signOut": "サインアウト",
-    "cancel": "キャンセル"
+    "cancel": "キャンセル",
+    "ayahs": "ayahs",
+    "page": "Page",
+    "of": "of",
+    "retry": "Retry",
+    "listen": "Listen",
+    "gotIt": "Got it",
+    "playing": "Playing"
   },
   "search": {
     "placeholder": "スーラ:アーヤを検索 (例: 2:255)",
@@ -34,7 +41,8 @@
     "surahNotFound": "スーラが見つかりません",
     "examples": "例",
     "goToDashboard": "ホームに戻る",
-    "notAvailable": "このアーヤはまだ利用できません"
+    "notAvailable": "このアーヤはまだ利用できません",
+    "searchVerse": "Search Verse"
   },
   "settings": {
     "title": "設定",
@@ -95,7 +103,9 @@
     "noJuzsFound": "ジュズが見つかりません。",
     "surahsAvailable": "利用可能",
     "progress": "進捗",
-    "viewTrophies": "トロフィーを見る"
+    "viewTrophies": "トロフィーを見る",
+    "restartTutorial": "Restart Tutorial",
+    "returnToDashboard": "Return to Dashboard"
   },
   "profile": {
     "title": "プロフィール",
@@ -113,7 +123,15 @@
     "aboutStreaks": "連続記録について",
     "streakDescription1": "毎日少なくとも1つのパズルを完了すると、連続記録が増えます。",
     "streakDescription2": "連続記録を維持するために毎日パズルを完了しましょう！",
-    "streakDescription3": "1日スキップすると、連続記録がリセットされます。"
+    "streakDescription3": "1日スキップすると、連続記録がリセットされます。",
+    "myProfile": "My Profile",
+    "userProfile": "{name}'s Profile",
+    "surahsCompleted": "Surahs Completed",
+    "puzzlesSolved": "Puzzles Solved",
+    "daysLeft": "{days} Days Left",
+    "admin": "Admin",
+    "lifetime": "Lifetime",
+    "monthly": "Monthly"
   },
   "puzzle": {
     "buildTheAyah": "アーヤを組み立てる",
@@ -130,7 +148,11 @@
     "goBackToAyahView": "アーヤビューに戻る",
     "goBack": "戻る",
     "dragOrClickWords": "下の単語をドラッグまたはクリックしてアーヤを組み立てる",
-    "allWordsUsed": "すべての単語を使用しました。"
+    "allWordsUsed": "すべての単語を使用しました。",
+    "mashallah": "Mashallah!",
+    "youCompleted": "You completed",
+    "achievementsUnlocked": "Achievements Unlocked",
+    "continueTo": "Continue to {surah}"
   },
   "liked": {
     "title": "お気に入りのアーヤ",
@@ -149,18 +171,54 @@
     "inProgress": "進行中 ({count})"
   },
   "trophies": {
-    "first_puzzle": { "name": "第一歩", "description": "最初のパズルを完了" },
-    "puzzle_10": { "name": "スタート", "description": "10個のパズルを完了" },
-    "puzzle_50": { "name": "熱心な学習者", "description": "50個のパズルを完了" },
-    "puzzle_100": { "name": "センチュリー", "description": "100個のパズルを完了" },
-    "puzzle_500": { "name": "学者", "description": "500個のパズルを完了" },
-    "streak_3": { "name": "継続", "description": "3日連続達成" },
-    "streak_7": { "name": "週間戦士", "description": "7日連続達成" },
-    "streak_30": { "name": "月間マスター", "description": "30日連続達成" },
-    "juz_1": { "name": "最初のジュズ", "description": "1ジュズのすべてのパズルを完了" },
-    "juz_5": { "name": "5ジュズ", "description": "5ジュズを完了" },
-    "surah_fatiha": { "name": "開端", "description": "アル・ファーティハを完了" },
-    "liked_10": { "name": "コレクター", "description": "10個のアーヤをお気に入り" }
+    "first_puzzle": {
+      "name": "第一歩",
+      "description": "最初のパズルを完了"
+    },
+    "puzzle_10": {
+      "name": "スタート",
+      "description": "10個のパズルを完了"
+    },
+    "puzzle_50": {
+      "name": "熱心な学習者",
+      "description": "50個のパズルを完了"
+    },
+    "puzzle_100": {
+      "name": "センチュリー",
+      "description": "100個のパズルを完了"
+    },
+    "puzzle_500": {
+      "name": "学者",
+      "description": "500個のパズルを完了"
+    },
+    "streak_3": {
+      "name": "継続",
+      "description": "3日連続達成"
+    },
+    "streak_7": {
+      "name": "週間戦士",
+      "description": "7日連続達成"
+    },
+    "streak_30": {
+      "name": "月間マスター",
+      "description": "30日連続達成"
+    },
+    "juz_1": {
+      "name": "最初のジュズ",
+      "description": "1ジュズのすべてのパズルを完了"
+    },
+    "juz_5": {
+      "name": "5ジュズ",
+      "description": "5ジュズを完了"
+    },
+    "surah_fatiha": {
+      "name": "開端",
+      "description": "アル・ファーティハを完了"
+    },
+    "liked_10": {
+      "name": "コレクター",
+      "description": "10個のアーヤをお気に入り"
+    }
   },
   "auth": {
     "signIn": "サインイン",
@@ -248,5 +306,204 @@
     "section11Content": "本規約はいつでも変更される可能性があります。",
     "section12Title": "12. お問い合わせ",
     "section12Content": "ご質問はこちらまでお問い合わせください"
+  },
+  "tutorial": {
+    "dashboardWelcome": "Welcome to Ayatbits! 👋",
+    "dashboardWelcomeMsg": "Your personal dashboard for exploring the Quran through interactive puzzles.",
+    "trackProgress": "Track Your Progress",
+    "trackProgressMsg": "Keep an eye on your streak, completed puzzles, and Juz explored here.",
+    "dailyInspiration": "Daily Inspiration",
+    "dailyInspirationMsg": "Get inspired with a new Quranic verse every day. Tap to hear the recitation!",
+    "exploreQuran": "Explore the Quran",
+    "exploreQuranMsg": "Choose any Juz to start solving puzzles and learning the Quran in a fun way.",
+    "easyNavigation": "Easy Navigation",
+    "easyNavigationMsg": "Use the bottom navigation to quickly access your dashboard, search, and profile.",
+    "skip": "Skip",
+    "next": "Next",
+    "gotIt": "Got it!",
+    "translationPreference": "Translation Preference",
+    "translationPreferenceMsg": "Choose your preferred translation language",
+    "translationUpdated": "Translation preference updated",
+    "failedToUpdate": "Failed to update translation",
+    "settings": "Settings",
+    "billing": "Billing",
+    "account": "Account",
+    "manageAccount": "Manage your account",
+    "wordByWordAudio": "Word-by-Word Audio",
+    "wordByWordAudioMsg": "Click on any word to hear its pronunciation",
+    "enableWordAudio": "Enable word audio playback",
+    "enableWordAudioMsg": "When enabled, you can click individual words to hear their recitation",
+    "audioApiInfo": "This feature uses the Quran.com API to provide word-level audio recitation by Sheikh Alafasy.",
+    "audioEnabled": "Word-by-word audio enabled",
+    "audioDisabled": "Word-by-word audio disabled",
+    "failedToUpdateAudio": "Failed to update audio settings",
+    "subscriptionBilling": "Subscription & Billing",
+    "subscriptionBillingMsg": "Manage your subscription plan",
+    "currentPlan": "Current Plan",
+    "trialEnds": "Trial ends",
+    "renewsOn": "Renews on",
+    "upgradePlan": "Upgrade Plan",
+    "changePlan": "Change Plan",
+    "billingAndSubscription": "Billing & Subscription",
+    "adminAccount": "Admin Account",
+    "fullAccessGranted": "Full access granted",
+    "puzzleIntro": "Welcome to Puzzle Mode! 🧩",
+    "puzzleIntroMsg": "Complete the verse by dragging words from the bank to the correct positions.",
+    "wordBank": "Word Bank",
+    "wordBankMsg": "All the words you need are here. Drag them to the answer area or tap to place them.",
+    "answerArea": "Answer Area",
+    "answerAreaMsg": "Drop words here in the correct order. Tap any word to hear its pronunciation.",
+    "needHelp": "Need Help?",
+    "needHelpMsg": "Stuck? Use the hint button to reveal the next word. You have 3 hints per puzzle.",
+    "listenLearn": "Listen & Learn",
+    "listenLearnMsg": "Toggle transliteration to see pronunciation, or tap tafsir to understand the deeper meaning.",
+    "understandAyah": "Understand the Ayah",
+    "understandAyahMsg": "View tafsir (explanation) to understand the deeper meaning and context of the verse you're learning.",
+    "yourStats": "Your Stats",
+    "yourStatsMsg": "View your account details, join date, and learning progress here.",
+    "chooseTranslation": "Choose Your Translation",
+    "chooseTranslationMsg": "Select from multiple English translations to enhance your understanding.",
+    "audioSettings": "Audio Settings",
+    "audioSettingsMsg": "Enable word-by-word audio to hear the pronunciation of each word in puzzles.",
+    "manageAccountTitle": "Manage Your Account",
+    "manageAccountMsg": "Update your email, password, and other account settings in this section.",
+    "subscriptionStatus": "Subscription Status",
+    "subscriptionStatusMsg": "View your current plan, trial status, and subscription details here.",
+    "choosePlan": "Choose Your Plan",
+    "choosePlanMsg": "Explore monthly, yearly, and lifetime plans to continue your learning journey.",
+    "manageSubscription": "Manage Subscription",
+    "manageSubscriptionMsg": "Update your payment method, cancel, or modify your subscription anytime.",
+    "mushafIntro": "Welcome to Mushaf View! 📖",
+    "mushafIntroMsg": "Read the Quran in traditional Mushaf format, page by page with beautiful Arabic script.",
+    "navigatePages": "Navigate Pages",
+    "navigatePagesMsg": "Jump to any page or Juz quickly using the page selector.",
+    "swipeNavigate": "Swipe to Navigate",
+    "swipeNavigateMsg": "Swipe left/right or use arrow keys to move between pages. Long press any ayah for options.",
+    "ayahActions": "Ayah Actions",
+    "ayahActionsMsg": "Long press any ayah to see options: practice puzzle, play audio, view translation, or read tafsir explanation.",
+    "learnTafsir": "Learn Tafsir",
+    "learnTafsirMsg": "Tap the tafsir button to read detailed explanations and context of any ayah from authentic sources.",
+    "learnHarakat": "Learn Harakat",
+    "learnHarakatMsg": "Need help with Arabic pronunciation marks? Tap the help button to see the harakat guide.",
+    "yourTrophies": "Your Trophies! 🏆",
+    "yourTrophiesMsg": "Track your achievements and unlock trophies as you progress in your Quran journey.",
+    "yourStatsAchievements": "Your Stats",
+    "yourStatsAchievementsMsg": "See your total puzzles completed, best streak, and unlocked trophies at a glance.",
+    "unlockedTrophies": "Unlocked Trophies",
+    "unlockedTrophiesMsg": "View all the achievements you've earned. Each trophy celebrates your dedication!",
+    "workInProgress": "Work In Progress",
+    "workInProgressMsg": "Track your progress toward locked achievements. Keep learning to unlock them all!",
+    "yourFavorites": "Your Favorites! ❤️",
+    "yourFavoritesMsg": "All your liked ayahs are saved here. Build your personal collection of meaningful verses.",
+    "browseCollection": "Browse Your Collection",
+    "browseCollectionMsg": "Each ayah shows the surah name, ayah number, and Juz. Tap to read the full verse.",
+    "quickActions": "Quick Actions",
+    "quickActionsMsg": "Visit the ayah in Mushaf view or remove it from your collection with a tap.",
+    "verseBrowsingIntro": "Browse Verses 📖",
+    "verseBrowsingIntroMsg": "Read the Arabic text with full vowelization. Like verses and listen to recitation.",
+    "changeTranslation": "Change Translation 🌐",
+    "changeTranslationMsg": "Switch between 18+ translations in different languages. Your selection is saved and applied across all verses.",
+    "showTransliteration": "Transliteration 🔤",
+    "showTransliterationMsg": "View the Arabic text in Latin script to help with pronunciation and reading.",
+    "readTafsir": "Read Tafsir (Commentary)",
+    "readTafsirMsg": "View classical tafsir explanations. Works best with Arabic tafsirs and select translations (English: Sahih, Pickthall, Yusuf Ali; Russian: Kuliev).",
+    "aiTafsir": "AI Tafsir (Pro) ✨",
+    "aiTafsirMsg": "Get AI-powered explanations in English, Arabic, and Russian. Available for Pro subscribers only.",
+    "viewTranslation": "View Translation",
+    "viewTranslationMsg": "Read the verse meaning in your selected translation language.",
+    "restartTutorial": "Restart Tutorial"
+  },
+  "wordPuzzle": {
+    "tips": "Tips",
+    "mistakes": "Mistakes",
+    "dropEachWord": "Drop each word in the correct slot",
+    "dragOrTap": "Drag or tap a word to place it",
+    "listen": "Listen",
+    "startPuzzle": "Start Puzzle",
+    "ayahOf": "Ayah {current} of {total}",
+    "previous": "Previous",
+    "next": "Next",
+    "readMushaf": "Read Mushaf",
+    "dismiss": "Dismiss",
+    "noTipsAvailable": "No tips available!",
+    "tipAlreadyShowing": "Tip already showing! Dismiss or use it first.",
+    "allSlotsFilled": "All slots are filled!",
+    "tipActivated": "💡 Tip activated! Watch the highlighted word and slot.",
+    "unableToFindWord": "Unable to find the correct word. Try placing more words!",
+    "tooManyMistakes": "Too many mistakes! Review the ayah again.",
+    "wrongPosition": "Wrong position! Try again."
+  },
+  "mushaf": {
+    "juz": "Juz",
+    "page": "Page",
+    "previous": "Previous",
+    "next": "Next",
+    "harakatGuide": "Harakat Guide",
+    "closeGuide": "Close Guide",
+    "practice": "Practice",
+    "playAudio": "Play Audio",
+    "viewTranslation": "View Translation",
+    "readTafsir": "Read Tafsir",
+    "likeAyah": "Like Ayah",
+    "copyText": "Copy Text",
+    "surah": "Surah",
+    "swipeInstruction": "Swipe left/right or use arrows to navigate • Long press ayah for options"
+  },
+  "juz": {
+    "surahs": "Surahs in this Juz",
+    "surahsCount": "{count} Surahs",
+    "progress": "Progress",
+    "ayahs": "ayahs",
+    "ayah": "Ayah",
+    "completed": "Completed",
+    "juzProgress": "Juz {number} Progress",
+    "overallProgress": "Overall Progress",
+    "ayahsCompleted": "ayahs completed",
+    "juzCompleted": "Juz {number} Completed!",
+    "backToJuz": "Back to Juz {number}"
+  },
+  "dailyQuote": {
+    "verseOfTheDay": "Verse of the Day",
+    "playRecitation": "Play recitation",
+    "openAyah": "Open ayah",
+    "translationNotAvailable": "Translation not available",
+    "unableToLoad": "Unable to load verse. Check your connection.",
+    "failedToLoad": "Failed to load verse."
+  },
+  "transliteration": {
+    "show": "Show Transliteration",
+    "hide": "Hide Transliteration",
+    "label": "Transliteration",
+    "loading": "Loading transliteration...",
+    "notAvailable": "Transliteration not available"
+  },
+  "harakat": {
+    "guide": "Harakat Guide",
+    "closeGuide": "Close Guide",
+    "diacriticalMarks": "Arabic diacritical marks",
+    "tapToSeeDetails": "Tap any harakat in the text to see its details",
+    "sound": "Sound",
+    "transliteration": "Transliteration",
+    "description": "Description",
+    "examples": "Examples",
+    "shortVowels": "Short Vowels",
+    "nunation": "Nunation (Tanween)",
+    "otherMarks": "Other Marks",
+    "fatha": "Fatha",
+    "kasra": "Kasra",
+    "damma": "Damma",
+    "sukun": "Sukun",
+    "shadda": "Shadda",
+    "tanweenFath": "Tanween Fath",
+    "tanweenKasr": "Tanween Kasr",
+    "tanweenDamm": "Tanween Damm",
+    "maddah": "Maddah",
+    "hamzaAbove": "Hamza Above",
+    "hamzaBelow": "Hamza Below",
+    "superscriptAlef": "Superscript Alef"
+  },
+  "onboarding": {
+    "completeProfile": "Complete your profile",
+    "completeProfileDescription": "Take a moment to personalize your experience"
   }
 }
