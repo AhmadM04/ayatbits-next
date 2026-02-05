@@ -30,7 +30,7 @@ const floatingArabicWords = [
 ];
 
 // Component to check access and render appropriate button
-function DashboardButton({ size, className = "" }: { size?: "default" | "sm" | "lg" | "icon" | null, className?: string }) {
+function DashboardButton({ size, className = "", t }: { size?: "default" | "sm" | "lg" | "icon" | null, className?: string, t: any }) {
   const { isSignedIn, isLoaded } = useUser();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
@@ -87,7 +87,7 @@ function DashboardButton({ size, className = "" }: { size?: "default" | "sm" | "
     return (
       <Link href="/pricing">
         <Button size={size} className={className}>
-          Start Learning
+          {t('landing.startLearning')}
           <Flame className="w-5 h-5 ml-2" />
         </Button>
       </Link>
@@ -98,7 +98,7 @@ function DashboardButton({ size, className = "" }: { size?: "default" | "sm" | "
   return (
     <Link href="/dashboard">
       <Button size={size} className={className}>
-        Continue Learning
+        {t('landing.continuelearning')}
         <Flame className="w-5 h-5 ml-2" />
       </Button>
     </Link>
@@ -180,7 +180,7 @@ export default function Home() {
                 {/* Navigation Links */}
                 <nav className="hidden md:flex items-center gap-6 text-sm">
                   <Link href="#features" className="text-gray-400 hover:text-white transition-colors">
-                    Features
+                    {t('landing.featuresLink')}
                   </Link>
                   <Link href="#pricing" className="text-gray-400 hover:text-white transition-colors">
                     {t('landing.pricingLink')}
@@ -197,12 +197,12 @@ export default function Home() {
                   <SignedOut>
                     <SignInButton mode="modal">
                       <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/20">
-                        Sign In
+                        {t('landing.signIn')}
                       </Button>
                     </SignInButton>
                     <SignUpButton mode="modal">
                       <Button className="bg-green-600 hover:bg-green-700 text-white">
-                        Get Started
+                        {t('landing.getStarted')}
                       </Button>
                     </SignUpButton>
                   </SignedOut>
@@ -241,10 +241,10 @@ export default function Home() {
                       <div className="relative flex flex-col sm:flex-row items-center justify-center gap-3 text-center sm:text-left">
                         <div className="flex items-center gap-2">
                           <Gift className="w-5 h-5 text-purple-400" />
-                          <span className="text-purple-300 font-semibold">Ramadan Special</span>
+                          <span className="text-purple-300 font-semibold">{t('landing.ramadanSpecial')}</span>
                         </div>
                         <div className="text-white text-sm sm:text-base">
-                          Get <span className="font-bold text-purple-300">free Pro access</span> with voucher code <code className="px-2 py-0.5 bg-purple-500/30 rounded text-purple-200 font-mono text-xs sm:text-sm">RAMADAN2026</code>
+                          {t('landing.ramadanOffer')} <code className="px-2 py-0.5 bg-purple-500/30 rounded text-purple-200 font-mono text-xs sm:text-sm">RAMADAN2026</code>
                         </div>
                       </div>
                     </div>
@@ -308,6 +308,7 @@ export default function Home() {
                   {/* CTA for Signed In Users */}
                   <SignedIn>
                     <DashboardButton 
+                      t={t}
                       className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-5 text-lg rounded-xl shadow-lg shadow-green-600/25 min-h-[56px]"
                     />
                   </SignedIn>
@@ -513,10 +514,10 @@ export default function Home() {
                 className="text-center mb-12"
               >
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                  Choose Your Plan
+                  {t('landing.chooseYourPlan')}
                 </h2>
                 <p className="text-gray-400 max-w-xl mx-auto">
-                  Start with a 7-day free trial. Cancel anytime.
+                  {t('landing.pricingSubtitle')}
                 </p>
               </motion.div>
 
@@ -537,7 +538,7 @@ export default function Home() {
                         : 'text-gray-400 hover:text-white'
                     }`}
                   >
-                    Monthly
+                    {t('landing.monthly')}
                   </button>
                   <button
                     onClick={() => setBillingPeriod('yearly')}
@@ -547,8 +548,8 @@ export default function Home() {
                         : 'text-gray-400 hover:text-white'
                     }`}
                   >
-                    Yearly
-                    <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">Save 30%</span>
+                    {t('landing.yearly')}
+                    <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">{t('landing.save30')}</span>
                   </button>
                 </div>
               </motion.div>
@@ -563,32 +564,32 @@ export default function Home() {
                   className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-8 hover:border-green-500/30 transition-all duration-300"
                 >
                   <div className="mb-6">
-                    <h3 className="text-2xl font-bold text-white mb-2">Basic</h3>
+                    <h3 className="text-2xl font-bold text-white mb-2">{t('landing.basic')}</h3>
                     <div className="flex items-baseline gap-2">
                       <span className="text-4xl font-bold">
                         {billingPeriod === 'monthly' ? '€5.99' : '€49.99'}
                       </span>
                       <span className="text-gray-500">
-                        {billingPeriod === 'monthly' ? '/month' : '/year'}
+                        {billingPeriod === 'monthly' ? t('landing.perMonth') : t('landing.perYear')}
                       </span>
                     </div>
                     {billingPeriod === 'yearly' && (
                       <div className="mt-1 flex items-center gap-2">
                         <span className="text-gray-500 line-through text-sm">€71.88</span>
-                        <span className="text-green-400 text-sm font-medium">Save 30%</span>
+                        <span className="text-green-400 text-sm font-medium">{t('landing.save30')}</span>
                       </div>
                     )}
-                    <p className="text-xs text-gray-500 mt-2">7-day free trial included</p>
+                    <p className="text-xs text-gray-500 mt-2">{t('landing.trialIncluded')}</p>
                   </div>
 
                   <ul className="space-y-3 mb-8">
                     {[
-                      'All 30 Juzs & 114 Surahs',
-                      'Unlimited puzzles',
-                      '18+ translations',
-                      'Progress tracking & streaks',
-                      'Audio recitations',
-                      'Transliterations',
+                      t('landing.feature_juz114'),
+                      t('landing.feature_unlimited'),
+                      t('landing.feature_translations'),
+                      t('landing.feature_progress'),
+                      t('landing.feature_audio'),
+                      t('landing.feature_transliteration'),
                     ].map((feature, index) => (
                       <li key={index} className="flex items-start gap-3">
                         <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
@@ -600,14 +601,14 @@ export default function Home() {
                   <SignedOut>
                     <SignUpButton mode="modal">
                       <button className="w-full py-3 rounded-xl font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all">
-                        Start Free Trial
+                        {t('landing.startFreeTrial')}
                       </button>
                     </SignUpButton>
                   </SignedOut>
                   <SignedIn>
                     <Link href="/pricing">
                       <button className="w-full py-3 rounded-xl font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all">
-                        Start Free Trial
+                        {t('landing.startFreeTrial')}
                       </button>
                     </Link>
                   </SignedIn>
@@ -624,13 +625,13 @@ export default function Home() {
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <div className="flex items-center gap-1.5 px-3 py-1 bg-green-600 rounded-full text-xs font-semibold">
                       <Sparkles className="w-3 h-3" />
-                      Best Value
+                      {t('pricing.bestValue')}
                     </div>
                   </div>
 
                   <div className="mb-6">
                     <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-                      Pro
+                      {t('landing.pro')}
                       <Sparkles className="w-5 h-5 text-green-400" />
                     </h3>
                     <div className="flex items-baseline gap-2">
@@ -638,29 +639,29 @@ export default function Home() {
                         {billingPeriod === 'monthly' ? '€11.99' : '€99.99'}
                       </span>
                       <span className="text-gray-500">
-                        {billingPeriod === 'monthly' ? '/month' : '/year'}
+                        {billingPeriod === 'monthly' ? t('landing.perMonth') : t('landing.perYear')}
                       </span>
                     </div>
                     {billingPeriod === 'yearly' && (
                       <div className="mt-1 flex items-center gap-2">
                         <span className="text-gray-500 line-through text-sm">€143.88</span>
-                        <span className="text-green-400 text-sm font-medium">Save 35%</span>
+                        <span className="text-green-400 text-sm font-medium">{t('landing.save35')}</span>
                       </div>
                     )}
-                    <p className="text-xs text-gray-500 mt-2">7-day free trial included</p>
+                    <p className="text-xs text-gray-500 mt-2">{t('landing.trialIncluded')}</p>
                   </div>
 
                   <ul className="space-y-3 mb-8">
                     {[
-                      'All 30 Juzs & 114 Surahs',
-                      'Unlimited puzzles',
-                      '18+ translations',
-                      'Progress tracking & streaks',
-                      'Audio recitations',
-                      'Transliterations',
-                      '✨ AI Tafsir (Ibn Kathir)',
-                      '✨ Word-by-word audio',
-                      'Priority support',
+                      t('landing.feature_juz114'),
+                      t('landing.feature_unlimited'),
+                      t('landing.feature_translations'),
+                      t('landing.feature_progress'),
+                      t('landing.feature_audio'),
+                      t('landing.feature_transliteration'),
+                      t('landing.feature_aiTafsir'),
+                      t('landing.feature_wordAudio'),
+                      t('landing.feature_support'),
                     ].map((feature, index) => (
                       <li key={index} className="flex items-start gap-3">
                         <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
@@ -672,14 +673,14 @@ export default function Home() {
                   <SignedOut>
                     <SignUpButton mode="modal">
                       <button className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white transition-all">
-                        Start Free Trial
+                        {t('landing.startFreeTrial')}
                       </button>
                     </SignUpButton>
                   </SignedOut>
                   <SignedIn>
                     <Link href="/pricing">
                       <button className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white transition-all">
-                        Start Free Trial
+                        {t('landing.startFreeTrial')}
                       </button>
                     </Link>
                   </SignedIn>
@@ -694,7 +695,7 @@ export default function Home() {
                 className="mt-8 text-center"
               >
                 <p className="text-gray-500 text-sm">
-                  7-day free trial • Cancel anytime • Secure payment via Stripe
+                  {t('landing.securePayment')}
                 </p>
               </motion.div>
             </section>
@@ -748,6 +749,7 @@ export default function Home() {
 
                   <SignedIn>
                     <DashboardButton 
+                      t={t}
                       className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-12 py-6 text-xl rounded-xl shadow-xl shadow-green-600/30 font-semibold min-h-[60px]"
                     />
                   </SignedIn>

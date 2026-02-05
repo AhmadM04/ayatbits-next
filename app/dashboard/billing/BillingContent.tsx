@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { CreditCard, ExternalLink, Loader2, CheckCircle2, XCircle, Calendar, Crown, Gift, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import Link from 'next/link';
+import { useI18n } from '@/lib/i18n';
 
 interface BillingContentProps {
   user: {
@@ -19,6 +20,7 @@ interface BillingContentProps {
 export default function BillingContent({ user }: BillingContentProps) {
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useI18n();
 
   const handleOpenBillingPortal = async () => {
     setIsLoading(true);
@@ -32,11 +34,11 @@ export default function BillingContent({ user }: BillingContentProps) {
       if (response.ok && data.url) {
         window.location.href = data.url;
       } else {
-        showToast(data.error || 'Failed to open billing portal', 'error');
+        showToast(data.error || t('billing.failedToOpenPortal'), 'error');
       }
     } catch (error) {
       console.error('Billing portal error:', error);
-      showToast('Failed to open billing portal', 'error');
+      showToast(t('billing.failedToOpenPortal'), 'error');
     } finally {
       setIsLoading(false);
     }
@@ -46,8 +48,8 @@ export default function BillingContent({ user }: BillingContentProps) {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Billing & Subscription</h1>
-          <p className="text-gray-400">Manage your subscription and billing information</p>
+          <h1 className="text-3xl font-bold text-white mb-2">{t('billing.title')}</h1>
+          <p className="text-gray-400">{t('billing.manageInfo')}</p>
         </div>
 
         <div className="bg-[#111] border border-white/10 rounded-2xl p-6">
@@ -56,8 +58,8 @@ export default function BillingContent({ user }: BillingContentProps) {
               <Crown className="w-6 h-6 text-purple-400" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-white">Admin Account</h3>
-              <p className="text-sm text-gray-400">You have full access as an administrator</p>
+              <h3 className="text-lg font-semibold text-white">{t('billing.adminAccount')}</h3>
+              <p className="text-sm text-gray-400">{t('billing.adminFullAccess')}</p>
             </div>
           </div>
         </div>
@@ -87,7 +89,7 @@ export default function BillingContent({ user }: BillingContentProps) {
       return (
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
           <Crown className="w-4 h-4" />
-          <span className="text-sm font-medium">Lifetime Access</span>
+          <span className="text-sm font-medium">{t('billing.lifetimeAccess')}</span>
         </div>
       );
     }
@@ -97,7 +99,7 @@ export default function BillingContent({ user }: BillingContentProps) {
       return (
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
           <AlertCircle className="w-4 h-4" />
-          <span className="text-sm font-medium">Expiring Soon</span>
+          <span className="text-sm font-medium">{t('billing.expiringSoon')}</span>
         </div>
       );
     }
@@ -107,7 +109,7 @@ export default function BillingContent({ user }: BillingContentProps) {
       return (
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
           <Gift className="w-4 h-4" />
-          <span className="text-sm font-medium">Admin Granted</span>
+          <span className="text-sm font-medium">{t('billing.adminGranted')}</span>
         </div>
       );
     }
@@ -127,21 +129,21 @@ export default function BillingContent({ user }: BillingContentProps) {
       return (
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/30">
           <XCircle className="w-4 h-4" />
-          <span className="text-sm font-medium">Payment Required</span>
+          <span className="text-sm font-medium">{t('billing.paymentRequired')}</span>
         </div>
       );
     } else if (status === 'canceled') {
       return (
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-500/20 text-gray-400 border border-gray-500/30">
           <XCircle className="w-4 h-4" />
-          <span className="text-sm font-medium">Canceled</span>
+          <span className="text-sm font-medium">{t('billing.canceled')}</span>
         </div>
       );
     } else {
       return (
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
           <Calendar className="w-4 h-4" />
-          <span className="text-sm font-medium">Trial</span>
+          <span className="text-sm font-medium">{t('billing.trial')}</span>
         </div>
       );
     }
@@ -151,8 +153,8 @@ export default function BillingContent({ user }: BillingContentProps) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Billing & Subscription</h1>
-        <p className="text-gray-400">Manage your subscription and billing information</p>
+        <h1 className="text-3xl font-bold text-white mb-2">{t('billing.title')}</h1>
+        <p className="text-gray-400">{t('billing.manageInfo')}</p>
       </div>
 
       {/* Current Plan Card */}
@@ -163,8 +165,8 @@ export default function BillingContent({ user }: BillingContentProps) {
               <CreditCard className="w-6 h-6 text-purple-400" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-white">Current Plan</h3>
-              <p className="text-sm text-gray-400">Your active subscription details</p>
+              <h3 className="text-lg font-semibold text-white">{t('billing.currentPlan')}</h3>
+              <p className="text-sm text-gray-400">{t('billing.activeSubscription')}</p>
             </div>
           </div>
           {getStatusBadge()}
@@ -175,10 +177,10 @@ export default function BillingContent({ user }: BillingContentProps) {
           {isLifetimeGrant && (
             <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-xl">
               <p className="text-sm text-purple-300 mb-2 font-medium">
-                🏆 You have lifetime access granted by admin
+                {t('billing.lifetimeGranted')}
               </p>
               <p className="text-sm text-gray-400">
-                Subscribe to support AyatBits and get priority support, or simply continue enjoying your lifetime access!
+                {t('billing.lifetimeGrantedDesc')}
               </p>
             </div>
           )}
@@ -186,10 +188,12 @@ export default function BillingContent({ user }: BillingContentProps) {
           {isExpiringSoon && daysUntilExpiry !== null && (
             <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
               <p className="text-sm text-orange-300 mb-2 font-medium">
-                ⚠️ Your access expires in {daysUntilExpiry} day{daysUntilExpiry !== 1 ? 's' : ''}
+                {daysUntilExpiry === 1 
+                  ? t('billing.accessExpires', { days: daysUntilExpiry })
+                  : t('billing.accessExpiresDays', { days: daysUntilExpiry })}
               </p>
               <p className="text-sm text-gray-400">
-                Subscribe now for uninterrupted access to AyatBits Pro features!
+                {t('billing.subscribeNowDesc')}
               </p>
             </div>
           )}
@@ -197,14 +201,16 @@ export default function BillingContent({ user }: BillingContentProps) {
           {isTemporaryGrant && !isExpiringSoon && daysUntilExpiry !== null && (
             <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
               <p className="text-sm text-blue-300 mb-2 font-medium">
-                ✅ You have admin-granted access
+                {t('billing.adminGrantedAccess')}
               </p>
               <p className="text-sm text-gray-400">
-                Your access is valid until {new Date(user.subscriptionEndDate!).toLocaleDateString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}. Subscribe anytime to ensure continuous access.
+                {t('billing.validUntil', { 
+                  date: new Date(user.subscriptionEndDate!).toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })
+                })}
               </p>
             </div>
           )}
@@ -212,28 +218,28 @@ export default function BillingContent({ user }: BillingContentProps) {
           {hasBothGrantAndStripe && (
             <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-xl">
               <p className="text-sm text-green-300 mb-2 font-medium">
-                ✨ You have both admin-granted access and an active subscription
+                {t('billing.bothAccessAndSub')}
               </p>
               <p className="text-sm text-gray-400">
-                Thank you for supporting AyatBits! Manage your Stripe subscription below.
+                {t('billing.thankYouSupport')}
               </p>
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 bg-white/5 rounded-xl">
-              <p className="text-sm text-gray-400 mb-1">Plan Type</p>
+              <p className="text-sm text-gray-400 mb-1">{t('billing.planType')}</p>
               <p className="text-lg font-medium text-white capitalize">
-                {user.subscriptionPlan || 'Trial'}
-                {user.hasDirectAccess && ' (Admin)'}
+                {user.subscriptionPlan || t('billing.trial')}
+                {user.hasDirectAccess && ` ${t('billing.adminLabel')}`}
               </p>
             </div>
             {user.subscriptionEndDate && (
               <div className="p-4 bg-white/5 rounded-xl">
                 <p className="text-sm text-gray-400 mb-1">
                   {user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing'
-                    ? user.stripeCustomerId ? 'Renews on' : 'Expires on'
-                    : 'Expires on'}
+                    ? user.stripeCustomerId ? t('billing.renewsOn') : t('billing.expiresOn')
+                    : t('billing.expiresOn')}
                 </p>
                 <p className="text-lg font-medium text-white">
                   {new Date(user.subscriptionEndDate).toLocaleDateString('en-US', {
@@ -249,7 +255,7 @@ export default function BillingContent({ user }: BillingContentProps) {
           {!user.stripeCustomerId && !user.hasDirectAccess && (
             <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
               <p className="text-sm text-orange-400">
-                No billing account found. Subscribe to a plan to access billing management.
+                {t('billing.noBillingAccount')}
               </p>
             </div>
           )}
@@ -270,12 +276,12 @@ export default function BillingContent({ user }: BillingContentProps) {
         >
           <Crown className="w-5 h-5" />
           {isLifetimeGrant 
-            ? 'Support Us' 
+            ? t('billing.supportUs')
             : isExpiringSoon 
-            ? 'Subscribe Now' 
+            ? t('billing.subscribeNow')
             : user.stripeCustomerId 
-            ? 'Change Plan' 
-            : 'Subscribe'}
+            ? t('billing.changePlan')
+            : t('billing.subscribe')}
         </Link>
 
         {user.stripeCustomerId ? (
@@ -288,19 +294,19 @@ export default function BillingContent({ user }: BillingContentProps) {
             {isLoading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Opening...
+                {t('billing.opening')}
               </>
             ) : (
               <>
                 <ExternalLink className="w-5 h-5" />
-                Manage Billing
+                {t('billing.manageBilling')}
               </>
             )}
           </button>
         ) : (
           <div className="flex items-center justify-center px-6 py-4 bg-white/5 border border-white/10 text-gray-500 rounded-xl">
             <span className="text-sm">
-              {user.hasDirectAccess ? 'No Stripe subscription yet' : 'Subscribe to manage billing'}
+              {user.hasDirectAccess ? t('billing.noStripeYet') : t('billing.subscribeToManage')}
             </span>
           </div>
         )}
@@ -308,18 +314,16 @@ export default function BillingContent({ user }: BillingContentProps) {
 
       {/* Info Section */}
       <div className="bg-[#111] border border-white/10 rounded-2xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Billing Information</h3>
+        <h3 className="text-lg font-semibold text-white mb-4">{t('billing.billingInformation')}</h3>
         <div className="space-y-3 text-sm text-gray-400">
           <p>
-            • Manage your payment methods, view invoices, and update billing information through
-            the Stripe billing portal.
+            {t('billing.info1')}
           </p>
           <p>
-            • Your subscription will automatically renew unless canceled before the renewal date.
+            {t('billing.info2')}
           </p>
           <p>
-            • All payments are securely processed through Stripe. We never store your payment
-            information.
+            {t('billing.info3')}
           </p>
         </div>
       </div>

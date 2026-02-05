@@ -55,7 +55,7 @@ export async function saveTafsir(
   language: string,
   tafsirText: string,
   source: string,
-  model: string = 'gemini-2.0-flash-exp'
+  model: string = 'gemini-2.5-flash'
 ): Promise<boolean> {
   try {
     await connectDB();
@@ -81,7 +81,6 @@ export async function saveTafsir(
           surahNumber,
           ayahNumber,
           language: normalizedLang,
-          version: 1,
         },
       },
       {

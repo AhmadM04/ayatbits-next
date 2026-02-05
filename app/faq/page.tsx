@@ -5,41 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const faqItems = [
-  {
-    question: "What is AyatBits?",
-    answer: "AyatBits is an interactive Quran learning app that uses word puzzles to help you memorize and understand the Quran. By arranging words in the correct order, you actively engage with each ayah, making memorization more effective and enjoyable."
-  },
-  {
-    question: "How does the puzzle system work?",
-    answer: "Each puzzle presents you with the words of an ayah in a shuffled order. Your task is to drag or tap the words to arrange them in the correct sequence. This active engagement helps reinforce your memory of the verse structure and word order."
-  },
-  {
-    question: "What happens if I make mistakes?",
-    answer: "You have 3 attempts per puzzle. If you exceed the mistake limit, you'll be prompted to review the ayah before trying again. This ensures you understand the verse before moving on."
-  },
-  {
-    question: "How do streaks work?",
-    answer: "Your streak increases by 1 for each consecutive day you complete at least one puzzle. If you miss a day, your streak resets to zero. Streaks help motivate consistent daily practice."
-  },
-  {
-    question: "What translations are available?",
-    answer: "We offer 18+ translations including English (Sahih International, Pickthall, Yusuf Ali), Arabic Tafsir, French, German, Spanish, Turkish, Urdu, Indonesian, Malay, Bengali, Hindi, Russian, Chinese, Japanese, and Dutch."
-  },
-  {
-    question: "What is the 7-day free trial?",
-    answer: "New users get full access to all features for 7 days. You must provide payment information to start the trial. If you don't cancel before the trial ends, you will be automatically charged for your selected subscription plan."
-  },
-  {
-    question: "Can I cancel my subscription anytime?",
-    answer: "Yes, you can cancel your subscription at any time. Your access will continue until the end of your current billing period."
-  },
-  {
-    question: "How do I contact support?",
-    answer: "You can reach our support team at hello@ayatbits.com. We typically respond within 24-48 hours."
-  },
-];
+import { useI18n } from '@/lib/i18n';
 
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -75,6 +41,21 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 }
 
 export default function FAQPage() {
+  const { t } = useI18n();
+
+  const faqItems = [
+    { question: t('faq.q1'), answer: t('faq.a1') },
+    { question: t('faq.q2'), answer: t('faq.a2') },
+    { question: t('faq.q3'), answer: t('faq.a3') },
+    { question: t('faq.q4'), answer: t('faq.a4') },
+    { question: t('faq.q5'), answer: t('faq.a5') },
+    { question: t('faq.q6'), answer: t('faq.a6') },
+    { question: t('faq.q7'), answer: t('faq.a7') },
+    { question: t('faq.q8'), answer: t('faq.a8') },
+    { question: t('faq.q9'), answer: t('faq.a9') },
+    { question: t('faq.q10'), answer: t('faq.a10') },
+  ];
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
@@ -95,7 +76,7 @@ export default function FAQPage() {
               className="flex items-center gap-2 px-3 py-2 hover:bg-white/5 rounded-lg transition-colors text-sm text-gray-400 hover:text-white"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Back to Home</span>
+              <span>{t('landing.backToHome')}</span>
             </Link>
           </div>
         </div>
@@ -104,8 +85,8 @@ export default function FAQPage() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-6">
           <div className="mb-6">
-            <h2 className="text-xl font-bold mb-2">Got Questions?</h2>
-            <p className="text-gray-400 text-sm">Find answers to common questions below.</p>
+            <h2 className="text-xl font-bold mb-2">{t('faq.subtitle')}</h2>
+            <p className="text-gray-400 text-sm">{t('faq.description')}</p>
           </div>
 
           <div className="space-y-0">
@@ -116,12 +97,12 @@ export default function FAQPage() {
         </div>
 
         <div className="mt-6 text-center">
-          <p className="text-gray-500 text-sm mb-3">Still have questions?</p>
+          <p className="text-gray-500 text-sm mb-3">{t('faq.stillHaveQuestions')}</p>
           <Link
             href="mailto:hello@ayatbits.com"
             className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm font-medium"
           >
-            Contact Support
+            {t('faq.contactSupport')}
           </Link>
         </div>
       </main>

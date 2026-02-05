@@ -17,6 +17,7 @@ import {
 } from '@dnd-kit/core';
 import { tokenizeAyah, type WordToken } from '@/lib/puzzle-logic';
 import { HarakatColoredText } from '@/components/arabic';
+import { useI18n } from '@/lib/i18n';
 
 // Demo ayah text for the puzzle (Surah Al-Fatiha verse 1)
 const DEMO_AYAH = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
@@ -96,6 +97,7 @@ function DropSlot({
 }
 
 export default function DemoPuzzle() {
+  const { t } = useI18n();
   const [placedWords, setPlacedWords] = useState<Map<number, WordToken>>(new Map());
   const [bankWords, setBankWords] = useState<WordToken[]>([]);
   const [isComplete, setIsComplete] = useState(false);
@@ -228,7 +230,7 @@ export default function DemoPuzzle() {
                 : 'bg-[#1a1a1a] border-white/10'
             }`}>
               <span className={`text-xs font-medium ${mistakeCount >= 3 ? 'text-red-400' : 'text-gray-400'}`}>
-                Mistakes: {mistakeCount}/3
+                {t('demo.mistakes', { count: mistakeCount })}
               </span>
             </div>
             <button
@@ -271,7 +273,7 @@ export default function DemoPuzzle() {
           </div>
 
           <p className="text-gray-500 text-xs text-center mt-3">
-            Drag or tap words to place them
+            {t('demo.dragOrTap')}
           </p>
         </div>
 
@@ -310,7 +312,7 @@ export default function DemoPuzzle() {
               className="mt-4 p-4 bg-green-500/10 border border-green-500/20 rounded-xl flex items-center justify-center gap-2"
             >
               <Check className="w-5 h-5 text-green-400" />
-              <span className="text-green-400 font-medium">MashaAllah! Perfect!</span>
+              <span className="text-green-400 font-medium">{t('demo.completedMessage')}</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -324,12 +326,12 @@ export default function DemoPuzzle() {
               exit={{ opacity: 0 }}
               className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-center"
             >
-              <p className="text-red-400 text-sm mb-2">Too many mistakes!</p>
+              <p className="text-red-400 text-sm mb-2">{t('puzzle.tooManyMistakes')}</p>
               <button
                 onClick={resetPuzzle}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
               >
-                Try Again
+                {t('demo.tryAgain')}
               </button>
             </motion.div>
           )}

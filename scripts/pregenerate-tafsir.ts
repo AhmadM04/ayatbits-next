@@ -122,7 +122,7 @@ Keep it brief (2-3 paragraphs), scholarly, and in clear ${languageName}.`;
 
     // Generate with AI
     const response = await ai!.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-flash',
       contents: fullPrompt,
     });
 
@@ -142,7 +142,7 @@ Keep it brief (2-3 paragraphs), scholarly, and in clear ${languageName}.`;
       language,
       tafsirText,
       sourceText,
-      'gemini-2.0-flash-exp'
+      'gemini-2.5-flash'
     );
 
     totalGenerated++;

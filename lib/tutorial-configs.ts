@@ -75,22 +75,6 @@ export const puzzleTutorialSteps: TutorialStep[] = [
     placement: 'left',
     offset: { x: -20 },
   },
-  {
-    id: 'puzzle-audio',
-    target: '[data-tutorial="audio-button"]',
-    title: 'tutorial.listenLearn',
-    message: 'tutorial.listenLearnMsg',
-    placement: 'left',
-    offset: { x: -20 },
-  },
-  {
-    id: 'puzzle-tafsir',
-    target: '[data-tutorial="tafsir-button"]',
-    title: 'tutorial.understandAyah',
-    message: 'tutorial.understandAyahMsg',
-    placement: 'left',
-    offset: { x: -20 },
-  },
 ];
 
 /**
@@ -150,6 +134,54 @@ export const billingTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="manage-subscription"]',
     title: 'tutorial.manageSubscription',
     message: 'tutorial.manageSubscriptionMsg',
+    placement: 'bottom',
+  },
+];
+
+/**
+ * Verse Browsing Tutorial Configuration
+ */
+export const verseBrowsingTutorialSteps: TutorialStep[] = [
+  {
+    id: 'verse-intro',
+    target: '[data-tutorial="arabic-text"]',
+    title: 'tutorial.verseBrowsingIntro',
+    message: 'tutorial.verseBrowsingIntroMsg',
+    placement: 'bottom',
+  },
+  {
+    id: 'verse-translation-selector',
+    target: '[data-tutorial="translation-button"]',
+    title: 'tutorial.changeTranslation',
+    message: 'tutorial.changeTranslationMsg',
+    placement: 'bottom',
+  },
+  {
+    id: 'verse-transliteration',
+    target: '[data-tutorial="transliteration-button"]',
+    title: 'tutorial.showTransliteration',
+    message: 'tutorial.showTransliterationMsg',
+    placement: 'bottom',
+  },
+  {
+    id: 'verse-tafsir',
+    target: '[data-tutorial="tafsir-button"]',
+    title: 'tutorial.readTafsir',
+    message: 'tutorial.readTafsirMsg',
+    placement: 'bottom',
+  },
+  {
+    id: 'verse-ai-tafsir',
+    target: '[data-tutorial="ai-tafsir-button"]',
+    title: 'tutorial.aiTafsir',
+    message: 'tutorial.aiTafsirMsg',
+    placement: 'bottom',
+  },
+  {
+    id: 'verse-translation',
+    target: '[data-tutorial="translation"]',
+    title: 'tutorial.viewTranslation',
+    message: 'tutorial.viewTranslationMsg',
     placement: 'bottom',
   },
 ];
@@ -278,6 +310,8 @@ export function getTutorialSteps(section: string): TutorialStep[] {
       return profileTutorialSteps;
     case 'billing_overview':
       return billingTutorialSteps;
+    case 'verse_browsing':
+      return verseBrowsingTutorialSteps;
     case 'mushaf_reading':
       return mushafTutorialSteps;
     case 'achievements_trophies':

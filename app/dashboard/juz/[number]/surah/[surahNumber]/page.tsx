@@ -10,9 +10,12 @@ import AyahSelectorClient from './AyahSelectorClient';
 import BismillahDisplay from './BismillahDisplay';
 import VerseNavButtons from './VerseNavButtons';
 import ArabicTextCard from './ArabicTextCard';
+import TafseerButtons from './TafseerButtons';
 import { cleanAyahText, extractBismillah, shouldShowBismillahSeparately } from '@/lib/ayah-utils';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
 import { fetchTranslation, fetchTransliteration } from '@/lib/quran-api-adapter';
+import { generateAiTafsir } from '@/lib/ai-tafsir-generator';
+import { checkProAccess } from '@/lib/subscription';
 
 export default async function SurahVersePage({
   params,
@@ -98,6 +101,48 @@ export default async function SurahVersePage({
     }
   }
 
+  // Pre-load AI Tafsir if user has Pro access (for instant display on dashboard)
+  let initialAiTafsir = '';
+  let initialAiTafsirSource = '';
+  
+  const hasPro = checkProAccess(dbUser);
+  if (hasPro) {
+    try {
+      const targetLang = selectedTranslation.split('.')[0] || 'en';
+      
+      // Fetch translation text for better AI tafsir context
+      let translationText = initialTranslation;
+      if (!translationText) {
+        try {
+          const translationData = await fetchTranslation(
+            parseInt(surahNumber),
+            selectedAyah,
+            selectedTranslation,
+            { next: { revalidate: 86400 } }
+          );
+          translationText = translationData.data?.text || '';
+        } catch (error) {
+          console.error('Failed to fetch translation for AI tafsir:', error);
+        }
+      }
+      
+      // Generate or retrieve cached AI tafsir
+      const tafsirResult = await generateAiTafsir({
+        surahNumber: parseInt(surahNumber),
+        ayahNumber: selectedAyah,
+        ayahText: currentPuzzle?.content?.ayahText || '',
+        translation: translationText,
+        targetLanguage: targetLang,
+      });
+      
+      initialAiTafsir = tafsirResult.tafsirText;
+      initialAiTafsirSource = tafsirResult.source;
+    } catch (error) {
+      console.error('Failed to pre-load AI tafsir:', error);
+      // Continue without AI tafsir - user can still generate it manually
+    }
+  }
+
   // Fetch page number for Mushaf navigation
   let mushafPageNumber: number | null = null;
   try {
@@ -130,26 +175,45 @@ export default async function SurahVersePage({
         {/* Header - Solid background */}
         <header className="sticky top-0 z-10 bg-[#0a0a0a] border-b border-white/10">
           <div className="max-w-3xl mx-auto px-3 sm:px-4">
-            <div className="flex items-center h-14 gap-3">
+            <div className="flex items-center justify-between h-14">
               <Link
                 href={`/dashboard/juz/${juzNumber}`}
                 className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-400" />
               </Link>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 mx-3">
                 <h1 className="text-base font-semibold truncate">{surah.nameEnglish}</h1>
                 <p className="text-xs text-gray-500 truncate">Juz {juz.number} • {completedAyahs}/{totalAyahs} completed</p>
               </div>
-              {mushafPageNumber && (
-                <Link
-                  href={`/dashboard/mushaf/page/${mushafPageNumber}`}
-                  className="p-2 -mr-2 hover:bg-white/5 rounded-lg transition-colors"
-                  title="View in Mushaf"
-                >
-                  <BookOpen className="w-5 h-5 text-gray-400" />
-                </Link>
-              )}
+              <div className="flex items-center gap-2">
+                {/* Tafseer Buttons */}
+                {currentPuzzle && (
+                  <TafseerButtons
+                    surahNumber={parseInt(surahNumber)}
+                    ayahNumber={selectedAyah}
+                    selectedTranslation={selectedTranslation}
+                    ayahText={showBismillahSeparately ? remainingText : cleanAyahText(
+                      currentPuzzle.content?.ayahText || '',
+                      parseInt(surahNumber),
+                      selectedAyah
+                    )}
+                    subscriptionPlan={dbUser.subscriptionPlan}
+                    initialShowTransliteration={dbUser.showTransliteration || false}
+                    initialAiTafsir={initialAiTafsir}
+                    initialAiTafsirSource={initialAiTafsirSource}
+                  />
+                )}
+                {mushafPageNumber && (
+                  <Link
+                    href={`/dashboard/mushaf/page/${mushafPageNumber}`}
+                    className="p-2 hover:bg-white/5 rounded-lg transition-colors flex-shrink-0"
+                    title="View in Mushaf"
+                  >
+                    <BookOpen className="w-5 h-5 text-gray-400" />
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         </header>
@@ -189,26 +253,30 @@ export default async function SurahVersePage({
               )}
 
               {/* Arabic Text Card with Audio Player */}
-              <ArabicTextCard
-                surahNumber={parseInt(surahNumber)}
-                ayahNumber={selectedAyah}
-                ayahText={showBismillahSeparately ? remainingText : cleanAyahText(
-                  currentPuzzle.content?.ayahText || '',
-                  parseInt(surahNumber),
-                  selectedAyah
-                )}
-                puzzleId={currentPuzzle._id.toString()}
-                isMemorized={isMemorized}
-                isLiked={isLiked}
-              />
+              <div data-tutorial="arabic-text">
+                <ArabicTextCard
+                  surahNumber={parseInt(surahNumber)}
+                  ayahNumber={selectedAyah}
+                  ayahText={showBismillahSeparately ? remainingText : cleanAyahText(
+                    currentPuzzle.content?.ayahText || '',
+                    parseInt(surahNumber),
+                    selectedAyah
+                  )}
+                  puzzleId={currentPuzzle._id.toString()}
+                  isMemorized={isMemorized}
+                  isLiked={isLiked}
+                />
+              </div>
 
               {/* Translation */}
-              <TranslationDisplay
-                surahNumber={parseInt(surahNumber)}
-                ayahNumber={selectedAyah}
-                selectedTranslation={selectedTranslation}
-                initialTranslation={initialTranslation}
-              />
+              <div data-tutorial="translation">
+                <TranslationDisplay
+                  surahNumber={parseInt(surahNumber)}
+                  ayahNumber={selectedAyah}
+                  selectedTranslation={selectedTranslation}
+                  initialTranslation={initialTranslation}
+                />
+              </div>
 
               {/* Transliteration */}
               <TransliterationDisplay

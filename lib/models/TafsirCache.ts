@@ -43,7 +43,7 @@ const tafsirCacheSchema = new mongoose.Schema<ITafsirCache>(
     aiModel: {
       type: String,
       required: true,
-      default: 'gemini-2.0-flash-exp',
+      default: 'gemini-2.5-flash',
     },
     generatedAt: {
       type: Date,

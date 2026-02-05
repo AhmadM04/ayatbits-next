@@ -7,6 +7,7 @@ export type TutorialSection =
   | 'puzzle_guide'
   | 'profile_settings'
   | 'billing_overview'
+  | 'verse_browsing'
   | 'mushaf_reading'
   | 'achievements_trophies'
   | 'liked_collection';

@@ -293,6 +293,19 @@ const EN_MESSAGES: Record<string, Record<string, any>> = {
     browseCollectionMsg: 'Each ayah shows the surah name, ayah number, and Juz. Tap to read the full verse.',
     quickActions: 'Quick Actions',
     quickActionsMsg: 'Visit the ayah in Mushaf view or remove it from your collection with a tap.',
+    // Verse Browsing tutorial
+    verseBrowsingIntro: 'Browse Verses 📖',
+    verseBrowsingIntroMsg: 'Read the Arabic text with full vowelization. Like verses and listen to recitation.',
+    changeTranslation: 'Change Translation 🌐',
+    changeTranslationMsg: 'Switch between 18+ translations in different languages. Your selection is saved and applied across all verses.',
+    showTransliteration: 'Transliteration 🔤',
+    showTransliterationMsg: 'View the Arabic text in Latin script to help with pronunciation and reading.',
+    readTafsir: 'Read Tafsir (Commentary)',
+    readTafsirMsg: 'View classical tafsir explanations. Works best with Arabic tafsirs and select translations (English: Sahih, Pickthall, Yusuf Ali; Russian: Kuliev).',
+    aiTafsir: 'AI Tafsir (Pro) ✨',
+    aiTafsirMsg: 'Get AI-powered explanations in English, Arabic, and Russian. Available for Pro subscribers only.',
+    viewTranslation: 'View Translation',
+    viewTranslationMsg: 'Read the verse meaning in your selected translation language.',
     // General
     restartTutorial: 'Restart Tutorial',
   },
@@ -925,6 +938,19 @@ const AR_MESSAGES: Record<string, Record<string, any>> = {
     browseCollectionMsg: 'كل آية تُظهر اسم السورة، رقم الآية، والجزء. انقر لقراءة الآية كاملة.',
     quickActions: 'إجراءات سريعة',
     quickActionsMsg: 'قم بزيارة الآية في عرض المصحف أو احذفها من مجموعتك بنقرة.',
+    // Verse Browsing tutorial
+    verseBrowsingIntro: 'تصفح الآيات 📖',
+    verseBrowsingIntroMsg: 'اقرأ النص العربي مع التشكيل الكامل. أعجب بالآيات واستمع للتلاوة.',
+    changeTranslation: 'تغيير الترجمة 🌐',
+    changeTranslationMsg: 'التبديل بين أكثر من 18 ترجمة بلغات مختلفة. يتم حفظ اختيارك وتطبيقه على جميع الآيات.',
+    showTransliteration: 'النسخ الصوتي 🔤',
+    showTransliterationMsg: 'عرض النص العربي بالأحرف اللاتينية للمساعدة في النطق والقراءة.',
+    readTafsir: 'اقرأ التفسير',
+    readTafsirMsg: 'اعرض شروحات التفسير الكلاسيكي. يعمل بشكل أفضل مع التفاسير العربية والترجمات المختارة (الإنجليزية: Sahih، Pickthall، Yusuf Ali؛ الروسية: Kuliev).',
+    aiTafsir: 'التفسير بالذكاء الاصطناعي (برو) ✨',
+    aiTafsirMsg: 'احصل على شروحات مدعومة بالذكاء الاصطناعي بالعربية والإنجليزية والروسية. متاح للمشتركين في الخطة الاحترافية فقط.',
+    viewTranslation: 'عرض الترجمة',
+    viewTranslationMsg: 'اقرأ معنى الآية بلغة الترجمة المختارة.',
     // General
     restartTutorial: 'إعادة تشغيل البرنامج التعليمي',
   },
@@ -1557,6 +1583,19 @@ const RU_MESSAGES: Record<string, Record<string, any>> = {
     browseCollectionMsg: 'Каждый аят показывает название суры, номер аята и джуз. Нажмите, чтобы прочитать полный аят.',
     quickActions: 'Быстрые действия',
     quickActionsMsg: 'Посетите аят в Мусхафе или удалите его из коллекции одним нажатием.',
+    // Verse Browsing tutorial
+    verseBrowsingIntro: 'Просмотр аятов 📖',
+    verseBrowsingIntroMsg: 'Читайте арабский текст с полной огласовкой. Добавляйте аяты в избранное и слушайте чтение.',
+    changeTranslation: 'Изменить перевод 🌐',
+    changeTranslationMsg: 'Переключайтесь между 18+ переводами на разных языках. Ваш выбор сохраняется и применяется ко всем аятам.',
+    showTransliteration: 'Транслитерация 🔤',
+    showTransliterationMsg: 'Просмотр арабского текста латинскими буквами для помощи с произношением и чтением.',
+    readTafsir: 'Прочитать тафсир (комментарий)',
+    readTafsirMsg: 'Просмотрите классические объяснения тафсира. Лучше всего работает с арабскими тафсирами и избранными переводами (английский: Sahih, Pickthall, Yusuf Ali; русский: Kuliev).',
+    aiTafsir: 'AI Тафсир (Pro) ✨',
+    aiTafsirMsg: 'Получите объяснения на основе ИИ на английском, арабском и русском языках. Доступно только для подписчиков Pro.',
+    viewTranslation: 'Посмотреть перевод',
+    viewTranslationMsg: 'Прочитайте значение аята на выбранном языке перевода.',
     // General
     restartTutorial: 'Перезапустить обучение',
   },

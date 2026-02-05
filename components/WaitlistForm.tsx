@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Loader2, Mail, User } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { useI18n } from '@/lib/i18n';
 
 interface WaitlistFormProps {
   source?: string;
@@ -13,6 +14,7 @@ interface WaitlistFormProps {
 type FormState = 'idle' | 'loading' | 'success' | 'error';
 
 export default function WaitlistForm({ source = 'web' }: WaitlistFormProps) {
+  const { t } = useI18n();
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [state, setState] = useState<FormState>('idle');
@@ -22,13 +24,13 @@ export default function WaitlistForm({ source = 'web' }: WaitlistFormProps) {
     e.preventDefault();
     
     if (!firstName || firstName.trim().length < 2) {
-      setErrorMessage('Please enter a valid first name (at least 2 characters)');
+      setErrorMessage(t('waitlist.errorInvalidName'));
       setState('error');
       return;
     }
     
     if (!email || !email.includes('@')) {
-      setErrorMessage('Please enter a valid email address');
+      setErrorMessage(t('waitlist.errorInvalidEmail'));
       setState('error');
       return;
     }
@@ -79,12 +81,12 @@ export default function WaitlistForm({ source = 'web' }: WaitlistFormProps) {
         }, 200);
       } else {
         setState('error');
-        setErrorMessage(data.error || 'Something went wrong. Please try again.');
+        setErrorMessage(data.error || t('waitlist.errorGeneric'));
       }
     } catch (error) {
       console.error('Error submitting form:', error);
       setState('error');
-      setErrorMessage('Network error. Please check your connection and try again.');
+      setErrorMessage(t('waitlist.errorNetwork'));
     }
   };
 
@@ -102,15 +104,15 @@ export default function WaitlistForm({ source = 'web' }: WaitlistFormProps) {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 mb-4">
               <Check className="w-8 h-8 text-green-500" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-2">You're on the waitlist!</h3>
+            <h3 className="text-2xl font-bold text-white mb-2">{t('waitlist.success')}</h3>
             <p className="text-gray-400 mb-6">
-              Check your email for confirmation. We'll keep you updated with exciting news, features, and beta access.
+              {t('waitlist.successMessage')}
             </p>
             <Button
               onClick={() => setState('idle')}
               className="bg-white/10 hover:bg-white/20 text-white border border-white/20"
             >
-              Join with another email
+              {t('waitlist.joinAnother')}
             </Button>
           </motion.div>
         ) : (
@@ -133,7 +135,7 @@ export default function WaitlistForm({ source = 'web' }: WaitlistFormProps) {
                   setFirstName(e.target.value);
                   if (state === 'error') setState('idle');
                 }}
-                placeholder="Enter your first name"
+                placeholder={t('waitlist.firstName')}
                 className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                 disabled={state === 'loading'}
                 required
@@ -152,7 +154,7 @@ export default function WaitlistForm({ source = 'web' }: WaitlistFormProps) {
                   setEmail(e.target.value);
                   if (state === 'error') setState('idle');
                 }}
-                placeholder="Enter your email address"
+                placeholder={t('waitlist.email')}
                 className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                 disabled={state === 'loading'}
                 required
@@ -167,10 +169,10 @@ export default function WaitlistForm({ source = 'web' }: WaitlistFormProps) {
               {state === 'loading' ? (
                 <span className="flex items-center justify-center gap-2">
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Joining...
+                  {t('waitlist.joining')}
                 </span>
               ) : (
-                'JOIN WAITLIST'
+                t('waitlist.joinButton')
               )}
             </Button>
 
@@ -188,7 +190,7 @@ export default function WaitlistForm({ source = 'web' }: WaitlistFormProps) {
             </AnimatePresence>
 
             <p className="text-xs text-gray-500 text-center">
-              By joining, you agree to receive occasional emails about AyatBits updates. Unsubscribe anytime.
+              {t('waitlist.disclaimer')}
             </p>
           </motion.form>
         )}
