@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Flame, BookOpen, AlertTriangle, HelpCircle } from 'lucide-react';
+import { Flame, BookOpen, AlertTriangle, HelpCircle, Menu, X, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
+import { SignOutButton } from '@clerk/nextjs';
 import BottomNav from '@/components/BottomNav';
 import DailyQuote from '@/components/DailyQuote';
 import TrialBanner from '@/components/TrialBanner';
@@ -53,6 +54,7 @@ export default function DashboardContent({
   juzs,
 }: DashboardContentProps) {
   const [showHelpMenu, setShowHelpMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const { startTutorial } = useTutorial();
   const { t } = useI18n();
   
@@ -119,7 +121,9 @@ export default function DashboardContent({
                 className="h-9 w-auto"
               />
             </Link>
-            <div className="flex items-center gap-2 sm:gap-3">
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-2 sm:gap-3">
               {/* Search */}
               <VerseSearch />
               
@@ -179,6 +183,16 @@ export default function DashboardContent({
                 </AnimatePresence>
               </div>
               
+              {/* Logout Button */}
+              <SignOutButton>
+                <button 
+                  className="p-2 hover:bg-white/5 rounded-lg transition-colors text-gray-400 hover:text-red-400"
+                  aria-label="Logout"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </SignOutButton>
+              
               <Link 
                 href="/dashboard/profile" 
                 className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center"
@@ -188,8 +202,90 @@ export default function DashboardContent({
                 </span>
               </Link>
             </div>
+
+            {/* Mobile Burger Menu */}
+            <div className="md:hidden flex items-center gap-2">
+              <button
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className="p-2 hover:bg-white/5 rounded-lg transition-colors text-gray-400 hover:text-white"
+                aria-label="Menu"
+              >
+                {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        <AnimatePresence>
+          {showMobileMenu && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden border-t border-white/5 bg-[#0a0a0a]/98 backdrop-blur-md overflow-hidden"
+            >
+              <div className="max-w-6xl mx-auto px-4 py-4 space-y-3">
+                {/* User Profile */}
+                <Link 
+                  href="/dashboard/profile"
+                  onClick={() => setShowMobileMenu(false)}
+                  className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
+                    <span className="text-white font-semibold text-sm">
+                      {userFirstName?.[0] || 'U'}
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-white">{userFirstName || 'User'}</div>
+                    <div className="text-xs text-gray-400">View Profile</div>
+                  </div>
+                </Link>
+
+                {/* Streak */}
+                <Link 
+                  href="/dashboard/achievements"
+                  onClick={() => setShowMobileMenu(false)}
+                  className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors"
+                >
+                  <Flame className="w-5 h-5 text-orange-500" />
+                  <span className="text-sm text-white">Streak: {Number.isNaN(currentStreak) ? 0 : (currentStreak ?? 0)} days</span>
+                </Link>
+
+                {/* Search */}
+                <div className="p-3">
+                  <VerseSearch />
+                </div>
+
+                {/* Language Selector */}
+                <div className="p-3">
+                  <LanguageSelector />
+                </div>
+
+                {/* Help */}
+                <button
+                  onClick={() => {
+                    handleRestartTutorial();
+                    setShowMobileMenu(false);
+                  }}
+                  className="w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors text-left"
+                >
+                  <HelpCircle className="w-5 h-5 text-gray-400" />
+                  <span className="text-sm text-white">🎓 {t('dashboard.restartTutorial')}</span>
+                </button>
+
+                {/* Logout */}
+                <SignOutButton>
+                  <button className="w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors text-left">
+                    <LogOut className="w-5 h-5 text-red-400" />
+                    <span className="text-sm text-white">Logout</span>
+                  </button>
+                </SignOutButton>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-6">

@@ -4,9 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ConditionalMotion, useReducedMotion } from "@/components/ConditionalMotion";
-import { Puzzle, Trophy, Flame, Star, Sparkles, CheckCircle2, Quote, Gift } from "lucide-react";
+import { Puzzle, Trophy, Flame, Star, Sparkles, CheckCircle2, Quote, Gift, Menu, X } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import UserProfileSection from "@/components/UserProfileSection";
 import DemoPuzzle from "@/components/DemoPuzzle";
@@ -110,6 +110,7 @@ export default function Home() {
   const { t } = useI18n();
   const shouldReduceMotion = useReducedMotion();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   
   return (
     <Suspense fallback={
@@ -166,7 +167,7 @@ export default function Home() {
           <header className="w-full border-b border-white/5 backdrop-blur-md bg-[#0a0a0a]/80 sticky top-0 z-50">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
-                <Link href="/dashboard" className="flex items-center hover:opacity-80 transition-opacity">
+                <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
                   <Image 
                     src="/ayatbits-logo.svg" 
                     alt="AyatBits" 
@@ -177,7 +178,7 @@ export default function Home() {
                   />
                 </Link>
                 
-                {/* Navigation Links */}
+                {/* Desktop Navigation Links */}
                 <nav className="hidden md:flex items-center gap-6 text-sm">
                   <Link href="#features" className="text-gray-400 hover:text-white transition-colors">
                     {t('landing.featuresLink')}
@@ -190,7 +191,8 @@ export default function Home() {
                   </Link>
                 </nav>
 
-                <div className="flex items-center gap-3">
+                {/* Desktop Actions */}
+                <div className="hidden md:flex items-center gap-3">
                   {/* Language Selector */}
                   <LanguageSelector />
                   
@@ -210,7 +212,77 @@ export default function Home() {
                     <UserProfileSection />
                   </SignedIn>
                 </div>
+
+                {/* Mobile Menu Button */}
+                <div className="md:hidden flex items-center gap-2">
+                  <LanguageSelector />
+                  <button
+                    onClick={() => setShowMobileMenu(!showMobileMenu)}
+                    className="p-2 hover:bg-white/5 rounded-lg transition-colors text-gray-400 hover:text-white"
+                    aria-label="Menu"
+                  >
+                    {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                  </button>
+                </div>
               </div>
+
+              {/* Mobile Menu Dropdown */}
+              <AnimatePresence>
+                {showMobileMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="md:hidden border-t border-white/5 overflow-hidden"
+                  >
+                    <nav className="py-4 space-y-2">
+                      <Link 
+                        href="#features"
+                        onClick={() => setShowMobileMenu(false)}
+                        className="block px-4 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                      >
+                        {t('landing.featuresLink')}
+                      </Link>
+                      <Link 
+                        href="#pricing"
+                        onClick={() => setShowMobileMenu(false)}
+                        className="block px-4 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                      >
+                        {t('landing.pricingLink')}
+                      </Link>
+                      <Link 
+                        href="/faq"
+                        onClick={() => setShowMobileMenu(false)}
+                        className="block px-4 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                      >
+                        {t('landing.faqLink')}
+                      </Link>
+                      
+                      <div className="border-t border-white/5 my-2 pt-2">
+                        <SignedOut>
+                          <div className="px-4 space-y-2">
+                            <SignInButton mode="modal">
+                              <Button className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/20">
+                                {t('landing.signIn')}
+                              </Button>
+                            </SignInButton>
+                            <SignUpButton mode="modal">
+                              <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+                                {t('landing.getStarted')}
+                              </Button>
+                            </SignUpButton>
+                          </div>
+                        </SignedOut>
+                        <SignedIn>
+                          <div className="px-4">
+                            <UserProfileSection />
+                          </div>
+                        </SignedIn>
+                      </div>
+                    </nav>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </header>
 
