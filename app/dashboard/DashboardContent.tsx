@@ -127,20 +127,22 @@ export default function DashboardContent({
               {/* Search */}
               <VerseSearch />
               
-              {/* Streak with hover animation */}
-              <Link 
-                href="/dashboard/achievements"
-                className="group flex items-center gap-1.5 text-orange-500 hover:bg-white/5 px-2 py-1.5 rounded-lg transition-colors"
-                data-tutorial="stats-cards"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.2, rotate: [0, -10, 10, 0] }}
-                  transition={{ duration: 0.3 }}
+              {/* Streak with hover animation - only show if streak > 0 */}
+              {currentStreak > 0 && (
+                <Link 
+                  href="/dashboard/achievements"
+                  className="group flex items-center gap-1.5 text-orange-500 hover:bg-white/5 px-2 py-1.5 rounded-lg transition-colors"
+                  data-tutorial="stats-cards"
                 >
-                  <Flame className="w-4 h-4 group-hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]" />
-                </motion.div>
-                <span className="font-semibold text-sm">{Number.isNaN(currentStreak) ? 0 : (currentStreak ?? 0)}</span>
-              </Link>
+                  <motion.div
+                    whileHover={{ scale: 1.2, rotate: [0, -10, 10, 0] }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Flame className="w-4 h-4 group-hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]" />
+                  </motion.div>
+                  <span className="font-semibold text-sm">{currentStreak}</span>
+                </Link>
+              )}
               
               {/* Language Selector */}
               <LanguageSelector />
@@ -243,15 +245,17 @@ export default function DashboardContent({
                   </div>
                 </Link>
 
-                {/* Streak */}
-                <Link 
-                  href="/dashboard/achievements"
-                  onClick={() => setShowMobileMenu(false)}
-                  className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors"
-                >
-                  <Flame className="w-5 h-5 text-orange-500" />
-                  <span className="text-sm text-white">Streak: {Number.isNaN(currentStreak) ? 0 : (currentStreak ?? 0)} days</span>
-                </Link>
+                {/* Streak - only show if streak > 0 */}
+                {currentStreak > 0 && (
+                  <Link 
+                    href="/dashboard/achievements"
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors"
+                  >
+                    <Flame className="w-5 h-5 text-orange-500" />
+                    <span className="text-sm text-white">Streak: {currentStreak} days</span>
+                  </Link>
+                )}
 
                 {/* Search */}
                 <div className="p-3">
