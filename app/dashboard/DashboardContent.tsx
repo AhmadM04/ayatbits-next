@@ -83,7 +83,8 @@ export default function DashboardContent({
           target: '[data-tutorial="awards-button"]',
           title: 'tutorial.trackProgress',
           message: 'tutorial.trackProgressAwardsMsg',
-          placement: 'top',
+          placement: 'bottom',
+          offset: { y: 120 }, // Position more toward center of screen
         },
         languageSelectorTutorialStep, // language selector - NEW
         dashboardTutorialSteps[2], // daily-quote
