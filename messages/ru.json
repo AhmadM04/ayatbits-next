@@ -154,7 +154,11 @@
     "mashallah": "Машаллах!",
     "youCompleted": "Вы завершили",
     "achievementsUnlocked": "Достижения разблокированы",
-    "continueTo": "Перейти к {surah}"
+    "continueTo": "Перейти к {surah}",
+    "exitPuzzleTitle": "Выйти из головоломки?",
+    "exitPuzzleMessage": "Если вы вернетесь сейчас, ваш прогресс для этого аята будет сброшен и вам придется начать заново.",
+    "exitPuzzleConfirm": "Да, вернуться",
+    "exitPuzzleCancel": "Продолжить головоломку"
   },
   "liked": {
     "title": "Понравившиеся аяты",

@@ -194,7 +194,11 @@
     "mashallah": "ما شاء الله!",
     "youCompleted": "لقد أكملت",
     "achievementsUnlocked": "إنجازات تم فتحها",
-    "continueTo": "متابعة إلى {surah}"
+    "continueTo": "متابعة إلى {surah}",
+    "exitPuzzleTitle": "الخروج من اللغز؟",
+    "exitPuzzleMessage": "إذا عدت الآن، سيتم إعادة تعيين تقدمك في هذه الآية وستحتاج إلى البدء من جديد.",
+    "exitPuzzleConfirm": "نعم، العودة",
+    "exitPuzzleCancel": "متابعة اللغز"
   },
   "liked": {
     "title": "الآيات المحفوظة",
