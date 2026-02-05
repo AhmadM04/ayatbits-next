@@ -13,7 +13,6 @@ interface TafseerButtonsProps {
   selectedTranslation: string;
   ayahText: string;
   subscriptionPlan?: string;
-  initialShowTransliteration?: boolean;
 }
 
 // Translation names and options
@@ -66,7 +65,6 @@ export default function TafseerButtons({
   selectedTranslation,
   ayahText,
   subscriptionPlan,
-  initialShowTransliteration = false,
 }: TafseerButtonsProps) {
   const { t } = useI18n();
   const router = useRouter();
@@ -83,7 +81,7 @@ export default function TafseerButtons({
   const [aiError, setAiError] = useState<string | null>(null);
   const [requiresPro, setRequiresPro] = useState(false);
   const [translation, setTranslation] = useState<string | null>(null);
-  const [showTransliteration, setShowTransliteration] = useState(initialShowTransliteration);
+  const [showTransliteration, setShowTransliteration] = useState(false);
   const [transliteration, setTransliteration] = useState<string>('');
   const [wordTransliterations, setWordTransliterations] = useState<Array<{ text: string; transliteration: string }>>([]);
   const [isLoadingTransliteration, setIsLoadingTransliteration] = useState(false);
@@ -109,6 +107,7 @@ export default function TafseerButtons({
     setAiError(null);
     setRequiresPro(false);
     setTranslation(null);
+    setShowTransliteration(false);
     setTransliteration('');
     setWordTransliterations([]);
     setShowMobileMenu(false);
@@ -190,17 +189,6 @@ export default function TafseerButtons({
       }
 
       setShowTransliteration(true);
-
-      // Save preference to backend
-      try {
-        await fetch('/api/user/settings', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ showTransliteration: true }),
-        });
-      } catch (error) {
-        console.error('Failed to save transliteration preference:', error);
-      }
     } catch (error) {
       console.error('Failed to fetch transliteration:', error);
     } finally {

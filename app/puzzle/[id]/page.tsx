@@ -205,11 +205,6 @@ export default async function PuzzlePage({
       nextPuzzleAyahNumber={nextPuzzleAyahNumber}
       versePageUrl={versePageUrl}
       isLastAyahInSurah={isLastAyahInSurah}
-      initialTransliteration={initialTransliteration}
-      initialWordTransliterations={initialWordTransliterations}
-      initialShowTransliteration={dbUser.showTransliteration || false}
-      initialAiTafsir={initialAiTafsir}
-      initialAiTafsirSource={initialAiTafsirSource}
     />
   );
 }

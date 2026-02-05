@@ -29,11 +29,6 @@ interface PuzzleClientProps {
   nextPuzzleAyahNumber?: number | null;
   versePageUrl: string;
   isLastAyahInSurah?: boolean;
-  initialTransliteration?: string;
-  initialWordTransliterations?: Array<{ text: string; transliteration: string }>;
-  initialShowTransliteration?: boolean;
-  initialAiTafsir?: string;
-  initialAiTafsirSource?: string;
 }
 
 export default function PuzzleClient({

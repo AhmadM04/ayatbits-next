@@ -147,7 +147,6 @@ export default async function SurahVersePage({
                       selectedAyah
                     )}
                     subscriptionPlan={dbUser.subscriptionPlan}
-                    initialShowTransliteration={dbUser.showTransliteration || false}
                   />
                 )}
                 {mushafPageNumber && (
