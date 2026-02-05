@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, AlertTriangle } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
@@ -17,6 +17,11 @@ export default function ConfirmExitModal({
   onConfirm,
 }: ConfirmExitModalProps) {
   const { t } = useI18n();
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -45,7 +50,7 @@ export default function ConfirmExitModal({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !isMounted) return null;
 
   return (
     <AnimatePresence>
