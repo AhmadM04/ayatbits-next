@@ -21,6 +21,11 @@ export default function PricingContent() {
   const [voucherError, setVoucherError] = useState('');
   const [voucherData, setVoucherData] = useState<any>(null);
   const [redeemingVoucher, setRedeemingVoucher] = useState(false);
+  const [subscriptionDetails, setSubscriptionDetails] = useState<{
+    plan: string;
+    tier: string;
+    daysUntilExpiry?: number | null;
+  } | null>(null);
   
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -54,15 +59,20 @@ export default function PricingContent() {
         
         if (data.hasAccess) {
           setHasAccess(true);
-          setTimeout(() => {
-            router.push('/dashboard');
-          }, 1500);
+          setSubscriptionDetails({
+            plan: data.plan,
+            tier: data.tier,
+            daysUntilExpiry: data.daysUntilExpiry,
+          });
+          // Don't auto-redirect - let user see they have access
         } else {
           setHasAccess(false);
+          setSubscriptionDetails(null);
         }
       } catch (error) {
         console.error('[PricingContent] Error checking access:', error);
         setHasAccess(false);
+        setSubscriptionDetails(null);
       } finally {
         setCheckingAccess(false);
       }
@@ -318,7 +328,7 @@ export default function PricingContent() {
           )}
 
           {/* Access Granted Banner */}
-          {hasAccess && (
+          {hasAccess && subscriptionDetails && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -328,7 +338,20 @@ export default function PricingContent() {
                 <Check className="w-5 h-5 text-green-500" />
                 <h3 className="text-lg font-semibold text-green-400">{t('pricing.youHaveAccess')}</h3>
               </div>
-              <p className="text-gray-300 mb-4">{t('pricing.redirectingToDashboard')}</p>
+              <p className="text-gray-300 mb-2">
+                {subscriptionDetails.plan === 'lifetime' && 'You have Lifetime access'}
+                {subscriptionDetails.plan === 'monthly' && 'You have a Monthly subscription'}
+                {subscriptionDetails.plan === 'yearly' && 'You have a Yearly subscription'}
+                {subscriptionDetails.plan === 'trial' && `You have a Trial (${subscriptionDetails.daysUntilExpiry || 7} days remaining)`}
+                {subscriptionDetails.plan === 'granted' && subscriptionDetails.daysUntilExpiry && 
+                  `You have temporary access (${subscriptionDetails.daysUntilExpiry} days remaining)`}
+                {subscriptionDetails.plan === 'granted' && !subscriptionDetails.daysUntilExpiry && 
+                  'You have admin-granted access'}
+                {subscriptionDetails.plan === 'admin' && 'You have Admin access'}
+              </p>
+              <p className="text-sm text-gray-400 mb-4">
+                No need to subscribe - you already have access to the platform.
+              </p>
               <Link href="/dashboard" className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg font-medium transition-colors">
                 {t('pricing.goToDashboard')}
                 <ArrowRight className="w-4 h-4" />

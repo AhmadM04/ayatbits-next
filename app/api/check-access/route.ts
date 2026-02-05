@@ -118,6 +118,11 @@ export async function GET() {
       user.subscriptionEndDate &&
       new Date(user.subscriptionEndDate) > new Date()
     ) {
+      const now = new Date();
+      const endDate = new Date(user.subscriptionEndDate);
+      const diffTime = endDate.getTime() - now.getTime();
+      const daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
       console.log('[check-access] ✅ User has ACTIVE/TRIALING subscription - granting access', {
         status: user.subscriptionStatus,
         endDate: user.subscriptionEndDate,
@@ -125,6 +130,7 @@ export async function GET() {
         isEndDateValid: new Date(user.subscriptionEndDate) > new Date(),
         tier: user.subscriptionTier,
         plan: user.subscriptionPlan,
+        daysRemaining,
       });
       return NextResponse.json({ 
         hasAccess: true, 
@@ -132,7 +138,7 @@ export async function GET() {
         tier: user.subscriptionTier || 'basic',
         hasPro: hasProTier,
         grantType: 'none',
-        daysUntilExpiry: null,
+        daysUntilExpiry: user.subscriptionStatus === SubscriptionStatusEnum.TRIALING ? daysRemaining : null,
         hasStripeSubscription,
       });
     }
@@ -142,6 +148,11 @@ export async function GET() {
       user.trialEndsAt &&
       new Date(user.trialEndsAt) > new Date()
     ) {
+      const now = new Date();
+      const trialEnd = new Date(user.trialEndsAt);
+      const diffTime = trialEnd.getTime() - now.getTime();
+      const daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
       console.log('[check-access] ✅ User has LEGACY TRIAL - granting access');
       return NextResponse.json({ 
         hasAccess: true, 
@@ -149,7 +160,7 @@ export async function GET() {
         tier: user.subscriptionTier || 'basic',
         hasPro: hasProTier,
         grantType: 'none',
-        daysUntilExpiry: null,
+        daysUntilExpiry: daysRemaining,
         hasStripeSubscription,
       });
     }
