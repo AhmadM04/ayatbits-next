@@ -58,11 +58,11 @@ export default function BottomNav() {
   }, [pathname, isMounted]);
 
   const navItems = [
-    { href: '/dashboard', icon: Home, labelKey: 'navigation.home' },
-    { href: '/dashboard/liked', icon: Heart, labelKey: 'navigation.liked' },
-    { href: 'resume', icon: Play, labelKey: 'navigation.resume', isResume: true },
+    { href: '/dashboard', icon: Home, labelKey: 'common.home' },
+    { href: '/dashboard/liked', icon: Heart, labelKey: 'common.liked' },
+    { href: 'resume', icon: Play, labelKey: 'common.resume', isResume: true },
     { href: '/dashboard/achievements', icon: Trophy, labelKey: 'common.awards' },
-    { href: '/dashboard/profile', icon: User, labelKey: 'navigation.profile' },
+    { href: '/dashboard/profile', icon: User, labelKey: 'common.profile' },
   ];
 
   return (

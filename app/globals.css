@@ -168,9 +168,11 @@ html {
   background: var(--neutral-dark-gray);
 }
 
-/* Arabic Font */
+/* Arabic Font - Uthmani script for Quranic text */
 .font-arabic {
-  font-family: var(--font-amiri), 'Amiri', 'Traditional Arabic', serif;
+  font-family: var(--font-amiri), 'Amiri Quran', 'Scheherazade New', 'Traditional Arabic', serif;
+  font-feature-settings: 'liga' 1, 'dlig' 1, 'calt' 1;
+  text-rendering: optimizeLegibility;
 }
 
 /* Clerk Social Button Overrides */

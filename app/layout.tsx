@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Amiri_Quran } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ToastProvider } from "@/components/Toast";
 import { ThemeProvider } from "@/lib/theme-context";
@@ -22,6 +22,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
   display: "swap",
   preload: false,
+});
+
+// Amiri Quran font for proper Uthmani script display
+const amiriQuran = Amiri_Quran({
+  weight: "400",
+  subsets: ["arabic", "latin"],
+  variable: "--font-amiri",
+  display: "swap",
+  preload: true,
+  fallback: ["serif"],
 });
 
 export const viewport: Viewport = {
@@ -243,7 +253,7 @@ export default function RootLayout({
           <link rel="dns-prefetch" href="https://api.stripe.com" />
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0a] text-white`}
+          className={`${geistSans.variable} ${geistMono.variable} ${amiriQuran.variable} antialiased bg-[#0a0a0a] text-white`}
         >
           <ThemeProvider>
             <MotionProvider>

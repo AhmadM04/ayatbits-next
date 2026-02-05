@@ -58,7 +58,7 @@ export default function DashboardContent({
   const { startTutorial } = useTutorial();
   const { t } = useI18n();
   
-  const showTrialBanner = subscriptionStatus === 'trialing' && trialDaysLeft && trialDaysLeft > 0;
+  const showTrialBanner = Boolean(subscriptionStatus === 'trialing' && trialDaysLeft && trialDaysLeft > 0);
   const needsSubscription = !subscriptionStatus || subscriptionStatus === 'inactive' || subscriptionStatus === 'INACTIVE';
   
   // Calculate subscription days left if applicable
@@ -86,7 +86,7 @@ export default function DashboardContent({
     >
       <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
       {/* Trial Banner */}
-      {showTrialBanner && <TrialBanner daysLeft={trialDaysLeft} />}
+      {showTrialBanner && <TrialBanner daysLeft={trialDaysLeft!} />}
       
       {/* Subscription Expiry Warning */}
       {showSubscriptionWarning && (

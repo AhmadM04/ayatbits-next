@@ -66,16 +66,15 @@ To verify the fix works:
 6. ✅ **Puzzles** - Word bank instructions, tips, mistakes counter
 7. ✅ **Mushaf** - Page navigation, "Practice", "Play Audio" buttons
 
-## What Still Needs to Be Done
+## Translation Status by Language
 
-### Arabic Translation (`messages/ar.json`)
-All 211 keys need to be added with Arabic translations. The hardcoded Arabic translations exist in `lib/i18n.tsx` (lines 755-1499) and can be copied over.
+### ✅ Fully Translated (Native Language)
+- **English (`en.json`)** - Complete with all 211 keys
+- **Arabic (`ar.json`)** - Complete with all 211 keys in Arabic
+- **Russian (`ru.json`)** - Complete with all 211 keys in Russian
 
-### Russian Translation (`messages/ru.json`)
-All 211 keys need to be added with Russian translations. The hardcoded Russian translations exist in `lib/i18n.tsx` (lines 1507-2251) and can be copied over.
-
-### Other Languages
-The following JSON files also need these sections added (with appropriate translations):
+### ⚠️ Partially Translated (English Placeholders)
+The following languages have all 211 keys added, but use **English text as placeholders**:
 - `bn.json` (Bengali)
 - `de.json` (German)
 - `es.json` (Spanish)
@@ -89,20 +88,56 @@ The following JSON files also need these sections added (with appropriate transl
 - `ur.json` (Urdu)
 - `zh.json` (Chinese)
 
+**Note**: These files need proper translations from native speakers or professional translation services. The English placeholders ensure the app won't break when users select these languages.
+
 ## Build Status
 ✅ **Build successful** - `npm run build` completes without errors
 ✅ **No linting errors** - All JSON is valid
-✅ **All English keys present** - Verified programmatically
+✅ **All 15 language files updated** - All keys present in all files
+✅ **3 languages fully translated** - English, Arabic, Russian
+⚠️ **12 languages need translation** - Currently using English placeholders
 
 ## Recommendation for Future
 Consider removing the hardcoded messages from `lib/i18n.tsx` entirely once all JSON files are updated. The JSON files should be the single source of truth to avoid this type of discrepancy in the future.
 
 Alternatively, create a script to sync hardcoded messages → JSON files automatically.
 
+## Next Steps for Full Translation
+
+To complete the translations for the 12 languages with English placeholders:
+
+1. **Professional Translation Service** - Send the JSON files to a translation service
+2. **Community Translation** - Engage native speakers from your user community
+3. **Machine Translation** - Use AI translation as a starting point, then review with native speakers
+4. **Incremental Updates** - Translate high-priority sections first (tutorial, onboarding, dashboard)
+
+Priority sections to translate first:
+1. `tutorial` (105 keys) - User onboarding experience
+2. `onboarding` (23 keys) - First-time user flow
+3. `common` (30 keys) - Used throughout the app
+4. `wordPuzzle` (16 keys) - Core game functionality
+
 ---
 
-**Fixed by:** AI Assistant
-**Date:** February 5, 2026
-**Files Modified:** `messages/en.json`
-**Build Status:** ✅ Passing
+**Fixed by:** AI Assistant  
+**Date:** February 5, 2026  
+**Files Modified:** 
+- `messages/en.json` ✅ Complete
+- `messages/ar.json` ✅ Complete  
+- `messages/ru.json` ✅ Complete
+- `messages/bn.json` ⚠️ Needs translation
+- `messages/de.json` ⚠️ Needs translation
+- `messages/es.json` ⚠️ Needs translation
+- `messages/fr.json` ⚠️ Needs translation
+- `messages/hi.json` ⚠️ Needs translation
+- `messages/id.json` ⚠️ Needs translation
+- `messages/ja.json` ⚠️ Needs translation
+- `messages/ms.json` ⚠️ Needs translation
+- `messages/nl.json` ⚠️ Needs translation
+- `messages/tr.json` ⚠️ Needs translation
+- `messages/ur.json` ⚠️ Needs translation
+- `messages/zh.json` ⚠️ Needs translation
+
+**Build Status:** ✅ Passing  
+**Total Keys Added:** 211 per language × 15 languages = 3,165 translations
 
