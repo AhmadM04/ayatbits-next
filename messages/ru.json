@@ -78,7 +78,7 @@
     "clearDataClerkInfo": "Чтобы удалить аккаунт:",
     "manageViaClerk": "Настройки аккаунта →",
     "signOutTitle": "Выйти?",
-    "signOutMessage": "Вы уверены, что хотите выйти?"
+    "signOutMessage": "Вы уверены, что хотите выйти? Вам нужно будет войти снова, чтобы продолжить обучение."
   },
   "verse": {
     "ayahNumber": "Аят {number}",

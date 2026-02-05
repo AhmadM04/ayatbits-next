@@ -5,12 +5,16 @@ import { useUser, SignOutButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { LogOut, User, Mail, LayoutDashboard } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 export default function UserProfileSection() {
   const { user, isSignedIn, isLoaded } = useUser();
+  const { t } = useI18n();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
+  const confirmRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isSignedIn && isLoaded) {
@@ -53,16 +57,19 @@ export default function UserProfileSection() {
       if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
         setIsModalOpen(false);
       }
+      if (confirmRef.current && !confirmRef.current.contains(event.target as Node)) {
+        setShowSignOutConfirm(false);
+      }
     };
 
-    if (isModalOpen) {
+    if (isModalOpen || showSignOutConfirm) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isModalOpen]);
+  }, [isModalOpen, showSignOutConfirm]);
   
   if (!user) return null;
 
@@ -83,11 +90,12 @@ export default function UserProfileSection() {
             {userInitial}
           </span>
         </button>
-        <SignOutButton>
-          <button className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
-            <LogOut className="w-3.5 h-3.5" />
-          </button>
-        </SignOutButton>
+        <button 
+          onClick={() => setShowSignOutConfirm(true)}
+          className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+        </button>
       </div>
 
       {/* Profile Modal */}
@@ -131,6 +139,36 @@ export default function UserProfileSection() {
                 <div className="text-xs text-gray-500">View your progress</div>
               </div>
             </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Sign Out Confirmation Dialog */}
+      {showSignOutConfirm && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] animate-in fade-in">
+          <div 
+            ref={confirmRef}
+            className="bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl w-[90%] max-w-md p-6 animate-in zoom-in-95"
+          >
+            <h3 className="text-lg font-semibold text-white mb-2">
+              {t('settings.signOutTitle')}
+            </h3>
+            <p className="text-sm text-gray-400 mb-6">
+              {t('settings.signOutMessage')}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowSignOutConfirm(false)}
+                className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-white font-medium transition-colors"
+              >
+                {t('common.cancel')}
+              </button>
+              <SignOutButton>
+                <button className="flex-1 px-4 py-2.5 rounded-lg bg-red-500/90 hover:bg-red-500 text-white font-medium transition-colors">
+                  {t('common.signOut')}
+                </button>
+              </SignOutButton>
+            </div>
           </div>
         </div>
       )}

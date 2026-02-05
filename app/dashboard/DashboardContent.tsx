@@ -55,6 +55,7 @@ export default function DashboardContent({
 }: DashboardContentProps) {
   const [showHelpMenu, setShowHelpMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const { startTutorial } = useTutorial();
   const { t } = useI18n();
   
@@ -212,14 +213,13 @@ export default function DashboardContent({
               </div>
               
               {/* Logout Button */}
-              <SignOutButton>
-                <button 
-                  className="p-2 hover:bg-white/5 rounded-lg transition-colors text-gray-400 hover:text-red-400"
-                  aria-label="Logout"
-                >
-                  <LogOut className="w-5 h-5" />
-                </button>
-              </SignOutButton>
+              <button 
+                onClick={() => setShowSignOutConfirm(true)}
+                className="p-2 hover:bg-white/5 rounded-lg transition-colors text-gray-400 hover:text-red-400"
+                aria-label="Logout"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
               
               <Link 
                 href="/dashboard/profile" 
@@ -333,14 +333,18 @@ export default function DashboardContent({
                   </button>
 
                   {/* Logout */}
-                  <SignOutButton>
-                    <button className="w-full flex items-center gap-3 p-3 hover:bg-red-500/10 rounded-xl transition-colors text-left group border border-white/5 hover:border-red-500/20">
-                      <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
-                        <LogOut className="w-5 h-5 text-red-400" />
-                      </div>
-                      <span className="text-sm text-white font-medium">Logout</span>
-                    </button>
-                  </SignOutButton>
+                  <button 
+                    onClick={() => {
+                      setShowSignOutConfirm(true);
+                      setShowMobileMenu(false);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 hover:bg-red-500/10 rounded-xl transition-colors text-left group border border-white/5 hover:border-red-500/20"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
+                      <LogOut className="w-5 h-5 text-red-400" />
+                    </div>
+                    <span className="text-sm text-white font-medium">{t('common.signOut')}</span>
+                  </button>
                 </div>
               </div>
             </motion.div>
@@ -463,6 +467,33 @@ export default function DashboardContent({
       <MushafFAB />
 
       <BottomNav />
+
+      {/* Sign Out Confirmation Dialog */}
+      {showSignOutConfirm && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] animate-in fade-in">
+          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl w-[90%] max-w-md p-6 animate-in zoom-in-95">
+            <h3 className="text-lg font-semibold text-white mb-2">
+              {t('settings.signOutTitle')}
+            </h3>
+            <p className="text-sm text-gray-400 mb-6">
+              {t('settings.signOutMessage')}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowSignOutConfirm(false)}
+                className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-white font-medium transition-colors"
+              >
+                {t('common.cancel')}
+              </button>
+              <SignOutButton>
+                <button className="flex-1 px-4 py-2.5 rounded-lg bg-red-500/90 hover:bg-red-500 text-white font-medium transition-colors">
+                  {t('common.signOut')}
+                </button>
+              </SignOutButton>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </TutorialWrapper>
   );
