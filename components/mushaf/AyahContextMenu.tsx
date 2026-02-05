@@ -6,6 +6,7 @@ import { Play, Volume2, Heart, Languages, Share2, X, BookText, Sparkles } from '
 import { useRouter } from 'next/navigation';
 import { MushafVerse } from './AyahRow';
 import { useI18n } from '@/lib/i18n';
+import { useToast } from '@/components/Toast';
 
 interface AyahContextMenuProps {
   verse: MushafVerse | null;
@@ -22,6 +23,7 @@ export default function AyahContextMenu({
 }: AyahContextMenuProps) {
   const { t } = useI18n();
   const router = useRouter();
+  const { showToast } = useToast();
   const menuRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
@@ -275,9 +277,12 @@ export default function AyahContextMenu({
         if (data.requiresPro) {
           setRequiresPro(true);
           setAiError('AI Tafsir is a Pro feature. Upgrade to access.');
+          showToast('🔒 AI Tafsir requires Pro subscription. Upgrade to unlock!', 'warning', 7000);
         } else {
           setAiError(data.error || 'Access denied');
+          showToast(data.error || 'Access denied', 'error', 5000);
         }
+        setShowAiTafsir(true); // Show the error message in the UI
         return;
       }
 

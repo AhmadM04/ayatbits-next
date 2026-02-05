@@ -94,16 +94,16 @@ export default function ConfirmExitModal({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 p-6 pt-0">
+          <div className="flex flex-col sm:flex-row gap-3 p-6 pt-0">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 text-white font-medium transition-colors"
+              className="flex-1 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 text-white font-medium transition-colors whitespace-nowrap"
             >
               {t('puzzle.exitPuzzleCancel')}
             </button>
             <button
               onClick={onConfirm}
-              className="flex-1 px-4 py-3 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 font-medium transition-colors border border-red-500/20"
+              className="flex-1 px-4 py-3 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 font-medium transition-colors border border-red-500/20 whitespace-nowrap"
             >
               {t('puzzle.exitPuzzleConfirm')}
             </button>

@@ -48,6 +48,11 @@ export default async function SurahVersePage({
     .sort({ 'content.ayahNumber': 1 })
     .lean() as any[];
 
+  // Get total puzzles in the entire surah (not just this juz) for accurate total count
+  const totalPuzzlesInSurah = await Puzzle.countDocuments({
+    surahId: surah._id,
+  });
+
   const puzzleIds = puzzles.map((p: any) => p._id);
   const progress = await UserProgress.find({
     userId: dbUser._id,
@@ -158,7 +163,7 @@ export default async function SurahVersePage({
     // Page number fetch failed
   }
 
-  const totalAyahs = puzzles.length;
+  const totalAyahs = totalPuzzlesInSurah;
   const completedAyahs = completedPuzzleIds.size;
   const progressPercentage = totalAyahs > 0 ? (completedAyahs / totalAyahs) * 100 : 0;
 

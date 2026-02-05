@@ -2,8 +2,18 @@
 
 import { createContext, useContext, ReactNode, useMemo, useCallback, useState, useEffect } from 'react';
 
-// English strings
-const EN_MESSAGES: Record<string, Record<string, any>> = {
+// Import JSON translation files
+import enMessages from '@/messages/en.json';
+import arMessages from '@/messages/ar.json';
+import ruMessages from '@/messages/ru.json';
+
+// Use imported JSON files as the source of truth
+const EN_MESSAGES: Record<string, Record<string, any>> = enMessages as any;
+const AR_MESSAGES: Record<string, Record<string, any>> = arMessages as any;
+const RU_MESSAGES: Record<string, Record<string, any>> = ruMessages as any;
+
+// Fallback English strings (kept for backwards compatibility)
+const EN_MESSAGES_FALLBACK: Record<string, Record<string, any>> = {
   common: {
     search: 'Search',
     home: 'Home',
@@ -752,8 +762,10 @@ const EN_MESSAGES: Record<string, Record<string, any>> = {
   },
 };
 
-// Arabic strings
-const AR_MESSAGES: Record<string, Record<string, any>> = {
+// Note: AR_MESSAGES is now imported from JSON file above
+
+// Old hardcoded Arabic strings (kept for reference, not used)
+const AR_MESSAGES_OLD: Record<string, Record<string, any>> = {
   common: {
     search: 'بحث',
     home: 'الرئيسية',
@@ -1502,8 +1514,10 @@ const AR_MESSAGES: Record<string, Record<string, any>> = {
   },
 };
 
-// Russian strings
-const RU_MESSAGES: Record<string, Record<string, any>> = {
+// Note: RU_MESSAGES is now imported from JSON file above
+
+// Old hardcoded Russian strings (kept for reference, not used)
+const RU_MESSAGES_OLD: Record<string, Record<string, any>> = {
   common: {
     search: 'Поиск',
     home: 'Главная',

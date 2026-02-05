@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BookText, Sparkles, X, AlertCircle, Languages, Menu, Globe, Check } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
+import { useToast } from '@/components/Toast';
 
 interface TafseerButtonsProps {
   surahNumber: number;
@@ -73,6 +74,7 @@ export default function TafseerButtons({
 }: TafseerButtonsProps) {
   const { t } = useI18n();
   const router = useRouter();
+  const { showToast } = useToast();
   const [showTafsir, setShowTafsir] = useState(false);
   const [showAiTafsir, setShowAiTafsir] = useState(false);
   const [tafsir, setTafsir] = useState<string | null>(null);
@@ -284,8 +286,10 @@ export default function TafseerButtons({
         if (data.requiresPro) {
           setRequiresPro(true);
           setAiError('AI Tafsir is a Pro feature. Upgrade to access.');
+          showToast('🔒 AI Tafsir requires Pro subscription. Upgrade to unlock!', 'warning', 7000);
         } else {
           setAiError(data.error || 'Access denied');
+          showToast(data.error || 'Access denied', 'error', 5000);
         }
         return;
       }
