@@ -5,12 +5,13 @@ import { Check, Sparkles, Loader2, CreditCard, Shield, Clock, ArrowRight, Gift, 
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { SignedIn, SignedOut, SignUpButton } from '@clerk/nextjs';
+import { SignedIn, SignedOut, SignUpButton, useUser } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n';
 
 export default function PricingContent() {
   const { t } = useI18n();
+  const { user, isLoaded } = useUser();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [checkingAccess, setCheckingAccess] = useState(true);
@@ -34,12 +35,31 @@ export default function PricingContent() {
     setMounted(true);
     // Check for voucher in URL
     const urlVoucher = searchParams.get('voucher');
+    const autoRedeem = searchParams.get('redeem');
     
     if (urlVoucher) {
       setVoucherCode(urlVoucher);
       validateVoucher(urlVoucher);
+      
+      // Auto-redeem if user just signed up (redeem=true in URL)
+      if (autoRedeem === 'true' && isLoaded && user) {
+        // Wait a moment for validation to complete
+        setTimeout(() => {
+          const attemptAutoRedeem = async () => {
+            // Validate first to get voucher data
+            await validateVoucher(urlVoucher);
+            // Then attempt to redeem
+            setTimeout(() => {
+              if (voucherData) {
+                redeemVoucher();
+              }
+            }, 1000);
+          };
+          attemptAutoRedeem();
+        }, 500);
+      }
     }
-  }, []);
+  }, [isLoaded, user]);
   
   const isTrialFlow = mounted ? searchParams.get('trial') === 'true' : false;
   const reason = mounted ? searchParams.get('reason') : null;
@@ -426,7 +446,10 @@ export default function PricingContent() {
                       <p className="text-sm text-blue-300 mb-2">
                         {t('pricing.signInToRedeem')}
                       </p>
-                      <SignUpButton mode="modal">
+                      <SignUpButton 
+                        mode="redirect"
+                        forceRedirectUrl={`/pricing?voucher=${encodeURIComponent(voucherCode)}&redeem=true`}
+                      >
                         <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition-colors">
                           {t('pricing.signInSignUp')}
                         </button>
