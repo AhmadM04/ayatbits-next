@@ -14,16 +14,29 @@ export async function POST(req: NextRequest) {
     // 1. Authenticate user
     const user = await currentUser();
     if (!user) {
+      logger.warn('Voucher redemption attempted without authentication', {
+        route: '/api/vouchers/redeem',
+      });
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
+    logger.info('Voucher redemption started', {
+      userId: user.id,
+      email: user.emailAddresses[0]?.emailAddress,
+      route: '/api/vouchers/redeem',
+    });
+
     const body = await req.json();
     const { code } = body;
 
     if (!code || typeof code !== 'string') {
+      logger.warn('Voucher redemption without code', {
+        userId: user.id,
+        route: '/api/vouchers/redeem',
+      });
       return NextResponse.json(
         { success: false, error: 'Voucher code is required' },
         { status: 400 }
@@ -31,6 +44,12 @@ export async function POST(req: NextRequest) {
     }
 
     const normalizedCode = code.toUpperCase().trim();
+    
+    logger.info('Processing voucher code', {
+      userId: user.id,
+      code: normalizedCode,
+      route: '/api/vouchers/redeem',
+    });
 
     await connectDB();
 
@@ -89,11 +108,27 @@ export async function POST(req: NextRequest) {
     const voucher = await Voucher.findOne({ code: normalizedCode });
 
     if (!voucher) {
+      logger.warn('Invalid voucher code attempted', {
+        userId: user.id,
+        code: normalizedCode,
+        route: '/api/vouchers/redeem',
+      });
       return NextResponse.json({
         success: false,
         error: 'Invalid voucher code',
       });
     }
+
+    logger.info('Voucher found', {
+      userId: user.id,
+      voucherCode: voucher.code,
+      voucherTier: voucher.tier,
+      voucherDuration: voucher.duration,
+      isActive: voucher.isActive,
+      redemptionCount: voucher.redemptionCount,
+      maxRedemptions: voucher.maxRedemptions,
+      route: '/api/vouchers/redeem',
+    });
 
     if (!voucher.isActive) {
       return NextResponse.json({
@@ -133,6 +168,17 @@ export async function POST(req: NextRequest) {
     const now = new Date();
     const endDate = addMonths(now, voucher.duration);
 
+    logger.info('Updating user subscription', {
+      userId: user.id,
+      dbUserId: dbUser._id.toString(),
+      currentStatus: dbUser.subscriptionStatus,
+      currentTier: dbUser.subscriptionTier,
+      newStatus: SubscriptionStatusEnum.ACTIVE,
+      newTier: voucher.tier,
+      newEndDate: endDate.toISOString(),
+      route: '/api/vouchers/redeem',
+    });
+
     const updatedUser = await User.findByIdAndUpdate(
       dbUser._id, 
       {
@@ -154,6 +200,7 @@ export async function POST(req: NextRequest) {
       logger.error('Failed to update user after voucher redemption', undefined, {
         userId: dbUser._id.toString(),
         voucherCode: voucher.code,
+        route: '/api/vouchers/redeem',
       });
       return NextResponse.json(
         { success: false, error: 'Failed to update user subscription' },
@@ -164,9 +211,14 @@ export async function POST(req: NextRequest) {
     // Log the update for debugging
     logger.info('User subscription updated successfully', {
       userId: user.id,
+      dbUserId: updatedUser._id.toString(),
+      email: updatedUser.email,
       newStatus: updatedUser.subscriptionStatus,
       newTier: updatedUser.subscriptionTier,
-      newEndDate: updatedUser.subscriptionEndDate?.toString(),
+      newPlan: updatedUser.subscriptionPlan,
+      newEndDate: updatedUser.subscriptionEndDate?.toISOString(),
+      hasDirectAccess: updatedUser.hasDirectAccess,
+      route: '/api/vouchers/redeem',
     });
 
     // 6. Increment voucher redemption count
@@ -198,6 +250,15 @@ export async function POST(req: NextRequest) {
         tier: voucher.tier,
         duration: voucher.duration,
         expiresAt: endDate,
+      },
+      // Tell client to refresh access check
+      shouldRefreshAccess: true,
+    }, {
+      headers: {
+        // Prevent caching of this response
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
       },
     });
   } catch (error: any) {

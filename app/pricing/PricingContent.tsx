@@ -178,6 +178,12 @@ export default function PricingContent() {
       if (data.success) {
         alert(t('pricing.voucherRedeemed', { tier: data.granted.tier, duration: data.granted.duration }));
         
+        // Redirect to dashboard after successful redemption
+        // Use window.location to force a full page reload and clear any cached state
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 1500);
+        
         // Force re-check access immediately with cache busting
         setCheckingAccess(true);
         setHasAccess(null); // Reset to trigger re-check

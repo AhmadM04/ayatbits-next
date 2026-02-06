@@ -17,6 +17,12 @@ function isAdminEmail(email?: string | null): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  // Log ALL webhook attempts for debugging
+  logger.info('Clerk webhook received', {
+    route: '/api/webhook/clerk',
+    timestamp: new Date().toISOString(),
+  });
+
   if (!webhookSecret) {
     logger.error('Missing CLERK_WEBHOOK_SECRET environment variable', undefined, {
       route: '/api/webhook/clerk',
@@ -72,6 +78,14 @@ export async function POST(request: NextRequest) {
 
     // Handle the webhook event
     const eventType = evt.type;
+
+    // Log every event type received for debugging
+    logger.info('Clerk webhook event type received', {
+      eventType,
+      eventId: evt.id,
+      route: '/api/webhook/clerk',
+      timestamp: new Date().toISOString(),
+    });
 
     if (eventType === 'user.created') {
       const { id, email_addresses, first_name, last_name, image_url } = evt.data;
