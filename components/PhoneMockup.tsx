@@ -9,9 +9,9 @@ export function PhoneMockup({ imageSrc, alt }: PhoneMockupProps) {
   return (
     <div className="relative mx-auto" style={{ width: '300px', height: '650px' }}>
       {/* iPhone 14 Pro Max Frame */}
-      <div className="absolute inset-0 rounded-[3.5rem] border-[14px] border-gray-900 bg-gray-900 shadow-2xl">
+      <div className="absolute inset-0 rounded-[3.5rem] border-[10px] border-gray-900 bg-gray-900 shadow-2xl">
         {/* Screen - no notch overlay since screenshots already include the phone UI */}
-        <div className="relative w-full h-full bg-black rounded-[2.8rem] overflow-hidden">
+        <div className="relative w-full h-full bg-black rounded-[3rem] overflow-hidden">
           <Image
             src={imageSrc}
             alt={alt}
