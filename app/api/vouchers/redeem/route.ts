@@ -11,9 +11,17 @@ function addMonths(base: Date, months: number) {
 
 export async function POST(req: NextRequest) {
   try {
+    console.log('[voucher-redeem] ========== REDEMPTION STARTED ==========');
+    
     // 1. Authenticate user
     const user = await currentUser();
+    console.log('[voucher-redeem] User authenticated:', {
+      userId: user?.id,
+      email: user?.emailAddresses[0]?.emailAddress,
+    });
+    
     if (!user) {
+      console.log('[voucher-redeem] ❌ No user - unauthorized');
       logger.warn('Voucher redemption attempted without authentication', {
         route: '/api/vouchers/redeem',
       });
@@ -31,8 +39,10 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const { code } = body;
+    console.log('[voucher-redeem] Request body:', { code });
 
     if (!code || typeof code !== 'string') {
+      console.log('[voucher-redeem] ❌ Invalid code:', code);
       logger.warn('Voucher redemption without code', {
         userId: user.id,
         route: '/api/vouchers/redeem',
@@ -44,6 +54,7 @@ export async function POST(req: NextRequest) {
     }
 
     const normalizedCode = code.toUpperCase().trim();
+    console.log('[voucher-redeem] Normalized code:', normalizedCode);
     
     logger.info('Processing voucher code', {
       userId: user.id,
@@ -52,9 +63,15 @@ export async function POST(req: NextRequest) {
     });
 
     await connectDB();
+    console.log('[voucher-redeem] ✅ Database connected');
 
     // 2. Find or create user
     let dbUser = await User.findOne({ clerkIds: user.id });
+    console.log('[voucher-redeem] DB user lookup:', {
+      found: !!dbUser,
+      userId: dbUser?._id?.toString(),
+      email: dbUser?.email,
+    });
     
     if (!dbUser) {
       // User not found by clerkId, try by email
@@ -106,8 +123,14 @@ export async function POST(req: NextRequest) {
 
     // 3. Find and validate voucher (with lock for concurrent safety)
     const voucher = await Voucher.findOne({ code: normalizedCode });
+    console.log('[voucher-redeem] Voucher lookup:', {
+      found: !!voucher,
+      code: voucher?.code,
+      isActive: voucher?.isActive,
+    });
 
     if (!voucher) {
+      console.log('[voucher-redeem] ❌ Voucher not found:', normalizedCode);
       logger.warn('Invalid voucher code attempted', {
         userId: user.id,
         code: normalizedCode,
@@ -179,6 +202,16 @@ export async function POST(req: NextRequest) {
       route: '/api/vouchers/redeem',
     });
 
+    console.log('[voucher-redeem] 🔄 About to update user subscription:', {
+      dbUserId: dbUser._id.toString(),
+      updates: {
+        subscriptionStatus: SubscriptionStatusEnum.ACTIVE,
+        subscriptionPlan: voucher.duration >= 12 ? 'yearly' : 'monthly',
+        subscriptionTier: voucher.tier,
+        subscriptionEndDate: endDate,
+      },
+    });
+
     const updatedUser = await User.findByIdAndUpdate(
       dbUser._id, 
       {
@@ -197,6 +230,7 @@ export async function POST(req: NextRequest) {
     );
 
     if (!updatedUser) {
+      console.log('[voucher-redeem] ❌ Failed to update user - updatedUser is null');
       logger.error('Failed to update user after voucher redemption', undefined, {
         userId: dbUser._id.toString(),
         voucherCode: voucher.code,
@@ -207,6 +241,13 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    console.log('[voucher-redeem] ✅ User updated successfully:', {
+      subscriptionStatus: updatedUser.subscriptionStatus,
+      subscriptionTier: updatedUser.subscriptionTier,
+      subscriptionPlan: updatedUser.subscriptionPlan,
+      subscriptionEndDate: updatedUser.subscriptionEndDate?.toISOString(),
+    });
 
     // Log the update for debugging
     logger.info('User subscription updated successfully', {
@@ -243,6 +284,14 @@ export async function POST(req: NextRequest) {
       duration: voucher.duration,
     });
 
+    console.log('[voucher-redeem] ========== ✅ SUCCESS ✅ ==========');
+    console.log('[voucher-redeem] Voucher redeemed successfully!', {
+      code: voucher.code,
+      tier: voucher.tier,
+      duration: voucher.duration,
+      expiresAt: endDate.toISOString(),
+    });
+
     return NextResponse.json({
       success: true,
       message: 'Voucher redeemed successfully!',
@@ -262,6 +311,13 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error: any) {
+    console.error('[voucher-redeem] ========== ❌ ERROR ❌ ==========');
+    console.error('[voucher-redeem] Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+    });
+    
     logger.error('Voucher redemption error', error, {
       route: '/api/vouchers/redeem',
     });

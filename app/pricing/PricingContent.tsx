@@ -176,18 +176,26 @@ export default function PricingContent() {
   const redeemVoucher = async () => {
     if (!voucherData) return;
 
+    console.log('[PricingContent] ========== REDEEMING VOUCHER ==========');
+    console.log('[PricingContent] Voucher code:', voucherCode);
+    console.log('[PricingContent] User:', user?.id, user?.primaryEmailAddress?.emailAddress);
+
     setRedeemingVoucher(true);
 
     try {
+      console.log('[PricingContent] Sending redemption request...');
       const response = await fetch('/api/vouchers/redeem', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: voucherCode }),
       });
 
+      console.log('[PricingContent] Response status:', response.status, response.statusText);
       const data = await response.json();
+      console.log('[PricingContent] Response data:', data);
 
       if (data.success) {
+        console.log('[PricingContent] ✅ Redemption successful!');
         alert(t('pricing.voucherRedeemed', { tier: data.granted.tier, duration: data.granted.duration }));
         
         // Redirect to dashboard after successful redemption
@@ -227,12 +235,15 @@ export default function PricingContent() {
           }
         }, 500);
       } else {
-        console.error('[PricingContent] Redemption failed:', data.error);
+        console.error('[PricingContent] ❌ Redemption failed!');
+        console.error('[PricingContent] Error:', data.error);
+        console.error('[PricingContent] Full response:', data);
         alert(data.error || t('pricing.voucherRedemptionFailed'));
         setRedeemingVoucher(false);
       }
     } catch (error) {
-      console.error('[PricingContent] Redemption error:', error);
+      console.error('[PricingContent] ❌ Redemption exception!');
+      console.error('[PricingContent] Exception details:', error);
       alert(t('pricing.voucherRedemptionFailed'));
       setRedeemingVoucher(false);
     }
