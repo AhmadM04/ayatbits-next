@@ -78,6 +78,18 @@ export default function PricingContent() {
     
     const checkAccess = async () => {
       try {
+        // First, ensure user exists in database (fixes users who registered before webhook was fixed)
+        try {
+          await fetch('/api/user/sync-from-clerk', {
+            method: 'POST',
+            cache: 'no-store',
+          });
+          // Don't block on sync - continue to access check
+        } catch (syncError) {
+          console.error('[PricingContent] User sync failed (non-blocking):', syncError);
+          // Continue anyway - access check will handle missing user
+        }
+        
         const response = await fetch('/api/check-access', {
           cache: 'no-store',
           headers: { 'Cache-Control': 'no-cache' },
