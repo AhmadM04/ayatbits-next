@@ -13,6 +13,7 @@ import DemoPuzzle from "@/components/DemoPuzzle";
 import { QuranLoader } from "@/components/animations";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useI18n } from "@/lib/i18n";
+import { PhoneMockup } from "@/components/PhoneMockup";
 
 // Floating Arabic letters/words for the background - Names of Allah (Asma ul Husna)
 const floatingArabicWords = [
@@ -569,6 +570,130 @@ export default function Home() {
               >
                 <DemoPuzzle />
               </motion.div>
+            </section>
+
+            {/* How It Works Section */}
+            <section className="py-20 border-t border-white/5">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-center mb-16"
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm mb-6">
+                  <Sparkles className="w-4 h-4" />
+                  <span>{t('landing.howItWorks')}</span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                  {t('landing.howItWorksTitle')}
+                </h2>
+                <p className="text-gray-400 max-w-xl mx-auto">
+                  {t('landing.howItWorksSubtitle')}
+                </p>
+              </motion.div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 max-w-7xl mx-auto">
+                {/* Step 1: Read Ayah */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                  className="flex flex-col items-center text-center"
+                >
+                  <PhoneMockup 
+                    imageSrc="/screenshots/fullayahview-english.png"
+                    alt="Read Ayah Screen"
+                  />
+                  <div className="mt-6">
+                    <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 text-green-400 font-bold mb-3 text-lg">
+                      1
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">
+                      {t('landing.step1Title')}
+                    </h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      {t('landing.step1Description')}
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Step 2: Solve Puzzle */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="flex flex-col items-center text-center"
+                >
+                  <PhoneMockup 
+                    imageSrc="/screenshots/wordpuzzleview-english.png"
+                    alt="Solve Puzzle Screen"
+                  />
+                  <div className="mt-6">
+                    <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 text-green-400 font-bold mb-3 text-lg">
+                      2
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">
+                      {t('landing.step2Title')}
+                    </h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      {t('landing.step2Description')}
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Step 3: Save Favorites */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  className="flex flex-col items-center text-center"
+                >
+                  <PhoneMockup 
+                    imageSrc="/screenshots/likedayahview-english.png"
+                    alt="Liked Ayahs Screen"
+                  />
+                  <div className="mt-6">
+                    <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 text-green-400 font-bold mb-3 text-lg">
+                      3
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">
+                      {t('landing.step3Title')}
+                    </h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      {t('landing.step3Description')}
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Step 4: Track Progress */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  className="flex flex-col items-center text-center"
+                >
+                  <PhoneMockup 
+                    imageSrc="/screenshots/trophiesview-english.png"
+                    alt="Achievements Screen"
+                  />
+                  <div className="mt-6">
+                    <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 text-green-400 font-bold mb-3 text-lg">
+                      4
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">
+                      {t('landing.step4Title')}
+                    </h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      {t('landing.step4Description')}
+                    </p>
+                  </div>
+                </motion.div>
+              </div>
             </section>
 
             {/* Pricing Section */}

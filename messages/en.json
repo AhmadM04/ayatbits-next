@@ -479,7 +479,18 @@
     "securePayment": "7-day free trial • Cancel anytime • Secure payment via Stripe",
     "ramadanSpecial": "Ramadan Special",
     "ramadanOffer": "Get free Pro access with voucher code",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "howItWorks": "How It Works",
+    "howItWorksTitle": "Simple, Engaging, Effective",
+    "howItWorksSubtitle": "Master the Quran in four simple steps",
+    "step1Title": "Read the Ayah",
+    "step1Description": "Read the Arabic text with translation and transliteration to understand the meaning",
+    "step2Title": "Solve the Puzzle",
+    "step2Description": "Arrange the scrambled words to reconstruct the verse and reinforce your memory",
+    "step3Title": "Save Your Favorites",
+    "step3Description": "Like ayahs that resonate with you and access them anytime from your collection",
+    "step4Title": "Track Your Progress",
+    "step4Description": "Unlock achievements, maintain streaks, and celebrate your learning milestones"
   },
   "waitlist": {
     "firstName": "Enter your first name",
