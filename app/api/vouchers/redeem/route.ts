@@ -34,13 +34,55 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
 
-    // 2. Find user
-    const dbUser = await User.findOne({ clerkIds: user.id });
+    // 2. Find or create user
+    let dbUser = await User.findOne({ clerkIds: user.id });
+    
     if (!dbUser) {
-      return NextResponse.json(
-        { success: false, error: 'User not found' },
-        { status: 404 }
-      );
+      // User not found by clerkId, try by email
+      const email = user.emailAddresses[0]?.emailAddress;
+      const emailLower = email?.toLowerCase();
+      
+      if (!emailLower) {
+        return NextResponse.json(
+          { success: false, error: 'Email address is required' },
+          { status: 400 }
+        );
+      }
+      
+      // Check if user exists with this email
+      dbUser = await User.findOne({ 
+        email: { $regex: new RegExp(`^${emailLower}$`, 'i') } 
+      });
+      
+      if (dbUser) {
+        // Merge: Add clerkId to existing user
+        if (!dbUser.clerkIds) {
+          dbUser.clerkIds = [];
+        }
+        if (!dbUser.clerkIds.includes(user.id)) {
+          dbUser.clerkIds.push(user.id);
+          await dbUser.save();
+          logger.info('Added clerkId to existing user during voucher redemption', {
+            userId: user.id,
+            email: emailLower,
+          });
+        }
+      } else {
+        // Create new user (webhook might have failed)
+        dbUser = await User.create({
+          clerkIds: [user.id],
+          email: emailLower,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          name: user.fullName,
+          imageUrl: user.imageUrl,
+        });
+        
+        logger.info('User created during voucher redemption (webhook fallback)', {
+          userId: user.id,
+          email: emailLower,
+        });
+      }
     }
 
     // 3. Find and validate voucher (with lock for concurrent safety)
