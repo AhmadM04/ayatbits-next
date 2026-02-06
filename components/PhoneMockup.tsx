@@ -16,7 +16,7 @@ export function PhoneMockup({ imageSrc, alt }: PhoneMockupProps) {
             src={imageSrc}
             alt={alt}
             fill
-            className="object-cover object-top"
+            className="object-contain"
             sizes="300px"
           />
         </div>
