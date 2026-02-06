@@ -25,6 +25,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/waitlist/(.*)', // Allow waitlist API to be public
   '/api/check-access', // Allow check-access to handle its own auth (returns 401 if not authenticated)
   '/api/user/onboarding', // Allow onboarding API to be accessible
+  '/api/vouchers/validate', // Allow voucher validation to be public (anyone can check if a voucher is valid)
 ]);
 
 // Routes that should skip onboarding check (to avoid redirect loops)
