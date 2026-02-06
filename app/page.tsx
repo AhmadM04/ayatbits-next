@@ -11,7 +11,6 @@ import { Suspense, useEffect, useState } from "react";
 import UserProfileSection from "@/components/UserProfileSection";
 import DemoPuzzle from "@/components/DemoPuzzle";
 import { QuranLoader } from "@/components/animations";
-import WaitlistForm from "@/components/WaitlistForm";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useI18n } from "@/lib/i18n";
 
@@ -335,45 +334,41 @@ export default function Home() {
                   {t('landing.heroDescription')}
                 </p>
 
-                {/* Waitlist Section - Prominent Hero CTA */}
+                {/* Hero Banner with CTAs */}
                 <div className="max-w-2xl mx-auto">
                   <SignedOut>
-                    {/* Waitlist Form */}
-                    <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
-                      <div className="text-center mb-6">
-                        <h3 className="text-xl font-semibold text-white mb-2">
-                          {t('landing.waitlistTitle')}
-                        </h3>
-                        <p className="text-sm text-gray-400">
-                          {t('landing.waitlistDescription')}
-                        </p>
+                    {/* Call to Action for Non-signed in Users */}
+                    <div className="flex flex-col items-center gap-6">
+                      <SignUpButton mode="modal">
+                        <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-12 py-6 text-xl rounded-xl shadow-lg shadow-green-600/25 font-semibold min-h-[60px]">
+                          {t('landing.getStarted')}
+                          <Flame className="w-6 h-6 ml-2" />
+                        </Button>
+                      </SignUpButton>
+                      
+                      <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
+                        <span>{t('landing.alreadyHaveAccount')}</span>
+                        <SignInButton mode="modal">
+                          <button className="text-green-400 hover:text-green-300 underline font-medium">
+                            {t('landing.signIn')}
+                          </button>
+                        </SignInButton>
                       </div>
                       
-                      <WaitlistForm source="hero-banner" />
-                      
-                      <div className="mt-6 flex flex-wrap justify-center gap-4 text-xs text-gray-500">
+                      <div className="flex flex-wrap justify-center gap-6 text-xs text-gray-500">
                         <div className="flex items-center gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                          <span>{t('landing.freeToJoin')}</span>
+                          <span>{t('landing.trialIncluded')}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                          <span>{t('landing.earlyAccessPerks')}</span>
+                          <span>{t('landing.noCreditCard')}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                          <span>{t('landing.launchUpdates')}</span>
+                          <span>{t('landing.startImmediately')}</span>
                         </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-center gap-4 text-sm text-gray-500 mt-6">
-                      <span>{t('landing.alreadyHaveAccount')}</span>
-                      <SignInButton mode="modal">
-                        <button className="text-green-400 hover:text-green-300 underline">
-                          {t('landing.signIn')}
-                        </button>
-                      </SignInButton>
                     </div>
                   </SignedOut>
 
@@ -381,7 +376,7 @@ export default function Home() {
                   <SignedIn>
                     <DashboardButton 
                       t={t}
-                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-5 text-lg rounded-xl shadow-lg shadow-green-600/25 min-h-[56px]"
+                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-12 py-6 text-xl rounded-xl shadow-lg shadow-green-600/25 font-semibold min-h-[60px]"
                     />
                   </SignedIn>
                 </div>
@@ -800,13 +795,18 @@ export default function Home() {
                   {/* Primary CTA */}
                   <SignedOut>
                     <div className="mb-8">
-                      <WaitlistForm source="final-cta" />
+                      <SignUpButton mode="modal">
+                        <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-12 py-6 text-xl rounded-xl shadow-xl shadow-green-600/30 font-semibold min-h-[60px]">
+                          {t('landing.getStarted')}
+                          <Flame className="w-6 h-6 ml-2" />
+                        </Button>
+                      </SignUpButton>
                     </div>
                     
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
                       <div className="flex items-center gap-2 text-sm text-gray-400">
                         <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        <span>{t('landing.freeToJoin')}</span>
+                        <span>{t('landing.trialIncluded')}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-400">
                         <CheckCircle2 className="w-4 h-4 text-green-500" />
@@ -816,6 +816,15 @@ export default function Home() {
                         <CheckCircle2 className="w-4 h-4 text-green-500" />
                         <span>{t('landing.startImmediately')}</span>
                       </div>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
+                      <span>{t('landing.alreadyHaveAccount')}</span>
+                      <SignInButton mode="modal">
+                        <button className="text-green-400 hover:text-green-300 underline font-medium">
+                          {t('landing.signIn')}
+                        </button>
+                      </SignInButton>
                     </div>
                   </SignedOut>
 
@@ -844,7 +853,6 @@ export default function Home() {
                   />
                 </Link>
               <div className="flex gap-6 text-sm text-gray-500">
-                <Link href="/waitlist" className="hover:text-white transition-colors">{t('landing.waitlistLink')}</Link>
                 <Link href="/terms" className="hover:text-white transition-colors">{t('landing.termsLink')}</Link>
                 <Link href="/faq" className="hover:text-white transition-colors">{t('landing.faqLink')}</Link>
                 <Link href="/pricing" className="hover:text-white transition-colors">{t('landing.pricingLink')}</Link>

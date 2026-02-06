@@ -174,7 +174,12 @@ export default function PricingContent() {
 
   // Redeem voucher
   const redeemVoucher = async () => {
-    if (!voucherData) return;
+    console.log('[PricingContent] 🔴 redeemVoucher called! voucherData:', voucherData);
+    
+    if (!voucherData) {
+      console.log('[PricingContent] ❌ No voucher data, aborting');
+      return;
+    }
 
     console.log('[PricingContent] ========== REDEEMING VOUCHER ==========');
     console.log('[PricingContent] Voucher code:', voucherCode);

@@ -112,58 +112,15 @@ export function TutorialOverlay({
   const placement = step.placement || 'bottom';
   const offset = step.offset || {};
 
-  // Calculate tooltip position with viewport bounds checking
+  // Calculate tooltip position - centered on screen for better mobile experience
   const getTooltipPosition = () => {
-    const baseOffset = 48; // Gap between target and tooltip (increased for better spacing)
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const isMobile = viewportWidth < 768;
-    const tooltipWidth = isMobile ? Math.min(viewportWidth * 0.9, 340) : 384; // max-w-sm = 24rem = 384px
     
-    let left = targetRect.left + targetRect.width / 2;
-    let top = targetRect.top;
-    let transform = 'translate(-50%, -100%)';
-    
-    switch (placement) {
-      case 'top':
-        top = targetRect.top - baseOffset;
-        transform = 'translate(-50%, -100%)';
-        break;
-      case 'bottom':
-        top = targetRect.bottom + baseOffset;
-        transform = 'translate(-50%, 0)';
-        break;
-      case 'left':
-        left = targetRect.left - baseOffset;
-        top = targetRect.top + targetRect.height / 2;
-        transform = 'translate(-100%, -50%)';
-        break;
-      case 'right':
-        left = targetRect.right + baseOffset;
-        top = targetRect.top + targetRect.height / 2;
-        transform = 'translate(0, -50%)';
-        break;
-    }
-    
-    // Keep tooltip within viewport bounds with better mobile handling
-    const horizontalPadding = isMobile ? 20 : 40;
-    const minLeft = tooltipWidth / 2 + horizontalPadding;
-    const maxLeft = viewportWidth - tooltipWidth / 2 - horizontalPadding;
-    
-    if (left < minLeft) {
-      left = minLeft;
-    } else if (left > maxLeft) {
-      left = maxLeft;
-    }
-    
-    // On mobile, ensure tooltip doesn't go off-screen vertically
-    const verticalPadding = isMobile ? 80 : 20;
-    if (top < verticalPadding) {
-      top = verticalPadding;
-      transform = transform.replace('-100%', '0');
-    } else if (top > viewportHeight - 250) {
-      top = Math.max(verticalPadding, viewportHeight - 250);
-    }
+    // Center the tooltip on screen both horizontally and vertically
+    const left = viewportWidth / 2;
+    const top = viewportHeight / 2;
+    const transform = 'translate(-50%, -50%)';
     
     return { left, top, transform };
   };
