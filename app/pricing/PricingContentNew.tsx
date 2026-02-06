@@ -57,9 +57,16 @@ export default function PricingContent() {
   const isTrialFlow = mounted ? searchParams.get('trial') === 'true' : false;
   const reason = mounted ? searchParams.get('reason') : null;
 
-  // Check access
+  // Check access (only for authenticated users)
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !isLoaded) return;
+    
+    // If user is not authenticated, skip access check
+    if (!user) {
+      setHasAccess(false);
+      setCheckingAccess(false);
+      return;
+    }
     
     const checkAccess = async () => {
       try {
@@ -89,7 +96,7 @@ export default function PricingContent() {
     }, 2000);
 
     return () => clearInterval(pollInterval);
-  }, [mounted, hasAccess, router]);
+  }, [mounted, isLoaded, user, hasAccess, router]);
 
   // Validate voucher
   const validateVoucher = async (code: string) => {
@@ -110,15 +117,24 @@ export default function PricingContent() {
         body: JSON.stringify({ code: code.trim() }),
       });
 
+      if (!response.ok) {
+        console.error('[PricingContentNew] Voucher validation failed:', response.status, response.statusText);
+        setVoucherError('Failed to validate voucher');
+        return;
+      }
+
       const data = await response.json();
 
       if (data.valid) {
+        console.log('[PricingContentNew] Voucher validated successfully:', data.voucher);
         setVoucherData(data.voucher);
         setSelectedTier(data.voucher.tier);
       } else {
+        console.log('[PricingContentNew] Voucher validation failed:', data.error);
         setVoucherError(data.error || 'Invalid voucher code');
       }
     } catch (error) {
+      console.error('[PricingContentNew] Voucher validation error:', error);
       setVoucherError('Failed to validate voucher');
     } finally {
       setValidatingVoucher(false);

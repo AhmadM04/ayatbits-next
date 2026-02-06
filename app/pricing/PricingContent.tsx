@@ -65,9 +65,16 @@ export default function PricingContent() {
   const reason = mounted ? searchParams.get('reason') : null;
   const isProcessingPayment = mounted ? searchParams.get('success') === 'true' : false;
 
-  // Check access
+  // Check access (only for authenticated users)
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !isLoaded) return;
+    
+    // If user is not authenticated, skip access check
+    if (!user) {
+      setHasAccess(false);
+      setCheckingAccess(false);
+      return;
+    }
     
     const checkAccess = async () => {
       try {
@@ -108,7 +115,7 @@ export default function PricingContent() {
     return () => {
       clearInterval(pollInterval);
     };
-  }, [mounted, hasAccess, router]);
+  }, [mounted, isLoaded, user, hasAccess, router]);
 
   // Validate voucher
   const validateVoucher = async (code: string) => {
@@ -129,15 +136,24 @@ export default function PricingContent() {
         body: JSON.stringify({ code: code.trim() }),
       });
 
+      if (!response.ok) {
+        console.error('[PricingContent] Voucher validation failed:', response.status, response.statusText);
+        setVoucherError(t('pricing.voucherValidationFailed'));
+        return;
+      }
+
       const data = await response.json();
 
       if (data.valid) {
+        console.log('[PricingContent] Voucher validated successfully:', data.voucher);
         setVoucherData(data.voucher);
         setSelectedTier(data.voucher.tier);
       } else {
+        console.log('[PricingContent] Voucher validation failed:', data.error);
         setVoucherError(data.error || t('pricing.invalidVoucher'));
       }
     } catch (error) {
+      console.error('[PricingContent] Voucher validation error:', error);
       setVoucherError(t('pricing.voucherValidationFailed'));
     } finally {
       setValidatingVoucher(false);
