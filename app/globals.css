@@ -22,8 +22,8 @@
   --blue-primary: #3b82f6;
   --blue-soft: #dbeafe;
   
-  --purple-primary: #a855f7;
-  --purple-soft: #f3e8ff;
+  --blue-primary: #3b82f6;
+  --blue-soft: #dbeafe;
   
   --orange-primary: #f97316;
   --orange-soft: #ffedd5;
@@ -62,7 +62,7 @@
   /* Dark mode color adjustments */
   --green-soft: #14532d;
   --blue-soft: #1e3a5f;
-  --purple-soft: #3b0764;
+  --blue-soft: #1e3a5f;
   --orange-soft: #431407;
   --red-soft: #450a0a;
   --yellow-soft: #422006;
@@ -85,8 +85,8 @@
   --color-green-dark: var(--green-dark);
   --color-blue-primary: var(--blue-primary);
   --color-blue-soft: var(--blue-soft);
-  --color-purple-primary: var(--purple-primary);
-  --color-purple-soft: var(--purple-soft);
+  --color-blue-primary: var(--blue-primary);
+  --color-blue-soft: var(--blue-soft);
   --color-orange-primary: var(--orange-primary);
   --color-orange-soft: var(--orange-soft);
   --color-red-primary: var(--red-primary);

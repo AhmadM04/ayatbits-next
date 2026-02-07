@@ -21,8 +21,8 @@ export default function BillingSection({ user, stats }: BillingSectionProps) {
   return (
     <div className="bg-[#111] border border-white/10 rounded-2xl p-6 transition-colors hover:border-white/20">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-purple-500/20 rounded-xl border border-purple-500/30">
-          <CreditCard className="w-6 h-6 text-purple-400" />
+        <div className="p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
+          <CreditCard className="w-6 h-6 text-blue-400" />
         </div>
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-white">{t('tutorial.subscriptionBilling')}</h3>

@@ -45,7 +45,8 @@
     "hide": "Hide Transliteration",
     "label": "Transliteration",
     "loading": "Loading transliteration...",
-    "notAvailable": "Transliteration not available"
+    "notAvailable": "Transliteration not available",
+    "title": "Transliteration"
   },
   "harakat": {
     "guide": "Harakat Guide",
@@ -131,7 +132,9 @@
     "englishTranslation": "Translation",
     "verseOfTheDay": "Verse of the Day",
     "playRecitation": "Play recitation",
-    "openAyah": "Open ayah"
+    "openAyah": "Open ayah",
+    "surahAyahFormat": "Surah {surah}, Ayah {ayah}",
+    "pageJuzFormat": "Page {page} • Juz {juz}"
   },
   "dashboard": {
     "welcome": "Welcome back, {name}!",
@@ -160,7 +163,8 @@
     "overallProgress": "Overall Progress",
     "ayahsCompleted": "ayahs completed",
     "juzCompleted": "Juz {number} Completed!",
-    "backToJuz": "Back to Juz {number}"
+    "backToJuz": "Back to Juz {number}",
+    "juzProgressHeader": "Juz {number} • {completed}/{total} completed"
   },
   "profile": {
     "title": "Profile",
@@ -683,7 +687,12 @@
     "likeAyah": "Like Ayah",
     "copyText": "Copy Text",
     "surah": "Surah",
-    "swipeInstruction": "Swipe left/right or use arrows to navigate • Long press ayah for options"
+    "swipeInstruction": "Swipe left/right or use arrows to navigate • Long press ayah for options",
+    "tafsir": "Tafsir",
+    "aiTafsir": "AI Tafsir",
+    "aiTafsirPro": "AI Tafsir (Pro)",
+    "aiTafsirRequiresPro": "🔒 AI Tafsir requires Pro subscription. Upgrade to unlock!",
+    "wordByWordAudioRequiresPro": "Word-by-word audio is only available for Pro subscribers. Upgrade to Pro to access this feature."
   },
   "onboarding": {
     "title": "Welcome to AyatBits!",

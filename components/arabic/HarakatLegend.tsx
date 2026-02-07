@@ -27,8 +27,8 @@ export default function HarakatLegend({
         <motion.button
           onClick={() => setIsExpanded(true)}
           className="fixed bottom-24 left-4 z-40 w-12 h-12 rounded-full 
-                     bg-gradient-to-br from-purple-600 to-indigo-600 
-                     shadow-lg shadow-purple-500/25 
+                     bg-gradient-to-br from-blue-600 to-indigo-600 
+                     shadow-lg shadow-blue-500/25 
                      flex items-center justify-center
                      hover:scale-105 transition-transform"
           whileTap={{ scale: 0.95 }}
@@ -108,7 +108,7 @@ export default function HarakatLegend({
                    hover:bg-white/[0.02] transition-colors"
       >
         <div className="flex items-center gap-2">
-          <HelpCircle className="w-4 h-4 text-purple-400" />
+          <HelpCircle className="w-4 h-4 text-blue-400" />
           <span className="text-sm font-medium text-gray-300">
             {t('harakat.guide')}
           </span>

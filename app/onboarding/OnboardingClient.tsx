@@ -7,6 +7,7 @@ import { ArrowRight, ArrowLeft, Check, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useI18n } from '@/lib/i18n';
+import type { Locale } from '@/lib/i18n-config';
 import { useToast } from '@/components/Toast';
 
 interface OnboardingClientProps {
@@ -81,7 +82,7 @@ export default function OnboardingClient({
     { value: '55_plus', label: t('onboarding.age55plus') },
   ];
 
-  const languageOptions = [
+  const languageOptions: { value: Locale; label: string; nativeName: string }[] = [
     { value: 'en', label: 'English', nativeName: 'English' },
     { value: 'ar', label: 'Arabic', nativeName: 'العربية' },
     { value: 'ru', label: 'Russian', nativeName: 'Русский' },
@@ -165,7 +166,7 @@ export default function OnboardingClient({
     }
   };
 
-  const handleLanguageSelect = (lang: string) => {
+  const handleLanguageSelect = (lang: Locale) => {
     setFormData({ ...formData, preferredLanguage: lang });
     setLocale(lang);
   };

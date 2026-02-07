@@ -54,8 +54,8 @@ export default function BillingContent({ user }: BillingContentProps) {
 
         <div className="bg-[#111] border border-white/10 rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-purple-500/20 rounded-xl">
-              <Crown className="w-6 h-6 text-purple-400" />
+            <div className="p-3 bg-blue-500/20 rounded-xl">
+              <Crown className="w-6 h-6 text-blue-400" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-white">{t('billing.adminAccount')}</h3>
@@ -87,7 +87,7 @@ export default function BillingContent({ user }: BillingContentProps) {
     // Admin-granted lifetime access
     if (isLifetimeGrant) {
       return (
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
           <Crown className="w-4 h-4" />
           <span className="text-sm font-medium">{t('billing.lifetimeAccess')}</span>
         </div>
@@ -161,8 +161,8 @@ export default function BillingContent({ user }: BillingContentProps) {
       <div className="bg-[#111] border border-white/10 rounded-2xl p-6" data-tutorial="subscription-status">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-purple-500/20 rounded-xl">
-              <CreditCard className="w-6 h-6 text-purple-400" />
+            <div className="p-3 bg-blue-500/20 rounded-xl">
+              <CreditCard className="w-6 h-6 text-blue-400" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-white">{t('billing.currentPlan')}</h3>
@@ -175,8 +175,8 @@ export default function BillingContent({ user }: BillingContentProps) {
         <div className="space-y-4">
           {/* Grant-specific messaging */}
           {isLifetimeGrant && (
-            <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-xl">
-              <p className="text-sm text-purple-300 mb-2 font-medium">
+            <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+              <p className="text-sm text-blue-300 mb-2 font-medium">
                 {t('billing.lifetimeGranted')}
               </p>
               <p className="text-sm text-gray-400">
@@ -270,7 +270,7 @@ export default function BillingContent({ user }: BillingContentProps) {
             isExpiringSoon 
               ? 'bg-orange-600 hover:bg-orange-700 animate-pulse' 
               : isLifetimeGrant 
-              ? 'bg-purple-600 hover:bg-purple-700' 
+              ? 'bg-blue-600 hover:bg-blue-700' 
               : 'bg-green-600 hover:bg-green-700'
           }`}
         >

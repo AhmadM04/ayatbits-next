@@ -232,14 +232,26 @@ export default function VerseSearch() {
 
   return (
     <>
-      {/* Search Button */}
+      {/* Search Button - Desktop style */}
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors w-full sm:w-auto"
+        className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors w-full sm:w-auto"
       >
         <Search className="w-4 h-4 text-gray-400" />
         <span className="text-sm text-gray-400 flex-1 text-left sm:flex-initial">{t('common.search')}</span>
         <span className="text-xs text-gray-600 hidden sm:inline">⌘K</span>
+      </button>
+
+      {/* Search Button - Mobile style matching other items */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className="md:hidden w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-colors text-left group"
+      >
+        <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
+          <Search className="w-5 h-5 text-emerald-400" />
+        </div>
+        <span className="text-sm text-white font-medium flex-1">{t('common.search')}</span>
+        <span className="text-xs text-gray-500 px-2 py-1 bg-white/5 rounded">⌘K</span>
       </button>
 
       {/* Search Modal - rendered at root level */}

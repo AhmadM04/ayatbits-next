@@ -43,7 +43,11 @@ export default function AudioSettings({ initialEnabled = false }: AudioSettingsP
           'success'
         );
       } else {
-        showToast(data.error || t('tutorial.failedToUpdateAudio'), 'error');
+        // Check if it's the Pro requirement error
+        const errorMessage = data.error === 'WORD_BY_WORD_AUDIO_REQUIRES_PRO' 
+          ? t('mushaf.wordByWordAudioRequiresPro')
+          : (data.error || t('tutorial.failedToUpdateAudio'));
+        showToast(errorMessage, 'error');
       }
     } catch (error) {
       console.error('Audio settings update error:', error);
@@ -56,8 +60,8 @@ export default function AudioSettings({ initialEnabled = false }: AudioSettingsP
   return (
     <div className="bg-[#111] border border-white/10 rounded-2xl p-6 transition-colors hover:border-white/20" data-tutorial="audio-settings">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-purple-500/20 rounded-xl border border-purple-500/30">
-          <Volume2 className="w-6 h-6 text-purple-400" />
+        <div className="p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
+          <Volume2 className="w-6 h-6 text-blue-400" />
         </div>
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-white">{t('tutorial.wordByWordAudio')}</h3>
@@ -76,8 +80,8 @@ export default function AudioSettings({ initialEnabled = false }: AudioSettingsP
         <button
           onClick={handleToggle}
           disabled={isLoading}
-          className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-[#111] disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 ${
-            enabled ? 'bg-purple-500' : 'bg-gray-600'
+          className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-[#111] disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 ${
+            enabled ? 'bg-blue-500' : 'bg-gray-600'
           }`}
           role="switch"
           aria-checked={enabled}
@@ -90,9 +94,9 @@ export default function AudioSettings({ initialEnabled = false }: AudioSettingsP
             }`}
           >
             {isLoading ? (
-              <Loader2 className="w-3 h-3 animate-spin text-purple-500" />
+              <Loader2 className="w-3 h-3 animate-spin text-blue-500" />
             ) : enabled ? (
-              <Check className="w-3 h-3 text-purple-500" />
+              <Check className="w-3 h-3 text-blue-500" />
             ) : null}
           </span>
         </button>

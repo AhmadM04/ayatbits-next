@@ -1,6 +1,10 @@
 'use client';
 
 import { createContext, useContext, ReactNode, useMemo, useCallback, useState, useEffect } from 'react';
+import type { Locale } from '@/lib/i18n-config';
+
+// Re-export Locale type for backward compatibility
+export type { Locale } from '@/lib/i18n-config';
 
 // Import JSON translation files
 import enMessages from '@/messages/en.json';
@@ -2276,9 +2280,9 @@ const MESSAGES_MAP: Record<string, Record<string, Record<string, string>>> = {
 type MessagePath = string;
 
 interface I18nContextType {
-  locale: string;
+  locale: Locale;
   t: (key: MessagePath, params?: Record<string, string | number>) => string;
-  setLocale: (locale: string) => void;
+  setLocale: (locale: Locale) => void;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -2343,8 +2347,8 @@ export function I18nProvider({ children }: I18nProviderProps) {
     return interpolate(value, params);
   }, [currentLocale]);
 
-  const setLocale = useCallback((newLocale: string) => {
-    const locale = newLocale as Locale;
+  const setLocale = useCallback((newLocale: Locale) => {
+    const locale = newLocale;
     if (locale === 'en' || locale === 'ar' || locale === 'ru') {
       setCurrentLocale(locale);
       if (typeof window !== 'undefined') {
@@ -2393,5 +2397,4 @@ export function useI18nSafe() {
   return useI18n();
 }
 
-export type Locale = 'en' | 'ar' | 'ru';
 export type Messages = Record<string, any>;

@@ -365,10 +365,10 @@ export default function AyahContextMenu({
               <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-white">
-                    Surah {verse.surahNumber}, Ayah {verse.ayahNumber}
+                    {t('verse.surahAyahFormat', { surah: verse.surahNumber, ayah: verse.ayahNumber })}
                   </p>
                   <p className="text-xs text-gray-500">
-                    Page {verse.pageNumber} • Juz {verse.juzNumber}
+                    {t('verse.pageJuzFormat', { page: verse.pageNumber, juz: verse.juzNumber })}
                   </p>
                 </div>
                 <button
@@ -474,14 +474,14 @@ export default function AyahContextMenu({
                 <button
                   onClick={handleShowTafsir}
                   disabled={isLoadingTafsir}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-500/10 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-500/10 transition-colors text-left"
                   data-tutorial="tafsir-button"
                 >
-                  <div className={`p-2 rounded-lg ${showTafsir ? 'bg-purple-500/30' : 'bg-purple-500/20'}`}>
+                  <div className={`p-2 rounded-lg ${showTafsir ? 'bg-blue-500/30' : 'bg-blue-500/20'}`}>
                     {isLoadingTafsir ? (
-                      <div className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <BookText className="w-5 h-5 text-purple-400" />
+                      <BookText className="w-5 h-5 text-blue-400" />
                     )}
                   </div>
                   <div>
@@ -511,7 +511,7 @@ export default function AyahContextMenu({
                       <p className="font-medium text-white">
                         {showAiTafsir ? 'Hide AI Tafsir' : 'AI Tafsir'}
                       </p>
-                      <span className="px-1.5 py-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded text-[10px] font-bold text-white">
+                      <span className="px-1.5 py-0.5 bg-gradient-to-r from-pink-500 to-blue-500 rounded text-[10px] font-bold text-white">
                         PRO
                       </span>
                     </div>
@@ -563,10 +563,10 @@ export default function AyahContextMenu({
                     exit={{ height: 0, opacity: 0 }}
                     className="border-t border-white/5 overflow-hidden"
                   >
-                    <div className="p-4 bg-purple-500/5 max-h-80 overflow-y-auto">
+                    <div className="p-4 bg-blue-500/5 max-h-80 overflow-y-auto">
                       <div className="flex items-center gap-2 mb-2">
-                        <BookText className="w-3.5 h-3.5 text-purple-400" />
-                        <span className="text-xs font-medium text-purple-400 uppercase tracking-wide">
+                        <BookText className="w-3.5 h-3.5 text-blue-400" />
+                        <span className="text-xs font-medium text-blue-400 uppercase tracking-wide">
                           {tafsirResource}
                         </span>
                       </div>
@@ -595,13 +595,13 @@ export default function AyahContextMenu({
                     exit={{ height: 0, opacity: 0 }}
                     className="border-t border-white/5 overflow-hidden"
                   >
-                    <div className="p-4 bg-gradient-to-br from-pink-500/5 to-purple-500/5 max-h-80 overflow-y-auto">
+                    <div className="p-4 bg-gradient-to-br from-pink-500/5 to-blue-500/5 max-h-80 overflow-y-auto">
                       <div className="flex items-center gap-2 mb-2">
                         <Sparkles className="w-3.5 h-3.5 text-pink-400" />
                         <span className="text-xs font-medium text-pink-400 uppercase tracking-wide">
                           AI-Generated Tafsir
                         </span>
-                        <span className="px-1.5 py-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded text-[9px] font-bold text-white">
+                        <span className="px-1.5 py-0.5 bg-gradient-to-r from-pink-500 to-blue-500 rounded text-[9px] font-bold text-white">
                           PRO
                         </span>
                       </div>

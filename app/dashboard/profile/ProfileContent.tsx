@@ -40,7 +40,7 @@ export default function ProfileContent({ user, stats, trialDaysLeft }: ProfileCo
           </div>
           {showSubscriptionBadge && (
             <div className={`px-4 py-2 rounded-xl text-sm font-medium capitalize flex items-center gap-2 transition-colors
-              ${stats.planType === 'lifetime' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30 hover:bg-purple-500/25' : 
+              ${stats.planType === 'lifetime' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/25' : 
                 stats.planType === 'monthly' || stats.planType === 'yearly' ? 'bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/25' : 
                 'bg-orange-500/20 text-orange-400 border border-orange-500/30 hover:bg-orange-500/25'}`}>
               <Crown className="w-4 h-4" />
@@ -50,7 +50,7 @@ export default function ProfileContent({ user, stats, trialDaysLeft }: ProfileCo
             </div>
           )}
           {user.role === 'admin' && (
-            <div className="px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 bg-purple-500/20 text-purple-400 border border-purple-500/30 transition-colors hover:bg-purple-500/25">
+            <div className="px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 bg-blue-500/20 text-blue-400 border border-blue-500/30 transition-colors hover:bg-blue-500/25">
               <Crown className="w-4 h-4" />
               {t('profile.admin')}
             </div>

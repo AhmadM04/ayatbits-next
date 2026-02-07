@@ -132,7 +132,7 @@ export default function AchievementsContent() {
                 whileHover={{ scale: 1.02, borderColor: 'rgba(168, 85, 247, 0.3)' }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="text-2xl font-bold text-purple-500">
+                <div className="text-2xl font-bold text-blue-500">
                   {stats.totalUnlocked}
                 </div>
                 <div className="text-xs text-gray-500">{t('achievements.trophies')}</div>

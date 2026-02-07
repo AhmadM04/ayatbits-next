@@ -35,8 +35,8 @@ export default function TafsirDisplay({
     <div className="bg-white/[0.02] rounded-xl p-4 border border-white/5">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <BookText className="w-3.5 h-3.5 text-purple-400" />
-          <span className="text-xs font-medium text-purple-400 uppercase tracking-wide">
+          <BookText className="w-3.5 h-3.5 text-blue-400" />
+          <span className="text-xs font-medium text-blue-400 uppercase tracking-wide">
             {resource} - {language}
           </span>
         </div>
@@ -50,7 +50,7 @@ export default function TafsirDisplay({
                 onClick={() => onTafsirTypeChange(option.type)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   selectedTafsirType === option.type
-                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
                     : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-white/5'
                 }`}
               >
@@ -77,7 +77,7 @@ export default function TafsirDisplay({
           <div 
             className="text-gray-300 text-sm leading-relaxed prose prose-sm prose-invert max-w-none
               prose-p:my-2 prose-strong:text-white prose-strong:font-semibold
-              prose-em:text-gray-300 prose-a:text-purple-400 prose-a:no-underline hover:prose-a:underline"
+              prose-em:text-gray-300 prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline"
             dangerouslySetInnerHTML={{ __html: sanitizedTafsir }}
           />
         </>

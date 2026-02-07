@@ -218,7 +218,7 @@ export default function DashboardContent({
                 className="p-2 hover:bg-white/5 rounded-lg transition-colors text-gray-400 hover:text-red-400"
                 aria-label="Logout"
               >
-                <LogOut className="w-5 h-10" />
+                <LogOut className="w-5 h-5" />
               </button>
               
               <Link 
@@ -298,23 +298,25 @@ export default function DashboardContent({
                 {/* Divider */}
                 <div className="h-px bg-white/5 my-3" />
 
-                {/* Search Section */}
-                <div className="space-y-2">
-                  <div className="text-xs font-medium text-gray-500 px-1">Quick Access</div>
+                {/* Quick Access Section */}
+                <div className="space-y-1">
+                  <div className="text-xs font-medium text-gray-500 px-1 mb-2">Quick Access</div>
+                  
+                  {/* Search Button */}
                   <div className="w-full">
                     <VerseSearch />
                   </div>
-                </div>
 
-                {/* Language Selector */}
-                <div className="w-full">
-                  <LanguageSelector />
+                  {/* Language Selector */}
+                  <div className="w-full">
+                    <LanguageSelector />
+                  </div>
                 </div>
 
                 {/* Divider */}
                 <div className="h-px bg-white/5 my-3" />
 
-                {/* Actions Section */}
+                {/* Settings Section */}
                 <div className="space-y-1">
                   <div className="text-xs font-medium text-gray-500 px-1 mb-2">Settings</div>
                   
@@ -467,34 +469,34 @@ export default function DashboardContent({
       <MushafFAB />
 
       <BottomNav />
+    </div>
 
-      {/* Sign Out Confirmation Dialog */}
-      {showSignOutConfirm && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] animate-in fade-in">
-          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl w-[90%] max-w-md p-6 animate-in zoom-in-95">
-            <h3 className="text-lg font-semibold text-white mb-2">
-              {t('settings.signOutTitle')}
-            </h3>
-            <p className="text-sm text-gray-400 mb-6">
-              {t('settings.signOutMessage')}
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowSignOutConfirm(false)}
-                className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-white font-medium transition-colors"
-              >
-                {t('common.cancel')}
+    {/* Sign Out Confirmation Dialog - Positioned outside main container for proper centering */}
+    {showSignOutConfirm && (
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] animate-in fade-in">
+        <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl w-[90%] max-w-md p-6 animate-in zoom-in-95 mx-4">
+          <h3 className="text-lg font-semibold text-white mb-2">
+            {t('settings.signOutTitle')}
+          </h3>
+          <p className="text-sm text-gray-400 mb-6">
+            {t('settings.signOutMessage')}
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowSignOutConfirm(false)}
+              className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-white font-medium transition-colors"
+            >
+              {t('common.cancel')}
+            </button>
+            <SignOutButton>
+              <button className="flex-1 px-4 py-2.5 rounded-lg bg-red-500/90 hover:bg-red-500 text-white font-medium transition-colors">
+                {t('common.signOut')}
               </button>
-              <SignOutButton>
-                <button className="flex-1 px-4 py-2.5 rounded-lg bg-red-500/90 hover:bg-red-500 text-white font-medium transition-colors">
-                  {t('common.signOut')}
-                </button>
-              </SignOutButton>
-            </div>
+            </SignOutButton>
           </div>
         </div>
-      )}
-    </div>
+      </div>
+    )}
     </TutorialWrapper>
   );
 }

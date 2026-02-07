@@ -128,12 +128,12 @@ export default function VoucherManagement() {
     <div className="bg-white/5 rounded-xl p-6 border border-white/10">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Gift className="w-6 h-6 text-purple-500" />
+          <Gift className="w-6 h-6 text-blue-500" />
           <h2 className="text-2xl font-bold">Voucher Management</h2>
         </div>
         <button
           onClick={() => setShowCreateForm(!showCreateForm)}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg font-medium transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition-colors"
         >
           {showCreateForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
           {showCreateForm ? 'Cancel' : 'Create Voucher'}
@@ -142,7 +142,7 @@ export default function VoucherManagement() {
 
       {/* Create Form */}
       {showCreateForm && (
-        <form onSubmit={createVoucher} className="mb-6 p-6 bg-white/5 rounded-lg border border-purple-500/30">
+        <form onSubmit={createVoucher} className="mb-6 p-6 bg-white/5 rounded-lg border border-blue-500/30">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -153,7 +153,7 @@ export default function VoucherManagement() {
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="RAMADAN2026"
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
                 required
               />
             </div>
@@ -165,7 +165,7 @@ export default function VoucherManagement() {
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as any)}
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
               >
                 <option value="promo">Promo</option>
                 <option value="ramadan">Ramadan</option>
@@ -180,7 +180,7 @@ export default function VoucherManagement() {
               <select
                 value={tier}
                 onChange={(e) => setTier(e.target.value as 'basic' | 'pro')}
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
               >
                 <option value="basic">Basic</option>
                 <option value="pro">Pro</option>
@@ -197,7 +197,7 @@ export default function VoucherManagement() {
                 onChange={(e) => setDuration(parseInt(e.target.value))}
                 min="1"
                 max="12"
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
               />
             </div>
 
@@ -210,7 +210,7 @@ export default function VoucherManagement() {
                 value={maxRedemptions}
                 onChange={(e) => setMaxRedemptions(parseInt(e.target.value))}
                 min="1"
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
               />
             </div>
 
@@ -223,7 +223,7 @@ export default function VoucherManagement() {
                 value={expiresIn}
                 onChange={(e) => setExpiresIn(parseInt(e.target.value))}
                 min="1"
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
               />
             </div>
 
@@ -236,7 +236,7 @@ export default function VoucherManagement() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Special Ramadan offer"
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
               />
             </div>
           </div>
@@ -244,7 +244,7 @@ export default function VoucherManagement() {
           <button
             type="submit"
             disabled={creating}
-            className="mt-4 w-full flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 rounded-lg font-medium transition-colors"
+            className="mt-4 w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-lg font-medium transition-colors"
           >
             {creating ? (
               <>
@@ -264,7 +264,7 @@ export default function VoucherManagement() {
       {/* Vouchers List */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+          <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
         </div>
       ) : vouchers.length === 0 ? (
         <div className="text-center py-12 text-gray-400">
@@ -285,12 +285,12 @@ export default function VoucherManagement() {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <code className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg font-mono font-bold">
+                    <code className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg font-mono font-bold">
                       {voucher.code}
                     </code>
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                       voucher.tier === 'pro'
-                        ? 'bg-purple-500/20 text-purple-300'
+                        ? 'bg-blue-500/20 text-blue-300'
                         : 'bg-blue-500/20 text-blue-300'
                     }`}>
                       {voucher.tier.toUpperCase()}

@@ -270,7 +270,7 @@ export default function TafseerButtons({
         if (data.requiresPro) {
           setRequiresPro(true);
           setAiError('AI Tafsir is a Pro feature. Upgrade to access.');
-          showToast('🔒 AI Tafsir requires Pro subscription. Upgrade to unlock!', 'warning', 7000);
+          showToast(t('mushaf.aiTafsirRequiresPro'), 'warning', 7000);
         } else {
           setAiError(data.error || 'Access denied');
           showToast(data.error || 'Access denied', 'error', 5000);
@@ -339,7 +339,7 @@ export default function TafseerButtons({
                 >
                   <div className="p-2">
                     <div className="px-3 py-2 text-xs font-medium text-gray-400 uppercase tracking-wide">
-                      Select Translation
+                      {t('profile.selectTranslation')}
                     </div>
                     {TRANSLATION_OPTIONS.map((option) => (
                       <button
@@ -396,7 +396,7 @@ export default function TafseerButtons({
           className={`
             p-2 rounded-lg transition-colors flex-shrink-0
             ${showTafsir
-              ? 'bg-purple-500/20 text-purple-400'
+              ? 'bg-blue-500/20 text-blue-400'
               : 'relative bg-white/5 text-gray-400 hover:bg-white/10'
             }
             ${!isTafseerSupported ? 'opacity-60' : ''}
@@ -405,7 +405,7 @@ export default function TafseerButtons({
           data-tutorial="tafsir-button"
         >
           {isLoadingTafsir ? (
-            <div className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
           ) : (
             <BookText className="w-5 h-5" />
           )}
@@ -423,7 +423,7 @@ export default function TafseerButtons({
           className={`
             p-2 rounded-lg transition-colors flex-shrink-0 relative
             ${showAiTafsir
-              ? 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-400'
+              ? 'bg-gradient-to-r from-pink-500/20 to-blue-500/20 text-pink-400'
               : 'bg-white/5 text-gray-400 hover:bg-white/10'
             }
             ${!isAiTafseerLanguageSupported ? 'opacity-60' : ''}
@@ -437,7 +437,7 @@ export default function TafseerButtons({
             <Sparkles className="w-5 h-5" />
           )}
           {!isPro && (
-            <span className="absolute -top-1 -right-1 px-1 bg-gradient-to-r from-pink-500 to-purple-500 rounded text-[8px] font-bold text-white">
+            <span className="absolute -top-1 -right-1 px-1 bg-gradient-to-r from-pink-500 to-blue-500 rounded text-[8px] font-bold text-white">
               PRO
             </span>
           )}
@@ -482,7 +482,7 @@ export default function TafseerButtons({
                   className="w-full px-4 py-3 text-left text-sm text-gray-300 hover:bg-white/5 transition-colors flex items-center gap-3"
                 >
                   <Globe className="w-4 h-4 text-gray-400" />
-                  <span>Translation</span>
+                  <span>{t('verse.englishTranslation')}</span>
                 </button>
 
                 <button
@@ -498,7 +498,7 @@ export default function TafseerButtons({
                   ) : (
                     <Languages className={`w-4 h-4 ${showTransliteration ? 'text-teal-400' : 'text-gray-400'}`} />
                   )}
-                  <span className={showTransliteration ? 'text-teal-400' : ''}>Transliteration</span>
+                  <span className={showTransliteration ? 'text-teal-400' : ''}>{t('transliteration.title')}</span>
                 </button>
 
                 <button
@@ -510,11 +510,11 @@ export default function TafseerButtons({
                   className="w-full px-4 py-3 text-left text-sm text-gray-300 hover:bg-white/5 transition-colors flex items-center gap-3 border-t border-white/5"
                 >
                   {isLoadingTafsir ? (
-                    <div className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
                   ) : (
-                    <BookText className={`w-4 h-4 ${showTafsir ? 'text-purple-400' : 'text-gray-400'}`} />
+                    <BookText className={`w-4 h-4 ${showTafsir ? 'text-blue-400' : 'text-gray-400'}`} />
                   )}
-                  <span className={showTafsir ? 'text-purple-400' : ''}>Tafsir</span>
+                  <span className={showTafsir ? 'text-blue-400' : ''}>{t('mushaf.tafsir')}</span>
                 </button>
 
                 <button
@@ -531,7 +531,7 @@ export default function TafseerButtons({
                     <Sparkles className={`w-4 h-4 ${showAiTafsir ? 'text-pink-400' : 'text-gray-400'}`} />
                   )}
                   <span className={showAiTafsir ? 'text-pink-400' : ''}>
-                    AI Tafsir {!isPro && <span className="text-[10px] ml-1 px-1 bg-gradient-to-r from-pink-500 to-purple-500 rounded">PRO</span>}
+                    {t('mushaf.aiTafsir')} {!isPro && <span className="text-[10px] ml-1 px-1 bg-gradient-to-r from-pink-500 to-blue-500 rounded">PRO</span>}
                   </span>
                 </button>
               </motion.div>
@@ -565,7 +565,7 @@ export default function TafseerButtons({
                   <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between flex-shrink-0">
                     <div className="flex items-center gap-2">
                       <Globe className="w-4 h-4 text-blue-400" />
-                      <p className="text-sm font-medium text-white">Select Translation</p>
+                      <p className="text-sm font-medium text-white">{t('profile.selectTranslation')}</p>
                     </div>
                     <button
                       onClick={() => setShowTranslationMenu(false)}
@@ -637,10 +637,10 @@ export default function TafseerButtons({
                 <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between flex-shrink-0">
                   <div>
                     <p className="text-sm font-medium text-white">
-                      {showTransliteration ? 'Transliteration' : showTafsir ? 'Tafsir' : 'AI Tafsir'}
+                      {showTransliteration ? t('transliteration.title') : showTafsir ? t('mushaf.tafsir') : t('mushaf.aiTafsir')}
                     </p>
                     <p className="text-xs text-gray-500">
-                      Surah {surahNumber}, Ayah {ayahNumber}
+                      {t('verse.surahAyahFormat', { surah: surahNumber, ayah: ayahNumber })}
                     </p>
                   </div>
                   <button
@@ -662,7 +662,7 @@ export default function TafseerButtons({
                       <div className="flex items-center gap-2 mb-3">
                         <Languages className="w-3.5 h-3.5 text-teal-400" />
                         <span className="text-xs font-medium text-teal-400 uppercase tracking-wide">
-                          Transliteration
+                          {t('transliteration.title')}
                         </span>
                       </div>
                       
@@ -683,8 +683,8 @@ export default function TafseerButtons({
                   {showTafsir && (
                     <div>
                       <div className="flex items-center gap-2 mb-3">
-                        <BookText className="w-3.5 h-3.5 text-purple-400" />
-                        <span className="text-xs font-medium text-purple-400 uppercase tracking-wide">
+                        <BookText className="w-3.5 h-3.5 text-blue-400" />
+                        <span className="text-xs font-medium text-blue-400 uppercase tracking-wide">
                           {tafsirResource}
                         </span>
                       </div>
@@ -724,7 +724,7 @@ export default function TafseerButtons({
                         <span className="text-xs font-medium text-pink-400 uppercase tracking-wide">
                           AI-Generated Tafsir
                         </span>
-                        <span className="px-1.5 py-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded text-[9px] font-bold text-white">
+                        <span className="px-1.5 py-0.5 bg-gradient-to-r from-pink-500 to-blue-500 rounded text-[9px] font-bold text-white">
                           PRO
                         </span>
                         {isAiTafseerLanguageSupported && (

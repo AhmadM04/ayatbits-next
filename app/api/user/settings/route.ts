@@ -108,7 +108,7 @@ export async function PATCH(request: Request) {
         });
         return NextResponse.json(
           { 
-            error: 'Word-by-word audio is only available for Pro subscribers. Upgrade to Pro to access this feature.',
+            error: 'WORD_BY_WORD_AUDIO_REQUIRES_PRO',
             requiresPro: true,
             featureName: 'Word-by-Word Audio'
           },

@@ -1,15 +1,13 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect, notFound } from 'next/navigation';
 import { connectDB, Surah, Juz, Puzzle, UserProgress, User, LikedAyat } from '@/lib/db';
-import Link from 'next/link';
-import { ArrowLeft, BookOpen } from 'lucide-react';
 import VersePageClient from './VersePageClient';
 import TranslationDisplay from './TranslationDisplay';
 import AyahSelectorClient from './AyahSelectorClient';
 import BismillahDisplay from './BismillahDisplay';
 import VerseNavButtons from './VerseNavButtons';
 import ArabicTextCard from './ArabicTextCard';
-import TafseerButtons from './TafseerButtons';
+import SurahHeader from './SurahHeader';
 import { cleanAyahText, extractBismillah, shouldShowBismillahSeparately } from '@/lib/ayah-utils';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
 import { fetchTranslation } from '@/lib/quran-api-adapter';
@@ -121,47 +119,24 @@ export default async function SurahVersePage({
     <VersePageClient translationCode={selectedTranslation}>
       <div className="min-h-screen bg-[#0a0a0a] text-white pb-6">
         {/* Header - Solid background */}
-        <header className="sticky top-0 z-10 bg-[#0a0a0a] border-b border-white/10">
-          <div className="max-w-3xl mx-auto px-3 sm:px-4">
-            <div className="flex items-center justify-between h-14">
-              <Link
-                href={`/dashboard/juz/${juzNumber}`}
-                className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-400" />
-              </Link>
-              <div className="flex-1 min-w-0 mx-3">
-                <h1 className="text-base font-semibold truncate">{surah.nameEnglish}</h1>
-                <p className="text-xs text-gray-500 truncate">Juz {juz.number} • {completedAyahs}/{totalAyahs} completed</p>
-              </div>
-              <div className="flex items-center gap-2">
-                {/* Tafseer Buttons */}
-                {currentPuzzle && (
-                  <TafseerButtons
-                    surahNumber={parseInt(surahNumber)}
-                    ayahNumber={selectedAyah}
-                    selectedTranslation={selectedTranslation}
-                    ayahText={showBismillahSeparately ? remainingText : cleanAyahText(
-                      currentPuzzle.content?.ayahText || '',
-                      parseInt(surahNumber),
-                      selectedAyah
-                    )}
-                    subscriptionPlan={dbUser.subscriptionPlan}
-                  />
-                )}
-                {mushafPageNumber && (
-                  <Link
-                    href={`/dashboard/mushaf/page/${mushafPageNumber}`}
-                    className="p-2 hover:bg-white/5 rounded-lg transition-colors flex-shrink-0"
-                    title="View in Mushaf"
-                  >
-                    <BookOpen className="w-5 h-5 text-gray-400" />
-                  </Link>
-                )}
-              </div>
-            </div>
-          </div>
-        </header>
+        <SurahHeader
+          juzNumber={juzNumber}
+          juzNumberValue={juz.number}
+          surahName={surah.nameEnglish}
+          completedAyahs={completedAyahs}
+          totalAyahs={totalAyahs}
+          currentPuzzle={currentPuzzle}
+          surahNumber={parseInt(surahNumber)}
+          selectedAyah={selectedAyah}
+          selectedTranslation={selectedTranslation}
+          ayahText={showBismillahSeparately ? remainingText : cleanAyahText(
+            currentPuzzle?.content?.ayahText || '',
+            parseInt(surahNumber),
+            selectedAyah
+          )}
+          subscriptionPlan={dbUser.subscriptionPlan}
+          mushafPageNumber={mushafPageNumber}
+        />
 
         <main className="max-w-3xl mx-auto px-3 sm:px-4 py-4">
           {/* Progress Bar */}

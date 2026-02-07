@@ -92,8 +92,8 @@ export const HARAKAT_DEFINITIONS: Record<string, HarakatDefinition> = {
     description: 'A w-shaped mark above the letter indicating the consonant is doubled/stressed.',
     example: 'بّ',
     exampleWord: 'رَبَّ (rabba - Lord)',
-    color: '#c084fc', // purple-400
-    colorClass: 'text-purple-400',
+    color: '#60a5fa', // blue-400
+    colorClass: 'text-blue-400',
   },
   
   // Tanween Fath - 'an' ending
@@ -238,8 +238,8 @@ export const HARAKAT_DEFINITIONS: Record<string, HarakatDefinition> = {
     description: 'A mark indicating nasalization (ghunna).',
     example: 'نٜ',
     exampleWord: 'Ghunna mark',
-    color: '#c084fc', // purple-400
-    colorClass: 'text-purple-400',
+    color: '#60a5fa', // blue-400
+    colorClass: 'text-blue-400',
   },
 };
 
@@ -557,8 +557,8 @@ export const QURANIC_MARKS: Record<string, HarakatDefinition> = {
     description: 'A small meem indicating nasalization or hidden meem.',
     example: 'نۢ',
     exampleWord: 'Ikhfa/iqlab',
-    color: '#c084fc', // purple-400
-    colorClass: 'text-purple-400',
+    color: '#60a5fa', // blue-400
+    colorClass: 'text-blue-400',
   },
   '\u06E3': {
     unicode: 'U+06E3',
@@ -635,8 +635,8 @@ export const QURANIC_MARKS: Record<string, HarakatDefinition> = {
     description: 'A small noon indicating hidden noon sound.',
     example: 'مۨ',
     exampleWord: 'Ikhfa marker',
-    color: '#c084fc', // purple-400
-    colorClass: 'text-purple-400',
+    color: '#60a5fa', // blue-400
+    colorClass: 'text-blue-400',
   },
   '\u06E9': {
     unicode: 'U+06E9',
@@ -700,8 +700,8 @@ export const QURANIC_MARKS: Record<string, HarakatDefinition> = {
     description: 'A small low meem indicating hidden meem sound.',
     example: 'نۭ',
     exampleWord: 'Iqlab marker',
-    color: '#c084fc', // purple-400
-    colorClass: 'text-purple-400',
+    color: '#60a5fa', // blue-400
+    colorClass: 'text-blue-400',
   },
 };
 

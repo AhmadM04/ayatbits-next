@@ -308,15 +308,15 @@ export default function Home() {
                   className="max-w-2xl mx-auto mb-6"
                 >
                   <Link href="/pricing">
-                    <div className="relative overflow-hidden bg-gradient-to-r from-purple-600/20 via-purple-500/20 to-pink-600/20 border border-purple-500/40 rounded-2xl p-4 hover:border-purple-400/60 transition-all duration-300 group cursor-pointer">
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600/20 via-blue-500/20 to-pink-600/20 border border-blue-500/40 rounded-2xl p-4 hover:border-blue-400/60 transition-all duration-300 group cursor-pointer">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-pink-600/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                       <div className="relative flex flex-col sm:flex-row items-center justify-center gap-3 text-center sm:text-left">
                         <div className="flex items-center gap-2">
-                          <Gift className="w-5 h-5 text-purple-400" />
-                          <span className="text-purple-300 font-semibold">{t('landing.ramadanSpecial')}</span>
+                          <Gift className="w-5 h-5 text-blue-400" />
+                          <span className="text-blue-300 font-semibold">{t('landing.ramadanSpecial')}</span>
                         </div>
                         <div className="text-white text-sm sm:text-base">
-                          {t('landing.ramadanOffer')} <code className="px-2 py-0.5 bg-purple-500/30 rounded text-purple-200 font-mono text-xs sm:text-sm">RAMADAN2026</code>
+                          {t('landing.ramadanOffer')} <code className="px-2 py-0.5 bg-blue-500/30 rounded text-blue-200 font-mono text-xs sm:text-sm">RAMADAN2026</code>
                         </div>
                       </div>
                     </div>
@@ -420,7 +420,7 @@ export default function Home() {
                     icon: Star,
                     title: t('landing.translationsTitle'),
                     description: t('landing.translationsDesc'),
-                    color: "purple",
+                    color: "blue",
                   },
                 ].map((feature, index) => (
                   <ConditionalMotion
@@ -434,11 +434,11 @@ export default function Home() {
                   >
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
                       feature.color === 'green' ? 'bg-green-500/10' :
-                      feature.color === 'orange' ? 'bg-orange-500/10' : 'bg-purple-500/10'
+                      feature.color === 'orange' ? 'bg-orange-500/10' : 'bg-blue-500/10'
                     }`}>
                       <feature.icon className={`w-6 h-6 ${
                         feature.color === 'green' ? 'text-green-500' :
-                        feature.color === 'orange' ? 'text-orange-500' : 'text-purple-500'
+                        feature.color === 'orange' ? 'text-orange-500' : 'text-blue-500'
                       }`} />
                     </div>
                     <h3 className="text-xl font-semibold mb-2 text-white">{feature.title}</h3>
@@ -549,7 +549,7 @@ export default function Home() {
                 transition={{ duration: 0.6 }}
                 className="text-center mb-12"
               >
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm mb-6">
                   <Puzzle className="w-4 h-4" />
                   <span>{t('landing.tryItNow')}</span>
                 </div>
