@@ -218,7 +218,7 @@ export default function DashboardContent({
                 className="p-2 hover:bg-white/5 rounded-lg transition-colors text-gray-400 hover:text-red-400"
                 aria-label="Logout"
               >
-                <LogOut className="w-5 h-5" />
+                <LogOut className="w-5 h-10" />
               </button>
               
               <Link 
