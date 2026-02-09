@@ -631,11 +631,11 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.2 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <div className="relative w-full max-w-[350px] mx-auto">
+                  <div className="relative w-full max-w-[600px] mx-auto">
                     <Image
                       src="/screenshots/wordpuzzleview-english.png"
                       alt="Solve Puzzle Screen"
-                      width={350}
+                      width={600}
                       height={700}
                       className="w-full h-auto"
                     />
