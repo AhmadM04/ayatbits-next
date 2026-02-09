@@ -84,11 +84,16 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
   return (
     <motion.span
       className={`
-        relative inline-block group cursor-pointer select-none max-w-full
+        relative inline group cursor-pointer select-none w-full
         ${isHighlighted ? 'bg-green-500/20 rounded-lg px-1 -mx-1' : ''}
         ${isHolding ? 'bg-blue-500/20 rounded-lg px-1 -mx-1' : ''}
       `}
-      style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+      style={{ 
+        wordBreak: 'break-word', 
+        overflowWrap: 'break-word',
+        display: 'inline',
+        lineHeight: 'inherit',
+      }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
@@ -113,10 +118,10 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
       {(verse.isCompleted || verse.isLiked) && (
         <span className="inline-flex items-center gap-0.5 mx-1 align-middle">
           {verse.isCompleted && (
-            <CheckCircle className="w-3 h-3 text-green-500 inline" />
+            <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-500 inline" />
           )}
           {verse.isLiked && (
-            <Heart className="w-3 h-3 text-red-500 fill-current inline" />
+            <Heart className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-red-500 fill-current inline" />
           )}
         </span>
       )}
@@ -129,7 +134,7 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
       />
       
       {/* Ayah number in Arabic numerals - with whitespace control */}
-      <span className="text-green-400 mx-2 text-lg inline-block whitespace-nowrap">
+      <span className="text-green-400 mx-1.5 sm:mx-2 text-base sm:text-lg inline-block whitespace-nowrap align-middle">
         ﴿{toArabicNumerals(verse.ayahNumber)}﴾
       </span>
       

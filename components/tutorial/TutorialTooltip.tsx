@@ -35,7 +35,7 @@ export function TutorialTooltip({
     right: 100,
   });
 
-  // Update drag constraints based on viewport size
+  // Update drag constraints based on viewport size to keep tooltip within bounds
   useEffect(() => {
     const updateConstraints = () => {
       const vw = window.innerWidth;
@@ -43,7 +43,7 @@ export function TutorialTooltip({
       
       const isMobile = vw < 768;
       const tooltipWidth = isMobile ? Math.min(vw * 0.9, 340) : 384; // max-w-sm
-      const tooltipHeight = 250; // estimated height
+      const tooltipHeight = 280; // estimated height with some padding
       
       // Calculate the maximum distance the tooltip can be dragged from its centered position
       // while still keeping it fully visible on screen
@@ -51,23 +51,26 @@ export function TutorialTooltip({
       const centerY = vh / 2;
       
       // Add padding to prevent touching the edges
-      const padding = 16;
+      const padding = 20;
       
       // Calculate max distances in each direction to keep tooltip fully visible
-      // Left edge: centerX - tooltipWidth/2 + dragX >= padding
-      // So: dragX >= padding - (centerX - tooltipWidth/2)
-      // Therefore: min dragX (most negative) = -(centerX - tooltipWidth/2 - padding)
-      const maxLeft = centerX - (tooltipWidth / 2) - padding;
+      // The tooltip is centered, so we need to calculate how far it can move in each direction
       
-      // Right edge: centerX + tooltipWidth/2 + dragX <= vw - padding
-      // So: dragX <= vw - padding - (centerX + tooltipWidth/2)
-      const maxRight = vw - padding - centerX - (tooltipWidth / 2);
+      // Left: tooltip left edge should stay at padding distance from left edge
+      // centerX - tooltipWidth/2 is current left edge position
+      // It can move left by: (centerX - tooltipWidth/2 - padding)
+      const maxLeft = Math.max(0, centerX - (tooltipWidth / 2) - padding);
       
-      // Top edge: centerY - tooltipHeight/2 + dragY >= padding
-      const maxTop = centerY - (tooltipHeight / 2) - padding;
+      // Right: tooltip right edge should stay at padding distance from right edge
+      // centerX + tooltipWidth/2 is current right edge position
+      // It can move right by: (vw - padding - centerX - tooltipWidth/2)
+      const maxRight = Math.max(0, vw - padding - centerX - (tooltipWidth / 2));
       
-      // Bottom edge: centerY + tooltipHeight/2 + dragY <= vh - padding
-      const maxBottom = vh - padding - centerY - (tooltipHeight / 2);
+      // Top: tooltip top edge should stay at padding distance from top edge
+      const maxTop = Math.max(0, centerY - (tooltipHeight / 2) - padding);
+      
+      // Bottom: tooltip bottom edge should stay at padding distance from bottom edge
+      const maxBottom = Math.max(0, vh - padding - centerY - (tooltipHeight / 2));
       
       setDragConstraints({
         top: -maxTop,
@@ -79,7 +82,11 @@ export function TutorialTooltip({
 
     updateConstraints();
     window.addEventListener('resize', updateConstraints);
-    return () => window.removeEventListener('resize', updateConstraints);
+    window.addEventListener('orientationchange', updateConstraints);
+    return () => {
+      window.removeEventListener('resize', updateConstraints);
+      window.removeEventListener('orientationchange', updateConstraints);
+    };
   }, []);
 
   // Translate title and message if they are translation keys (dot notation)
@@ -90,16 +97,17 @@ export function TutorialTooltip({
     <motion.div
       drag
       dragMomentum={false}
-      dragElastic={0.1}
+      dragElastic={0.05}
       dragConstraints={dragConstraints}
-      dragTransition={{ bounceStiffness: 300, bounceDamping: 20 }}
-      whileDrag={{ scale: 1.05, cursor: 'grabbing' }}
+      dragTransition={{ bounceStiffness: 600, bounceDamping: 30 }}
+      whileDrag={{ scale: 1.02, cursor: 'grabbing' }}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className="relative bg-gray-900 backdrop-blur-md rounded-2xl shadow-2xl border border-green-500/30 w-[90vw] max-w-sm cursor-grab active:cursor-grabbing touch-none"
+      className="relative bg-gray-900 backdrop-blur-md rounded-2xl shadow-2xl border border-green-500/30 w-[90vw] max-w-sm cursor-grab active:cursor-grabbing touch-none overflow-hidden"
       style={{ 
         boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(16, 185, 129, 0.3)',
+        maxHeight: 'calc(100vh - 40px)',
       }}
     >
       {/* Drag handle indicator */}

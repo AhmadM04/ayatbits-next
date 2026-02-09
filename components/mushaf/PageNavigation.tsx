@@ -98,7 +98,7 @@ export default function PageNavigation({
         onClick={handlePrevious}
         disabled={!canGoPrevious}
         className={`
-          p-2 rounded-lg transition-colors
+          p-1.5 sm:p-2 rounded-lg transition-colors
           ${canGoPrevious 
             ? 'hover:bg-white/5 text-white' 
             : 'text-gray-600 cursor-not-allowed'
@@ -106,20 +106,20 @@ export default function PageNavigation({
         `}
         aria-label="Previous page"
       >
-        <ChevronLeft className="w-6 h-6" />
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
 
       {/* Page Info & Dropdown */}
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
+          className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
         >
           <div className="text-center">
-            <span className="text-white font-medium">{t('common.page')} {currentPage}</span>
-            <span className="text-gray-500 text-sm ml-2">{t('common.of')} {totalPages}</span>
+            <span className="text-white font-medium text-sm sm:text-base">{t('common.page')} {currentPage}</span>
+            <span className="text-gray-500 text-xs sm:text-sm ml-1 sm:ml-2">{t('common.of')} {totalPages}</span>
           </div>
-          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
         </button>
 
         {/* Dropdown Panel */}
@@ -130,7 +130,7 @@ export default function PageNavigation({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
+              className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[90vw] max-w-xs bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
             >
               {/* Search Input */}
               <form onSubmit={handleSearchSubmit} className="p-3 border-b border-white/5">
@@ -199,7 +199,7 @@ export default function PageNavigation({
         onClick={handleNext}
         disabled={!canGoNext}
         className={`
-          p-2 rounded-lg transition-colors
+          p-1.5 sm:p-2 rounded-lg transition-colors
           ${canGoNext 
             ? 'hover:bg-white/5 text-white' 
             : 'text-gray-600 cursor-not-allowed'
@@ -207,7 +207,7 @@ export default function PageNavigation({
         `}
         aria-label="Next page"
       >
-        <ChevronRight className="w-6 h-6" />
+        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
     </div>
   );

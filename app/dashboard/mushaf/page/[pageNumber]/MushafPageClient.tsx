@@ -182,7 +182,7 @@ export default function MushafPageClient({
       {/* Main Content with Swipe Support */}
       <motion.main
         ref={containerRef}
-        className="max-w-3xl mx-auto px-4 py-6 pb-24 touch-pan-y"
+        className="max-w-3xl mx-auto px-3 sm:px-4 py-4 sm:py-6 pb-24 touch-pan-y"
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.2}
@@ -207,13 +207,18 @@ export default function MushafPageClient({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: swipeDirection === 'left' ? -50 : swipeDirection === 'right' ? 50 : 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-white/[0.02] border border-white/5 rounded-2xl p-6"
+            className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-6"
           >
             {/* Arabic Text Container */}
             <div
-              className="text-2xl sm:text-3xl leading-[2.5] font-arabic text-right break-words overflow-wrap-anywhere"
+              className="text-xl sm:text-2xl md:text-3xl leading-[2.2] sm:leading-[2.5] font-arabic text-right"
               dir="rtl"
-              style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)', overflowWrap: 'anywhere', wordBreak: 'break-word' }}
+              style={{ 
+                fontFamily: 'var(--font-arabic, "Amiri", serif)',
+                wordWrap: 'break-word',
+                overflowWrap: 'break-word',
+                hyphens: 'none',
+              }}
               data-tutorial="ayah-row"
             >
               {renderVerses()}
