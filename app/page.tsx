@@ -13,7 +13,6 @@ import DemoPuzzle from "@/components/DemoPuzzle";
 import { QuranLoader } from "@/components/animations";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useI18n } from "@/lib/i18n";
-import { PhoneMockup } from "@/components/PhoneMockup";
 
 // Floating Arabic letters/words for the background - Names of Allah (Asma ul Husna)
 const floatingArabicWords = [
@@ -602,10 +601,15 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.1 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <PhoneMockup 
-                    imageSrc="/screenshots/fullayahview-english.png"
-                    alt="Read Ayah Screen"
-                  />
+                  <div className="relative w-full max-w-[275px] mx-auto">
+                    <Image
+                      src="/screenshots/fullayahview-english.png"
+                      alt="Read Ayah Screen"
+                      width={275}
+                      height={570}
+                      className="w-full h-auto"
+                    />
+                  </div>
                   <div className="mt-6">
                     <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 text-green-400 font-bold mb-3 text-lg">
                       1
@@ -627,10 +631,15 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.2 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <PhoneMockup 
-                    imageSrc="/screenshots/wordpuzzleview-english.png"
-                    alt="Solve Puzzle Screen"
-                  />
+                  <div className="relative w-full max-w-[275px] mx-auto">
+                    <Image
+                      src="/screenshots/wordpuzzleview-english.png"
+                      alt="Solve Puzzle Screen"
+                      width={275}
+                      height={570}
+                      className="w-full h-auto"
+                    />
+                  </div>
                   <div className="mt-6">
                     <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 text-green-400 font-bold mb-3 text-lg">
                       2
@@ -652,10 +661,15 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.3 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <PhoneMockup 
-                    imageSrc="/screenshots/likedayahview-english.png"
-                    alt="Liked Ayahs Screen"
-                  />
+                  <div className="relative w-full max-w-[275px] mx-auto">
+                    <Image
+                      src="/screenshots/likedayahview-english.png"
+                      alt="Liked Ayahs Screen"
+                      width={275}
+                      height={570}
+                      className="w-full h-auto"
+                    />
+                  </div>
                   <div className="mt-6">
                     <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 text-green-400 font-bold mb-3 text-lg">
                       3
@@ -677,10 +691,15 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.4 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <PhoneMockup 
-                    imageSrc="/screenshots/trophiesview-english.png"
-                    alt="Achievements Screen"
-                  />
+                  <div className="relative w-full max-w-[275px] mx-auto">
+                    <Image
+                      src="/screenshots/trophiesview-english.png"
+                      alt="Achievements Screen"
+                      width={275}
+                      height={570}
+                      className="w-full h-auto"
+                    />
+                  </div>
                   <div className="mt-6">
                     <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 text-green-400 font-bold mb-3 text-lg">
                       4
