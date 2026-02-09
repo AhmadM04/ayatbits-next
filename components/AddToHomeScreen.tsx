@@ -150,7 +150,7 @@ export default function AddToHomeScreen() {
                       onClick={handleDismiss}
                       size="sm"
                       variant="outline"
-                      className="border-white/30 text-white hover:bg-white/10 text-xs h-8"
+                      className="border-white/30 text-red-500 hover:bg-white/10 hover:text-red-400 text-xs h-8"
                     >
                       {t('addToHomeScreen.maybeLater')}
                     </Button>
