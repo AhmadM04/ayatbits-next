@@ -12,6 +12,7 @@ import UserProfileSection from "@/components/UserProfileSection";
 import DemoPuzzle from "@/components/DemoPuzzle";
 import { QuranLoader } from "@/components/animations";
 import LanguageSelector from "@/components/LanguageSelector";
+import AddToHomeScreen from "@/components/AddToHomeScreen";
 import { useI18n } from "@/lib/i18n";
 
 // Floating Arabic letters/words for the background - Names of Allah (Asma ul Husna)
@@ -1011,6 +1012,9 @@ export default function Home() {
             </div>
           </footer>
         </div>
+        
+        {/* Add to Home Screen Component */}
+        <AddToHomeScreen />
       </div>
     </Suspense>
   );

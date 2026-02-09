@@ -5,11 +5,26 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
 
+// PWA configuration
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
+  register: true,
+  skipWaiting: true,
+  sw: 'sw.js',
+  fallbacks: {
+    document: '/offline',
+  },
+});
+
 const nextConfig: NextConfig = {
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  
+  // Turbopack configuration (empty to silence warning)
+  turbopack: {},
   
   // Experimental features for better performance
   experimental: {
@@ -136,4 +151,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+export default withPWA(withBundleAnalyzer(nextConfig));
