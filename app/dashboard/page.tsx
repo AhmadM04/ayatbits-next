@@ -105,6 +105,7 @@ export default async function DashboardPage() {
   });
 
   const translationCode = user.selectedTranslation || 'en.sahih';
+  const enableWordByWordAudio = user.enableWordByWordAudio || false;
 
   return (
     <DashboardContent 
@@ -113,6 +114,7 @@ export default async function DashboardPage() {
       completedPuzzles={stats.surahsCompleted}
       juzsExplored={uniqueJuzIds.size}
       selectedTranslation={translationCode}
+      enableWordByWordAudio={enableWordByWordAudio}
       trialDaysLeft={trialDaysLeft}
       subscriptionStatus={user.subscriptionStatus}
       subscriptionEndDate={user.subscriptionEndDate?.toISOString()}

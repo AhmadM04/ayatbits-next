@@ -65,6 +65,7 @@ export default async function SurahVersePage({
   const likedPuzzleIds = new Set(likedAyahs.map((l: any) => l.puzzleId.toString()));
 
   const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
+  const enableWordByWordAudio = dbUser.enableWordByWordAudio || false;
   const selectedAyah = ayahParam ? parseInt(ayahParam) : puzzles[0]?.content?.ayahNumber || 1;
 
   const currentPuzzle = puzzles.find((p: any) => p.content?.ayahNumber === selectedAyah);
@@ -185,6 +186,7 @@ export default async function SurahVersePage({
                   puzzleId={currentPuzzle._id.toString()}
                   isMemorized={isMemorized}
                   isLiked={isLiked}
+                  enableWordByWordAudio={enableWordByWordAudio}
                 />
               </div>
 

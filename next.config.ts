@@ -15,6 +15,54 @@ const withPWA = require('next-pwa')({
   fallbacks: {
     document: '/offline',
   },
+  // Aggressive caching strategy for better offline experience
+  runtimeCaching: [
+    {
+      urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'google-fonts',
+        expiration: {
+          maxEntries: 4,
+          maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
+        },
+      },
+    },
+    {
+      urlPattern: /^https:\/\/api\.quran\.com\/.*/i,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'quran-api',
+        networkTimeoutSeconds: 3,
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 7 * 24 * 60 * 60, // 1 week
+        },
+      },
+    },
+    {
+      urlPattern: /^https:\/\/everyayah\.com\/.*/i,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'audio-recitations',
+        expiration: {
+          maxEntries: 100,
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+        },
+      },
+    },
+    {
+      urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif)$/i,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'images',
+        expiration: {
+          maxEntries: 60,
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+        },
+      },
+    },
+  ],
 });
 
 const nextConfig: NextConfig = {
@@ -34,6 +82,8 @@ const nextConfig: NextConfig = {
       'next-intl',
       'zustand',
       '@react-email/components',
+      'lucide-react',
+      '@dnd-kit/core',
     ],
   },
 

@@ -26,16 +26,20 @@ interface DailyQuoteData {
 
 interface DailyQuoteProps {
   translationEdition?: string;
+  enableWordByWordAudio?: boolean;
 }
 
-export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuoteProps) {
+export default function DailyQuote({ 
+  translationEdition = 'en.sahih',
+  enableWordByWordAudio: enableWordByWordAudioProp,
+}: DailyQuoteProps) {
   const { t } = useI18n();
   const [quote, setQuote] = useState<DailyQuoteData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-  const [enableWordByWordAudio, setEnableWordByWordAudio] = useState(false);
+  const [enableWordByWordAudio, setEnableWordByWordAudio] = useState(enableWordByWordAudioProp ?? false);
   const [selectedHarakat, setSelectedHarakat] = useState<HarakatDefinition | null>(null);
   const [showHarakatModal, setShowHarakatModal] = useState(false);
   
@@ -87,8 +91,13 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
     fetchDailyQuote();
   }, [fetchDailyQuote]);
 
-  // Fetch user settings for word audio
+  // Fetch user settings for word audio - only if not provided as prop
   useEffect(() => {
+    // Skip fetch if prop was provided
+    if (enableWordByWordAudioProp !== undefined) {
+      return;
+    }
+    
     const fetchSettings = async () => {
       try {
         const response = await fetch('/api/user/settings');
@@ -97,11 +106,14 @@ export default function DailyQuote({ translationEdition = 'en.sahih' }: DailyQuo
           setEnableWordByWordAudio(data.enableWordByWordAudio || false);
         }
       } catch (error) {
+        // Silently fail - not critical for daily quote functionality
         console.error('Failed to fetch user settings:', error);
       }
     };
-    fetchSettings();
-  }, []);
+    // Delay settings fetch to not block initial render
+    const timer = setTimeout(fetchSettings, 0);
+    return () => clearTimeout(timer);
+  }, [enableWordByWordAudioProp]);
 
   const playAudio = async () => {
     if (!quote) return;

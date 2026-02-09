@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { X, Move } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface TutorialTooltipProps {
   title: string;
@@ -28,66 +28,71 @@ export function TutorialTooltip({
 }: TutorialTooltipProps) {
   const isLastStep = currentStep === totalSteps - 1;
   const { t, locale } = useI18n();
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const [dragConstraints, setDragConstraints] = useState({
-    top: -100,
-    bottom: 100,
-    left: -100,
-    right: 100,
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
   });
 
-  // Update drag constraints based on viewport size to keep tooltip within bounds
+  // Update drag constraints based on actual tooltip dimensions and viewport
   useEffect(() => {
     const updateConstraints = () => {
+      if (!tooltipRef.current) return;
+      
       const vw = window.innerWidth;
       const vh = window.innerHeight;
+      const rect = tooltipRef.current.getBoundingClientRect();
       
-      const isMobile = vw < 768;
-      const tooltipWidth = isMobile ? Math.min(vw * 0.9, 340) : 384; // max-w-sm
-      const tooltipHeight = 280; // estimated height with some padding
+      // Get actual tooltip dimensions
+      const tooltipWidth = rect.width;
+      const tooltipHeight = rect.height;
       
-      // Calculate the maximum distance the tooltip can be dragged from its centered position
-      // while still keeping it fully visible on screen
+      // Calculate centered position
       const centerX = vw / 2;
       const centerY = vh / 2;
       
-      // Add padding to prevent touching the edges
-      const padding = 20;
+      // Padding from edges
+      const padding = 16;
       
-      // Calculate max distances in each direction to keep tooltip fully visible
-      // The tooltip is centered, so we need to calculate how far it can move in each direction
+      // Since the tooltip is centered with translate(-50%, -50%),
+      // we need to calculate constraints from the center point
+      // The tooltip can drag as far as it needs to stay within bounds
       
-      // Left: tooltip left edge should stay at padding distance from left edge
-      // centerX - tooltipWidth/2 is current left edge position
-      // It can move left by: (centerX - tooltipWidth/2 - padding)
-      const maxLeft = Math.max(0, centerX - (tooltipWidth / 2) - padding);
+      // How far can we drag left before left edge hits padding?
+      const maxDragLeft = centerX - (tooltipWidth / 2) - padding;
       
-      // Right: tooltip right edge should stay at padding distance from right edge
-      // centerX + tooltipWidth/2 is current right edge position
-      // It can move right by: (vw - padding - centerX - tooltipWidth/2)
-      const maxRight = Math.max(0, vw - padding - centerX - (tooltipWidth / 2));
+      // How far can we drag right before right edge hits padding?
+      const maxDragRight = vw - centerX - (tooltipWidth / 2) - padding;
       
-      // Top: tooltip top edge should stay at padding distance from top edge
-      const maxTop = Math.max(0, centerY - (tooltipHeight / 2) - padding);
+      // How far can we drag up before top edge hits padding?
+      const maxDragUp = centerY - (tooltipHeight / 2) - padding;
       
-      // Bottom: tooltip bottom edge should stay at padding distance from bottom edge
-      const maxBottom = Math.max(0, vh - padding - centerY - (tooltipHeight / 2));
+      // How far can we drag down before bottom edge hits padding?
+      const maxDragDown = vh - centerY - (tooltipHeight / 2) - padding;
       
       setDragConstraints({
-        top: -maxTop,
-        bottom: maxBottom,
-        left: -maxLeft,
-        right: maxRight,
+        left: -Math.max(0, maxDragLeft),
+        right: Math.max(0, maxDragRight),
+        top: -Math.max(0, maxDragUp),
+        bottom: Math.max(0, maxDragDown),
       });
     };
 
+    // Update on mount and after a short delay to ensure dimensions are calculated
+    const timer = setTimeout(updateConstraints, 100);
     updateConstraints();
+    
     window.addEventListener('resize', updateConstraints);
     window.addEventListener('orientationchange', updateConstraints);
+    
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('resize', updateConstraints);
       window.removeEventListener('orientationchange', updateConstraints);
     };
-  }, []);
+  }, [currentStep]);
 
   // Translate title and message if they are translation keys (dot notation)
   const translatedTitle = title.includes('.') ? t(title) : title;
@@ -95,19 +100,21 @@ export function TutorialTooltip({
 
   return (
     <motion.div
+      ref={tooltipRef}
       drag
       dragMomentum={false}
-      dragElastic={0.05}
+      dragElastic={0}
       dragConstraints={dragConstraints}
-      dragTransition={{ bounceStiffness: 600, bounceDamping: 30 }}
+      dragTransition={{ power: 0, timeConstant: 0 }}
       whileDrag={{ scale: 1.02, cursor: 'grabbing' }}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className="relative bg-gray-900 backdrop-blur-md rounded-2xl shadow-2xl border border-green-500/30 w-[90vw] max-w-sm cursor-grab active:cursor-grabbing touch-none overflow-hidden"
+      className="relative bg-gray-900 backdrop-blur-md rounded-2xl shadow-2xl border border-green-500/30 w-[90vw] max-w-sm cursor-grab active:cursor-grabbing touch-none"
       style={{ 
         boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(16, 185, 129, 0.3)',
-        maxHeight: 'calc(100vh - 40px)',
+        maxHeight: 'calc(100vh - 32px)',
+        maxWidth: 'calc(100vw - 32px)',
       }}
     >
       {/* Drag handle indicator */}

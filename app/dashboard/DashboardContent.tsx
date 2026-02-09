@@ -29,6 +29,7 @@ interface DashboardContentProps {
   completedPuzzles: number;
   juzsExplored: number;
   selectedTranslation: string;
+  enableWordByWordAudio?: boolean;
   trialDaysLeft?: number;
   subscriptionStatus?: string;
   subscriptionEndDate?: string;
@@ -53,6 +54,7 @@ export default function DashboardContent({
   completedPuzzles,
   juzsExplored,
   selectedTranslation,
+  enableWordByWordAudio,
   trialDaysLeft,
   subscriptionStatus,
   subscriptionEndDate,
@@ -387,7 +389,10 @@ export default function DashboardContent({
 
         {/* Daily Quote */}
         <div className="mb-6" data-tutorial="daily-quote">
-          <DailyQuote translationEdition={selectedTranslation} />
+          <DailyQuote 
+            translationEdition={selectedTranslation}
+            enableWordByWordAudio={enableWordByWordAudio}
+          />
         </div>
 
         {/* Juz Selector */}

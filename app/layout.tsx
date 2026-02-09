@@ -251,6 +251,11 @@ export default function RootLayout({
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <link rel="dns-prefetch" href="https://*.clerk.com" />
           <link rel="dns-prefetch" href="https://api.stripe.com" />
+          {/* Preconnect to Quran API endpoints */}
+          <link rel="dns-prefetch" href="https://api.quran.com" />
+          <link rel="dns-prefetch" href="https://everyayah.com" />
+          <link rel="preconnect" href="https://api.quran.com" crossOrigin="anonymous" />
+          <link rel="preconnect" href="https://everyayah.com" crossOrigin="anonymous" />
         </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${amiriQuran.variable} antialiased bg-[#0a0a0a] text-white`}

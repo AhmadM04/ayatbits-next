@@ -84,15 +84,16 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
   return (
     <motion.span
       className={`
-        relative inline group cursor-pointer select-none w-full
+        relative inline-block group cursor-pointer select-none
         ${isHighlighted ? 'bg-green-500/20 rounded-lg px-1 -mx-1' : ''}
         ${isHolding ? 'bg-blue-500/20 rounded-lg px-1 -mx-1' : ''}
       `}
       style={{ 
-        wordBreak: 'break-word', 
+        wordBreak: 'keep-all',
         overflowWrap: 'break-word',
         display: 'inline',
         lineHeight: 'inherit',
+        verticalAlign: 'baseline',
       }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -114,18 +115,6 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
       }}
       whileTap={!isHolding ? { scale: 0.98, opacity: 0.8 } : {}}
     >
-      {/* Status indicators - shown inline before ayah number */}
-      {(verse.isCompleted || verse.isLiked) && (
-        <span className="inline-flex items-center gap-0.5 mx-1 align-middle">
-          {verse.isCompleted && (
-            <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-500 inline" />
-          )}
-          {verse.isLiked && (
-            <Heart className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-red-500 fill-current inline" />
-          )}
-        </span>
-      )}
-      
       {/* Arabic text with harakat coloring */}
       <HarakatText 
         text={verse.text} 
@@ -133,9 +122,21 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
         onHarakatClick={handleHarakatClick}
       />
       
-      {/* Ayah number in Arabic numerals - with whitespace control */}
-      <span className="text-green-400 mx-1.5 sm:mx-2 text-base sm:text-lg inline-block whitespace-nowrap align-middle">
-        ﴿{toArabicNumerals(verse.ayahNumber)}﴾
+      {/* Ayah number in Arabic numerals with status indicators */}
+      <span className="inline-flex items-center gap-1 mx-1.5 sm:mx-2 whitespace-nowrap align-middle">
+        <span className="text-green-400 text-[0.9em] inline-block">
+          ﴿{toArabicNumerals(verse.ayahNumber)}﴾
+        </span>
+        {(verse.isCompleted || verse.isLiked) && (
+          <span className="inline-flex items-center gap-0.5">
+            {verse.isCompleted && (
+              <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-500" />
+            )}
+            {verse.isLiked && (
+              <Heart className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-red-500 fill-current" />
+            )}
+          </span>
+        )}
       </span>
       
       {/* Hover/active indicator */}

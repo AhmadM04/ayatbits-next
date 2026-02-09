@@ -10,12 +10,18 @@ interface AyahTextDisplayProps {
   ayahText: string;
   surahNumber: number;
   ayahNumber: number;
+  enableWordByWordAudio?: boolean;
 }
 
-export default function AyahTextDisplay({ ayahText, surahNumber, ayahNumber }: AyahTextDisplayProps) {
+export default function AyahTextDisplay({ 
+  ayahText, 
+  surahNumber, 
+  ayahNumber,
+  enableWordByWordAudio: enableWordByWordAudioProp,
+}: AyahTextDisplayProps) {
   const [selectedHarakat, setSelectedHarakat] = useState<HarakatDefinition | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [enableWordByWordAudio, setEnableWordByWordAudio] = useState(false);
+  const [enableWordByWordAudio, setEnableWordByWordAudio] = useState(enableWordByWordAudioProp ?? false);
 
   // Word audio hook
   const {
@@ -29,8 +35,13 @@ export default function AyahTextDisplay({ ayahText, surahNumber, ayahNumber }: A
     enabled: enableWordByWordAudio,
   });
 
-  // Fetch user settings for word audio
+  // Fetch user settings for word audio - only if not provided as prop
   useEffect(() => {
+    // Skip fetch if prop was provided
+    if (enableWordByWordAudioProp !== undefined) {
+      return;
+    }
+    
     const fetchSettings = async () => {
       try {
         const response = await fetch('/api/user/settings');
@@ -39,11 +50,14 @@ export default function AyahTextDisplay({ ayahText, surahNumber, ayahNumber }: A
           setEnableWordByWordAudio(data.enableWordByWordAudio || false);
         }
       } catch (error) {
+        // Silently fail - not critical for ayah display functionality
         console.error('Failed to fetch user settings:', error);
       }
     };
-    fetchSettings();
-  }, []);
+    // Delay settings fetch to not block initial render
+    const timer = setTimeout(fetchSettings, 0);
+    return () => clearTimeout(timer);
+  }, [enableWordByWordAudioProp]);
 
   const handleHarakatClick = useCallback((definition: HarakatDefinition) => {
     setSelectedHarakat(definition);

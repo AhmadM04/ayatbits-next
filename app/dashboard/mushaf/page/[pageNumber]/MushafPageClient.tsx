@@ -207,17 +207,24 @@ export default function MushafPageClient({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: swipeDirection === 'left' ? -50 : swipeDirection === 'right' ? 50 : 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-6"
+            className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-6 overflow-hidden"
           >
             {/* Arabic Text Container */}
             <div
-              className="text-xl sm:text-2xl md:text-3xl leading-[2.2] sm:leading-[2.5] font-arabic text-right"
+              className="text-[1.375rem] sm:text-[1.75rem] md:text-3xl font-arabic text-right"
               dir="rtl"
               style={{ 
-                fontFamily: 'var(--font-arabic, "Amiri", serif)',
+                fontFamily: 'var(--font-amiri), "Amiri Quran", "Traditional Arabic", serif',
+                lineHeight: '2.5',
+                wordSpacing: '0.15em',
+                letterSpacing: '0.01em',
                 wordWrap: 'break-word',
                 overflowWrap: 'break-word',
+                wordBreak: 'normal',
+                whiteSpace: 'normal',
                 hyphens: 'none',
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
               }}
               data-tutorial="ayah-row"
             >

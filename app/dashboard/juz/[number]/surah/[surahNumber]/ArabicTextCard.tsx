@@ -13,6 +13,7 @@ interface ArabicTextCardProps {
   puzzleId: string;
   isMemorized: boolean;
   isLiked: boolean;
+  enableWordByWordAudio?: boolean;
 }
 
 export default function ArabicTextCard({
@@ -22,6 +23,7 @@ export default function ArabicTextCard({
   puzzleId,
   isMemorized,
   isLiked,
+  enableWordByWordAudio,
 }: ArabicTextCardProps) {
   const [isPlayingRecitation, setIsPlayingRecitation] = useState(false);
 
@@ -57,6 +59,7 @@ export default function ArabicTextCard({
           ayahText={ayahText}
           surahNumber={surahNumber}
           ayahNumber={ayahNumber}
+          enableWordByWordAudio={enableWordByWordAudio}
         />
       </div>
 
