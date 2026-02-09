@@ -5,6 +5,7 @@
 // MODIFIED: 2026-01-18 - Fixed word-by-word audio index for Muqatta'at letters
 // MODIFIED: 2026-01-30 - Fixed auto-play audio index offset bug (was off by 2 on Muqatta'at surahs)
 // MODIFIED: 2026-02-09 - Performance optimizations: disabled logs in production
+// MODIFIED: 2026-02-09 - Performance: Removed mounted/isLoading states, deferred settings fetch
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, useRef, memo } from 'react';
@@ -52,6 +53,7 @@ interface WordPuzzleProps {
   transliteration?: string;
   wordTransliterations?: Array<{ text: string; transliteration: string }>;
   isLoadingTransliteration?: boolean;
+  enableWordByWordAudio?: boolean;
 }
 
 const MAX_MISTAKES = 3;
@@ -441,10 +443,10 @@ export default function WordPuzzle({
   transliteration = '',
   wordTransliterations = [],
   isLoadingTransliteration = false,
+  enableWordByWordAudio: enableWordByWordAudioProp,
 }: WordPuzzleProps) {
   const { t } = useI18n();
   const { showToast } = useToast();
-  const [mounted, setMounted] = useState(false);
   
   // Tokenize ayah and map transliterations to tokens
   const originalTokens = useMemo(() => {
@@ -470,13 +472,6 @@ export default function WordPuzzle({
   const [mistakeCount, setMistakeCount] = useState(0);
   const [hasExceededMistakeLimit, setHasExceededMistakeLimit] = useState(false);
   const hasCompletedRef = useRef(false);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Ensure component is mounted before initializing drag and drop
-  useEffect(() => {
-    log('[DND] Component mounting, setting mounted=true');
-    setMounted(true);
-  }, []);
   const [shakingIds, setShakingIds] = useState<Set<string>>(new Set());
   
   // Tips system state - initialize with calculated value from originalTokens
@@ -489,8 +484,8 @@ export default function WordPuzzle({
   const [activeHint, setActiveHint] = useState<{ tokenId: string; slotPosition: number } | null>(null);
   const [isFadingHint, setIsFadingHint] = useState(false);
   
-  // Word audio state
-  const [enableWordByWordAudio, setEnableWordByWordAudio] = useState(false);
+  // Word audio state - use prop if provided, otherwise fetch from API
+  const [enableWordByWordAudio, setEnableWordByWordAudio] = useState(enableWordByWordAudioProp ?? false);
   
   const pendingToast = useRef<{ message: string; type: 'success' | 'error'; duration: number } | null>(null);
   const onSolvedRef = useRef(onSolved);
@@ -512,8 +507,13 @@ export default function WordPuzzle({
     onSolvedRef.current = onSolved;
   }, [onSolved]);
 
-  // Fetch user settings for word audio
+  // Fetch user settings for word audio - only if not provided as prop
   useEffect(() => {
+    // Skip fetch if prop was provided
+    if (enableWordByWordAudioProp !== undefined) {
+      return;
+    }
+    
     const fetchSettings = async () => {
       try {
         const response = await fetch('/api/user/settings');
@@ -522,11 +522,14 @@ export default function WordPuzzle({
           setEnableWordByWordAudio(data.enableWordByWordAudio || false);
         }
       } catch (error) {
-        console.error('Failed to fetch user settings:', error);
+        // Silently fail - not critical for puzzle functionality
+        log('Failed to fetch user settings:', error);
       }
     };
-    fetchSettings();
-  }, []);
+    // Delay settings fetch to not block initial render
+    const timer = setTimeout(fetchSettings, 0);
+    return () => clearTimeout(timer);
+  }, [enableWordByWordAudioProp]);
 
   // Calculate offset values for word audio index mapping
   // We need to account for MUQATTA'AT: Split into individual letters in puzzle but kept as one word in API
@@ -610,11 +613,8 @@ export default function WordPuzzle({
       },
     })
   );
-  
-  log('[DND] Sensors setup complete', { mounted, sensorsLength: sensors?.length });
 
   const resetState = useCallback(() => {
-    setIsLoading(true);
     setPlacedTokens(new Map());
     setBank(shuffleArray(originalTokens));
     setMistakeCount(0);
@@ -633,8 +633,6 @@ export default function WordPuzzle({
     setUsedTips(0);
     setActiveHint(null);
     setIsFadingHint(false);
-    
-    setTimeout(() => setIsLoading(false), 0);
   }, [originalTokens]);
   
 
@@ -658,7 +656,6 @@ export default function WordPuzzle({
     setUsedTips(0);
     setActiveHint(null);
     setIsFadingHint(false);
-    setIsLoading(false);
     
     log('[PUZZLE] Initial state set with', originalTokens.length, 'tokens, bank length:', initialBank.length);
     
@@ -1023,12 +1020,6 @@ export default function WordPuzzle({
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      {isLoading && (
-        <div className="w-full flex justify-center mb-4">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-transparent" />
-        </div>
-      )}
-      
       {/* Compact header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 flex-wrap">
@@ -1133,58 +1124,49 @@ export default function WordPuzzle({
         </div>
       </div>
 
-      {mounted ? (
-        <>
-          {log('[DND] Rendering DndContext', { mounted, bankLength: bank.length })}
-          <DndContext
-            sensors={sensors}
-            collisionDetection={pointerWithin}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          >
-          <AnswerArea
-            correctTokens={originalTokens}
-            placedTokens={placedTokens}
-            activeTokenId={activeToken?.id || null}
-            hintedSlotPosition={activeHint?.slotPosition ?? null}
-            isFadingHint={isFadingHint}
-            showTransliteration={wordTransliterations.length > 0}
-            enableWordAudio={enableWordByWordAudio}
-            onWordClick={handleAnswerWordClick}
-            playingWordIndex={currentWordIndex !== null ? (() => {
-              // Convert API word index to puzzle position
-              if (muqattaatTokens > 0 && currentWordIndex === 0) {
-                // Playing the Muqatta'at word - highlight the last Muqatta'at letter
-                return muqattaatTokens - 1;
-              } else {
-                // Playing a regular word or word after Muqatta'at
-                return muqattaatTokens > 0 
-                  ? muqattaatTokens - 1 + currentWordIndex
-                  : currentWordIndex;
-              }
-            })() : null}
-            t={t}
-          />
-          <WordBank
-            bank={bank}
-            shakingIds={shakingIds}
-            hintedTokenId={activeHint?.tokenId ?? null}
-            isFadingHint={isFadingHint}
-            showTransliteration={wordTransliterations.length > 0}
-            onWordTap={handleWordTap}
-            t={t}
-          />
+      <DndContext
+        sensors={sensors}
+        collisionDetection={pointerWithin}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <AnswerArea
+          correctTokens={originalTokens}
+          placedTokens={placedTokens}
+          activeTokenId={activeToken?.id || null}
+          hintedSlotPosition={activeHint?.slotPosition ?? null}
+          isFadingHint={isFadingHint}
+          showTransliteration={wordTransliterations.length > 0}
+          enableWordAudio={enableWordByWordAudio}
+          onWordClick={handleAnswerWordClick}
+          playingWordIndex={currentWordIndex !== null ? (() => {
+            // Convert API word index to puzzle position
+            if (muqattaatTokens > 0 && currentWordIndex === 0) {
+              // Playing the Muqatta'at word - highlight the last Muqatta'at letter
+              return muqattaatTokens - 1;
+            } else {
+              // Playing a regular word or word after Muqatta'at
+              return muqattaatTokens > 0 
+                ? muqattaatTokens - 1 + currentWordIndex
+                : currentWordIndex;
+            }
+          })() : null}
+          t={t}
+        />
+        <WordBank
+          bank={bank}
+          shakingIds={shakingIds}
+          hintedTokenId={activeHint?.tokenId ?? null}
+          isFadingHint={isFadingHint}
+          showTransliteration={wordTransliterations.length > 0}
+          onWordTap={handleWordTap}
+          t={t}
+        />
 
-          <DragOverlay dropAnimation={dropAnimation}>
-            {activeToken ? <DraggableWord token={activeToken} isOverlay /> : null}
-          </DragOverlay>
-        </DndContext>
-        </>
-      ) : (
-        <div className="min-h-[400px] flex items-center justify-center">
-          <div className="animate-pulse text-gray-500">Loading puzzle...</div>
-        </div>
-      )}
+        <DragOverlay dropAnimation={dropAnimation}>
+          {activeToken ? <DraggableWord token={activeToken} isOverlay /> : null}
+        </DragOverlay>
+      </DndContext>
 
       {/* Transliteration Display */}
       {transliteration && (

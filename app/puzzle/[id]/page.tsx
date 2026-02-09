@@ -205,6 +205,7 @@ export default async function PuzzlePage({
       nextPuzzleAyahNumber={nextPuzzleAyahNumber}
       versePageUrl={versePageUrl}
       isLastAyahInSurah={isLastAyahInSurah}
+      enableWordByWordAudio={dbUser.enableWordByWordAudio || false}
     />
   );
 }

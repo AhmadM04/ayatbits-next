@@ -43,6 +43,7 @@ interface PuzzleClientProps {
   nextPuzzleAyahNumber?: number | null;
   versePageUrl: string;
   isLastAyahInSurah?: boolean;
+  enableWordByWordAudio?: boolean;
 }
 
 export default function PuzzleClient({
@@ -54,6 +55,7 @@ export default function PuzzleClient({
   nextPuzzleAyahNumber,
   versePageUrl,
   isLastAyahInSurah = false,
+  enableWordByWordAudio = false,
 }: PuzzleClientProps) {
   const { t } = useI18n();
   const { startTutorial } = useTutorial();
@@ -354,6 +356,7 @@ export default function PuzzleClient({
                 handleSolved(isCorrect);
               }}
               onMistakeLimitExceeded={handleMistakeLimitExceeded}
+              enableWordByWordAudio={enableWordByWordAudio}
             />
           </div>
         </div>
