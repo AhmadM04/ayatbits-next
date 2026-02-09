@@ -606,7 +606,7 @@ export default function Home() {
                       src="/screenshots/fullayahview-english.png"
                       alt="Read Ayah Screen"
                       width={350}
-                      height={700}
+                      height={759}
                       className="w-full h-auto"
                     />
                   </div>
@@ -631,12 +631,12 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.2 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <div className="relative w-full max-w-[600px] mx-auto">
+                  <div className="relative w-full max-w-[350px] mx-auto">
                     <Image
                       src="/screenshots/wordpuzzleview-english.png"
                       alt="Solve Puzzle Screen"
-                      width={600}
-                      height={700}
+                      width={350}
+                      height={759}
                       className="w-full h-auto"
                     />
                   </div>
@@ -666,7 +666,7 @@ export default function Home() {
                       src="/screenshots/likedayahview-english.png"
                       alt="Liked Ayahs Screen"
                       width={350}
-                      height={700}
+                      height={759}
                       className="w-full h-auto"
                     />
                   </div>
@@ -696,7 +696,7 @@ export default function Home() {
                       src="/screenshots/trophiesview-english.png"
                       alt="Achievements Screen"
                       width={350}
-                      height={700}
+                      height={759}
                       className="w-full h-auto"
                     />
                   </div>
