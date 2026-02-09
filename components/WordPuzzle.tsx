@@ -4,9 +4,15 @@
 // MODIFIED: 2026-01-18 - Migrated to Quran.com API for consistent Uthmani text
 // MODIFIED: 2026-01-18 - Fixed word-by-word audio index for Muqatta'at letters
 // MODIFIED: 2026-01-30 - Fixed auto-play audio index offset bug (was off by 2 on Muqatta'at surahs)
+// MODIFIED: 2026-02-09 - Performance optimizations: disabled logs in production
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef, memo } from 'react';
+
+// Conditional logging - only in development for performance
+const DEBUG = process.env.NODE_ENV === 'development';
+const log = DEBUG ? console.log.bind(console) : (..._args: any[]) => {};
+
 import {
   DndContext,
   DragEndEvent,
@@ -215,7 +221,8 @@ function DropSlot({
 }
 
 // Bank words support both drag and click/tap
-function DraggableWord({
+// Memoized for performance - only re-renders when props change
+const DraggableWord = memo(function DraggableWord({
   token,
   isOverlay = false,
   isShaking = false,
@@ -237,7 +244,7 @@ function DraggableWord({
     data: { type: 'bank-item', token },
   });
   
-  console.log('[DND] DraggableWord rendered', { 
+  log('[DND] DraggableWord rendered', { 
     id: token.id, 
     hasListeners: !!listeners, 
     hasAttributes: !!attributes,
@@ -318,7 +325,7 @@ function DraggableWord({
       )}
     </ConditionalMotion>
   );
-}
+});
 
 function AnswerArea({
   correctTokens,
@@ -403,9 +410,10 @@ function WordBank({
             <motion.div
               key={token.id}
               layout
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.15 } }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.1 }}
             >
               <DraggableWord
                 token={token}
@@ -466,7 +474,7 @@ export default function WordPuzzle({
   
   // Ensure component is mounted before initializing drag and drop
   useEffect(() => {
-    console.log('[DND] Component mounting, setting mounted=true');
+    log('[DND] Component mounting, setting mounted=true');
     setMounted(true);
   }, []);
   const [shakingIds, setShakingIds] = useState<Set<string>>(new Set());
@@ -474,7 +482,7 @@ export default function WordPuzzle({
   // Tips system state - initialize with calculated value from originalTokens
   const [availableTips, setAvailableTips] = useState(() => {
     const initialTips = calculateTipsForAyah(originalTokens.length);
-    console.log('[TIPS] Initial state - calculated tips:', initialTips, 'for', originalTokens.length, 'tokens');
+    log('[TIPS] Initial state - calculated tips:', initialTips, 'for', originalTokens.length, 'tokens');
     return initialTips;
   });
   const [usedTips, setUsedTips] = useState(0);
@@ -557,7 +565,7 @@ export default function WordPuzzle({
           break;
         }
       }
-      console.log(`🔤 [WORD AUDIO] Muqatta'at detected - ${muqattaatLetterCount} puzzle tokens for 1 API word`);
+      log(`🔤 [WORD AUDIO] Muqatta'at detected - ${muqattaatLetterCount} puzzle tokens for 1 API word`);
     }
     
     return muqattaatLetterCount;
@@ -567,8 +575,8 @@ export default function WordPuzzle({
   const handleAnswerWordClick = useCallback((wordIndex: number) => {
     if (!enableWordByWordAudio) return;
     
-    console.log('🎯 [WORD AUDIO] Word clicked at puzzle position:', wordIndex);
-    console.log('  - Muqatta\'at tokens:', muqattaatTokens);
+    log('🎯 [WORD AUDIO] Word clicked at puzzle position:', wordIndex);
+    log('  - Muqatta\'at tokens:', muqattaatTokens);
     
     // Convert puzzle position to API word index
     let apiIndex: number;
@@ -576,17 +584,17 @@ export default function WordPuzzle({
     if (muqattaatTokens > 0 && wordIndex < muqattaatTokens) {
       // Clicking on a Muqatta'at letter - all letters map to the first API word (index 0)
       apiIndex = 0;
-      console.log('  ℹ️ Clicked on Muqatta\'at letter - playing combined word at API index:', apiIndex);
+      log('  ℹ️ Clicked on Muqatta\'at letter - playing combined word at API index:', apiIndex);
     } else if (muqattaatTokens > 0) {
       // Word after Muqatta'at letters
       // The Muqatta'at letters (e.g., 3 letters) in puzzle map to 1 word in API (index 0)
       // So puzzle position 3 = API position 1, puzzle position 4 = API position 2, etc.
       apiIndex = wordIndex - muqattaatTokens + 1;
-      console.log('  ✓ Word after Muqatta\'at - puzzle pos:', wordIndex, '→ API index:', apiIndex);
+      log('  ✓ Word after Muqatta\'at - puzzle pos:', wordIndex, '→ API index:', apiIndex);
     } else {
       // No Muqatta'at - direct 1:1 mapping
       apiIndex = wordIndex;
-      console.log('  ✓ Regular word - puzzle pos:', wordIndex, '→ API index:', apiIndex);
+      log('  ✓ Regular word - puzzle pos:', wordIndex, '→ API index:', apiIndex);
     }
     
     playWord(apiIndex);
@@ -603,7 +611,7 @@ export default function WordPuzzle({
     })
   );
   
-  console.log('[DND] Sensors setup complete', { mounted, sensorsLength: sensors?.length });
+  log('[DND] Sensors setup complete', { mounted, sensorsLength: sensors?.length });
 
   const resetState = useCallback(() => {
     setIsLoading(true);
@@ -617,7 +625,7 @@ export default function WordPuzzle({
     
     // Reset tips system
     const tipsCount = calculateTipsForAyah(originalTokens.length);
-    console.log('[TIPS] resetState - calculating tips:', {
+    log('[TIPS] resetState - calculating tips:', {
       originalTokensLength: originalTokens.length,
       tipsCount,
     });
@@ -632,7 +640,7 @@ export default function WordPuzzle({
 
   // Initialize puzzle state ONLY on mount - don't reset during completion
   useEffect(() => {
-    console.log('[PUZZLE] Initializing puzzle state on mount', {
+    log('[PUZZLE] Initializing puzzle state on mount', {
       originalTokensLength: originalTokens.length,
       ayahText: ayahText.substring(0, 50)
     });
@@ -652,10 +660,10 @@ export default function WordPuzzle({
     setIsFadingHint(false);
     setIsLoading(false);
     
-    console.log('[PUZZLE] Initial state set with', originalTokens.length, 'tokens, bank length:', initialBank.length);
+    log('[PUZZLE] Initial state set with', originalTokens.length, 'tokens, bank length:', initialBank.length);
     
     return () => {
-      console.log('[PUZZLE] Component unmounting/cleanup');
+      log('[PUZZLE] Component unmounting/cleanup');
     };
   }, []); // ONLY on mount - never reset automatically
 
@@ -673,9 +681,9 @@ export default function WordPuzzle({
   }, [placedTokens.size, originalTokens.length]);
 
   useEffect(() => {
-    console.log('[COMPLETION] useEffect running', { isComplete, hasCompleted: hasCompletedRef.current });
+    log('[COMPLETION] useEffect running', { isComplete, hasCompleted: hasCompletedRef.current });
     if (isComplete && !hasCompletedRef.current) {
-      console.log('Puzzle completed! Calling onSolved callback', { 
+      log('Puzzle completed! Calling onSolved callback', { 
         onSolved: !!onSolvedRef.current, 
         onSolvedType: typeof onSolvedRef.current,
         isComplete,
@@ -695,15 +703,15 @@ export default function WordPuzzle({
       // Otherwise, wait a short 500ms to let the user see the completion
       const delay = isPlayingWord ? 1500 : 500;
       
-      console.log(`⏱️ Waiting ${delay}ms before calling onSolved (word audio playing: ${isPlayingWord})`);
+      log(`⏱️ Waiting ${delay}ms before calling onSolved (word audio playing: ${isPlayingWord})`);
       
       const timeoutId = setTimeout(() => {
-        console.log('⏰ TIMEOUT FIRED after', delay, 'ms');
+        log('⏰ TIMEOUT FIRED after', delay, 'ms');
         if (onSolvedRef.current && typeof onSolvedRef.current === 'function') {
-          console.log('🚀 Calling onSolved(true) after delay');
+          log('🚀 Calling onSolved(true) after delay');
           try {
             onSolvedRef.current(true);
-            console.log('✅ onSolved(true) called successfully');
+            log('✅ onSolved(true) called successfully');
           } catch (error) {
             console.error('❌ Error calling onSolved:', error);
           }
@@ -717,7 +725,7 @@ export default function WordPuzzle({
       
       // Cleanup timeout ONLY if component unmounts - not on re-render!
       return () => {
-        console.log('🧹 Cleanup called - clearing timeout (this cancels navigation!)');
+        log('🧹 Cleanup called - clearing timeout (this cancels navigation!)');
         clearTimeout(timeoutId);
       };
     }
@@ -788,7 +796,7 @@ export default function WordPuzzle({
 
   // Manual tip triggering (when user clicks tips button)
   const handleManualTip = useCallback(() => {
-    console.log('[TIPS] handleManualTip called', {
+    log('[TIPS] handleManualTip called', {
       usedTips,
       availableTips,
       hasActiveHint: !!activeHint,
@@ -799,14 +807,14 @@ export default function WordPuzzle({
 
     // Check if tips are available
     if (usedTips >= availableTips) {
-      console.log('[TIPS] No tips available - usedTips >= availableTips');
+      log('[TIPS] No tips available - usedTips >= availableTips');
       showToast(t('wordPuzzle.noTipsAvailable'), 'error', 2000);
       return;
     }
 
     // Don't trigger if hint is already active
     if (activeHint) {
-      console.log('[TIPS] Hint already active');
+      log('[TIPS] Hint already active');
       showToast(t('wordPuzzle.tipAlreadyShowing'), 'info', 2000);
       return;
     }
@@ -820,7 +828,7 @@ export default function WordPuzzle({
       }
     }
     
-    console.log('[TIPS] First empty slot:', firstEmptySlot);
+    log('[TIPS] First empty slot:', firstEmptySlot);
     
     if (firstEmptySlot === -1) {
       showToast(t('wordPuzzle.allSlotsFilled'), 'info', 2000);
@@ -828,12 +836,12 @@ export default function WordPuzzle({
     }
 
     const correctToken = originalTokens[firstEmptySlot];
-    console.log('[TIPS] Looking for token:', { 
+    log('[TIPS] Looking for token:', { 
       text: correctToken.text, 
       norm: correctToken.norm,
       id: correctToken.id 
     });
-    console.log('[TIPS] Bank contents:', bank.map(t => ({ id: t.id, text: t.text, norm: t.norm })));
+    log('[TIPS] Bank contents:', bank.map(t => ({ id: t.id, text: t.text, norm: t.norm })));
     
     // Find the correct word in the bank - use exact ID match first, then fall back to norm match
     let correctWordInBank = bank.find(t => t.id === correctToken.id);
@@ -842,7 +850,7 @@ export default function WordPuzzle({
       correctWordInBank = bank.find(t => t.norm === correctToken.norm);
     }
     
-    console.log('[TIPS] Found word in bank:', correctWordInBank ? { id: correctWordInBank.id, text: correctWordInBank.text } : 'NOT FOUND');
+    log('[TIPS] Found word in bank:', correctWordInBank ? { id: correctWordInBank.id, text: correctWordInBank.text } : 'NOT FOUND');
     
     if (correctWordInBank) {
       setIsFadingHint(false);
@@ -850,12 +858,12 @@ export default function WordPuzzle({
         tokenId: correctWordInBank.id,
         slotPosition: firstEmptySlot,
       };
-      console.log('[TIPS] Setting activeHint:', hint);
+      log('[TIPS] Setting activeHint:', hint);
       setActiveHint(hint);
       setUsedTips((prev) => prev + 1);
       showToast(t('wordPuzzle.tipActivated'), 'success', 3000);
     } else {
-      console.log('[TIPS] Could not find correct word in bank');
+      log('[TIPS] Could not find correct word in bank');
       showToast(t('wordPuzzle.unableToFindWord'), 'error', 2000);
     }
   }, [usedTips, availableTips, activeHint, originalTokens, placedTokens, bank, showToast]);
@@ -866,14 +874,14 @@ export default function WordPuzzle({
     (token: WordToken, slotPosition: number): boolean => {
       // Check if slot is already filled
       if (placedTokens.has(slotPosition)) {
-        console.log('[PLACEMENT] Slot already filled:', { slotPosition });
+        log('[PLACEMENT] Slot already filled:', { slotPosition });
         return false;
       }
 
       // Check if this token is correct for THIS specific slot
       const expectedToken = originalTokens[slotPosition];
       
-      console.log('[PLACEMENT] Attempting placement:', {
+      log('[PLACEMENT] Attempting placement:', {
         slotPosition,
         token: { id: token.id, text: token.text, norm: token.norm, position: token.position },
         expected: { id: expectedToken.id, text: expectedToken.text, norm: expectedToken.norm, position: expectedToken.position },
@@ -884,13 +892,13 @@ export default function WordPuzzle({
       
       if (token.norm !== expectedToken.norm) {
         // Wrong token for this slot - count as mistake
-        console.log('[PLACEMENT] ❌ REJECTED - norm mismatch');
+        log('[PLACEMENT] ❌ REJECTED - norm mismatch');
         registerMistake(token.id);
         return false;
       }
 
       // Correct! Place the token
-      console.log('[PLACEMENT] ✅ ACCEPTED - placing token');
+      log('[PLACEMENT] ✅ ACCEPTED - placing token');
       setPlacedTokens((prev) => {
         const next = new Map(prev);
         next.set(slotPosition, token);
@@ -917,7 +925,7 @@ export default function WordPuzzle({
       
       // Auto-play word audio if enabled
       if (enableWordByWordAudio) {
-        console.log('[PLACEMENT] 🔊 Auto-playing word audio for position:', slotPosition);
+        log('[PLACEMENT] 🔊 Auto-playing word audio for position:', slotPosition);
         handleAnswerWordClick(slotPosition);
       }
       
@@ -928,9 +936,9 @@ export default function WordPuzzle({
 
   const handleDragStart = useCallback(
     (event: DragStartEvent) => {
-      console.log('[DND] handleDragStart called', event.active.id);
+      log('[DND] handleDragStart called', event.active.id);
       const token = bank.find((t) => t.id === event.active.id) || null;
-      console.log('[DND] Found token:', token);
+      log('[DND] Found token:', token);
       setActiveToken(token);
     },
     [bank]
@@ -938,13 +946,13 @@ export default function WordPuzzle({
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
-      console.log('[DND] handleDragEnd called', { activeId: event.active.id, overId: event.over?.id });
+      log('[DND] handleDragEnd called', { activeId: event.active.id, overId: event.over?.id });
       const { active, over } = event;
       setActiveToken(null);
 
       // If not dropped on anything, just return (no mistake)
       if (!over || hasExceededMistakeLimit) {
-        console.log('[DND] Early return - no over or exceeded limit');
+        log('[DND] Early return - no over or exceeded limit');
         return;
       }
 
@@ -1037,7 +1045,7 @@ export default function WordPuzzle({
           {/* Tips Counter - Clickable Button */}
           <motion.button
             onClick={(e) => {
-              console.log('[TIPS] Button clicked!', e);
+              log('[TIPS] Button clicked!', e);
               handleManualTip();
             }}
             disabled={usedTips >= availableTips || hasExceededMistakeLimit}
@@ -1127,7 +1135,7 @@ export default function WordPuzzle({
 
       {mounted ? (
         <>
-          {console.log('[DND] Rendering DndContext', { mounted, bankLength: bank.length })}
+          {log('[DND] Rendering DndContext', { mounted, bankLength: bank.length })}
           <DndContext
             sensors={sensors}
             collisionDetection={pointerWithin}

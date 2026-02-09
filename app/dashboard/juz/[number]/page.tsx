@@ -38,43 +38,62 @@ export default async function JuzPage({
     );
   }
 
-  // Get all puzzles in this juz to find unique surahs
-  const puzzles = await Puzzle.find({ juzId: juz._id }).select('surahId').lean() as any;
-  const uniqueSurahIds: string[] = [...new Set(puzzles.map((p: any) => p.surahId?.toString()).filter(Boolean))] as string[];
+  // OPTIMIZED: Fetch all puzzles in this juz with necessary fields in ONE query
+  const allJuzPuzzles = await Puzzle.find({ juzId: juz._id })
+    .select('_id surahId content.ayahNumber')
+    .sort({ 'content.ayahNumber': 1 })
+    .lean() as any;
+  
+  const uniqueSurahIds: string[] = [...new Set(allJuzPuzzles.map((p: any) => p.surahId?.toString()).filter(Boolean))] as string[];
   
   // Get surahs that appear in this juz
   const surahs = await Surah.find({
     _id: { $in: uniqueSurahIds.map((id) => new mongoose.Types.ObjectId(id)) }
   }).sort({ number: 1 }).lean() as any;
 
-  // Get puzzle counts and progress for each surah
-  // Also find the starting ayah number for each surah in this juz
-  const surahsWithData = await Promise.all(
-    surahs.map(async (surah: any) => {
-      const surahPuzzles = await Puzzle.find({ 
-        juzId: juz._id,
-        surahId: surah._id 
-      }).sort({ 'content.ayahNumber': 1 }).lean() as any;
-      
-      // Get the first puzzle to find where this juz starts in the surah
-      const firstPuzzle = surahPuzzles[0];
-      const startAyahNumber = firstPuzzle?.content?.ayahNumber || 1;
-      
-      const puzzleIds = surahPuzzles.map((p: any) => p._id);
-      const userProgress = await UserProgress.find({
-        userId: dbUser._id,
-        puzzleId: { $in: puzzleIds },
-        status: 'COMPLETED',
-      }).lean() as any;
-
-      return {
-        ...surah,
-        puzzleCount: surahPuzzles.length,
-        completedCount: userProgress.length,
-        startAyahNumber,
-      };
-    })
+  // OPTIMIZED: Fetch all user progress for this juz in ONE query
+  const allPuzzleIds = allJuzPuzzles.map((p: any) => p._id);
+  const allUserProgress = await UserProgress.find({
+    userId: dbUser._id,
+    puzzleId: { $in: allPuzzleIds },
+    status: 'COMPLETED',
+  }).select('puzzleId').lean() as any[];
+  
+  // Create a set of completed puzzle IDs for fast lookup
+  const completedPuzzleIds = new Set(
+    allUserProgress.map((p: any) => p.puzzleId?.toString()).filter(Boolean)
   );
+
+  // Group puzzles by surah in memory
+  const puzzlesBySurah = allJuzPuzzles.reduce((acc: any, puzzle: any) => {
+    const surahId = puzzle.surahId?.toString();
+    if (!surahId) return acc;
+    if (!acc[surahId]) acc[surahId] = [];
+    acc[surahId].push(puzzle);
+    return acc;
+  }, {});
+
+  // Process surah data in memory (no database queries in loop)
+  const surahsWithData = surahs.map((surah: any) => {
+    const surahId = surah._id.toString();
+    const surahPuzzles = puzzlesBySurah[surahId] || [];
+    
+    // Get the first puzzle to find where this juz starts in the surah
+    const firstPuzzle = surahPuzzles[0];
+    const startAyahNumber = firstPuzzle?.content?.ayahNumber || 1;
+    
+    // Count completed puzzles for this surah
+    const completedCount = surahPuzzles.filter((p: any) => 
+      completedPuzzleIds.has(p._id.toString())
+    ).length;
+
+    return {
+      ...surah,
+      puzzleCount: surahPuzzles.length,
+      completedCount,
+      startAyahNumber,
+    };
+  });
 
   const serializedSurahs = surahsWithData.map((surah: any) => ({
     _id: surah._id.toString(),

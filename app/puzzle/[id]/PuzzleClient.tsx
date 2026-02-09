@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import WordPuzzle from '@/components/WordPuzzle';
+import dynamic from 'next/dynamic';
 import { useToast } from '@/components/Toast';
 import { apiPost, apiDelete, getErrorMessage, NetworkError } from '@/lib/api-client';
 import { ArrowLeft, Heart, HelpCircle } from 'lucide-react';
@@ -12,7 +12,21 @@ import { TutorialWrapper, useTutorial } from '@/components/tutorial';
 import { puzzleTutorialSteps } from '@/lib/tutorial-configs';
 import { resetTutorial } from '@/lib/tutorial-manager';
 import { useI18n } from '@/lib/i18n';
-import ConfirmExitModal from '@/components/ConfirmExitModal';
+
+// OPTIMIZED: Dynamically import heavy components
+const WordPuzzle = dynamic(() => import('@/components/WordPuzzle'), {
+  loading: () => (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-green-500 border-t-transparent" />
+    </div>
+  ),
+  ssr: false,
+});
+
+// OPTIMIZED: Lazy load ConfirmExitModal - only loads when user attempts to exit
+const ConfirmExitModal = dynamic(() => import('@/components/ConfirmExitModal'), {
+  ssr: false,
+});
 
 interface PuzzleClientProps {
   puzzle: {
@@ -57,6 +71,34 @@ export default function PuzzleClient({
   useEffect(() => {
     hasHandledCompletion.current = false;
   }, [puzzle.id]);
+
+  // Handle browser back button / swipe gestures
+  useEffect(() => {
+    // Add a dummy history entry so we can intercept the back navigation
+    window.history.pushState({ puzzleInterceptor: true }, '');
+    
+    const handlePopState = (event: PopStateEvent) => {
+      // Check if this is our interceptor state
+      if (event.state?.puzzleInterceptor) {
+        // Prevent the default back navigation
+        event.preventDefault();
+        // Push the state back so we stay on the same page
+        window.history.pushState({ puzzleInterceptor: true }, '');
+        // Show the exit confirmation modal
+        setShowExitModal(true);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      // Clean up the interceptor state when component unmounts
+      if (window.history.state?.puzzleInterceptor) {
+        window.history.back();
+      }
+    };
+  }, []);
 
 
   const handleRestartTutorial = () => {

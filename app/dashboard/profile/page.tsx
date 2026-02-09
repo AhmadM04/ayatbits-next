@@ -16,30 +16,50 @@ export default async function ProfilePage() {
   const user = await requireDashboardAccess();
   const trialDaysLeft = getTrialDaysRemaining(user);
 
-  // Fetch user stats - get all completed progress
+  // OPTIMIZED: Fetch only puzzle IDs instead of full documents
   const completedProgress = await UserProgress.find({ 
     userId: user._id, 
     status: 'COMPLETED' 
-  }).populate('puzzleId').lean() as any[];
+  }).select('puzzleId').lean() as any[];
 
   // Count total puzzles solved
   const puzzlesSolved = completedProgress.length;
 
-  // Calculate surahs completed
-  // Group puzzles by surah and check if all puzzles in each surah are completed
-  const completedPuzzleIds = new Set(completedProgress.map((p: any) => p.puzzleId?._id?.toString()).filter(Boolean));
+  // Get completed puzzle IDs
+  const completedPuzzleIds = new Set(
+    completedProgress.map((p: any) => p.puzzleId?.toString()).filter(Boolean)
+  );
+
+  // OPTIMIZED: Fetch all completed puzzles in ONE query to get surah info
+  const completedPuzzles = await Puzzle.find({
+    _id: { $in: Array.from(completedPuzzleIds) }
+  }).select('_id surahId').lean() as any[];
   
   // Get all unique surahs from completed puzzles
   const uniqueSurahIds = new Set(
-    completedProgress
-      .map((p: any) => p.puzzleId?.surahId?.toString())
+    completedPuzzles
+      .map((p: any) => p.surahId?.toString())
       .filter(Boolean)
   );
 
-  // For each surah, check if all its puzzles are completed
+  // OPTIMIZED: Fetch all puzzles for unique surahs in ONE query (not N queries)
+  const allSurahPuzzles = await Puzzle.find({ 
+    surahId: { $in: Array.from(uniqueSurahIds) } 
+  }).select('_id surahId').lean() as any[];
+
+  // Group by surah in memory
+  const puzzlesBySurah = allSurahPuzzles.reduce((acc: any, puzzle: any) => {
+    const surahId = puzzle.surahId?.toString();
+    if (!surahId) return acc;
+    if (!acc[surahId]) acc[surahId] = [];
+    acc[surahId].push(puzzle);
+    return acc;
+  }, {});
+
+  // Calculate surahs completed
   let surahsCompleted = 0;
   for (const surahId of uniqueSurahIds) {
-    const surahPuzzles = await Puzzle.find({ surahId }).lean();
+    const surahPuzzles = puzzlesBySurah[surahId] || [];
     const allCompleted = surahPuzzles.every((puzzle: any) => 
       completedPuzzleIds.has(puzzle._id.toString())
     );

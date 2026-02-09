@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { Flame, BookOpen, AlertTriangle, HelpCircle, Menu, X, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo } from 'react';
@@ -9,8 +10,12 @@ import { SignOutButton } from '@clerk/nextjs';
 import BottomNav from '@/components/BottomNav';
 import DailyQuote from '@/components/DailyQuote';
 import TrialBanner from '@/components/TrialBanner';
-import VerseSearch from '@/components/VerseSearch';
 import LanguageSelector from '@/components/LanguageSelector';
+
+// OPTIMIZED: Lazy load VerseSearch modal for better initial page load
+const VerseSearch = dynamic(() => import('@/components/VerseSearch'), {
+  ssr: false,
+});
 import { SparkleAnimation } from '@/components/animations';
 import { TutorialWrapper, useTutorial, TutorialStep } from '@/components/tutorial';
 import { dashboardTutorialSteps, languageSelectorTutorialStep } from '@/lib/tutorial-configs';

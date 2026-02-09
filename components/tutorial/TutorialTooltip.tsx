@@ -41,21 +41,39 @@ export function TutorialTooltip({
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       
-      // Use more generous constraints for mobile to allow free movement
       const isMobile = vw < 768;
       const tooltipWidth = isMobile ? Math.min(vw * 0.9, 340) : 384; // max-w-sm
       const tooltipHeight = 250; // estimated height
       
-      // On mobile, allow dragging across most of the screen
-      // On desktop, keep more conservative bounds
-      const horizontalRange = isMobile ? vw * 0.45 : 300;
-      const verticalRange = isMobile ? vh * 0.4 : 250;
+      // Calculate the maximum distance the tooltip can be dragged from its centered position
+      // while still keeping it fully visible on screen
+      const centerX = vw / 2;
+      const centerY = vh / 2;
+      
+      // Add padding to prevent touching the edges
+      const padding = 16;
+      
+      // Calculate max distances in each direction to keep tooltip fully visible
+      // Left edge: centerX - tooltipWidth/2 + dragX >= padding
+      // So: dragX >= padding - (centerX - tooltipWidth/2)
+      // Therefore: min dragX (most negative) = -(centerX - tooltipWidth/2 - padding)
+      const maxLeft = centerX - (tooltipWidth / 2) - padding;
+      
+      // Right edge: centerX + tooltipWidth/2 + dragX <= vw - padding
+      // So: dragX <= vw - padding - (centerX + tooltipWidth/2)
+      const maxRight = vw - padding - centerX - (tooltipWidth / 2);
+      
+      // Top edge: centerY - tooltipHeight/2 + dragY >= padding
+      const maxTop = centerY - (tooltipHeight / 2) - padding;
+      
+      // Bottom edge: centerY + tooltipHeight/2 + dragY <= vh - padding
+      const maxBottom = vh - padding - centerY - (tooltipHeight / 2);
       
       setDragConstraints({
-        top: -verticalRange,
-        bottom: verticalRange,
-        left: -horizontalRange,
-        right: horizontalRange,
+        top: -maxTop,
+        bottom: maxBottom,
+        left: -maxLeft,
+        right: maxRight,
       });
     };
 

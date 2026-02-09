@@ -31,7 +31,6 @@ const nextConfig: NextConfig = {
     optimizePackageImports: [
       '@clerk/nextjs',
       'framer-motion',
-      'lucide-react',
       'next-intl',
       'zustand',
       '@react-email/components',

@@ -222,3 +222,23 @@ html {
 .animate-shimmer {
   animation: shimmer 2s infinite;
 }
+
+/* OPTIMIZED: Performance optimization for animated elements */
+/* Add will-change to elements that will be animated to improve performance */
+.motion-safe\:will-change-transform {
+  will-change: transform;
+}
+
+.motion-safe\:will-change-opacity {
+  will-change: opacity;
+}
+
+/* Apply to Framer Motion animated elements */
+[data-framer-motion] {
+  will-change: transform, opacity;
+}
+
+/* Remove will-change after animation completes to free up resources */
+.motion-safe\:animation-complete {
+  will-change: auto;
+}

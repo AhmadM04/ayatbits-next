@@ -1,7 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import AyahSelectorModal from './AyahSelectorModal';
+import dynamic from 'next/dynamic';
+
+// OPTIMIZED: Lazy load AyahSelectorModal - only loads when modal is opened
+const AyahSelectorModal = dynamic(() => import('./AyahSelectorModal'), {
+  ssr: false,
+});
 
 interface AyahSelectorClientProps {
   puzzles: Array<{ id: string; ayahNumber: number; isCompleted: boolean; isLiked: boolean }>;

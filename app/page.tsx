@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,24 +10,29 @@ import { ConditionalMotion, useReducedMotion } from "@/components/ConditionalMot
 import { Puzzle, Trophy, Flame, Star, Sparkles, CheckCircle2, Quote, Gift, Menu, X } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import UserProfileSection from "@/components/UserProfileSection";
-import DemoPuzzle from "@/components/DemoPuzzle";
 import { QuranLoader } from "@/components/animations";
 import LanguageSelector from "@/components/LanguageSelector";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
 import { useI18n } from "@/lib/i18n";
 
+// OPTIMIZED: Dynamically import heavy components
+const DemoPuzzle = dynamic(() => import("@/components/DemoPuzzle"), {
+  loading: () => (
+    <div className="flex items-center justify-center min-h-[300px]">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-green-500 border-t-transparent" />
+    </div>
+  ),
+  ssr: false,
+});
+
+// OPTIMIZED: Reduced floating Arabic words from 10 to 5 for better performance
 // Floating Arabic letters/words for the background - Names of Allah (Asma ul Husna)
 const floatingArabicWords = [
   { text: 'ٱلرَّحْمَٰن', x: '10%', y: '20%', delay: 0, duration: 8 },
   { text: 'ٱلرَّحِيم', x: '85%', y: '15%', delay: 1, duration: 10 },
   { text: 'ٱلْمَلِك', x: '75%', y: '70%', delay: 2, duration: 9 },
-  { text: 'ٱلْقُدُّوس', x: '15%', y: '75%', delay: 0.5, duration: 11 },
-  { text: 'ٱلسَّلَام', x: '90%', y: '45%', delay: 1.5, duration: 8 },
-  { text: 'ٱلْعَزِيز', x: '5%', y: '50%', delay: 2.5, duration: 10 },
-  { text: 'ٱلْحَكِيم', x: '50%', y: '85%', delay: 3, duration: 9 },
-  { text: 'ٱللَّطِيف', x: '30%', y: '10%', delay: 0.8, duration: 12 },
-  { text: 'ٱلْكَرِيم', x: '70%', y: '30%', delay: 1.2, duration: 8 },
-  { text: 'ٱلنُّور', x: '20%', y: '40%', delay: 2.2, duration: 10 },
+  { text: 'ٱلسَّلَام', x: '15%', y: '75%', delay: 0.5, duration: 11 },
+  { text: 'ٱلنُّور', x: '50%', y: '45%', delay: 1.5, duration: 10 },
 ];
 
 // Component to check access and render appropriate button
@@ -606,8 +612,9 @@ export default function Home() {
                     <Image
                       src="/screenshots/fullayahview-english.png"
                       alt="Read Ayah Screen"
-                      width={900}
-                      height={2000}
+                      width={600}
+                      height={1200}
+                      loading="lazy"
                       className="w-full h-auto"
                     />
                   </div>
@@ -636,8 +643,9 @@ export default function Home() {
                     <Image
                       src="/screenshots/wordpuzzleview-english.png"
                       alt="Solve Puzzle Screen"
-                      width={900}
-                      height={2000}
+                      width={600}
+                      height={1200}
+                      loading="lazy"
                       className="w-full h-auto"
                     />
                   </div>
@@ -666,8 +674,9 @@ export default function Home() {
                     <Image
                       src="/screenshots/likedayahview-english.png"
                       alt="Liked Ayahs Screen"
-                      width={1800}
-                      height={4000}
+                      width={600}
+                      height={1200}
+                      loading="lazy"
                       className="w-full h-auto"
                     />
                   </div>
@@ -696,8 +705,9 @@ export default function Home() {
                     <Image
                       src="/screenshots/trophiesview-english.png"
                       alt="Achievements Screen"
-                      width={1800}
-                      height={4000}
+                      width={600}
+                      height={1200}
+                      loading="lazy"
                       className="w-full h-auto"
                     />
                   </div>
