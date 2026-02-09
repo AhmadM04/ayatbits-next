@@ -601,12 +601,12 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.1 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <div className="relative w-full max-w-[275px] mx-auto">
+                  <div className="relative w-full max-w-[350px] mx-auto">
                     <Image
                       src="/screenshots/fullayahview-english.png"
                       alt="Read Ayah Screen"
-                      width={275}
-                      height={570}
+                      width={350}
+                      height={700}
                       className="w-full h-auto"
                     />
                   </div>
@@ -631,12 +631,12 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.2 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <div className="relative w-full max-w-[275px] mx-auto">
+                  <div className="relative w-full max-w-[350px] mx-auto">
                     <Image
                       src="/screenshots/wordpuzzleview-english.png"
                       alt="Solve Puzzle Screen"
-                      width={275}
-                      height={570}
+                      width={350}
+                      height={700}
                       className="w-full h-auto"
                     />
                   </div>
@@ -661,12 +661,12 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.3 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <div className="relative w-full max-w-[275px] mx-auto">
+                  <div className="relative w-full max-w-[350px] mx-auto">
                     <Image
                       src="/screenshots/likedayahview-english.png"
                       alt="Liked Ayahs Screen"
-                      width={275}
-                      height={570}
+                      width={350}
+                      height={700}
                       className="w-full h-auto"
                     />
                   </div>
@@ -691,12 +691,12 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.4 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <div className="relative w-full max-w-[275px] mx-auto">
+                  <div className="relative w-full max-w-[350px] mx-auto">
                     <Image
                       src="/screenshots/trophiesview-english.png"
                       alt="Achievements Screen"
-                      width={275}
-                      height={570}
+                      width={350}
+                      height={700}
                       className="w-full h-auto"
                     />
                   </div>
