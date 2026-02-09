@@ -592,7 +592,7 @@ export default function Home() {
                 </p>
               </motion.div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 max-w-7xl mx-auto">
+              <div className="flex flex-col gap-16 max-w-7xl mx-auto">
                 {/* Step 1: Read Ayah */}
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
@@ -601,12 +601,12 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.1 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <div className="relative w-full max-w-[350px] mx-auto">
+                  <div className="relative w-full max-w-[1800px] mx-auto">
                     <Image
                       src="/screenshots/fullayahview-english.png"
                       alt="Read Ayah Screen"
-                      width={350}
-                      height={759}
+                      width={900}
+                      height={2000}
                       className="w-full h-auto"
                     />
                   </div>
@@ -631,12 +631,12 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.2 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <div className="relative w-full max-w-[350px] mx-auto">
+                  <div className="relative w-full max-w-[1800px] mx-auto">
                     <Image
                       src="/screenshots/wordpuzzleview-english.png"
                       alt="Solve Puzzle Screen"
-                      width={350}
-                      height={759}
+                      width={900}
+                      height={2000}
                       className="w-full h-auto"
                     />
                   </div>
@@ -661,12 +661,12 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.3 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <div className="relative w-full max-w-[350px] mx-auto">
+                  <div className="relative w-full max-w-[1800px] mx-auto">
                     <Image
                       src="/screenshots/likedayahview-english.png"
                       alt="Liked Ayahs Screen"
-                      width={350}
-                      height={759}
+                      width={1800}
+                      height={4000}
                       className="w-full h-auto"
                     />
                   </div>
@@ -691,12 +691,12 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.4 }}
                   className="flex flex-col items-center text-center"
                 >
-                  <div className="relative w-full max-w-[350px] mx-auto">
+                  <div className="relative w-full max-w-[1800px] mx-auto">
                     <Image
                       src="/screenshots/trophiesview-english.png"
                       alt="Achievements Screen"
-                      width={350}
-                      height={759}
+                      width={1800}
+                      height={4000}
                       className="w-full h-auto"
                     />
                   </div>
