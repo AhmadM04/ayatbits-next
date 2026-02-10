@@ -49,28 +49,37 @@ export function TutorialTooltip({
       const tooltipWidth = rect.width;
       const tooltipHeight = rect.height;
       
-      // Calculate centered position
-      const centerX = vw / 2;
-      const centerY = vh / 2;
-      
       // Padding from edges
       const padding = 16;
       
-      // Since the tooltip is centered with translate(-50%, -50%),
-      // we need to calculate constraints from the center point
-      // The tooltip can drag as far as it needs to stay within bounds
+      // The tooltip is rendered at 50% viewport with translate(-50%, -50%)
+      // So its actual position spans from:
+      // - left edge: (vw/2) - (width/2)
+      // - right edge: (vw/2) + (width/2)
+      // - top edge: (vh/2) - (height/2)
+      // - bottom edge: (vh/2) + (height/2)
       
-      // How far can we drag left before left edge hits padding?
-      const maxDragLeft = centerX - (tooltipWidth / 2) - padding;
+      // Calculate the current position of edges relative to viewport
+      const leftEdge = rect.left;
+      const rightEdge = rect.right;
+      const topEdge = rect.top;
+      const bottomEdge = rect.bottom;
       
-      // How far can we drag right before right edge hits padding?
-      const maxDragRight = vw - centerX - (tooltipWidth / 2) - padding;
+      // Calculate how far we can drag in each direction
+      // Negative values mean we can drag in that direction
+      // The tooltip center can move as far as needed to keep all edges within padding
       
-      // How far can we drag up before top edge hits padding?
-      const maxDragUp = centerY - (tooltipHeight / 2) - padding;
+      // How far left can we drag? (until left edge hits padding)
+      const maxDragLeft = leftEdge - padding;
       
-      // How far can we drag down before bottom edge hits padding?
-      const maxDragDown = vh - centerY - (tooltipHeight / 2) - padding;
+      // How far right can we drag? (until right edge hits padding) 
+      const maxDragRight = vw - rightEdge - padding;
+      
+      // How far up can we drag? (until top edge hits padding)
+      const maxDragUp = topEdge - padding;
+      
+      // How far down can we drag? (until bottom edge hits padding)
+      const maxDragDown = vh - bottomEdge - padding;
       
       setDragConstraints({
         left: -Math.max(0, maxDragLeft),

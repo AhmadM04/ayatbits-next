@@ -279,23 +279,27 @@ const DraggableWord = memo(function DraggableWord({
       data-component="draggable-word-v2-fixed"
       data-hinted={isHinted}
       data-bank-word="true"
+      initial={{ opacity: 0, scale: 0.9 }}
       animate={
         isShaking
-          ? { x: [0, -8, 8, -8, 8, 0] }
+          ? { opacity: 1, scale: 1, x: [0, -8, 8, -8, 8, 0] }
           : isFadingHint
           ? {
+              opacity: 1,
+              scale: 1,
               borderColor: 'rgba(255, 255, 255, 0.1)',
               backgroundColor: '#1a1a1a',
               color: 'rgb(229, 229, 229)',
             }
-          : {}
+          : { opacity: 1, scale: 1 }
       }
+      exit={{ opacity: 0, scale: 0.9 }}
       transition={
         isShaking
           ? { duration: 0.3 }
           : isFadingHint
           ? { duration: 0.7, ease: 'easeOut' }
-          : { duration: 0.3 }
+          : { duration: 0.2, ease: 'easeOut' }
       }
       className={`
         relative cursor-grab active:cursor-grabbing group
@@ -411,25 +415,17 @@ function WordBank({
         {t('wordPuzzle.dragOrTap')}
       </p>
       <div className="flex flex-wrap justify-center gap-2">
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence>
           {bank.map((token) => (
-            <motion.div
+            <DraggableWord
               key={token.id}
-              layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.1 }}
-            >
-              <DraggableWord
-                token={token}
-                isShaking={shakingIds.has(token.id)}
-                isHinted={hintedTokenId === token.id}
-                isFadingHint={isFadingHint && hintedTokenId === token.id}
-                showTransliteration={showTransliteration}
-                onTap={onWordTap}
-              />
-            </motion.div>
+              token={token}
+              isShaking={shakingIds.has(token.id)}
+              isHinted={hintedTokenId === token.id}
+              isFadingHint={isFadingHint && hintedTokenId === token.id}
+              showTransliteration={showTransliteration}
+              onTap={onWordTap}
+            />
           ))}
         </AnimatePresence>
       </div>
