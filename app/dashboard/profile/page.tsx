@@ -5,7 +5,6 @@ import AudioSettings from './AudioSettings';
 import BillingSection from './BillingSection';
 import { getTrialDaysRemaining } from '@/lib/subscription';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
-import { UserProfile } from '@clerk/nextjs';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { TutorialWrapper } from '@/components/tutorial';

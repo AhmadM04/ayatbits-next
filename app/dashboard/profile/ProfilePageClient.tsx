@@ -1,6 +1,6 @@
 'use client';
 
-import { UserProfile } from '@clerk/nextjs';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
@@ -9,6 +9,22 @@ import TranslationSelector from './TranslationSelector';
 import AudioSettings from './AudioSettings';
 import BillingSection from './BillingSection';
 import UserPreferences from './UserPreferences';
+
+// Dynamically import UserProfile to ensure UI components are loaded
+const UserProfile = dynamic(
+  () => import('@clerk/nextjs').then((mod) => mod.UserProfile),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="bg-[#111] rounded-2xl border border-white/10 p-8 flex items-center justify-center">
+        <div className="flex items-center gap-3 text-gray-400">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-green-500 border-t-transparent" />
+          <span>Loading...</span>
+        </div>
+      </div>
+    )
+  }
+);
 
 interface ProfilePageClientProps {
   userData: {
