@@ -279,27 +279,25 @@ const DraggableWord = memo(function DraggableWord({
       data-component="draggable-word-v2-fixed"
       data-hinted={isHinted}
       data-bank-word="true"
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={false}
       animate={
         isShaking
-          ? { opacity: 1, scale: 1, x: [0, -8, 8, -8, 8, 0] }
+          ? { x: [0, -8, 8, -8, 8, 0] }
           : isFadingHint
           ? {
-              opacity: 1,
-              scale: 1,
               borderColor: 'rgba(255, 255, 255, 0.1)',
               backgroundColor: '#1a1a1a',
               color: 'rgb(229, 229, 229)',
             }
-          : { opacity: 1, scale: 1 }
+          : {}
       }
-      exit={{ opacity: 0, scale: 0.9 }}
+      exit={{ opacity: 0 }}
       transition={
         isShaking
           ? { duration: 0.3 }
           : isFadingHint
           ? { duration: 0.7, ease: 'easeOut' }
-          : { duration: 0.2, ease: 'easeOut' }
+          : { duration: 0.15, ease: 'easeOut' }
       }
       className={`
         relative cursor-grab active:cursor-grabbing group
