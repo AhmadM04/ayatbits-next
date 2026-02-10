@@ -41,6 +41,7 @@ export function useWordAudio({
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Preload a single audio file
+  // PERFORMANCE FIX: Use 'metadata' preload instead of 'auto' to reduce initial load
   const preloadSingleAudio = useCallback((segment: { position: number; audioUrl: string }): Promise<void> => {
     return new Promise((resolve) => {
       if (!segment.audioUrl) {
@@ -49,15 +50,23 @@ export function useWordAudio({
       }
       
       const audio = new Audio();
-      audio.preload = 'auto';
+      audio.preload = 'metadata'; // Changed from 'auto' - only loads metadata, not full audio
       audio.crossOrigin = 'anonymous';
       
       const cleanup = () => {
-        audio.removeEventListener('canplaythrough', onLoaded);
+        audio.removeEventListener('loadedmetadata', onLoaded);
+        audio.removeEventListener('canplaythrough', onCanPlay);
         audio.removeEventListener('error', onError);
       };
       
       const onLoaded = () => {
+        cleanup();
+        preloadedAudioRef.current.set(segment.position, audio);
+        resolve();
+      };
+      
+      const onCanPlay = () => {
+        // If it loads fully, use that instead
         cleanup();
         preloadedAudioRef.current.set(segment.position, audio);
         resolve();
@@ -68,21 +77,23 @@ export function useWordAudio({
         resolve(); // Don't block on errors
       };
       
-      audio.addEventListener('canplaythrough', onLoaded, { once: true });
+      audio.addEventListener('loadedmetadata', onLoaded, { once: true });
+      audio.addEventListener('canplaythrough', onCanPlay, { once: true });
       audio.addEventListener('error', onError, { once: true });
       
       audio.src = segment.audioUrl;
       audio.load();
       
-      // Timeout after 5 seconds
+      // Reduced timeout from 5s to 2s
       setTimeout(() => {
         cleanup();
         resolve();
-      }, 5000);
+      }, 2000);
     });
   }, []);
 
   // Preload audio files for all words - prioritize first words for faster initial response
+  // PERFORMANCE FIX: Use requestIdleCallback to defer preloading and avoid blocking main thread
   const preloadAudioFiles = useCallback(async (segmentsData: AyahAudioSegments) => {
     const totalWords = segmentsData.segments.length;
     if (totalWords === 0) return;
@@ -102,27 +113,54 @@ export function useWordAudio({
     };
 
     // Priority 1: Preload first 3 words immediately (most likely to be needed first)
+    // But defer even these to avoid blocking initial render
     const priorityWords = segmentsData.segments.slice(0, Math.min(3, totalWords));
-    await Promise.all(
-      priorityWords.map(async (segment) => {
-        await preloadSingleAudio(segment);
-        updateProgress();
-      })
-    );
-
-    // Priority 2: Preload remaining words in batches
-    const remainingWords = segmentsData.segments.slice(3);
-    const BATCH_SIZE = 4; // Load 4 at a time
     
-    for (let i = 0; i < remainingWords.length; i += BATCH_SIZE) {
-      const batch = remainingWords.slice(i, i + BATCH_SIZE);
+    // Use setTimeout to defer to next tick, allowing UI to render first
+    setTimeout(async () => {
       await Promise.all(
-        batch.map(async (segment) => {
+        priorityWords.map(async (segment) => {
           await preloadSingleAudio(segment);
           updateProgress();
         })
       );
-    }
+      
+      // Priority 2: Preload remaining words in batches during idle time
+      const remainingWords = segmentsData.segments.slice(3);
+      const BATCH_SIZE = 2; // Reduced from 4 to 2 for less blocking
+      
+      const preloadBatch = async (startIndex: number) => {
+        if (startIndex >= remainingWords.length) return;
+        
+        const batch = remainingWords.slice(startIndex, startIndex + BATCH_SIZE);
+        await Promise.all(
+          batch.map(async (segment) => {
+            await preloadSingleAudio(segment);
+            updateProgress();
+          })
+        );
+        
+        // Schedule next batch during idle time
+        const scheduleNext = () => {
+          if (startIndex + BATCH_SIZE < remainingWords.length) {
+            if ('requestIdleCallback' in window) {
+              requestIdleCallback(() => preloadBatch(startIndex + BATCH_SIZE), { timeout: 2000 });
+            } else {
+              setTimeout(() => preloadBatch(startIndex + BATCH_SIZE), 50);
+            }
+          }
+        };
+        
+        scheduleNext();
+      };
+      
+      // Start preloading remaining words
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => preloadBatch(0), { timeout: 2000 });
+      } else {
+        setTimeout(() => preloadBatch(0), 100);
+      }
+    }, 100); // 100ms delay to let initial render complete
   }, [preloadSingleAudio]);
 
   // Fetch segments when component mounts or verse changes

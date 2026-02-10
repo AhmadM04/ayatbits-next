@@ -16,6 +16,10 @@ const ALAFASY_RECITER_ID = 7; // Alafasy reciter ID on Quran.com
 // This prevents Immer from wrapping large audio timing datasets in expensive Proxies
 const segmentsCache = new Map<string, AyahAudioSegments>();
 
+// PERFORMANCE: Conditional logging - only in development
+const DEBUG = process.env.NODE_ENV === 'development';
+const log = DEBUG ? console.log.bind(console) : (..._args: any[]) => {};
+
 /**
  * Get cache key for a verse
  */
@@ -32,11 +36,11 @@ export async function fetchWordSegments(
 ): Promise<AyahAudioSegments | null> {
   const cacheKey = getCacheKey(surahNumber, ayahNumber);
   
-  console.log('🎵 fetchWordSegments called for', surahNumber, ':', ayahNumber);
+  log('🎵 fetchWordSegments called for', surahNumber, ':', ayahNumber);
   
   // Check cache first
   if (segmentsCache.has(cacheKey)) {
-    console.log('📦 Using cached segments');
+    log('📦 Using cached segments');
     return segmentsCache.get(cacheKey)!;
   }
 
@@ -63,7 +67,7 @@ export async function fetchWordSegments(
     }
 
     // Debug: Log the full response to understand structure
-    console.log('Quran.com API response for', verseKey, ':', {
+    log('Quran.com API response for', verseKey, ':', {
       totalWords: data.verse.words.length,
       wordTypes: data.verse.words.map(w => ({ pos: w.position, type: w.char_type_name, text: w.text_uthmani })),
     });
@@ -85,7 +89,7 @@ export async function fetchWordSegments(
         const wordAudioUrl = `https://verses.quran.com/wbw/${paddedSurah}_${paddedAyah}_${paddedWord}.mp3`;
         
         // Debug: Log word mapping
-        console.log(`Word ${index}: text=${word.text_uthmani}, audioURL=${wordAudioUrl}`);
+        log(`Word ${index}: text=${word.text_uthmani}, audioURL=${wordAudioUrl}`);
         
         return {
           position: index, // Use 0-based array index for easy lookup
@@ -97,7 +101,7 @@ export async function fetchWordSegments(
       });
     
     // Debug: Log summary
-    console.log(`Loaded ${segments.length} word segments for ${verseKey}`);
+    log(`Loaded ${segments.length} word segments for ${verseKey}`);
 
     const result: AyahAudioSegments = {
       surahNumber,
@@ -130,19 +134,19 @@ export function getWordSegment(
   segments: AyahAudioSegments,
   wordIndex: number
 ): WordSegment | null {
-  console.log('🔍 getWordSegment called:', {
+  log('🔍 getWordSegment called:', {
     requestedIndex: wordIndex,
     totalSegments: segments.segments.length,
     allSegments: segments.segments.map(s => ({ pos: s.position, text: s.text, url: s.audioUrl }))
   });
   
   if (wordIndex < 0 || wordIndex >= segments.segments.length) {
-    console.error(`❌ Index ${wordIndex} out of bounds (0-${segments.segments.length - 1})`);
+    if (DEBUG) console.error(`❌ Index ${wordIndex} out of bounds (0-${segments.segments.length - 1})`);
     return null;
   }
   
   const segment = segments.segments[wordIndex];
-  console.log('✅ Found segment:', segment);
+  log('✅ Found segment:', segment);
   return segment;
 }
 

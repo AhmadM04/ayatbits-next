@@ -3,6 +3,10 @@
  * Removed React Native dependencies, pure TypeScript
  */
 
+// PERFORMANCE: Conditional logging - only in development
+const DEBUG = process.env.NODE_ENV === 'development';
+const log = DEBUG ? console.log.bind(console) : (..._args: any[]) => {};
+
 export type WordToken = {
   id: string;
   text: string;
@@ -71,16 +75,13 @@ export function normalizeArabic(input: string): string {
   const normalized = out.normalize('NFC');
   
   // Debug logging for normalization differences
-  if (original !== normalized && process.env.NODE_ENV === 'development') {
-    const changed = original !== normalized;
-    if (changed) {
-      console.log('[NORMALIZE]', {
-        original,
-        normalized,
-        originalBytes: [...original].map(c => c.charCodeAt(0).toString(16)),
-        normalizedBytes: [...normalized].map(c => c.charCodeAt(0).toString(16)),
-      });
-    }
+  if (DEBUG && original !== normalized) {
+    log('[NORMALIZE]', {
+      original,
+      normalized,
+      originalBytes: [...original].map(c => c.charCodeAt(0).toString(16)),
+      normalizedBytes: [...normalized].map(c => c.charCodeAt(0).toString(16)),
+    });
   }
   
   return normalized;
@@ -274,8 +275,8 @@ export function tokenizeAyah(ayahText: string): WordToken[] {
         };
         tokens.push(token);
         
-        if (count > 1) {
-          console.log(`[DUPLICATE] Token created (${count}x):`, { 
+        if (DEBUG && count > 1) {
+          log(`[DUPLICATE] Token created (${count}x):`, { 
             id: token.id, 
             text: token.text, 
             norm: token.norm,
@@ -296,8 +297,8 @@ export function tokenizeAyah(ayahText: string): WordToken[] {
       };
       tokens.push(token);
       
-      if (count > 1) {
-        console.log(`[DUPLICATE] Token created (${count}x):`, { 
+      if (DEBUG && count > 1) {
+        log(`[DUPLICATE] Token created (${count}x):`, { 
           id: token.id, 
           text: token.text, 
           norm: token.norm,
@@ -308,9 +309,11 @@ export function tokenizeAyah(ayahText: string): WordToken[] {
   }
   
   // Log summary of duplicates
-  const duplicates = Array.from(wordNormMap.entries()).filter(([_, count]) => count > 1);
-  if (duplicates.length > 0) {
-    console.log('[TOKENIZATION] Duplicate words found:', duplicates.map(([norm, count]) => `"${norm}" (${count}x)`).join(', '));
+  if (DEBUG) {
+    const duplicates = Array.from(wordNormMap.entries()).filter(([_, count]) => count > 1);
+    if (duplicates.length > 0) {
+      log('[TOKENIZATION] Duplicate words found:', duplicates.map(([norm, count]) => `"${norm}" (${count}x)`).join(', '));
+    }
   }
 
   return tokens;
