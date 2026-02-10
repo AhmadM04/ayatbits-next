@@ -38,13 +38,11 @@ function DraggableWord({ word, isActive }: { word: WordToken; isActive: boolean 
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      layout
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: isDragging ? 0.5 : 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      className={`px-4 py-3 bg-[#1a1a1a] border border-white/10 rounded-xl text-white font-arabic text-lg hover:border-green-500/50 hover:bg-green-500/10 transition-colors cursor-grab active:cursor-grabbing touch-none ${
+      initial={{ opacity: 0 }}
+      animate={{ opacity: isDragging ? 0.5 : 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.15 } }}
+      transition={{ duration: 0.15, ease: 'easeOut' }}
+      className={`px-4 py-3 bg-[#1a1a1a] border border-white/10 rounded-xl text-white font-arabic text-lg hover:border-green-500/50 hover:bg-green-500/10 hover:scale-105 active:scale-95 transition-all cursor-grab active:cursor-grabbing touch-none ${
         isDragging ? 'opacity-50' : ''
       }`}
     >
@@ -84,8 +82,9 @@ function DropSlot({
       {placedWord ? (
         <motion.span
           key={placedWord.id}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.15, ease: 'easeOut' }}
           className="text-lg font-arabic text-green-400 px-3"
         >
           <HarakatColoredText text={placedWord.text} />

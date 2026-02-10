@@ -70,10 +70,10 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
           <motion.div
             className="relative bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-2xl 
                        w-full max-w-sm overflow-hidden"
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
           >
             {/* Close button */}
             <button

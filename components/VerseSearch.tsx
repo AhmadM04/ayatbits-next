@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, X, Sparkles, Loader2, BookOpen } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ConditionalMotion, ConditionalAnimatePresence } from '@/components/ConditionalMotion';
 import { useI18n } from '@/lib/i18n';
 
@@ -276,9 +275,10 @@ export default function VerseSearch() {
             {/* Modal */}
             <ConditionalMotion
               as="div"
-              initial={{ opacity: 0, scale: 0.95, y: -10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
               className="fixed left-4 right-4 top-20 sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md z-[101]"
             >
               <div className="bg-[#111] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
@@ -364,12 +364,10 @@ export default function VerseSearch() {
                 {/* Go Button */}
                 {query && (
                   <div className="p-3 pt-0">
-                    <motion.button
+                    <button
                       onClick={handleSearch}
                       disabled={isLoading}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 disabled:opacity-50 text-white font-medium rounded-xl transition-all shadow-lg shadow-green-600/20"
+                      className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 disabled:opacity-50 text-white font-medium rounded-xl transition-colors shadow-lg shadow-green-600/20"
                     >
                       {isLoading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -380,7 +378,7 @@ export default function VerseSearch() {
                           <Sparkles className="w-4 h-4" />
                         </>
                       )}
-                    </motion.button>
+                    </button>
                   </div>
                 )}
               </div>

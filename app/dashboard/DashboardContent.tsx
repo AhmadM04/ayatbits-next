@@ -123,8 +123,9 @@ export default function DashboardContent({
       {/* Subscription Expiry Warning */}
       {showSubscriptionWarning && (
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
           className="w-full px-4 py-2 flex items-center justify-center gap-3 text-sm bg-gradient-to-r from-orange-600/20 to-red-600/20 border-b border-orange-500/20"
         >
           <AlertTriangle className="w-4 h-4 text-orange-400" />
@@ -168,12 +169,9 @@ export default function DashboardContent({
                   className="group flex items-center gap-1.5 text-orange-500 hover:bg-white/5 px-2 py-1.5 rounded-lg transition-colors"
                   data-tutorial="stats-cards"
                 >
-                  <motion.div
-                    whileHover={{ scale: 1.2, rotate: [0, -10, 10, 0] }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Flame className="w-4 h-4 group-hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]" />
-                  </motion.div>
+                  <div className="transition-transform hover:scale-110">
+                    <Flame className="w-4 h-4 group-hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.6)] transition-all" />
+                  </div>
                   <span className="font-semibold text-sm">{currentStreak}</span>
                 </Link>
               )}
@@ -202,9 +200,10 @@ export default function DashboardContent({
                         onClick={() => setShowHelpMenu(false)}
                       />
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.15, ease: 'easeOut' }}
                         className="absolute right-0 top-12 bg-gray-900 border border-white/10 rounded-lg shadow-2xl p-2 min-w-[200px] z-30"
                       >
                         <button
@@ -255,9 +254,10 @@ export default function DashboardContent({
         <AnimatePresence>
           {showMobileMenu && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
               className="md:hidden border-t border-white/5 bg-[#0a0a0a]/98 backdrop-blur-md overflow-hidden"
             >
               <div className="max-w-6xl mx-auto px-4 py-4 space-y-2">
@@ -447,13 +447,9 @@ export default function DashboardContent({
                     )}
                     
                     <div className="text-center relative z-0">
-                      <motion.div 
-                        className="text-2xl font-bold text-green-500 mb-1"
-                        whileHover={{ scale: 1.15 }}
-                        transition={{ type: 'spring', stiffness: 400 }}
-                      >
+                      <div className="text-2xl font-bold text-green-500 mb-1 transition-transform hover:scale-110">
                         {juz.number}
-                      </motion.div>
+                      </div>
                       <div className="text-xs text-gray-500 mb-2 truncate">{juz.name}</div>
                       <div className="w-full bg-white/5 rounded-full h-1.5 mb-1 overflow-hidden">
                         <motion.div

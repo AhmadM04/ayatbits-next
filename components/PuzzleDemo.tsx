@@ -64,8 +64,6 @@ function SortableWord({
       {...attributes}
       {...listeners}
       onClick={onClick}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
       animate={
         isRecentlyCorrect
           ? {
@@ -74,11 +72,11 @@ function SortableWord({
             }
           : {}
       }
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
       className={`
         px-3 py-2 rounded-lg cursor-grab active:cursor-grabbing
         ${isCorrect ? 'bg-emerald-100 dark:bg-emerald-900/50 border-2 border-emerald-600 text-emerald-900 dark:text-emerald-100' : 'bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)]'}
-        shadow-sm hover:shadow-md transition-all
+        shadow-sm hover:shadow-md hover:scale-105 active:scale-95 transition-all
         font-medium text-base
       `}
       dir="rtl"

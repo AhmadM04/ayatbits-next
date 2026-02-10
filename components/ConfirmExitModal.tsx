@@ -66,10 +66,10 @@ export default function ConfirmExitModal({
 
         {/* Modal */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ duration: 0.15, ease: 'easeOut' }}
           className="relative bg-[#111] border border-white/10 rounded-2xl shadow-2xl w-full max-w-md mx-4 flex flex-col"
         >
           {/* Header */}
