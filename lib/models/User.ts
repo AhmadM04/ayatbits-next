@@ -54,6 +54,10 @@ export interface IUser extends Document {
   referralSource?: string;
   ageRange?: string;
   onboardingCompletedAt?: Date;
+  // User Preferences
+  themePreference?: 'light' | 'dark' | 'system';
+  emailNotifications?: boolean;
+  inAppNotifications?: boolean; // Future feature
   createdAt: Date;
   updatedAt: Date;
 }
@@ -109,6 +113,10 @@ const userSchema = new mongoose.Schema<IUser>(
     referralSource: { type: String },
     ageRange: { type: String },
     onboardingCompletedAt: { type: Date },
+    // User Preferences
+    themePreference: { type: String, enum: ['light', 'dark', 'system'], default: 'dark' },
+    emailNotifications: { type: Boolean, default: true },
+    inAppNotifications: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

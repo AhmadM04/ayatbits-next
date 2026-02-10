@@ -90,6 +90,13 @@ export default async function ProfilePage() {
     completed: user.onboardingCompleted || false,
     skipped: user.onboardingSkipped || false,
   };
+
+  // Get user preferences
+  const userPreferences = {
+    themePreference: user.themePreference || 'dark',
+    emailNotifications: user.emailNotifications ?? true,
+    inAppNotifications: user.inAppNotifications ?? true,
+  };
   
   return (
     <TutorialWrapper
@@ -105,6 +112,7 @@ export default async function ProfilePage() {
           initialTranslation={user.selectedTranslation || 'en.sahih'}
           initialAudioEnabled={user.enableWordByWordAudio || false}
           onboardingStatus={onboardingStatus}
+          userPreferences={userPreferences}
         />
       </div>
     </TutorialWrapper>

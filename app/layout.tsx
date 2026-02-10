@@ -219,6 +219,26 @@ export default function RootLayout({
     >
       <html lang="en" className="dark">
         <head>
+          {/* Set theme before page renders to prevent flash */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  try {
+                    const theme = localStorage.getItem('theme') || 'dark';
+                    let effectiveTheme = 'dark';
+                    if (theme === 'system') {
+                      effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                    } else {
+                      effectiveTheme = theme;
+                    }
+                    document.documentElement.classList.remove('light', 'dark');
+                    document.documentElement.classList.add(effectiveTheme);
+                  } catch (e) {}
+                })();
+              `,
+            }}
+          />
           <Script
             id="structured-data"
             type="application/ld+json"

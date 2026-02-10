@@ -548,6 +548,21 @@
     "q10": "كيف أتواصل مع الدعم؟",
     "a10": "يمكنك التواصل مع فريق الدعم على hello@ayatbits.com. نرد عادةً خلال 24-48 ساعة."
   },
+  "preferences": {
+    "title": "التفضيلات",
+    "appearance": "المظهر",
+    "appearanceDescription": "اختر كيف يبدو لك تطبيق آيات بِتس",
+    "lightMode": "فاتح",
+    "darkMode": "داكن",
+    "systemMode": "النظام",
+    "notifications": "الإشعارات",
+    "notificationsDescription": "إدارة تفضيلات الإشعارات",
+    "emailNotifications": "إشعارات البريد الإلكتروني",
+    "emailNotificationsDesc": "تلقي التحديثات والتذكيرات عبر البريد الإلكتروني",
+    "inAppNotifications": "الإشعارات داخل التطبيق",
+    "inAppNotificationsDesc": "تلقي الإشعارات أثناء استخدام التطبيق",
+    "comingSoon": "قريباً"
+  },
   "tos": {
     "title": "شروط الخدمة",
     "lastUpdated": "آخر تحديث: ديسمبر 2025",

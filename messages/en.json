@@ -757,6 +757,21 @@
     "completeProfile": "Complete your profile",
     "completeProfileDescription": "Take a moment to personalize your experience"
   },
+  "preferences": {
+    "title": "Preferences",
+    "appearance": "Appearance",
+    "appearanceDescription": "Choose how AyatBits looks to you",
+    "lightMode": "Light",
+    "darkMode": "Dark",
+    "systemMode": "System",
+    "notifications": "Notifications",
+    "notificationsDescription": "Manage your notification preferences",
+    "emailNotifications": "Email Notifications",
+    "emailNotificationsDesc": "Receive updates and reminders via email",
+    "inAppNotifications": "In-App Notifications",
+    "inAppNotificationsDesc": "Receive notifications while using the app",
+    "comingSoon": "Coming Soon"
+  },
   "tos": {
     "title": "Terms of Service",
     "lastUpdated": "Last updated: December 2025",

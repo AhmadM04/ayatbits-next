@@ -8,6 +8,7 @@ import ProfileContent from './ProfileContent';
 import TranslationSelector from './TranslationSelector';
 import AudioSettings from './AudioSettings';
 import BillingSection from './BillingSection';
+import UserPreferences from './UserPreferences';
 
 interface ProfilePageClientProps {
   userData: {
@@ -30,6 +31,11 @@ interface ProfilePageClientProps {
     completed: boolean;
     skipped: boolean;
   };
+  userPreferences?: {
+    themePreference?: 'light' | 'dark' | 'system';
+    emailNotifications?: boolean;
+    inAppNotifications?: boolean;
+  };
 }
 
 export default function ProfilePageClient({
@@ -39,6 +45,7 @@ export default function ProfilePageClient({
   initialTranslation,
   initialAudioEnabled,
   onboardingStatus,
+  userPreferences,
 }: ProfilePageClientProps) {
   const { t } = useI18n();
 
@@ -99,6 +106,21 @@ export default function ProfilePageClient({
             user={userData}
             stats={stats}
             trialDaysLeft={trialDaysLeft}
+          />
+        </div>
+
+        {/* User Preferences Section */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2 px-1">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{t('preferences.title')}</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+          </div>
+
+          <UserPreferences 
+            initialTheme={userPreferences?.themePreference || 'dark'}
+            initialEmailNotifications={userPreferences?.emailNotifications ?? true}
+            initialInAppNotifications={userPreferences?.inAppNotifications ?? true}
           />
         </div>
 

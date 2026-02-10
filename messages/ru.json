@@ -507,6 +507,21 @@
     "q10": "Как связаться с поддержкой?",
     "a10": "Вы можете связаться с нами по адресу hello@ayatbits.com. Мы обычно отвечаем в течение 24-48 часов."
   },
+  "preferences": {
+    "title": "Настройки",
+    "appearance": "Внешний вид",
+    "appearanceDescription": "Выберите, как выглядит AyatBits для вас",
+    "lightMode": "Светлая",
+    "darkMode": "Тёмная",
+    "systemMode": "Системная",
+    "notifications": "Уведомления",
+    "notificationsDescription": "Управление настройками уведомлений",
+    "emailNotifications": "Email-уведомления",
+    "emailNotificationsDesc": "Получать обновления и напоминания по email",
+    "inAppNotifications": "Уведомления в приложении",
+    "inAppNotificationsDesc": "Получать уведомления при использовании приложения",
+    "comingSoon": "Скоро"
+  },
   "tos": {
     "title": "Условия использования",
     "lastUpdated": "Последнее обновление: Декабрь 2025",
