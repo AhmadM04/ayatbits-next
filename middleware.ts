@@ -89,6 +89,15 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
     });
   }
 
+  // Optimize Clerk token refresh by adding cache headers
+  // This reduces the frequency of token refresh calls during navigation
+  if (pathname.includes('__clerk') || pathname.includes('clerk')) {
+    const response = NextResponse.next();
+    // Cache Clerk resources for 5 minutes to reduce redundant requests
+    response.headers.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=600');
+    return response;
+  }
+
   // For API routes, apply rate limiting and authentication
   if (pathname.startsWith('/api')) {
     const clientIP = getClientIP(request);

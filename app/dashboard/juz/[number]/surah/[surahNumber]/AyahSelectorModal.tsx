@@ -66,8 +66,10 @@ export default function AyahSelectorModal({
 
   const handleGo = () => {
     if (selectedAyah !== null) {
-      router.push(`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${selectedAyah}`);
+      // Close modal first to clean up state
       onClose();
+      // Use replace to avoid adding to history stack
+      router.replace(`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${selectedAyah}`);
     }
   };
 

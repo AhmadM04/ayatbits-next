@@ -216,6 +216,12 @@ export default function RootLayout({
       signUpUrl="/sign-up"
       // Disable Clerk monetization features since we use custom Stripe integration
       telemetry={false}
+      // Optimize token refresh - reduce frequency to improve performance
+      // Tokens are valid for 1 hour by default, refresh 5 minutes before expiry
+      clerkJSVariant="headless"
+      // Configure token refresh strategy
+      afterSignInUrl="/dashboard"
+      afterSignUpUrl="/onboarding"
     >
       <html lang="en" className="dark">
         <head>

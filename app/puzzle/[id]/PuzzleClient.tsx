@@ -67,6 +67,7 @@ export default function PuzzleClient({
   const router = useRouter();
   
   const hasHandledCompletion = useRef(false);
+  const isIntentionalExit = useRef(false);
   const backUrl = versePageUrl || '/dashboard';
 
   // Reset completion handler when puzzle changes
@@ -80,6 +81,11 @@ export default function PuzzleClient({
     window.history.pushState({ puzzleInterceptor: true }, '');
     
     const handlePopState = (event: PopStateEvent) => {
+      // Don't intercept if we're intentionally exiting
+      if (isIntentionalExit.current) {
+        return;
+      }
+      
       // Check if this is our interceptor state
       if (event.state?.puzzleInterceptor) {
         // Prevent the default back navigation
@@ -95,8 +101,8 @@ export default function PuzzleClient({
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
-      // Clean up the interceptor state when component unmounts
-      if (window.history.state?.puzzleInterceptor) {
+      // Only clean up the interceptor state if we're not intentionally exiting
+      if (!isIntentionalExit.current && window.history.state?.puzzleInterceptor) {
         window.history.back();
       }
     };
@@ -182,17 +188,20 @@ export default function PuzzleClient({
     // Wait for success animation and word audio to complete before navigating
     // This allows the user to see the success animation and hear any playing word audio
     setTimeout(() => {
+      isIntentionalExit.current = true;
       router.replace(targetUrl);
     }, 1800); // 1.8 seconds delay to allow word audio to finish
   }, [puzzle, nextPuzzleId, nextPuzzleAyahNumber, isLastAyahInSurah, router, showToast]);
 
   const handleMistakeLimitExceeded = useCallback(() => {
-    router.push(backUrl);
+    isIntentionalExit.current = true;
+    router.replace(backUrl);
   }, [backUrl, router]);
 
   const handleExitConfirm = () => {
+    isIntentionalExit.current = true;
     setShowExitModal(false);
-    router.push(backUrl);
+    router.replace(backUrl);
   };
 
   return (

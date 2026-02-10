@@ -168,6 +168,16 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // Optimize Clerk resources caching to reduce token refresh frequency
+        source: "/__clerk/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=300, stale-while-revalidate=600",
+          },
+        ],
+      },
     ];
   },
 
