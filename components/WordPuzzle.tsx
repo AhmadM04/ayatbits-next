@@ -452,25 +452,15 @@ export default function WordPuzzle({
   const { t } = useI18n();
   const { showToast } = useToast();
   
-  // Tokenize ayah and map transliterations to tokens
-  const originalTokens = useMemo(() => {
-    const tokens = tokenizeAyah(ayahText);
-    
-    // Map transliterations to tokens if available
-    if (wordTransliterations.length > 0) {
-      // Match transliterations to tokens by index
-      tokens.forEach((token, index) => {
-        if (index < wordTransliterations.length) {
-          token.transliteration = wordTransliterations[index].transliteration;
-        }
-      });
-    }
-    
-    return tokens;
-  }, [ayahText, wordTransliterations]);
-
-  // Initialize bank with shuffled tokens immediately
-  const [bank, setBank] = useState<WordToken[]>(() => shuffleArray(originalTokens));
+  // PERFORMANCE FIX: Use useRef for static puzzle data to avoid React diffing thousands of objects
+  // This prevents the 12-second freeze when initializing puzzles with large datasets
+  const puzzleDataRef = useRef<{
+    originalTokens: WordToken[];
+    bank: WordToken[];
+  }>({ originalTokens: [], bank: [] });
+  
+  // STATE FOR UI ONLY - only things that need to trigger re-renders
+  const [isLoaded, setIsLoaded] = useState(false);
   const [placedTokens, setPlacedTokens] = useState<Map<number, WordToken>>(new Map());
   const [activeToken, setActiveToken] = useState<WordToken | null>(null);
   const [mistakeCount, setMistakeCount] = useState(0);
@@ -478,12 +468,8 @@ export default function WordPuzzle({
   const hasCompletedRef = useRef(false);
   const [shakingIds, setShakingIds] = useState<Set<string>>(new Set());
   
-  // Tips system state - initialize with calculated value from originalTokens
-  const [availableTips, setAvailableTips] = useState(() => {
-    const initialTips = calculateTipsForAyah(originalTokens.length);
-    log('[TIPS] Initial state - calculated tips:', initialTips, 'for', originalTokens.length, 'tokens');
-    return initialTips;
-  });
+  // Tips system state
+  const [availableTips, setAvailableTips] = useState(0);
   const [usedTips, setUsedTips] = useState(0);
   const [activeHint, setActiveHint] = useState<{ tokenId: string; slotPosition: number } | null>(null);
   const [isFadingHint, setIsFadingHint] = useState(false);
@@ -493,6 +479,36 @@ export default function WordPuzzle({
   
   const pendingToast = useRef<{ message: string; type: 'success' | 'error'; duration: number } | null>(null);
   const onSolvedRef = useRef(onSolved);
+  
+  // Initialize puzzle data instantly in ref (does not trigger re-render)
+  useEffect(() => {
+    log('[PUZZLE] Initializing puzzle data in ref');
+    const tokens = tokenizeAyah(ayahText);
+    
+    // Map transliterations to tokens if available
+    if (wordTransliterations.length > 0) {
+      tokens.forEach((token, index) => {
+        if (index < wordTransliterations.length) {
+          token.transliteration = wordTransliterations[index].transliteration;
+        }
+      });
+    }
+    
+    // Assign to ref - instant, no re-render
+    puzzleDataRef.current = {
+      originalTokens: tokens,
+      bank: shuffleArray(tokens),
+    };
+    
+    // Initialize tips
+    const tipsCount = calculateTipsForAyah(tokens.length);
+    setAvailableTips(tipsCount);
+    
+    // Trigger single re-render with boolean flag
+    setIsLoaded(true);
+    
+    log('[PUZZLE] Puzzle data loaded -', tokens.length, 'tokens');
+  }, [ayahText, wordTransliterations]);
   
   // Word audio hook
   const {
@@ -539,6 +555,7 @@ export default function WordPuzzle({
   // We need to account for MUQATTA'AT: Split into individual letters in puzzle but kept as one word in API
   // Note: Bismillah is NOT included in the API word segments - it's handled separately at the surah level
   const muqattaatTokens = useMemo(() => {
+    const originalTokens = puzzleDataRef.current.originalTokens;
     if (originalTokens.length === 0) return 0;
     
     // Check for Muqatta'at (isolated letters at the start of some surahs)
@@ -576,7 +593,7 @@ export default function WordPuzzle({
     }
     
     return muqattaatLetterCount;
-  }, [originalTokens, ayahText]);
+  }, [isLoaded, ayahText]);
 
   // Handler for word click in answer area
   const handleAnswerWordClick = useCallback((wordIndex: number) => {
@@ -619,8 +636,11 @@ export default function WordPuzzle({
   );
 
   const resetState = useCallback(() => {
+    const originalTokens = puzzleDataRef.current.originalTokens;
+    
     setPlacedTokens(new Map());
-    setBank(shuffleArray(originalTokens));
+    // Update bank in ref and trigger re-render by updating a state
+    puzzleDataRef.current.bank = shuffleArray(originalTokens);
     setMistakeCount(0);
     setHasExceededMistakeLimit(false);
     hasCompletedRef.current = false;
@@ -637,36 +657,10 @@ export default function WordPuzzle({
     setUsedTips(0);
     setActiveHint(null);
     setIsFadingHint(false);
-  }, [originalTokens]);
-  
-
-  // Initialize puzzle state ONLY on mount - don't reset during completion
-  useEffect(() => {
-    log('[PUZZLE] Initializing puzzle state on mount', {
-      originalTokensLength: originalTokens.length,
-      ayahText: ayahText.substring(0, 50)
-    });
     
-    const initialBank = shuffleArray(originalTokens);
-    setBank(initialBank);
-    setPlacedTokens(new Map());
-    setMistakeCount(0);
-    setHasExceededMistakeLimit(false);
-    hasCompletedRef.current = false;
-    setShakingIds(new Set());
-    
-    const tipsCount = calculateTipsForAyah(originalTokens.length);
-    setAvailableTips(tipsCount);
-    setUsedTips(0);
-    setActiveHint(null);
-    setIsFadingHint(false);
-    
-    log('[PUZZLE] Initial state set with', originalTokens.length, 'tokens, bank length:', initialBank.length);
-    
-    return () => {
-      log('[PUZZLE] Component unmounting/cleanup');
-    };
-  }, []); // ONLY on mount - never reset automatically
+    // Force re-render
+    setIsLoaded(true);
+  }, []);
 
   useEffect(() => {
     if (pendingToast.current) {
@@ -678,8 +672,9 @@ export default function WordPuzzle({
 
   // Check if puzzle is complete
   const isComplete = useMemo(() => {
+    const originalTokens = puzzleDataRef.current.originalTokens;
     return originalTokens.length > 0 && placedTokens.size === originalTokens.length;
-  }, [placedTokens.size, originalTokens.length]);
+  }, [placedTokens.size, isLoaded]);
 
   useEffect(() => {
     log('[COMPLETION] useEffect running', { isComplete, hasCompleted: hasCompletedRef.current });
@@ -749,6 +744,8 @@ export default function WordPuzzle({
       // Trigger automatic tip on every 2nd mistake (if tips available)
       if (next % 2 === 0 && usedTips < availableTips && !activeHint) {
         setTimeout(() => {
+          const { originalTokens, bank } = puzzleDataRef.current;
+          
           // Find the first empty slot and the correct word for it
           let firstEmptySlot = -1;
           for (let i = 0; i < originalTokens.length; i++) {
@@ -793,10 +790,12 @@ export default function WordPuzzle({
       }
       return next;
     });
-  }, [onMistakeLimitExceeded, showToast, usedTips, availableTips, originalTokens, placedTokens, bank, activeHint]);
+  }, [onMistakeLimitExceeded, showToast, usedTips, availableTips, placedTokens, activeHint, t]);
 
   // Manual tip triggering (when user clicks tips button)
   const handleManualTip = useCallback(() => {
+    const { originalTokens, bank } = puzzleDataRef.current;
+    
     log('[TIPS] handleManualTip called', {
       usedTips,
       availableTips,
@@ -867,12 +866,14 @@ export default function WordPuzzle({
       log('[TIPS] Could not find correct word in bank');
       showToast(t('wordPuzzle.unableToFindWord'), 'error', 2000);
     }
-  }, [usedTips, availableTips, activeHint, originalTokens, placedTokens, bank, showToast]);
+  }, [usedTips, availableTips, activeHint, placedTokens, showToast, t]);
 
   // Try to place a token on a specific slot
   // Returns true if placed successfully, false otherwise
   const tryPlaceTokenOnSlot = useCallback(
     (token: WordToken, slotPosition: number): boolean => {
+      const originalTokens = puzzleDataRef.current.originalTokens;
+      
       // Check if slot is already filled
       if (placedTokens.has(slotPosition)) {
         log('[PLACEMENT] Slot already filled:', { slotPosition });
@@ -906,7 +907,9 @@ export default function WordPuzzle({
         return next;
       });
 
-      setBank((prev) => prev.filter((t) => t.id !== token.id));
+      // Remove from bank in ref
+      puzzleDataRef.current.bank = puzzleDataRef.current.bank.filter((t) => t.id !== token.id);
+      
       onWordCorrect?.(slotPosition, token.text);
       
       // Clear hint if this was the hinted word - with fade animation
@@ -932,17 +935,18 @@ export default function WordPuzzle({
       
       return true;
     },
-    [originalTokens, placedTokens, onWordCorrect, registerMistake, enableWordByWordAudio, handleAnswerWordClick]
+    [placedTokens, onWordCorrect, registerMistake, enableWordByWordAudio, handleAnswerWordClick]
   );
 
   const handleDragStart = useCallback(
     (event: DragStartEvent) => {
       log('[DND] handleDragStart called', event.active.id);
+      const bank = puzzleDataRef.current.bank;
       const token = bank.find((t) => t.id === event.active.id) || null;
       log('[DND] Found token:', token);
       setActiveToken(token);
     },
-    [bank]
+    []
   );
 
   const handleDragEnd = useCallback(
@@ -958,6 +962,7 @@ export default function WordPuzzle({
       }
 
       const activeId = active.id as string;
+      const bank = puzzleDataRef.current.bank;
       const token = bank.find((t) => t.id === activeId);
       if (!token) return;
 
@@ -976,7 +981,7 @@ export default function WordPuzzle({
       // This will check if the token is correct for THAT slot
       tryPlaceTokenOnSlot(token, slotPosition);
     },
-    [bank, hasExceededMistakeLimit, tryPlaceTokenOnSlot]
+    [hasExceededMistakeLimit, tryPlaceTokenOnSlot]
   );
 
   // Handle tap/click on bank words - place in next available slot
@@ -984,6 +989,8 @@ export default function WordPuzzle({
     (token: WordToken) => {
       if (hasExceededMistakeLimit) return;
 
+      const originalTokens = puzzleDataRef.current.originalTokens;
+      
       // Find the first empty slot
       let firstEmptySlot = -1;
       for (let i = 0; i < originalTokens.length; i++) {
@@ -1001,7 +1008,7 @@ export default function WordPuzzle({
       // Try to place the token in the first empty slot
       tryPlaceTokenOnSlot(token, firstEmptySlot);
     },
-    [hasExceededMistakeLimit, originalTokens, placedTokens, tryPlaceTokenOnSlot]
+    [hasExceededMistakeLimit, placedTokens, tryPlaceTokenOnSlot]
   );
 
   const dropAnimation: DropAnimation = {
@@ -1012,15 +1019,18 @@ export default function WordPuzzle({
     }),
   };
 
-  if (originalTokens.length === 0) {
+  // Wait for data to load
+  if (!isLoaded || puzzleDataRef.current.originalTokens.length === 0) {
     return (
       <div className="min-h-[150px] flex items-center justify-center text-gray-400">
         <div className="text-center">
-          <p className="text-sm">No words available for this ayah.</p>
+          <p className="text-sm">Loading puzzle...</p>
         </div>
       </div>
     );
   }
+
+  const { originalTokens, bank } = puzzleDataRef.current;
 
   return (
     <div className="w-full max-w-2xl mx-auto">
