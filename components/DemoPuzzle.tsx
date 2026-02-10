@@ -27,9 +27,10 @@ const DEMO_WORDS = tokenizeAyah(DEMO_AYAH);
 
 // Draggable word button
 function DraggableWord({ word, isActive }: { word: WordToken; isActive: boolean }) {
+  // PERFORMANCE FIX: Only pass ID to avoid Immer proxy wrapping
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: word.id,
-    data: { word },
+    data: { wordId: word.id }, // Only pass ID, not full object
   });
 
   return (
@@ -140,8 +141,9 @@ export default function DemoPuzzle() {
   };
 
   const handleDragStart = (event: DragStartEvent) => {
-    const word = event.active.data.current?.word as WordToken;
-    setActiveWord(word);
+    // PERFORMANCE FIX: Look up word by ID instead of passing full object
+    const word = bankWords.find(w => w.id === event.active.id);
+    setActiveWord(word || null);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -150,7 +152,10 @@ export default function DemoPuzzle() {
 
     if (!over) return;
 
-    const word = active.data.current?.word as WordToken;
+    // PERFORMANCE FIX: Look up word by ID from bank
+    const word = bankWords.find(w => w.id === active.id);
+    if (!word) return;
+    
     const overId = over.id as string;
 
     if (overId.startsWith('slot-')) {

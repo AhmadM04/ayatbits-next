@@ -82,9 +82,10 @@ function DropSlot({
   onWordClick?: (wordIndex: number) => void;
   playingWordIndex?: number | null;
 }) {
+  // PERFORMANCE FIX: Only pass minimal data to avoid Immer proxy wrapping
   const { setNodeRef, isOver } = useDroppable({
     id: `slot-${position}`,
-    data: { type: 'slot', position, expectedToken },
+    data: { type: 'slot', position, expectedTokenId: expectedToken.id }, // Only pass ID
   });
 
   const handleWordClick = (e: React.MouseEvent) => {
@@ -241,9 +242,12 @@ const DraggableWord = memo(function DraggableWord({
   showTransliteration?: boolean;
   onTap?: (token: WordToken) => void;
 }) {
+  // PERFORMANCE FIX: Only pass minimal data to avoid Immer proxy wrapping
+  // dnd-kit internally uses Immer which wraps all data in Proxies
+  // Passing full token objects causes 12-second freeze on large datasets
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: token.id,
-    data: { type: 'bank-item', token },
+    data: { type: 'bank-item', tokenId: token.id }, // Only pass ID, not full object
   });
   
   log('[DND] DraggableWord rendered', { 

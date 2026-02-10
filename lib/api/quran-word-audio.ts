@@ -1,4 +1,6 @@
 // Quran.com API integration for word-by-word audio
+// PERFORMANCE FIX: This cache is kept OUTSIDE of any reactive state (Redux/Zustand)
+// to avoid expensive Immer proxy wrapping on large datasets
 
 import { 
   AyahAudioSegments, 
@@ -10,7 +12,8 @@ import {
 const QURAN_API_BASE = 'https://api.quran.com/api/v4';
 const ALAFASY_RECITER_ID = 7; // Alafasy reciter ID on Quran.com
 
-// In-memory cache for audio segments
+// PERFORMANCE: Static in-memory cache (NOT in Redux/Zustand/React state)
+// This prevents Immer from wrapping large audio timing datasets in expensive Proxies
 const segmentsCache = new Map<string, AyahAudioSegments>();
 
 /**
