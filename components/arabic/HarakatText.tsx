@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { parseArabicText, type HarakatDefinition } from '@/lib/harakat-utils';
 
 interface HarakatTextProps {
@@ -101,7 +101,9 @@ export default function HarakatText({
   className = '',
   onHarakatClick,
 }: HarakatTextProps) {
-  const segments = parseArabicText(text);
+  // PERFORMANCE: Memoize parseArabicText to avoid re-parsing on every render
+  // For a 100+ character ayah, this saves significant processing time
+  const segments = useMemo(() => parseArabicText(text), [text]);
 
   const handleHarakatLongPress = useCallback((definition: HarakatDefinition) => {
     if (onHarakatClick) {

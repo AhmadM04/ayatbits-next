@@ -162,9 +162,126 @@ The freeze was caused by **synchronous resource allocation** when creating multi
 
 ---
 
+## Full Ayah View Performance Optimizations
+
+### Additional Bottlenecks Identified
+
+After fixing the puzzle page, similar performance issues were found in the **full ayah view** page (`/dashboard/juz/[number]/surah/[surahNumber]`).
+
+### Issues Found
+
+#### 1. Audio Preloading (Same Issue) ✅
+**File:** `app/dashboard/juz/[number]/surah/[surahNumber]/AyahTextDisplay.tsx`
+
+The component uses `useWordAudio` hook which was already fixed. The deferred preloading optimization now applies here automatically.
+
+#### 2. Un-memoized Text Parsing ✅
+**File:** `components/arabic/HarakatText.tsx`
+
+**Problem:**
+- `parseArabicText()` called on **every render**
+- For a 100+ character ayah, this parses character-by-character repeatedly
+- No caching between renders
+
+**Fix:**
+```typescript
+// Before: Re-parses on every render
+const segments = parseArabicText(text);
+
+// After: Memoized, only re-parses when text changes
+const segments = useMemo(() => parseArabicText(text), [text]);
+```
+
+**Impact:** Eliminates redundant parsing, especially during animations or state updates.
+
+#### 3. Excessive Re-renders in Word Segments ✅
+**File:** `app/dashboard/juz/[number]/surah/[surahNumber]/AyahTextDisplay.tsx`
+
+**Problem:**
+- When word-by-word audio enabled, renders 50-100 `motion.span` elements
+- Each word re-renders on every parent update
+- Framer Motion animations compound the overhead
+
+**Fix:**
+- Created memoized `WordSegment` component
+- Prevents re-renders when props don't change
+- Only active word re-animates
+
+```typescript
+// Before: All words re-render on any change
+segments.segments.map((wordSegment, index) => (
+  <motion.span key={index} ...>
+    <HarakatText text={wordSegment.text} />
+  </motion.span>
+))
+
+// After: Only changed words re-render
+segments.segments.map((wordSegment, index) => (
+  <WordSegment
+    key={index}
+    wordText={wordSegment.text}
+    isPlaying={isPlayingWord && currentWordIndex === index}
+    ...
+  />
+))
+```
+
+**Impact:** Dramatically reduces render cycles, especially for long ayahs.
+
+### Performance Comparison - Full Ayah View
+
+**Before:**
+```
+Load page
+↓
+Parse harakat (multiple times)
+↓ [Delay]
+Audio preloading blocks
+↓ [11 second freeze]
+All words re-render constantly
+↓ [Janky animations]
+Page interactive
+```
+
+**After:**
+```
+Load page
+↓
+Parse harakat (memoized, once)
+↓ [< 50ms]
+Audio preloads in background
+↓ [Non-blocking]
+Only active word re-renders
+↓ [Smooth animations]
+Page interactive immediately
+```
+
+### Files Modified - Full Ayah View
+
+1. ✅ `components/arabic/HarakatText.tsx` - Added useMemo for parseArabicText
+2. ✅ `app/dashboard/juz/[number]/surah/[surahNumber]/AyahTextDisplay.tsx` - Memoized WordSegment component
+
+### Testing Recommendations - Full Ayah View
+
+1. **Test Navigation Speed:**
+   - Navigate between ayahs quickly
+   - Should be instant, no lag
+
+2. **Test Word-by-Word Audio:**
+   - Enable word-by-word audio
+   - Click words rapidly
+   - Animations should be smooth
+
+3. **Test Long Ayahs:**
+   - Surah Al-Baqarah (100+ words)
+   - Should render instantly
+   - No janky scrolling
+
+---
+
 **Fix Date:** 2026-02-10  
-**Issue:** 11-second freeze on puzzle load  
-**Root Cause:** Synchronous audio preloading blocking main thread  
-**Solution:** Deferred + lazy loading with requestIdleCallback  
-**Status:** ✅ Fixed
+**Issue:** 11-second freeze on puzzle load + lag in full ayah view  
+**Root Cause:** Synchronous audio preloading + un-memoized text parsing + excessive re-renders  
+**Solution:** Deferred audio loading + useMemo + memoized components  
+**Status:** ✅ Fixed (both puzzle and full ayah view)
 

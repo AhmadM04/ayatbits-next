@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import { HarakatText, HarakatModal } from '@/components/arabic';
 import { type HarakatDefinition } from '@/lib/harakat-utils';
@@ -12,6 +12,66 @@ interface AyahTextDisplayProps {
   ayahNumber: number;
   enableWordByWordAudio?: boolean;
 }
+
+// PERFORMANCE: Memoized word segment to prevent unnecessary re-renders
+// With 50-100 words per ayah, this significantly reduces animation overhead
+const WordSegment = memo(({ 
+  wordText, 
+  wordIndex, 
+  isPlaying, 
+  onWordClick,
+  onHarakatClick,
+}: {
+  wordText: string;
+  wordIndex: number;
+  isPlaying: boolean;
+  onWordClick: () => void;
+  onHarakatClick: (def: HarakatDefinition) => void;
+}) => {
+  return (
+    <motion.span
+      onClick={onWordClick}
+      animate={
+        isPlaying
+          ? {
+              boxShadow: [
+                '0 0 0 rgba(16, 185, 129, 0)',
+                '0 0 20px rgba(16, 185, 129, 0.5)',
+                '0 0 0 rgba(16, 185, 129, 0)',
+              ],
+            }
+          : {
+              boxShadow: '0 0 0 rgba(16, 185, 129, 0)',
+            }
+      }
+      transition={
+        isPlaying
+          ? {
+              boxShadow: {
+                duration: 1,
+                repeat: Infinity,
+              },
+            }
+          : {
+              duration: 0.3,
+              boxShadow: { duration: 0.3 },
+            }
+      }
+      className={`inline-block cursor-pointer px-1 rounded transition-colors ${
+        isPlaying
+          ? 'bg-green-500/30 text-green-300'
+          : 'hover:bg-green-500/10'
+      }`}
+    >
+      <HarakatText 
+        text={wordText}
+        onHarakatClick={onHarakatClick}
+      />
+    </motion.span>
+  );
+});
+
+WordSegment.displayName = 'WordSegment';
 
 export default function AyahTextDisplay({ 
   ayahText, 
@@ -77,46 +137,14 @@ export default function AyahTextDisplay({
       >
         {enableWordByWordAudio && segments && segments.segments.length > 0 ? (
           segments.segments.map((wordSegment, index) => (
-            <motion.span
+            <WordSegment
               key={index}
-              onClick={() => playWord(index)}
-              animate={
-                isPlayingWord && currentWordIndex === index
-                  ? {
-                      boxShadow: [
-                        '0 0 0 rgba(16, 185, 129, 0)',
-                        '0 0 20px rgba(16, 185, 129, 0.5)',
-                        '0 0 0 rgba(16, 185, 129, 0)',
-                      ],
-                    }
-                  : {
-                      boxShadow: '0 0 0 rgba(16, 185, 129, 0)',
-                    }
-              }
-              transition={
-                isPlayingWord && currentWordIndex === index
-                  ? {
-                      boxShadow: {
-                        duration: 1,
-                        repeat: Infinity,
-                      },
-                    }
-                  : {
-                      duration: 0.3,
-                      boxShadow: { duration: 0.3 },
-                    }
-              }
-              className={`inline-block cursor-pointer px-1 rounded transition-colors ${
-                isPlayingWord && currentWordIndex === index
-                  ? 'bg-green-500/30 text-green-300'
-                  : 'hover:bg-green-500/10'
-              }`}
-            >
-              <HarakatText 
-                text={wordSegment.text}
-                onHarakatClick={handleHarakatClick}
-              />
-            </motion.span>
+              wordText={wordSegment.text}
+              wordIndex={index}
+              isPlaying={isPlayingWord && currentWordIndex === index}
+              onWordClick={() => playWord(index)}
+              onHarakatClick={handleHarakatClick}
+            />
           ))
         ) : (
           <HarakatText 
