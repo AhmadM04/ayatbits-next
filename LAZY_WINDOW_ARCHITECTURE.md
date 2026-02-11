@@ -442,7 +442,36 @@ useEffect(() => {
 
 ✅ **Implemented**  
 ✅ **No Linter Errors**  
+✅ **Phase 2 Fix Applied** (2026-02-11)  
 ⏳ **Awaiting Production Testing**
+
+### Phase 2 Fix (2026-02-11)
+
+**Problem**: Even after implementing RAW_PUZZLE_CACHE, the 15-second freeze persisted with the same stack trace (dispatch -> Immer).
+
+**Root Cause**: While data was stored in RAW_PUZZLE_CACHE (outside React state), it was still being passed as **props** to components inside `DndContext`:
+```tsx
+<DndContext>
+  <AnswerArea correctTokens={originalTokens} />  // ← Large array as prop
+  <WordBank bank={bank} />                        // ← Large array as prop
+</DndContext>
+```
+
+When DndContext wraps its children, Immer proxies ALL props during drag operations, not just the drag data. This caused the freeze.
+
+**Solution**: Pass **IDs only** as props, look up full objects from cache inside components:
+```tsx
+<DndContext>
+  <AnswerArea cacheKey={cacheKey} placedTokenIds={placedTokenIds} />  // ← IDs only
+  <WordBank cacheKey={cacheKey} bankTokenIds={bankIds} />              // ← IDs only
+</DndContext>
+```
+
+**Changes**:
+1. State now stores IDs instead of full objects: `Map<number, string>` instead of `Map<number, WordToken>`
+2. `puzzleDataRef.current.bankIds: string[]` instead of `bank: WordToken[]`
+3. Components look up full tokens from `RAW_PUZZLE_CACHE` using cache key
+4. Only IDs are passed through DndContext, preventing Immer from proxy-wrapping large arrays
 
 ### Success Criteria
 

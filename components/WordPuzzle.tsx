@@ -380,8 +380,8 @@ const DraggableWord = memo(function DraggableWord({
 });
 
 function AnswerArea({
-  correctTokens,
-  placedTokens,
+  cacheKey,
+  placedTokenIds,
   activeTokenId,
   hintedSlotPosition,
   isFadingHint,
@@ -391,8 +391,8 @@ function AnswerArea({
   playingWordIndex,
   t,
 }: {
-  correctTokens: WordToken[];
-  placedTokens: Map<number, WordToken>;
+  cacheKey: string;
+  placedTokenIds: Map<number, string>;  // position -> tokenId
   activeTokenId: string | null;
   hintedSlotPosition: number | null;
   isFadingHint: boolean;
@@ -402,6 +402,13 @@ function AnswerArea({
   playingWordIndex?: number | null;
   t: (key: string, params?: Record<string, any>) => string;
 }) {
+  // PERFORMANCE FIX: Look up data from cache instead of receiving as props
+  // This prevents Immer from proxy-wrapping large arrays
+  const cachedData = RAW_PUZZLE_CACHE.get(cacheKey);
+  if (!cachedData) return null;
+  
+  const { originalTokens } = cachedData;
+  
   return (
     <div
       dir="rtl"
@@ -409,23 +416,30 @@ function AnswerArea({
       className="min-h-[80px] w-full rounded-xl border-2 border-dashed p-3 transition-all duration-300 border-white/10 bg-[#0f0f0f]"
     >
       <div className="flex flex-wrap items-center gap-2" style={{ justifyContent: 'flex-start' }}>
-        {correctTokens.map((token, index) => (
-          <DropSlot
-            key={`slot-${index}`}
-            position={index}
-            expectedToken={token}
-            placedToken={placedTokens.get(index) || null}
-            isActive={activeTokenId !== null}
-            isHinted={hintedSlotPosition === index}
-            isFadingHint={isFadingHint && hintedSlotPosition === index}
-            showTransliteration={showTransliteration}
-            enableWordAudio={enableWordAudio}
-            onWordClick={onWordClick}
-            playingWordIndex={playingWordIndex}
-          />
-        ))}
+        {originalTokens.map((token, index) => {
+          const placedTokenId = placedTokenIds.get(index);
+          const placedToken = placedTokenId 
+            ? originalTokens.find(t => t.id === placedTokenId) || null
+            : null;
+          
+          return (
+            <DropSlot
+              key={`slot-${index}`}
+              position={index}
+              expectedToken={token}
+              placedToken={placedToken}
+              isActive={activeTokenId !== null}
+              isHinted={hintedSlotPosition === index}
+              isFadingHint={isFadingHint && hintedSlotPosition === index}
+              showTransliteration={showTransliteration}
+              enableWordAudio={enableWordAudio}
+              onWordClick={onWordClick}
+              playingWordIndex={playingWordIndex}
+            />
+          );
+        })}
       </div>
-      {placedTokens.size === 0 && (
+      {placedTokenIds.size === 0 && (
         <p className="text-gray-500 text-xs text-center mt-3">
           {t('wordPuzzle.dropEachWord')}
         </p>
@@ -435,7 +449,8 @@ function AnswerArea({
 }
 
 function WordBank({
-  bank,
+  cacheKey,
+  bankTokenIds,
   shakingIds,
   hintedTokenId,
   isFadingHint,
@@ -443,7 +458,8 @@ function WordBank({
   onWordTap,
   t,
 }: {
-  bank: WordToken[];
+  cacheKey: string;
+  bankTokenIds: string[];  // Array of token IDs in the bank
   shakingIds: Set<string>;
   hintedTokenId: string | null;
   isFadingHint: boolean;
@@ -451,6 +467,16 @@ function WordBank({
   onWordTap?: (token: WordToken) => void;
   t: (key: string, params?: Record<string, any>) => string;
 }) {
+  // PERFORMANCE FIX: Look up data from cache instead of receiving as props
+  // This prevents Immer from proxy-wrapping large arrays
+  const cachedData = RAW_PUZZLE_CACHE.get(cacheKey);
+  if (!cachedData) return null;
+  
+  const { originalTokens } = cachedData;
+  const bankTokens = bankTokenIds.map(id => 
+    originalTokens.find(t => t.id === id)
+  ).filter((t): t is WordToken => t !== undefined);
+  
   return (
     <div className="mt-6" dir="rtl" data-tutorial="word-bank">
       <p className="text-xs text-gray-500 text-center mb-3">
@@ -458,7 +484,7 @@ function WordBank({
       </p>
       <div className="flex flex-wrap justify-center gap-2">
         <AnimatePresence>
-          {bank.map((token) => (
+          {bankTokens.map((token) => (
             <DraggableWord
               key={token.id}
               token={token}
@@ -528,18 +554,19 @@ export default function WordPuzzle({
   }, [cacheKey, ayahText, wordTransliterations]);
   
   // ============================================================================
-  // LAZY WINDOW ARCHITECTURE - Step 3: Render State (Minimal)
+  // LAZY WINDOW ARCHITECTURE - Step 3: Render State (Minimal - IDs ONLY)
   // ============================================================================
-  // Only store what's needed for rendering the CURRENT verse
+  // Store ONLY IDs, not full objects - prevents Immer from proxy-wrapping large arrays
   const puzzleDataRef = useRef<{
-    originalTokens: WordToken[];
-    bank: WordToken[];
-  }>({ originalTokens: [], bank: [] });
+    originalTokens: WordToken[];  // Keep full objects in ref (not state)
+    bankIds: string[];  // ONLY IDs in state/props
+  }>({ originalTokens: [], bankIds: [] });
   
   // STATE FOR UI ONLY - only things that need to trigger re-renders
+  // PERFORMANCE FIX: Store IDs instead of full objects
   const [isLoaded, setIsLoaded] = useState(false);
-  const [placedTokens, setPlacedTokens] = useState<Map<number, WordToken>>(new Map());
-  const [activeToken, setActiveToken] = useState<WordToken | null>(null);
+  const [placedTokenIds, setPlacedTokenIds] = useState<Map<number, string>>(new Map());  // position -> tokenId
+  const [activeTokenId, setActiveTokenId] = useState<string | null>(null);
   const [mistakeCount, setMistakeCount] = useState(0);
   const [hasExceededMistakeLimit, setHasExceededMistakeLimit] = useState(false);
   const hasCompletedRef = useRef(false);
@@ -558,9 +585,9 @@ export default function WordPuzzle({
   const onSolvedRef = useRef(onSolved);
   
   // ============================================================================
-  // LAZY WINDOW ARCHITECTURE - Step 4: Load ONLY Active Verse
+  // LAZY WINDOW ARCHITECTURE - Step 4: Load ONLY Active Verse (IDs ONLY)
   // ============================================================================
-  // Pull data from cache and initialize render state
+  // Pull data from cache and initialize render state with IDs ONLY
   useEffect(() => {
     const cachedData = RAW_PUZZLE_CACHE.get(cacheKey);
     if (!cachedData) {
@@ -570,10 +597,10 @@ export default function WordPuzzle({
     
     log('[LAZY WINDOW] Loading ONLY active verse from cache:', cacheKey);
     
-    // Copy ONLY the current verse data into render state
+    // Store full objects in ref (not state), only IDs in state
     puzzleDataRef.current = {
       originalTokens: cachedData.originalTokens,
-      bank: shuffleArray([...cachedData.originalTokens]), // Shuffle a copy
+      bankIds: shuffleArray([...cachedData.originalTokens]).map(t => t.id), // Store IDs only
     };
     
     // Initialize tips (calculation only for THIS verse, not entire Surah)
@@ -718,9 +745,9 @@ export default function WordPuzzle({
     
     const originalTokens = cachedData.originalTokens;
     
-    setPlacedTokens(new Map());
-    // Update bank in ref with fresh shuffle from cache
-    puzzleDataRef.current.bank = shuffleArray([...originalTokens]);
+    setPlacedTokenIds(new Map());
+    // Update bank in ref with fresh shuffle from cache (IDs only)
+    puzzleDataRef.current.bankIds = shuffleArray([...originalTokens]).map(t => t.id);
     setMistakeCount(0);
     setHasExceededMistakeLimit(false);
     hasCompletedRef.current = false;
@@ -757,8 +784,8 @@ export default function WordPuzzle({
   const isComplete = useMemo(() => {
     const originalTokens = puzzleDataRef.current.originalTokens;
     // Simple comparison - no loops over 6000 words!
-    return originalTokens.length > 0 && placedTokens.size === originalTokens.length;
-  }, [placedTokens.size, isLoaded]);
+    return originalTokens.length > 0 && placedTokenIds.size === originalTokens.length;
+  }, [placedTokenIds.size, isLoaded]);
 
   useEffect(() => {
     log('[COMPLETION] useEffect running', { isComplete, hasCompleted: hasCompletedRef.current });
@@ -828,12 +855,12 @@ export default function WordPuzzle({
       // Trigger automatic tip on every 2nd mistake (if tips available)
       if (next % 2 === 0 && usedTips < availableTips && !activeHint) {
         setTimeout(() => {
-          const { originalTokens, bank } = puzzleDataRef.current;
+          const { originalTokens, bankIds } = puzzleDataRef.current;
           
           // Find the first empty slot and the correct word for it
           let firstEmptySlot = -1;
           for (let i = 0; i < originalTokens.length; i++) {
-            if (!placedTokens.has(i)) {
+            if (!placedTokenIds.has(i)) {
               firstEmptySlot = i;
               break;
             }
@@ -841,12 +868,15 @@ export default function WordPuzzle({
           
           if (firstEmptySlot !== -1) {
             const correctToken = originalTokens[firstEmptySlot];
-            const correctWordInBank = bank.find(t => t.norm === correctToken.norm);
+            const correctWordId = bankIds.find(id => {
+              const token = originalTokens.find(t => t.id === id);
+              return token && token.norm === correctToken.norm;
+            });
             
-            if (correctWordInBank) {
+            if (correctWordId) {
               setIsFadingHint(false);
               setActiveHint({
-                tokenId: correctWordInBank.id,
+                tokenId: correctWordId,
                 slotPosition: firstEmptySlot,
               });
               setUsedTips((prev) => prev + 1);
@@ -874,19 +904,19 @@ export default function WordPuzzle({
       }
       return next;
     });
-  }, [onMistakeLimitExceeded, showToast, usedTips, availableTips, placedTokens, activeHint, t]);
+  }, [onMistakeLimitExceeded, showToast, usedTips, availableTips, placedTokenIds, activeHint, t]);
 
   // Manual tip triggering (when user clicks tips button)
   const handleManualTip = useCallback(() => {
-    const { originalTokens, bank } = puzzleDataRef.current;
+    const { originalTokens, bankIds } = puzzleDataRef.current;
     
     log('[TIPS] handleManualTip called', {
       usedTips,
       availableTips,
       hasActiveHint: !!activeHint,
-      bankLength: bank.length,
+      bankLength: bankIds.length,
       originalTokensLength: originalTokens.length,
-      placedTokensSize: placedTokens.size,
+      placedTokensSize: placedTokenIds.size,
     });
 
     // Check if tips are available
@@ -906,7 +936,7 @@ export default function WordPuzzle({
     // Find the first empty slot and the correct word for it
     let firstEmptySlot = -1;
     for (let i = 0; i < originalTokens.length; i++) {
-      if (!placedTokens.has(i)) {
+      if (!placedTokenIds.has(i)) {
         firstEmptySlot = i;
         break;
       }
@@ -925,21 +955,22 @@ export default function WordPuzzle({
       norm: correctToken.norm,
       id: correctToken.id 
     });
-    log('[TIPS] Bank contents:', bank.map(t => ({ id: t.id, text: t.text, norm: t.norm })));
+    log('[TIPS] Bank IDs:', bankIds);
     
     // Find the correct word in the bank - use exact ID match first, then fall back to norm match
-    let correctWordInBank = bank.find(t => t.id === correctToken.id);
-    if (!correctWordInBank) {
+    let correctWordId = bankIds.find(id => id === correctToken.id);
+    if (!correctWordId) {
       // Fall back to norm matching for duplicate words
-      correctWordInBank = bank.find(t => t.norm === correctToken.norm);
+      const correctTokenInBank = originalTokens.find(t => bankIds.includes(t.id) && t.norm === correctToken.norm);
+      correctWordId = correctTokenInBank?.id;
     }
     
-    log('[TIPS] Found word in bank:', correctWordInBank ? { id: correctWordInBank.id, text: correctWordInBank.text } : 'NOT FOUND');
+    log('[TIPS] Found word ID in bank:', correctWordId || 'NOT FOUND');
     
-    if (correctWordInBank) {
+    if (correctWordId) {
       setIsFadingHint(false);
       const hint = {
-        tokenId: correctWordInBank.id,
+        tokenId: correctWordId,
         slotPosition: firstEmptySlot,
       };
       log('[TIPS] Setting activeHint:', hint);
@@ -950,7 +981,7 @@ export default function WordPuzzle({
       log('[TIPS] Could not find correct word in bank');
       showToast(t('wordPuzzle.unableToFindWord'), 'error', 2000);
     }
-  }, [usedTips, availableTips, activeHint, placedTokens, showToast, t]);
+  }, [usedTips, availableTips, activeHint, placedTokenIds, showToast, t]);
 
   // Try to place a token on a specific slot
   // Returns true if placed successfully, false otherwise
@@ -959,7 +990,7 @@ export default function WordPuzzle({
       const originalTokens = puzzleDataRef.current.originalTokens;
       
       // Check if slot is already filled
-      if (placedTokens.has(slotPosition)) {
+      if (placedTokenIds.has(slotPosition)) {
         log('[PLACEMENT] Slot already filled:', { slotPosition });
         return false;
       }
@@ -985,14 +1016,14 @@ export default function WordPuzzle({
 
       // Correct! Place the token
       log('[PLACEMENT] ✅ ACCEPTED - placing token');
-      setPlacedTokens((prev) => {
+      setPlacedTokenIds((prev) => {
         const next = new Map(prev);
-        next.set(slotPosition, token);
+        next.set(slotPosition, token.id);  // Store ID only
         return next;
       });
 
-      // Remove from bank in ref
-      puzzleDataRef.current.bank = puzzleDataRef.current.bank.filter((t) => t.id !== token.id);
+      // Remove from bank in ref (IDs only)
+      puzzleDataRef.current.bankIds = puzzleDataRef.current.bankIds.filter((id) => id !== token.id);
       
       onWordCorrect?.(slotPosition, token.text);
       
@@ -1019,16 +1050,15 @@ export default function WordPuzzle({
       
       return true;
     },
-    [placedTokens, onWordCorrect, registerMistake, enableWordByWordAudio, handleAnswerWordClick]
+    [placedTokenIds, onWordCorrect, registerMistake, enableWordByWordAudio, handleAnswerWordClick]
   );
 
   const handleDragStart = useCallback(
     (event: DragStartEvent) => {
       log('[DND] handleDragStart called', event.active.id);
-      const bank = puzzleDataRef.current.bank;
-      const token = bank.find((t) => t.id === event.active.id) || null;
-      log('[DND] Found token:', token);
-      setActiveToken(token);
+      const activeId = event.active.id as string;
+      setActiveTokenId(activeId);
+      log('[DND] Set active token ID:', activeId);
     },
     []
   );
@@ -1037,7 +1067,7 @@ export default function WordPuzzle({
     (event: DragEndEvent) => {
       log('[DND] handleDragEnd called', { activeId: event.active.id, overId: event.over?.id });
       const { active, over } = event;
-      setActiveToken(null);
+      setActiveTokenId(null);
 
       // If not dropped on anything, just return (no mistake)
       if (!over || hasExceededMistakeLimit) {
@@ -1046,8 +1076,8 @@ export default function WordPuzzle({
       }
 
       const activeId = active.id as string;
-      const bank = puzzleDataRef.current.bank;
-      const token = bank.find((t) => t.id === activeId);
+      const originalTokens = puzzleDataRef.current.originalTokens;
+      const token = originalTokens.find((t) => t.id === activeId);
       if (!token) return;
 
       // Check if dropped on a slot
@@ -1078,7 +1108,7 @@ export default function WordPuzzle({
       // Find the first empty slot
       let firstEmptySlot = -1;
       for (let i = 0; i < originalTokens.length; i++) {
-        if (!placedTokens.has(i)) {
+        if (!placedTokenIds.has(i)) {
           firstEmptySlot = i;
           break;
         }
@@ -1092,7 +1122,7 @@ export default function WordPuzzle({
       // Try to place the token in the first empty slot
       tryPlaceTokenOnSlot(token, firstEmptySlot);
     },
-    [hasExceededMistakeLimit, placedTokens, tryPlaceTokenOnSlot]
+    [hasExceededMistakeLimit, placedTokenIds, tryPlaceTokenOnSlot]
   );
 
   const dropAnimation: DropAnimation = {
@@ -1115,10 +1145,11 @@ export default function WordPuzzle({
   }
 
   // ============================================================================
-  // LAZY WINDOW ARCHITECTURE - Step 6: Render ONLY Active Verse
+  // LAZY WINDOW ARCHITECTURE - Step 6: Render ONLY Active Verse (IDs ONLY)
   // ============================================================================
   // Get ONLY the current verse data (e.g., 10-20 words, NOT 6000)
-  const { originalTokens, bank } = puzzleDataRef.current;
+  // Store full objects in ref, but only pass IDs as props to avoid Immer proxy-wrapping
+  const { originalTokens, bankIds } = puzzleDataRef.current;
   
   log('[LAZY WINDOW] Rendering active verse -', originalTokens.length, 'tokens');
 
@@ -1212,7 +1243,7 @@ export default function WordPuzzle({
         </div>
 
         <div className="text-xs text-gray-500">
-          {placedTokens.size}/{originalTokens.length}
+          {placedTokenIds.size}/{originalTokens.length}
         </div>
       </div>
 
@@ -1222,7 +1253,7 @@ export default function WordPuzzle({
           <motion.div
             className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full"
             initial={{ width: 0 }}
-            animate={{ width: `${(placedTokens.size / originalTokens.length) * 100}%` }}
+            animate={{ width: `${(placedTokenIds.size / originalTokens.length) * 100}%` }}
             transition={{ duration: 0.2 }}
           />
         </div>
@@ -1235,9 +1266,9 @@ export default function WordPuzzle({
         onDragEnd={handleDragEnd}
       >
         <AnswerArea
-          correctTokens={originalTokens}
-          placedTokens={placedTokens}
-          activeTokenId={activeToken?.id || null}
+          cacheKey={cacheKey}
+          placedTokenIds={placedTokenIds}
+          activeTokenId={activeTokenId}
           hintedSlotPosition={activeHint?.slotPosition ?? null}
           isFadingHint={isFadingHint}
           showTransliteration={wordTransliterations.length > 0}
@@ -1258,7 +1289,8 @@ export default function WordPuzzle({
           t={t}
         />
         <WordBank
-          bank={bank}
+          cacheKey={cacheKey}
+          bankTokenIds={bankIds}
           shakingIds={shakingIds}
           hintedTokenId={activeHint?.tokenId ?? null}
           isFadingHint={isFadingHint}
@@ -1268,7 +1300,10 @@ export default function WordPuzzle({
         />
 
         <DragOverlay dropAnimation={dropAnimation}>
-          {activeToken ? <DraggableWord token={activeToken} isOverlay /> : null}
+          {activeTokenId ? (() => {
+            const token = originalTokens.find(t => t.id === activeTokenId);
+            return token ? <DraggableWord token={token} isOverlay /> : null;
+          })() : null}
         </DragOverlay>
       </DndContext>
 
