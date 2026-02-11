@@ -205,11 +205,12 @@ export default function PuzzleClient({
   };
 
   return (
-    <TutorialWrapper
-      sectionId="puzzle_guide"
-      steps={puzzleTutorialSteps}
-      delay={1000}
-    >
+    // ISOLATION TEST: TutorialWrapper commented out to test if it causes the freeze
+    // <TutorialWrapper
+    //   sectionId="puzzle_guide"
+    //   steps={puzzleTutorialSteps}
+    //   delay={1000}
+    // >
       <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
       {/* Success Transition Overlay */}
       <AnimatePresence>
@@ -378,6 +379,6 @@ export default function PuzzleClient({
         onConfirm={handleExitConfirm}
       />
     </div>
-    </TutorialWrapper>
+    // </TutorialWrapper>
   );
 }

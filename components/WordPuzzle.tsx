@@ -523,15 +523,20 @@ export default function WordPuzzle({
   const cacheKey = `${surahNumber}-${ayahNumber}`;
   
   // ============================================================================
-  // LAZY WINDOW ARCHITECTURE - Step 2: Store in File-Level Cache
+  // PERFORMANCE FIX: INSTANT INITIALIZATION (No useEffect / No Loading State)
   // ============================================================================
-  // Check if data exists in cache, if not, create it (OUTSIDE React state)
-  useEffect(() => {
-    if (!RAW_PUZZLE_CACHE.has(cacheKey)) {
-      log('[LAZY WINDOW] Cache miss - tokenizing ayah:', cacheKey);
+  
+  // 1. Memoize the puzzle state so it is ready ON FIRST RENDER
+  const puzzleState = useMemo(() => {
+    // A. Check Cache (Synchronous)
+    let data = RAW_PUZZLE_CACHE.get(cacheKey);
+
+    // B. Cache Miss? Populate it SYNCHRONOUSLY (Blocking for 5ms is better than a re-render)
+    if (!data) {
+      log('[LAZY WINDOW] Cache miss (Sync) - tokenizing:', cacheKey);
       const tokens = tokenizeAyah(ayahText);
       
-      // Map transliterations to tokens if available
+      // Apply transliterations
       if (wordTransliterations.length > 0) {
         tokens.forEach((token, index) => {
           if (index < wordTransliterations.length) {
@@ -540,31 +545,34 @@ export default function WordPuzzle({
         });
       }
       
-      // Store in file-level cache - NO React state involved
       RAW_PUZZLE_CACHE.set(cacheKey, {
         originalTokens: tokens,
         ayahText,
         wordTransliterations,
       });
-      
-      log('[LAZY WINDOW] Cached data for:', cacheKey, '- tokens:', tokens.length);
-    } else {
-      log('[LAZY WINDOW] Cache hit for:', cacheKey);
+      data = RAW_PUZZLE_CACHE.get(cacheKey)!;
     }
-  }, [cacheKey, ayahText, wordTransliterations]);
-  
-  // ============================================================================
-  // LAZY WINDOW ARCHITECTURE - Step 3: Render State (Minimal - IDs ONLY)
-  // ============================================================================
-  // Store ONLY IDs, not full objects - prevents Immer from proxy-wrapping large arrays
+
+    // C. Return the render-ready data
+    return {
+      originalTokens: data.originalTokens,
+      // Shuffle bank immediately
+      bankIds: shuffleArray([...data.originalTokens]).map(t => t.id)
+    };
+  }, [cacheKey, ayahText, wordTransliterations]); // Re-run only if verse changes
+
+  // 2. Sync the Ref (for event handlers)
   const puzzleDataRef = useRef<{
-    originalTokens: WordToken[];  // Keep full objects in ref (not state)
-    bankIds: string[];  // ONLY IDs in state/props
-  }>({ originalTokens: [], bankIds: [] });
+    originalTokens: WordToken[];
+    bankIds: string[];
+  }>(puzzleState);
+  puzzleDataRef.current = puzzleState;
+
+  // 3. Extract data for render (No 'if !isLoaded' check needed anymore!)
+  const { originalTokens, bankIds } = puzzleState;
   
   // STATE FOR UI ONLY - only things that need to trigger re-renders
   // PERFORMANCE FIX: Store IDs instead of full objects
-  const [isLoaded, setIsLoaded] = useState(false);
   const [placedTokenIds, setPlacedTokenIds] = useState<Map<number, string>>(new Map());  // position -> tokenId
   const [activeTokenId, setActiveTokenId] = useState<string | null>(null);
   const [mistakeCount, setMistakeCount] = useState(0);
@@ -584,34 +592,11 @@ export default function WordPuzzle({
   const pendingToast = useRef<{ message: string; type: 'success' | 'error'; duration: number } | null>(null);
   const onSolvedRef = useRef(onSolved);
   
-  // ============================================================================
-  // LAZY WINDOW ARCHITECTURE - Step 4: Load ONLY Active Verse (IDs ONLY)
-  // ============================================================================
-  // Pull data from cache and initialize render state with IDs ONLY
+  // Initialize tips (calculation only for THIS verse, not entire Surah)
   useEffect(() => {
-    const cachedData = RAW_PUZZLE_CACHE.get(cacheKey);
-    if (!cachedData) {
-      log('[LAZY WINDOW] Waiting for cache to populate...');
-      return;
-    }
-    
-    log('[LAZY WINDOW] Loading ONLY active verse from cache:', cacheKey);
-    
-    // Store full objects in ref (not state), only IDs in state
-    puzzleDataRef.current = {
-      originalTokens: cachedData.originalTokens,
-      bankIds: shuffleArray([...cachedData.originalTokens]).map(t => t.id), // Store IDs only
-    };
-    
-    // Initialize tips (calculation only for THIS verse, not entire Surah)
-    const tipsCount = calculateTipsForAyah(cachedData.originalTokens.length);
+    const tipsCount = calculateTipsForAyah(originalTokens.length);
     setAvailableTips(tipsCount);
-    
-    // Trigger single re-render
-    setIsLoaded(true);
-    
-    log('[LAZY WINDOW] Loaded active verse -', cachedData.originalTokens.length, 'tokens (not 6000!)');
-  }, [cacheKey]);
+  }, [originalTokens.length]);
   
   // Word audio hook
   const {
@@ -658,7 +643,6 @@ export default function WordPuzzle({
   // We need to account for MUQATTA'AT: Split into individual letters in puzzle but kept as one word in API
   // Note: Bismillah is NOT included in the API word segments - it's handled separately at the surah level
   const muqattaatTokens = useMemo(() => {
-    const originalTokens = puzzleDataRef.current.originalTokens;
     if (originalTokens.length === 0) return 0;
     
     // Check for Muqatta'at (isolated letters at the start of some surahs)
@@ -696,7 +680,7 @@ export default function WordPuzzle({
     }
     
     return muqattaatLetterCount;
-  }, [isLoaded, ayahText]);
+  }, [originalTokens.length, ayahText]);
 
   // Handler for word click in answer area
   const handleAnswerWordClick = useCallback((wordIndex: number) => {
@@ -764,9 +748,6 @@ export default function WordPuzzle({
     setUsedTips(0);
     setActiveHint(null);
     setIsFadingHint(false);
-    
-    // Force re-render
-    setIsLoaded(true);
   }, [cacheKey]);
 
   useEffect(() => {
@@ -782,10 +763,9 @@ export default function WordPuzzle({
   // ============================================================================
   // Check completion using ONLY the current verse data (no iterations over full Surah)
   const isComplete = useMemo(() => {
-    const originalTokens = puzzleDataRef.current.originalTokens;
     // Simple comparison - no loops over 6000 words!
     return originalTokens.length > 0 && placedTokenIds.size === originalTokens.length;
-  }, [placedTokenIds.size, isLoaded]);
+  }, [placedTokenIds.size, originalTokens.length]);
 
   useEffect(() => {
     log('[COMPLETION] useEffect running', { isComplete, hasCompleted: hasCompletedRef.current });
@@ -1133,23 +1113,12 @@ export default function WordPuzzle({
     }),
   };
 
-  // Wait for data to load
-  if (!isLoaded || puzzleDataRef.current.originalTokens.length === 0) {
-    return (
-      <div className="min-h-[150px] flex items-center justify-center text-gray-400">
-        <div className="text-center">
-          <p className="text-sm">Loading puzzle...</p>
-        </div>
-      </div>
-    );
-  }
-
+  // No loading check needed - data is ready on first render!
   // ============================================================================
   // LAZY WINDOW ARCHITECTURE - Step 6: Render ONLY Active Verse (IDs ONLY)
   // ============================================================================
   // Get ONLY the current verse data (e.g., 10-20 words, NOT 6000)
-  // Store full objects in ref, but only pass IDs as props to avoid Immer proxy-wrapping
-  const { originalTokens, bankIds } = puzzleDataRef.current;
+  // Data is already available from useMemo above
   
   log('[LAZY WINDOW] Rendering active verse -', originalTokens.length, 'tokens');
 
