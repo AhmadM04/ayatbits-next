@@ -1,12 +1,10 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { connectDB, Puzzle, LikedAyat, User, Surah, Juz } from '@/lib/db';
+import { connectDB, Puzzle, LikedAyat, User } from '@/lib/db';
 import mongoose from 'mongoose';
 import PuzzleClient from './PuzzleClient';
 import { cleanAyahText } from '@/lib/ayah-utils';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
-import { fetchTransliteration, fetchTranslation } from '@/lib/quran-api-adapter';
-import { generateAiTafsir } from '@/lib/ai-tafsir-generator';
 import { checkProAccess } from '@/lib/subscription';
 
 export default async function PuzzlePage({
@@ -85,79 +83,14 @@ export default async function PuzzlePage({
   // Remove bismillah from first ayah of surahs (except Al-Fatiha)
   const ayahText = cleanAyahText(rawAyahText, surahNum, ayahNum);
 
-  // Fetch transliteration if user preference is enabled
-  let initialTransliteration = '';
-  let initialWordTransliterations: Array<{ text: string; transliteration: string }> = [];
+  // PERFORMANCE FIX: Don't fetch transliteration/AI on server - let client load it in background
+  // This prevents 10-15 second blocking on OpenAI API calls
+  // User sees page instantly, then data streams in
   
-  if (dbUser.showTransliteration) {
-    try {
-      // Fetch full-ayah transliteration using adapter
-      const transliterationData = await fetchTransliteration(
-        surahNum,
-        ayahNum,
-        { next: { revalidate: 86400 } }
-      );
-      initialTransliteration = transliterationData.data?.text || '';
-      
-      // Fetch word-by-word transliteration from Quran.com
-      const wordsResponse = await fetch(
-        `https://api.quran.com/api/v4/verses/by_key/${surahNum}:${ayahNum}?words=true&word_fields=transliteration,text_uthmani`,
-        { next: { revalidate: 86400 } }
-      );
-      if (wordsResponse.ok) {
-        const wordsData = await wordsResponse.json();
-        const words = wordsData.verse?.words || [];
-        initialWordTransliterations = words.map((word: any) => ({
-          text: word.text_uthmani || '',
-          transliteration: word.transliteration?.text || '',
-        }));
-      }
-    } catch (error) {
-      console.error('Failed to pre-fetch transliteration:', error);
-    }
-  }
-
-  // Pre-generate AI Tafsir if user has Pro access (for instant display on click)
-  let initialAiTafsir = '';
-  let initialAiTafsirSource = '';
-  
+  // Just pass flags to client about what to fetch
   const hasPro = checkProAccess(dbUser);
-  if (hasPro) {
-    try {
-      // Get user's selected translation
-      const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
-      const targetLang = selectedTranslation.split('.')[0] || 'en';
-      
-      // Fetch translation text for better AI tafsir context
-      let translationText = '';
-      try {
-        const translationData = await fetchTranslation(
-          surahNum,
-          ayahNum,
-          selectedTranslation,
-          { next: { revalidate: 86400 } }
-        );
-        translationText = translationData.data?.text || '';
-      } catch (error) {
-        console.error('Failed to fetch translation for AI tafsir:', error);
-      }
-      
-      // Generate or retrieve cached AI tafsir
-      const tafsirResult = await generateAiTafsir({
-        surahNumber: surahNum,
-        ayahNumber: ayahNum,
-        ayahText: rawAyahText,
-        translation: translationText,
-        targetLanguage: targetLang,
-      });
-      
-      initialAiTafsir = tafsirResult.tafsirText;
-      initialAiTafsirSource = tafsirResult.source;
-    } catch (error) {
-      console.error('Failed to pre-generate AI tafsir:', error);
-      // Continue without AI tafsir - user can still generate it manually
-    }
-  }
+  const shouldFetchTransliteration = dbUser.showTransliteration || false;
+  const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
 
   // Check if liked
   const likedAyat = await LikedAyat.findOne({
@@ -206,6 +139,12 @@ export default async function PuzzlePage({
       versePageUrl={versePageUrl}
       isLastAyahInSurah={isLastAyahInSurah}
       enableWordByWordAudio={dbUser.enableWordByWordAudio || false}
+      // PERFORMANCE FIX: Pass flags instead of pre-fetched data
+      shouldFetchTransliteration={shouldFetchTransliteration}
+      shouldFetchAiTafsir={hasPro}
+      selectedTranslation={selectedTranslation}
+      surahNumber={surahNum}
+      ayahNumber={ayahNum}
     />
   );
 }

@@ -44,6 +44,12 @@ interface PuzzleClientProps {
   versePageUrl: string;
   isLastAyahInSurah?: boolean;
   enableWordByWordAudio?: boolean;
+  // PERFORMANCE FIX: Flags for client-side fetching (no server blocking)
+  shouldFetchTransliteration?: boolean;
+  shouldFetchAiTafsir?: boolean;
+  selectedTranslation?: string;
+  surahNumber?: number;
+  ayahNumber?: number;
 }
 
 export default function PuzzleClient({
@@ -56,6 +62,11 @@ export default function PuzzleClient({
   versePageUrl,
   isLastAyahInSurah = false,
   enableWordByWordAudio = false,
+  shouldFetchTransliteration = false,
+  shouldFetchAiTafsir = false,
+  selectedTranslation = 'en.sahih',
+  surahNumber,
+  ayahNumber,
 }: PuzzleClientProps) {
   const { t } = useI18n();
   const { startTutorial } = useTutorial();
@@ -66,6 +77,11 @@ export default function PuzzleClient({
   const { showToast } = useToast();
   const router = useRouter();
   
+  // PERFORMANCE FIX: Client-side data fetching (non-blocking)
+  const [transliteration, setTransliteration] = useState('');
+  const [wordTransliterations, setWordTransliterations] = useState<Array<{ text: string; transliteration: string }>>([]);
+  const [isLoadingTransliteration, setIsLoadingTransliteration] = useState(false);
+  
   const hasHandledCompletion = useRef(false);
   const isIntentionalExit = useRef(false);
   const backUrl = versePageUrl || '/dashboard';
@@ -74,6 +90,59 @@ export default function PuzzleClient({
   useEffect(() => {
     hasHandledCompletion.current = false;
   }, [puzzle.id]);
+
+  // PERFORMANCE FIX: Fetch transliteration in background (non-blocking)
+  // Page loads instantly, transliteration streams in after
+  useEffect(() => {
+    if (!shouldFetchTransliteration || !surahNumber || !ayahNumber) {
+      return;
+    }
+
+    let isCancelled = false;
+    setIsLoadingTransliteration(true);
+
+    const fetchData = async () => {
+      try {
+        // Fetch full-ayah transliteration
+        const translitResponse = await fetch(
+          `/api/transliteration?surah=${surahNumber}&ayah=${ayahNumber}`
+        );
+        
+        if (!isCancelled && translitResponse.ok) {
+          const translitData = await translitResponse.json();
+          setTransliteration(translitData.text || '');
+        }
+
+        // Fetch word-by-word transliteration from Quran.com
+        const wordsResponse = await fetch(
+          `https://api.quran.com/api/v4/verses/by_key/${surahNumber}:${ayahNumber}?words=true&word_fields=transliteration,text_uthmani`
+        );
+        
+        if (!isCancelled && wordsResponse.ok) {
+          const wordsData = await wordsResponse.json();
+          const words = wordsData.verse?.words || [];
+          setWordTransliterations(words.map((word: any) => ({
+            text: word.text_uthmani || '',
+            transliteration: word.transliteration?.text || '',
+          })));
+        }
+      } catch (error) {
+        console.error('Failed to fetch transliteration:', error);
+      } finally {
+        if (!isCancelled) {
+          setIsLoadingTransliteration(false);
+        }
+      }
+    };
+
+    // Delay fetch by 500ms to let puzzle render first
+    const timer = setTimeout(fetchData, 500);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(timer);
+    };
+  }, [shouldFetchTransliteration, surahNumber, ayahNumber]);
 
   // Handle browser back button / swipe gestures
   useEffect(() => {
@@ -367,6 +436,9 @@ export default function PuzzleClient({
               }}
               onMistakeLimitExceeded={handleMistakeLimitExceeded}
               enableWordByWordAudio={enableWordByWordAudio}
+              transliteration={transliteration}
+              wordTransliterations={wordTransliterations}
+              isLoadingTransliteration={isLoadingTransliteration}
             />
           </div>
         </div>
