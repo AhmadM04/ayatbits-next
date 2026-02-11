@@ -598,7 +598,8 @@ export default function WordPuzzle({
     setAvailableTips(tipsCount);
   }, [originalTokens.length]);
   
-  // Word audio hook
+  // AUDIO KILL TEST: Commenting out to test if this is the freeze culprit
+  /*
   const {
     playWord,
     stopPlayback: stopWordPlayback,
@@ -609,6 +610,13 @@ export default function WordPuzzle({
     ayahNumber,
     enabled: enableWordByWordAudio,
   });
+  */
+  
+  // Fake values so the code doesn't break
+  const playWord = (_index: number) => {};
+  const stopPlayback = () => {};
+  const isPlayingWord = false;
+  const currentWordIndex = null;
   
   // Keep ref updated
   useEffect(() => {
