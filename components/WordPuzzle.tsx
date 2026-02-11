@@ -589,6 +589,10 @@ export default function WordPuzzle({
   // Word audio state - use prop if provided, otherwise fetch from API
   const [enableWordByWordAudio, setEnableWordByWordAudio] = useState(enableWordByWordAudioProp ?? false);
   
+  // PERFORMANCE FIX: Lazy-load audio system AFTER puzzle renders
+  // This prevents blocking the initial render with audio initialization
+  const [audioSystemReady, setAudioSystemReady] = useState(false);
+  
   const pendingToast = useRef<{ message: string; type: 'success' | 'error'; duration: number } | null>(null);
   const onSolvedRef = useRef(onSolved);
   
@@ -598,8 +602,23 @@ export default function WordPuzzle({
     setAvailableTips(tipsCount);
   }, [originalTokens.length]);
   
-  // AUDIO KILL TEST: Commenting out to test if this is the freeze culprit
-  /*
+  // PERFORMANCE FIX: Delay audio system initialization
+  // Wait 1.5 seconds after puzzle loads before enabling audio
+  // This ensures puzzle renders instantly and audio loads in background
+  useEffect(() => {
+    if (!enableWordByWordAudio) {
+      return;
+    }
+    
+    // Delay audio initialization to not block puzzle render
+    const timer = setTimeout(() => {
+      setAudioSystemReady(true);
+    }, 1500); // 1.5 second delay
+    
+    return () => clearTimeout(timer);
+  }, [enableWordByWordAudio]);
+  
+  // Word audio hook - only initialize when ready (lazy loading)
   const {
     playWord,
     stopPlayback: stopWordPlayback,
@@ -608,15 +627,8 @@ export default function WordPuzzle({
   } = useWordAudio({
     surahNumber,
     ayahNumber,
-    enabled: enableWordByWordAudio,
+    enabled: audioSystemReady, // Only enable after delay
   });
-  */
-  
-  // Fake values so the code doesn't break
-  const playWord = (_index: number) => {};
-  const stopPlayback = () => {};
-  const isPlayingWord = false;
-  const currentWordIndex = null;
   
   // Keep ref updated
   useEffect(() => {
@@ -642,8 +654,8 @@ export default function WordPuzzle({
         log('Failed to fetch user settings:', error);
       }
     };
-    // Delay settings fetch to not block initial render
-    const timer = setTimeout(fetchSettings, 0);
+    // PERFORMANCE FIX: Delay settings fetch even more (2s) to prioritize puzzle render
+    const timer = setTimeout(fetchSettings, 2000);
     return () => clearTimeout(timer);
   }, [enableWordByWordAudioProp]);
 
