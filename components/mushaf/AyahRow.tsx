@@ -1,11 +1,12 @@
 'use client';
 
-import { useRef, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, CheckCircle } from 'lucide-react';
 import { toArabicNumerals } from '@/lib/mushaf-utils';
 import { HarakatText } from '@/components/arabic';
 import { type HarakatDefinition } from '@/lib/harakat-utils';
+import { useLongPress } from '@/lib/hooks/useLongPress';
 
 export interface MushafVerse {
   id: number;
@@ -30,53 +31,31 @@ interface AyahRowProps {
 const LONG_PRESS_DURATION = 500; // 500ms for long press
 
 export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighlighted = false }: AyahRowProps) {
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
-  const isLongPressing = useRef(false);
   const [isHolding, setIsHolding] = useState(false);
 
-  const handleTouchStart = useCallback(() => {
-    isLongPressing.current = false;
-    setIsHolding(true);
-    
-    longPressTimer.current = setTimeout(() => {
-      isLongPressing.current = true;
-      
-      // Enhanced haptic feedback - a more noticeable pattern
-      if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        // Double vibration pattern for better feedback: [vibrate, pause, vibrate]
-        navigator.vibrate([100, 50, 100]);
-      }
-      
+  // ============================================================================
+  // PERFORMANCE FIX: Use custom useLongPress hook with scroll detection
+  // ============================================================================
+  // This prevents the modal from opening when users are scrolling
+  // Movement threshold of 10px ensures natural scrolling doesn't trigger long press
+  // ============================================================================
+  const longPressHandlers = useLongPress(
+    () => {
       onLongPress(verse);
       setIsHolding(false);
-    }, LONG_PRESS_DURATION);
-  }, [verse, onLongPress]);
-
-  const handleTouchEnd = useCallback(() => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
+    },
+    LONG_PRESS_DURATION,
+    {
+      movementThreshold: 10, // Cancel if user moves more than 10px (scrolling)
+      enableHaptics: true,
+      hapticPattern: [100, 50, 100], // Double vibration pattern
+      onStart: () => setIsHolding(true),
+      onCancel: () => setIsHolding(false),
     }
-    setIsHolding(false);
-  }, []);
-
-  const handleContextMenu = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    
-    // Haptic feedback for right-click/context menu as well
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
-      navigator.vibrate([100, 50, 100]);
-    }
-    
-    onLongPress(verse);
-  }, [verse, onLongPress]);
+  );
 
   const handleHarakatClick = useCallback((definition: HarakatDefinition) => {
-    // Cancel the long press timer since user clicked on harakat
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
+    // Cancel holding state when user clicks on harakat
     setIsHolding(false);
     onHarakatClick?.(definition);
   }, [onHarakatClick]);
@@ -95,13 +74,7 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
         lineHeight: 'inherit',
         verticalAlign: 'baseline',
       }}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onTouchCancel={handleTouchEnd}
-      onMouseDown={handleTouchStart}
-      onMouseUp={handleTouchEnd}
-      onMouseLeave={handleTouchEnd}
-      onContextMenu={handleContextMenu}
+      {...longPressHandlers}
       animate={isHolding ? {
         scale: [1, 1.02, 1.02],
         backgroundColor: 'rgba(59, 130, 246, 0.15)',
