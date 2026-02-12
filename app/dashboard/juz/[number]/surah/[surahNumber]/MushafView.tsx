@@ -18,8 +18,7 @@ interface MushafViewProps {
 export default function MushafView({ verses, onVerseLongPress }: MushafViewProps) {
   return (
     <div 
-      className="text-justify font-arabic text-2xl leading-[2.6] w-full" 
-      dir="rtl"
+      className="text-justify leading-[2.8] text-2xl dir-rtl font-arabic"
       style={{ textAlignLast: 'center' }}
     >
       {verses.map((verse) => {
@@ -28,21 +27,16 @@ export default function MushafView({ verses, onVerseLongPress }: MushafViewProps
           500
         );
 
+        const textColor = verse.isCompleted ? 'text-emerald-500' : 'text-gray-200';
+
         return (
           <span
             key={verse.id}
             {...longPressHandlers}
-            className={`
-              relative px-0.5 transition-colors duration-200 cursor-pointer
-              ${verse.isCompleted ? 'text-success' : 'text-foreground'} 
-              hover:bg-muted
-            `}
+            className={`${textColor} cursor-pointer transition-colors duration-200`}
           >
-            {/* 1. The Verse Text */}
             {verse.text_uthmani}{' '}
-            
-            {/* 2. The End of Ayah Symbol (Inline) */}
-            <span className="font-sans text-xl mx-1 opacity-80">
+            <span className="font-sans">
               ۝{verse.verse_key.split(':')[1]}
             </span>
           </span>
