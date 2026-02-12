@@ -1,26 +1,58 @@
 @import "tailwindcss";
 
+/* ============================================================================
+   AYATBITS THEME SYSTEM - Semantic Color Variables
+   ============================================================================
+   Light Mode: "Modern Parchment" - Clean, soft paper feel with high readability
+   Dark Mode: "Cyber-Mushaf" - Neon green accents on deep black backgrounds
+   ============================================================================ */
+
 /* Light mode (default) */
 :root,
 .light {
-  --background: #ffffff;
-  --foreground: #171717;
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --bg-tertiary: #f3f4f6;
-  --bg-card: #ffffff;
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-muted: #9ca3af;
-  --border-color: #e5e7eb;
+  /* LIGHT MODE - "Modern Parchment"
+     Concept: Clean, high-readability, soft paper feel. 
+     Avoids harsh pure white backgrounds to reduce eye strain. */
+  
+  /* Backgrounds */
+  --background: 250 248 245; /* #FAF8F5 - Warm Off-White (Paper-like) */
+  --foreground: 15 23 42;    /* #0F172A - Deep Slate (High contrast text) */
+  
+  /* Surface / Cards */
+  --card: 0 0% 100%;         /* #FFFFFF - Pure White */
+  --card-foreground: 15 23 42;
+  
+  /* Primary Brand (Green) */
+  --primary: 158 64% 52%;    /* #10B981 - Emerald 500 (Readable on white) */
+  --primary-foreground: 0 0% 100%;
+  
+  /* Secondary / Muted */
+  --muted: 210 40% 96.1%;    /* #F3F4F6 - Very Light Grey */
+  --muted-foreground: 215.4 16.3% 46.9%; /* #6B7280 - Muted Text */
+  
+  /* Borders & Inputs */
+  --border: 214.3 31.8% 91.4%; /* #E5E7EB - Light Grey Border */
+  --input: 214.3 31.8% 91.4%;
+  
+  /* Ring (Focus states) */
+  --ring: 158 64% 52%;
+  
+  /* Specialized Puzzle Colors */
+  --puzzle-slot-bg: 0 0% 96%;      /* Light Grey Slot */
+  --puzzle-slot-border: 220 13% 91%; 
+  --puzzle-word-bg: 0 0% 100%;     /* White Word Tile */
+  --puzzle-word-border: 214.3 31.8% 91.4%;
+  
+  /* Success/Error States */
+  --success: 158 64% 52%;        /* Green */
+  --success-soft: 142 76% 94%;   /* Light Green bg */
+  --error: 0 72% 51%;            /* Red */
+  --error-soft: 0 86% 97%;       /* Light Red bg */
   
   /* Vibrant AyatBits Colors - Duolingo-inspired */
   --green-primary: #16a34a;
   --green-soft: #dcfce7;
   --green-dark: #15803d;
-  
-  --blue-primary: #3b82f6;
-  --blue-soft: #dbeafe;
   
   --blue-primary: #3b82f6;
   --blue-soft: #dbeafe;
@@ -38,30 +70,49 @@
   --neutral-light-gray: #f3f4f6;
   --neutral-medium-gray: #9ca3af;
   --neutral-dark-gray: #4b5563;
-  --neutral-white: #ffffff;
-  
-  /* Shadow */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 }
 
 /* Dark mode */
 .dark {
-  --background: #0c0c0c;
-  --foreground: #ededed;
-  --bg-primary: #0c0c0c;
-  --bg-secondary: #111111;
-  --bg-tertiary: #1a1a1a;
-  --bg-card: #1a1a1a;
-  --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
-  --border-color: #27272a;
+  /* DARK MODE - "Cyber-Mushaf" (Existing Identity) */
+  
+  /* Backgrounds */
+  --background: 0 0% 3.9%;     /* #0a0a0a - Void Black */
+  --foreground: 0 0% 98%;      /* #fafafa - White Text */
+  
+  /* Surface / Cards */
+  --card: 0 0% 10%;            /* #1a1a1a - Card Grey */
+  --card-foreground: 0 0% 98%;
+  
+  /* Primary Brand (Green) */
+  --primary: 158 64% 52%;      /* #10B981 - Neon Green */
+  --primary-foreground: 144.9 80.4% 10%;
+  
+  /* Secondary / Muted */
+  --muted: 0 0% 15%;           /* #262626 */
+  --muted-foreground: 215 20.2% 65.1%; /* #a1a1aa */
+  
+  /* Borders */
+  --border: 0 0% 15%;          /* #262626 - Subtle Borders */
+  --input: 0 0% 15%;
+  
+  /* Ring (Focus states) */
+  --ring: 158 64% 52%;
+  
+  /* Specialized Puzzle Colors */
+  --puzzle-slot-bg: 0 0% 10%;      /* Dark Slot */
+  --puzzle-slot-border: 0 0% 20%; 
+  --puzzle-word-bg: 0 0% 10%;      /* Dark Word Tile */
+  --puzzle-word-border: 0 0% 15%;
+  
+  /* Success/Error States */
+  --success: 158 64% 52%;        /* Green */
+  --success-soft: 144.9 80.4% 10%; /* Dark Green bg */
+  --error: 0 72% 51%;            /* Red */
+  --error-soft: 0 63% 14%;       /* Dark Red bg */
   
   /* Dark mode color adjustments */
   --green-soft: #14532d;
-  --blue-soft: #1e3a5f;
   --blue-soft: #1e3a5f;
   --orange-soft: #431407;
   --red-soft: #450a0a;
@@ -70,21 +121,42 @@
   --neutral-light-gray: #27272a;
   --neutral-medium-gray: #52525b;
   --neutral-dark-gray: #a1a1aa;
-  --neutral-white: #18181b;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   
-  /* Color tokens */
+  /* Semantic Colors - Maps to Tailwind utilities */
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  
+  /* Puzzle-specific colors */
+  --color-puzzle-slot: hsl(var(--puzzle-slot-bg));
+  --color-puzzle-slot-border: hsl(var(--puzzle-slot-border));
+  --color-puzzle-word: hsl(var(--puzzle-word-bg));
+  --color-puzzle-word-border: hsl(var(--puzzle-word-border));
+  
+  /* State colors */
+  --color-success: hsl(var(--success));
+  --color-success-soft: hsl(var(--success-soft));
+  --color-error: hsl(var(--error));
+  --color-error-soft: hsl(var(--error-soft));
+  
+  /* Vibrant AyatBits Colors */
   --color-green-primary: var(--green-primary);
   --color-green-soft: var(--green-soft);
   --color-green-dark: var(--green-dark);
-  --color-blue-primary: var(--blue-primary);
-  --color-blue-soft: var(--blue-soft);
   --color-blue-primary: var(--blue-primary);
   --color-blue-soft: var(--blue-soft);
   --color-orange-primary: var(--orange-primary);
@@ -93,11 +165,16 @@
   --color-red-soft: var(--red-soft);
   --color-yellow-primary: var(--yellow-primary);
   --color-yellow-soft: var(--yellow-soft);
+  
+  /* Neutral colors */
+  --color-neutral-light: var(--neutral-light-gray);
+  --color-neutral-medium: var(--neutral-medium-gray);
+  --color-neutral-dark: var(--neutral-dark-gray);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
@@ -163,16 +240,16 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--neutral-light-gray);
+  background: hsl(var(--muted));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--neutral-medium-gray);
+  background: hsl(var(--muted-foreground) / 0.3);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--neutral-dark-gray);
+  background: hsl(var(--muted-foreground) / 0.5);
 }
 
 /* Arabic Font - Uthmani script for Quranic text */

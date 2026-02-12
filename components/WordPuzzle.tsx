@@ -221,14 +221,14 @@ function DropSlot({
         transition-all duration-150
         ${enableWordAudio && placedToken && placedToken.norm === expectedToken.norm ? 'cursor-pointer' : ''}
         ${placedToken 
-          ? 'bg-green-500/20 border-2 border-green-500'
+          ? 'bg-success/20 border-2 border-success'
           : isFadingHint
-            ? 'bg-[#1a1a1a]/50 border-2 border-dashed border-white/20'
+            ? 'bg-puzzle-slot border-2 border-dashed border-puzzle-slot-border'
             : isHinted
-            ? 'bg-green-500/30 border-2 border-green-400 scale-105'
+            ? 'bg-success/30 border-2 border-success scale-105'
             : isOver && isActive
-              ? 'bg-green-500/30 border-2 border-green-400 scale-105'
-              : 'bg-[#1a1a1a]/50 border-2 border-dashed border-white/20'
+              ? 'bg-success/30 border-2 border-success scale-105'
+              : 'bg-puzzle-slot border-2 border-dashed border-puzzle-slot-border'
         }
       `}
     >
@@ -238,13 +238,13 @@ function DropSlot({
             as="span"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="text-base font-medium font-arabic text-green-400 flex items-center gap-1"
+            className="text-base font-medium font-arabic text-success flex items-center gap-1"
           >
             <HarakatColoredText text={placedToken.text} />
             {enableWordAudio && (
-              <Volume2 className="w-3 h-3 text-green-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Volume2 className="w-3 h-3 text-success opacity-0 group-hover:opacity-100 transition-opacity" />
             )}
-            {!enableWordAudio && <CheckCircle2 className="w-3 h-3 text-green-400 hidden sm:block" />}
+            {!enableWordAudio && <CheckCircle2 className="w-3 h-3 text-success hidden sm:block" />}
           </ConditionalMotion>
           {showTransliteration && placedToken.transliteration && (
             <ConditionalMotion
@@ -252,14 +252,14 @@ function DropSlot({
               initial={{ opacity: 0, y: -10 }}
               whileHover={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="absolute top-full mt-1 text-xs text-gray-400 italic whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
+              className="absolute top-full mt-1 text-xs text-muted-foreground italic whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
             >
               {placedToken.transliteration}
             </ConditionalMotion>
           )}
         </ConditionalMotion>
       ) : (
-        <span className="text-gray-600 text-xs">
+        <span className="text-muted-foreground text-xs">
           {isOver && isActive ? '✓' : (position + 1)}
         </span>
       )}
@@ -327,11 +327,9 @@ const DraggableWord = memo(function DraggableWord({
       animate={
         isShaking
           ? { x: [0, -8, 8, -8, 8, 0] }
-          : isFadingHint
+          :           isFadingHint
           ? {
-              borderColor: 'rgba(255, 255, 255, 0.1)',
-              backgroundColor: '#1a1a1a',
-              color: 'rgb(229, 229, 229)',
+              opacity: 1,
             }
           : {}
       }
@@ -351,12 +349,12 @@ const DraggableWord = memo(function DraggableWord({
         ${isDragging ? 'opacity-40' : 'opacity-100'}
         ${
           isOverlay
-            ? 'bg-[#1a1a1a] border-2 border-green-500 shadow-xl text-white scale-105 z-50'
+            ? 'bg-puzzle-word border-2 border-success shadow-xl text-foreground scale-105 z-50'
             : isFadingHint
-              ? 'bg-[#1a1a1a] border border-white/10 text-gray-200'
+              ? 'bg-puzzle-word border border-puzzle-word-border text-foreground'
               : isHinted
-              ? 'bg-[#1a1a1a] border-2 border-amber-400 text-amber-200 shadow-lg shadow-amber-500/30'
-              : 'bg-[#1a1a1a] border border-white/10 text-gray-200 hover:bg-[#222] hover:border-white/20 active:scale-95'
+              ? 'bg-puzzle-word border-2 border-amber-400 text-amber-200 shadow-lg shadow-amber-500/30'
+              : 'bg-puzzle-word border border-puzzle-word-border text-foreground hover:bg-muted hover:border-border active:scale-95 shadow-sm dark:shadow-none'
         }
       `}
       style={{ 
@@ -373,7 +371,7 @@ const DraggableWord = memo(function DraggableWord({
           initial={{ opacity: 0, y: -10 }}
           whileHover={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs text-gray-400 italic whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
+          className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs text-muted-foreground italic whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
         >
           {token.transliteration}
         </ConditionalMotion>
@@ -416,7 +414,7 @@ function AnswerArea({
     <div
       dir="rtl"
       data-tutorial="answer-area"
-      className="min-h-[80px] w-full rounded-xl border-2 border-dashed p-3 transition-all duration-300 border-white/10 bg-[#0f0f0f]"
+      className="min-h-[80px] w-full rounded-xl border-2 border-dashed p-3 transition-all duration-300 border-border bg-muted/30"
     >
       <div className="flex flex-wrap items-center gap-2" style={{ justifyContent: 'flex-start' }}>
         {originalTokens.map((token, index) => {
@@ -443,7 +441,7 @@ function AnswerArea({
         })}
       </div>
       {placedTokenIds.size === 0 && (
-        <p className="text-gray-500 text-xs text-center mt-3">
+        <p className="text-muted-foreground text-xs text-center mt-3">
           {t('wordPuzzle.dropEachWord')}
         </p>
       )}
@@ -482,7 +480,7 @@ function WordBank({
   
   return (
     <div className="mt-6" dir="rtl" data-tutorial="word-bank">
-      <p className="text-xs text-gray-500 text-center mb-3">
+      <p className="text-xs text-muted-foreground text-center mb-3">
         {t('wordPuzzle.dragOrTap')}
       </p>
       <div className="flex flex-wrap justify-center gap-2">
@@ -1159,10 +1157,10 @@ export default function WordPuzzle({
         <div className="flex items-center gap-2 flex-wrap">
           <div className={`px-3 py-1.5 rounded-full border flex items-center gap-2 ${
             hasExceededMistakeLimit 
-              ? 'bg-red-500/20 border-red-500/30' 
-              : 'bg-[#1a1a1a] border-white/10'
+              ? 'bg-error-soft border-error/30' 
+              : 'bg-card border-border'
           }`}>
-            <span className={`text-xs font-medium ${hasExceededMistakeLimit ? 'text-red-400' : 'text-gray-400'}`}>
+            <span className={`text-xs font-medium ${hasExceededMistakeLimit ? 'text-error' : 'text-muted-foreground'}`}>
               {t('wordPuzzle.mistakes')}: {mistakeCount}/{MAX_MISTAKES}
             </span>
           </div>
@@ -1194,8 +1192,8 @@ export default function WordPuzzle({
             }}
             className={`px-3 py-1.5 rounded-full border flex items-center gap-1.5 transition-all ${
               usedTips >= availableTips || hasExceededMistakeLimit
-                ? 'bg-gray-500/10 border-gray-500/30 cursor-not-allowed opacity-50'
-                : 'bg-green-500/10 border-green-500/30 hover:bg-green-500/20 hover:border-green-500/50 cursor-pointer active:scale-95'
+                ? 'bg-muted border-border cursor-not-allowed opacity-50'
+                : 'bg-success-soft border-success/30 hover:bg-success/20 hover:border-success/50 cursor-pointer active:scale-95'
             }`}
             title={
               usedTips >= availableTips
@@ -1206,8 +1204,8 @@ export default function WordPuzzle({
             }
             data-tutorial="hint-button"
           >
-            <Lightbulb className={`w-3.5 h-3.5 ${usedTips >= availableTips ? 'text-gray-500' : 'text-green-400'}`} />
-            <span className={`text-xs font-medium ${usedTips >= availableTips ? 'text-gray-500' : 'text-green-400'}`}>
+            <Lightbulb className={`w-3.5 h-3.5 ${usedTips >= availableTips ? 'text-muted-foreground' : 'text-success'}`} />
+            <span className={`text-xs font-medium ${usedTips >= availableTips ? 'text-muted-foreground' : 'text-success'}`}>
               {t('wordPuzzle.tips')}: {usedTips}/{availableTips}
             </span>
           </motion.button>
@@ -1232,23 +1230,23 @@ export default function WordPuzzle({
             </motion.button>
           )}
           
-          <button
+            <button
             onClick={resetState}
-            className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 transition-colors"
+            className="p-2 rounded-lg bg-muted border border-border text-muted-foreground hover:bg-muted/80 transition-colors"
             title="Reset"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-muted-foreground">
           {placedTokenIds.size}/{originalTokens.length}
         </div>
       </div>
 
       {/* Progress bar */}
       <div className="mb-4">
-        <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+        <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
           <motion.div
             className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full"
             initial={{ width: 0 }}
@@ -1317,7 +1315,7 @@ export default function WordPuzzle({
             <Languages className="w-4 h-4 text-teal-400" />
             <span className="text-xs font-medium text-teal-400">Transliteration</span>
           </div>
-          <p className="text-base text-gray-300 italic leading-relaxed">
+          <p className="text-base text-foreground italic leading-relaxed">
             {transliteration}
           </p>
         </motion.div>
@@ -1326,7 +1324,7 @@ export default function WordPuzzle({
       {isLoadingTransliteration && (
         <div className="mt-6 bg-teal-500/5 border border-teal-500/20 rounded-xl p-4 flex items-center justify-center">
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-teal-400 border-t-transparent" />
-          <span className="ml-2 text-sm text-gray-400">Loading transliteration...</span>
+          <span className="ml-2 text-sm text-muted-foreground">Loading transliteration...</span>
         </div>
       )}
     </div>

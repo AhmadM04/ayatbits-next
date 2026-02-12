@@ -290,7 +290,7 @@ export default function PuzzleClient({
     //   steps={puzzleTutorialSteps}
     //   delay={1000}
     // >
-      <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
+      <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Success Transition Overlay */}
       <AnimatePresence>
         {showSuccessTransition && (
@@ -298,7 +298,7 @@ export default function PuzzleClient({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-sm flex items-center justify-center"
+            className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center"
           >
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
@@ -351,7 +351,7 @@ export default function PuzzleClient({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="text-2xl font-bold text-white mb-2"
+                className="text-2xl font-bold text-foreground mb-2"
               >
                 Mashallah!
               </motion.h2>
@@ -369,23 +369,23 @@ export default function PuzzleClient({
       </AnimatePresence>
 
       {/* Header - Solid background, not transparent */}
-      <header className="sticky top-0 z-10 bg-[#0a0a0a] border-b border-white/10">
+      <header className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="max-w-3xl mx-auto px-3 sm:px-4">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3 min-w-0">
               <button
                 onClick={() => setShowExitModal(true)}
-                className="flex items-center gap-2 p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors flex-shrink-0 group"
+                className="flex items-center gap-2 p-2 -ml-2 hover:bg-muted rounded-lg transition-colors flex-shrink-0 group"
                 title={t('puzzle.backToMushaf')}
               >
-                <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-gray-300" />
-                <span className="hidden sm:inline text-sm text-gray-400 group-hover:text-gray-300"></span>
+                <ArrowLeft className="w-5 h-5 text-muted-foreground group-hover:text-foreground" />
+                <span className="hidden sm:inline text-sm text-muted-foreground group-hover:text-foreground"></span>
               </button>
               <div className="min-w-0">
-                <h1 className="text-base font-semibold text-white truncate">
+                <h1 className="text-base font-semibold text-foreground truncate">
                   {puzzle.surah?.nameEnglish || `Juz ${puzzle.juz?.number}`}
                 </h1>
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {puzzle.content?.ayahNumber && `Ayah ${puzzle.content.ayahNumber}`}
                 </p>
               </div>
@@ -396,7 +396,7 @@ export default function PuzzleClient({
                 className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
                   isLiked
                     ? 'bg-red-500/20 text-red-400'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 }`}
               >
                 <Heart className={`w-5 h-5 ${isLiked ? 'fill-red-400' : ''}`} />
@@ -404,7 +404,7 @@ export default function PuzzleClient({
               <div className="relative">
                 <button
                   onClick={() => setShowHelpMenu(!showHelpMenu)}
-                  className="p-2 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 transition-colors flex-shrink-0"
+                  className="p-2 rounded-lg bg-muted text-muted-foreground hover:bg-muted/80 transition-colors flex-shrink-0"
                   title={t('common.menu')}
                 >
                   <HelpCircle className="w-5 h-5" />
@@ -416,11 +416,11 @@ export default function PuzzleClient({
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: -10 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-full mt-2 w-56 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
+                      className="absolute right-0 top-full mt-2 w-56 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-50"
                     >
                       <button
                         onClick={handleRestartTutorial}
-                        className="w-full px-4 py-3 text-left text-sm text-gray-300 hover:bg-white/5 transition-colors flex items-center gap-2"
+                        className="w-full px-4 py-3 text-left text-sm text-card-foreground hover:bg-muted transition-colors flex items-center gap-2"
                       >
                         🎓 {t('tutorial.restartTutorial')}
                       </button>
@@ -436,7 +436,7 @@ export default function PuzzleClient({
       {/* Main content - Cleaner padding for mobile */}
       <main className="flex-1 max-w-3xl mx-auto w-full px-3 sm:px-4 py-4 sm:py-6 pb-8">
         <div className="space-y-4">
-          <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 sm:p-6" data-tutorial="puzzle-container">
+          <div className="bg-card/50 border border-border rounded-xl p-4 sm:p-6" data-tutorial="puzzle-container">
             <WordPuzzle
               ayahText={ayahText}
               surahNumber={puzzle.surah?.number}
