@@ -1,11 +1,9 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { toArabicNumerals } from '@/lib/mushaf-utils';
-import { type HarakatDefinition } from '@/lib/harakat-utils';
 import { useLongPress } from '@/lib/hooks/useLongPress';
-import QuranTextRenderer from '@/components/QuranTextRenderer';
 
 export interface MushafVerse {
   id: number;
@@ -23,13 +21,12 @@ export interface MushafVerse {
 interface AyahRowProps {
   verse: MushafVerse;
   onLongPress: (verse: MushafVerse) => void;
-  onHarakatClick?: (definition: HarakatDefinition) => void;
   isHighlighted?: boolean;
 }
 
 const LONG_PRESS_DURATION = 500; // 500ms for long press
 
-export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighlighted = false }: AyahRowProps) {
+export default function AyahRow({ verse, onLongPress, isHighlighted = false }: AyahRowProps) {
   const [isHolding, setIsHolding] = useState(false);
 
   // ============================================================================
@@ -53,16 +50,14 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
     }
   );
 
-  const handleHarakatClick = useCallback((definition: HarakatDefinition) => {
-    // Cancel holding state when user clicks on harakat
-    setIsHolding(false);
-    onHarakatClick?.(definition);
-  }, [onHarakatClick]);
+  // Determine text color based on completion status
+  const textColor = verse.isCompleted ? 'text-emerald-500' : 'text-white';
 
   return (
     <motion.span
       className={`
         relative inline-block group cursor-pointer select-none font-uthmani
+        ${textColor}
         ${isHighlighted ? 'bg-green-500/20 rounded-lg px-1 -mx-1' : ''}
         ${isHolding ? 'bg-blue-500/20 rounded-lg px-1 -mx-1' : ''}
       `}
@@ -87,15 +82,12 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
       }}
       whileTap={!isHolding ? { scale: 0.98, opacity: 0.8 } : {}}
     >
-      {/* High-Performance Quran Text with Tajweed Colors */}
-      <QuranTextRenderer 
-        text={verse.text}
-        isCompleted={verse.isCompleted}
-      />
+      {/* Simple, Clean Quran Text Rendering */}
+      {verse.text}{' '}
       
       {/* Ayah number in Arabic numerals - NO ICONS */}
-      <span className={`inline-flex items-center gap-1 mx-1.5 sm:mx-2 whitespace-nowrap align-middle ${verse.isCompleted ? 'text-green-500' : 'text-white'}`}>
-        <span className="text-[0.9em] inline-block">
+      <span className={`inline-flex items-center gap-1 mx-1.5 sm:mx-2 whitespace-nowrap align-middle`}>
+        <span className="text-[0.85em] inline-block opacity-80">
           ﴿{toArabicNumerals(verse.ayahNumber)}﴾
         </span>
       </span>

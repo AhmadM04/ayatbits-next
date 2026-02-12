@@ -136,7 +136,6 @@ export default function MushafPageClient({
           key={verse.id}
           verse={verse}
           onLongPress={handleLongPress}
-          onHarakatClick={handleHarakatClick}
         />
       );
     });
