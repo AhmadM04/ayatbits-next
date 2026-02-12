@@ -22,11 +22,16 @@ export function UserSyncProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isLoaded && userId) {
-      // Trigger user sync on dashboard load
-      // This is a fire-and-forget operation - we don't wait for it
+      // ============================================================================
+      // PERFORMANCE FIX: Non-Blocking User Sync (keepalive: true)
+      // ============================================================================
+      // Use keepalive to send this in the background without blocking the UI
+      // This ensures the sync happens even if the user navigates away quickly
+      // ============================================================================
       fetch('/api/user/sync', { 
         method: 'POST',
-        credentials: 'include'
+        credentials: 'include',
+        keepalive: true, // Ensures request completes even if user navigates away
       })
         .then(response => {
           if (!response.ok) {
@@ -41,4 +46,3 @@ export function UserSyncProvider({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>;
 }
-

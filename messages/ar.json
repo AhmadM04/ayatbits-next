@@ -201,7 +201,14 @@
     "exitPuzzleTitle": "الخروج من اللغز؟",
     "exitPuzzleMessage": "إذا عدت الآن، سيتم إعادة تعيين تقدمك في هذه الآية وستحتاج إلى البدء من جديد.",
     "exitPuzzleConfirm": "نعم، العودة",
-    "exitPuzzleCancel": "متابعة اللغز"
+    "exitPuzzleCancel": "متابعة اللغز",
+    "backToMushaf": "العودة إلى المصحف",
+    "addedToFavorites": "تمت الإضافة إلى المفضلة",
+    "removedFromFavorites": "تمت الإزالة من المفضلة",
+    "networkError": "خطأ في الشبكة. الرجاء المحاولة مرة أخرى.",
+    "failedToSaveProgress": "فشل في حفظ التقدم",
+    "surahCompleted": "السورة مكتملة!",
+    "movingToNext": "الانتقال إلى الآية التالية..."
   },
   "liked": {
     "title": "الآيات المحفوظة",

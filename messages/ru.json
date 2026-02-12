@@ -160,7 +160,14 @@
     "exitPuzzleTitle": "Выйти из головоломки?",
     "exitPuzzleMessage": "Если вы вернетесь сейчас, ваш прогресс для этого аята будет сброшен и вам придется начать заново.",
     "exitPuzzleConfirm": "Да, вернуться",
-    "exitPuzzleCancel": "Продолжить головоломку"
+    "exitPuzzleCancel": "Продолжить головоломку",
+    "backToMushaf": "Назад к Мусхафу",
+    "addedToFavorites": "Добавлено в избранное",
+    "removedFromFavorites": "Удалено из избранного",
+    "networkError": "Ошибка сети. Пожалуйста, попробуйте снова.",
+    "failedToSaveProgress": "Не удалось сохранить прогресс",
+    "surahCompleted": "Сура завершена!",
+    "movingToNext": "Переход к следующему аяту..."
   },
   "liked": {
     "title": "Понравившиеся аяты",

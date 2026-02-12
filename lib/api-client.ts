@@ -23,6 +23,7 @@ export class ApiError extends Error {
 
 interface FetchOptions extends RequestInit {
   timeout?: number;
+  keepalive?: boolean; // Allow non-blocking background requests
 }
 
 /**
@@ -32,7 +33,7 @@ export async function apiFetch<T = unknown>(
   url: string,
   options: FetchOptions = {}
 ): Promise<T> {
-  const { timeout = 30000, ...fetchOptions } = options;
+  const { timeout = 30000, keepalive, ...fetchOptions } = options;
 
   // Check if we're online (browser only)
   if (typeof window !== 'undefined' && !navigator.onLine) {
@@ -47,6 +48,7 @@ export async function apiFetch<T = unknown>(
     const response = await fetch(url, {
       ...fetchOptions,
       signal: controller.signal,
+      keepalive, // Pass keepalive to fetch
     });
 
     clearTimeout(timeoutId);
@@ -154,7 +156,6 @@ export function getErrorMessage(error: unknown): string {
   }
   return 'An unexpected error occurred';
 }
-
 
 
 

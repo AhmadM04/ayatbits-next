@@ -150,9 +150,20 @@
     "dragOrClickWords": "Glissez ou cliquez sur les mots ci-dessous pour construire l'ayah",
     "allWordsUsed": "Tous les mots utilisés. Cliquez sur les mots ci-dessus pour les retirer.",
     "mashallah": "Mashallah!",
-    "youCompleted": "You completed",
-    "achievementsUnlocked": "Achievements Unlocked",
-    "continueTo": "Continue to {surah}"
+    "youCompleted": "Vous avez complété",
+    "achievementsUnlocked": "Réalisations débloquées",
+    "continueTo": "Continuer vers {surah}",
+    "exitPuzzleTitle": "Quitter le puzzle ?",
+    "exitPuzzleMessage": "Si vous revenez maintenant, votre progression pour cet ayah sera réinitialisée et vous devrez recommencer.",
+    "exitPuzzleConfirm": "Oui, revenir",
+    "exitPuzzleCancel": "Continuer le puzzle",
+    "backToMushaf": "Retour au Mushaf",
+    "addedToFavorites": "Ajouté aux favoris",
+    "removedFromFavorites": "Retiré des favoris",
+    "networkError": "Erreur réseau. Veuillez réessayer.",
+    "failedToSaveProgress": "Échec de la sauvegarde de la progression",
+    "surahCompleted": "Sourate terminée !",
+    "movingToNext": "Passage à l'ayah suivant..."
   },
   "liked": {
     "title": "Ayahs aimées",

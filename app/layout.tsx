@@ -32,6 +32,7 @@ const amiriQuran = Amiri_Quran({
   display: "swap",
   preload: true,
   fallback: ["serif"],
+  adjustFontFallback: false, // Skip font optimization during build to avoid connection errors
 });
 
 export const viewport: Viewport = {

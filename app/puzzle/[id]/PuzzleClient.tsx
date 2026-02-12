@@ -186,10 +186,13 @@ export default function PuzzleClient({
 
   const handleToggleLike = async () => {
     try {
+      // ============================================================================
+      // PERFORMANCE FIX: Non-Blocking Like/Unlike (keepalive: true)
+      // ============================================================================
       if (isLiked) {
-        await apiDelete(`/api/puzzles/${puzzle.id}/like`);
+        await apiDelete(`/api/puzzles/${puzzle.id}/like`, { keepalive: true });
       } else {
-        await apiPost(`/api/puzzles/${puzzle.id}/like`);
+        await apiPost(`/api/puzzles/${puzzle.id}/like`, undefined, { keepalive: true });
       }
       setIsLiked(!isLiked);
       showToast(isLiked ? t('puzzle.removedFromFavorites') : t('puzzle.addedToFavorites'), 'success');
@@ -214,10 +217,17 @@ export default function PuzzleClient({
     
     hasHandledCompletion.current = true;
 
-    // Save progress (don't block on this)
+    // ============================================================================
+    // PERFORMANCE FIX: Non-Blocking Progress Save (keepalive: true)
+    // ============================================================================
+    // Use keepalive to save progress in the background without blocking the UI
+    // This ensures progress is saved even if the user navigates away quickly
+    // ============================================================================
     apiPost(`/api/puzzles/${puzzle.id}/progress`, {
       status: 'COMPLETED',
       score: 100,
+    }, {
+      keepalive: true, // Ensures request completes even if user navigates away
     }).catch((error) => {
       if (error instanceof NetworkError) {
         showToast(t('puzzle.failedToSaveProgress'), 'error');
