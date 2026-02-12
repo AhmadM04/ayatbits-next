@@ -6,50 +6,17 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { LogOut, User, Mail, LayoutDashboard } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
+import { useAccess } from '@/lib/providers/access-provider';
 
 export default function UserProfileSection() {
   const { user, isSignedIn, isLoaded } = useUser();
   const { t } = useI18n();
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+  // PERFORMANCE FIX: Use centralized access provider instead of manual fetch
+  const { hasAccess } = useAccess();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const confirmRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (isSignedIn && isLoaded) {
-      // Add a small delay to ensure Clerk session is fully established
-      const checkAccess = async () => {
-        try {
-          const res = await fetch('/api/check-access', {
-            credentials: 'include', // Ensure cookies are sent
-          });
-          
-          if (res.ok) {
-            const data = await res.json();
-            setHasAccess(data.hasAccess);
-          } else if (res.status === 401) {
-            // Session not ready yet, retry after a short delay
-            setTimeout(() => {
-              fetch('/api/check-access', { credentials: 'include' })
-                .then(res => res.ok ? res.json() : { hasAccess: false })
-                .then(data => setHasAccess(data.hasAccess))
-                .catch(() => setHasAccess(false));
-            }, 1000);
-          } else {
-            setHasAccess(false);
-          }
-        } catch (error) {
-          console.error('Error checking access:', error);
-          setHasAccess(false);
-        }
-      };
-
-      // Small delay to ensure Clerk session is ready
-      const timeoutId = setTimeout(checkAccess, 300);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [isSignedIn, isLoaded]);
 
   // Close modal when clicking outside
   useEffect(() => {

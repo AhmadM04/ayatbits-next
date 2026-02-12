@@ -8,13 +8,14 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { SignedIn, SignedOut, SignUpButton, useUser } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n';
+import { useAccess } from '@/lib/providers/access-provider';
 
 export default function PricingContent() {
   const { t } = useI18n();
   const { user, isLoaded } = useUser();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
-  const [checkingAccess, setCheckingAccess] = useState(true);
+  // PERFORMANCE FIX: Use centralized access provider instead of manual fetch
+  const { hasAccess, isLoading: checkingAccess, refetch: refetchAccess } = useAccess();
   const [mounted, setMounted] = useState(false);
   const [selectedTier, setSelectedTier] = useState<'basic' | 'pro'>('pro'); // Default to pro
   const [voucherCode, setVoucherCode] = useState('');
@@ -65,62 +66,42 @@ export default function PricingContent() {
   const reason = mounted ? searchParams.get('reason') : null;
   const isProcessingPayment = mounted ? searchParams.get('success') === 'true' : false;
 
-  // Check access (only for authenticated users)
+  // PERFORMANCE FIX: Access check is now handled by AccessProvider
+  // We just need to sync subscription details when access changes
   useEffect(() => {
-    if (!mounted || !isLoaded) return;
+    if (!mounted || !isLoaded || !user || hasAccess === null) return;
     
-    // If user is not authenticated, skip access check
-    if (!user) {
-      setHasAccess(false);
-      setCheckingAccess(false);
-      return;
+    // Fetch subscription details if user has access
+    if (hasAccess) {
+      const fetchDetails = async () => {
+        try {
+          const response = await fetch('/api/check-access', {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache' },
+          });
+          const data = await response.json();
+          
+          if (data.hasAccess) {
+            setSubscriptionDetails({
+              plan: data.plan,
+              tier: data.tier,
+              daysUntilExpiry: data.daysUntilExpiry,
+            });
+          }
+        } catch (error) {
+          console.error('[PricingContent] Error fetching subscription details:', error);
+        }
+      };
+      
+      fetchDetails();
+    } else {
+      setSubscriptionDetails(null);
     }
     
-    const checkAccess = async () => {
-      try {
-        // First, ensure user exists in database (fixes users who registered before webhook was fixed)
-        try {
-          await fetch('/api/user/sync-from-clerk', {
-            method: 'POST',
-            cache: 'no-store',
-          });
-          // Don't block on sync - continue to access check
-        } catch (syncError) {
-          console.error('[PricingContent] User sync failed (non-blocking):', syncError);
-          // Continue anyway - access check will handle missing user
-        }
-        
-        const response = await fetch('/api/check-access', {
-          cache: 'no-store',
-          headers: { 'Cache-Control': 'no-cache' },
-        });
-        const data = await response.json();
-        
-        if (data.hasAccess) {
-          setHasAccess(true);
-          setSubscriptionDetails({
-            plan: data.plan,
-            tier: data.tier,
-            daysUntilExpiry: data.daysUntilExpiry,
-          });
-          // Don't auto-redirect - let user see they have access
-        } else {
-          setHasAccess(false);
-          setSubscriptionDetails(null);
-        }
-      } catch (error) {
-        console.error('[PricingContent] Error checking access:', error);
-        setHasAccess(false);
-        setSubscriptionDetails(null);
-      } finally {
-        setCheckingAccess(false);
-      }
-    };
-
-    checkAccess();
+    // Poll for access changes after payment (only if user doesn't have access yet)
     const pollInterval = setInterval(() => {
       if (!hasAccess) {
-        checkAccess();
+        refetchAccess();
       }
     }, 2000);
 
@@ -209,35 +190,11 @@ export default function PricingContent() {
           window.location.href = '/dashboard';
         }, 1500);
         
-        // Force re-check access immediately with cache busting
-        setCheckingAccess(true);
-        setHasAccess(null); // Reset to trigger re-check
-        
-        // Wait a moment for DB to propagate, then check access
+        // PERFORMANCE FIX: Use centralized refetch instead of manual fetch
+        // Wait a moment for DB to propagate, then refetch access
         setTimeout(async () => {
-          try {
-            const accessResponse = await fetch('/api/check-access', {
-              cache: 'no-store',
-              headers: { 
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-              },
-            });
-            const accessData = await accessResponse.json();
-            
-            if (accessData.hasAccess) {
-              setHasAccess(true);
-              setTimeout(() => router.push('/dashboard'), 500);
-            } else {
-              // If still no access, keep polling
-              setHasAccess(false);
-              setCheckingAccess(false);
-            }
-          } catch (error) {
-            console.error('[PricingContent] Error checking access after redemption:', error);
-            setHasAccess(false);
-            setCheckingAccess(false);
-          }
+          await refetchAccess();
+          // Access state will be updated automatically by the provider
         }, 500);
       } else {
         console.error('[PricingContent] ❌ Redemption failed!');
@@ -259,13 +216,8 @@ export default function PricingContent() {
     setLoadingPlan(priceId);
     
     try {
-      const accessCheck = await fetch('/api/check-access', {
-        cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache' },
-      });
-      const accessData = await accessCheck.json();
-      
-      if (accessData.hasAccess) {
+      // PERFORMANCE FIX: Use centralized access state instead of manual fetch
+      if (hasAccess) {
         alert(t('pricing.alreadyHaveAccessAlert'));
         window.location.href = '/dashboard';
         return;

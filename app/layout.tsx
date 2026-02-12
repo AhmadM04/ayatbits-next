@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/lib/theme-context";
 import { I18nProvider } from "@/lib/i18n";
 import { TutorialProvider } from "@/components/tutorial";
 import { MotionProvider } from "@/lib/contexts/motion-context";
+import { AccessProvider } from "@/lib/providers/access-provider";
 import "./globals.css";
 import Script from "next/script";
 
@@ -288,9 +289,11 @@ export default function RootLayout({
             <MotionProvider>
               <ToastProvider>
                 <I18nProvider>
-                  <TutorialProvider>
-                    {children}
-                  </TutorialProvider>
+                  <AccessProvider>
+                    <TutorialProvider>
+                      {children}
+                    </TutorialProvider>
+                  </AccessProvider>
                 </I18nProvider>
               </ToastProvider>
             </MotionProvider>
