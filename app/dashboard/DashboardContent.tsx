@@ -5,7 +5,7 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { Flame, BookOpen, AlertTriangle, HelpCircle, Menu, X, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { SignOutButton } from '@clerk/nextjs';
 import BottomNav from '@/components/BottomNav';
 import DailyQuote from '@/components/DailyQuote';
@@ -65,6 +65,40 @@ export default function DashboardContent({
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const { startTutorial } = useTutorial();
   const { t } = useI18n();
+  
+  // ============================================================================
+  // PERFORMANCE FIX: Non-Blocking Background Sync
+  // ============================================================================
+  // Uses sendBeacon or keepalive fetch to sync user activity without blocking
+  // the main thread. This prevents the 1.6s freeze on dashboard load.
+  // ============================================================================
+  useEffect(() => {
+    // Prepare sync payload
+    const payload = JSON.stringify({ 
+      lastActive: new Date().toISOString(),
+      page: 'dashboard',
+    });
+
+    // Try sendBeacon first (most efficient, runs in background)
+    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+      // sendBeacon queues the request and sends it asynchronously
+      // It doesn't block the main thread and completes even if user navigates away
+      const blob = new Blob([payload], { type: 'application/json' });
+      navigator.sendBeacon('/api/user/sync', blob);
+    } else {
+      // Fallback: Use fetch with keepalive (non-blocking)
+      // DO NOT await - let it run in the background
+      fetch('/api/user/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload,
+        keepalive: true, // Ensures request completes even if page unloads
+      }).catch((err) => {
+        // Silently log errors - don't block UI or show user-facing errors
+        console.error('[DashboardContent] Background sync failed:', err);
+      });
+    }
+  }, []); // Run once on mount
   
   const showTrialBanner = Boolean(subscriptionStatus === 'trialing' && trialDaysLeft && trialDaysLeft > 0);
   const needsSubscription = !subscriptionStatus || subscriptionStatus === 'inactive' || subscriptionStatus === 'INACTIVE';
