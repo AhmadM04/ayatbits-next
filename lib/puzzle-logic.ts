@@ -89,7 +89,7 @@ export function normalizeArabic(input: string): string {
 
 /**
  * Known Muqatta'at (Huruf al-Muqatta'at) - isolated letters that start some surahs
- * These should be separated letter by letter in the puzzle
+ * These should be kept as a SINGLE token since the audio plays them as one word
  */
 const MUQATTAAT_PATTERNS = [
   // Exact matches for the known Muqatta'at
@@ -140,6 +140,8 @@ function isMuqattaat(word: string): boolean {
 }
 
 /**
+ * @deprecated NO LONGER USED - Muqatta'at are now kept as single tokens
+ * 
  * Separate a Muqatta'at word into individual letters
  * Each letter becomes its own token
  */
@@ -259,52 +261,37 @@ export function tokenizeAyah(ayahText: string): WordToken[] {
   for (let i = 0; i < processedParts.length; i++) {
     const word = processedParts[i];
     
-    // Check if this is a Muqatta'at (only for first word)
-    if (i === 0 && firstWordIsMuqattaat) {
-      const letters = separateMuqattaatLetters(word);
-      for (const letter of letters) {
-        const norm = normalizeArabic(letter);
-        const count = (wordNormMap.get(norm) || 0) + 1;
-        wordNormMap.set(norm, count);
-        
-        const token = {
-          id: `token-${tokenCounter++}-${order}`,
-          text: letter,
-          norm,
-          position: order++,
-        };
-        tokens.push(token);
-        
-        if (DEBUG && count > 1) {
-          log(`[DUPLICATE] Token created (${count}x):`, { 
-            id: token.id, 
-            text: token.text, 
-            norm: token.norm,
-            position: token.position 
-          });
-        }
-      }
-    } else {
-      const norm = normalizeArabic(word);
-      const count = (wordNormMap.get(norm) || 0) + 1;
-      wordNormMap.set(norm, count);
-      
-      const token = {
-        id: `token-${tokenCounter++}-${order}`,
-        text: word,
-        norm,
-        position: order++,
-      };
-      tokens.push(token);
-      
-      if (DEBUG && count > 1) {
-        log(`[DUPLICATE] Token created (${count}x):`, { 
-          id: token.id, 
-          text: token.text, 
-          norm: token.norm,
-          position: token.position 
-        });
-      }
+    // Create a single token for each word (including Muqatta'at)
+    // Muqatta'at are kept as one token since audio plays them as a single word
+    const norm = normalizeArabic(word);
+    const count = (wordNormMap.get(norm) || 0) + 1;
+    wordNormMap.set(norm, count);
+    
+    const token = {
+      id: `token-${tokenCounter++}-${order}`,
+      text: word,
+      norm,
+      position: order++,
+    };
+    tokens.push(token);
+    
+    // Log Muqatta'at detection for debugging
+    if (DEBUG && i === 0 && firstWordIsMuqattaat) {
+      log(`[MUQATTAAT] Detected and keeping as single token:`, { 
+        id: token.id, 
+        text: token.text, 
+        norm: token.norm,
+        position: token.position 
+      });
+    }
+    
+    if (DEBUG && count > 1) {
+      log(`[DUPLICATE] Token created (${count}x):`, { 
+        id: token.id, 
+        text: token.text, 
+        norm: token.norm,
+        position: token.position 
+      });
     }
   }
   
