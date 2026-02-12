@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, CheckCircle } from 'lucide-react';
 import { toArabicNumerals } from '@/lib/mushaf-utils';
 import { HarakatText } from '@/components/arabic';
 import { type HarakatDefinition } from '@/lib/harakat-utils';
@@ -60,10 +59,14 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
     onHarakatClick?.(definition);
   }, [onHarakatClick]);
 
+  // Determine text color based on completion status
+  const textColor = verse.isCompleted ? 'text-green-500' : 'text-white';
+
   return (
     <motion.span
       className={`
         relative inline-block group cursor-pointer select-none
+        ${textColor}
         ${isHighlighted ? 'bg-green-500/20 rounded-lg px-1 -mx-1' : ''}
         ${isHolding ? 'bg-blue-500/20 rounded-lg px-1 -mx-1' : ''}
       `}
@@ -91,25 +94,15 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
       {/* Arabic text with harakat coloring */}
       <HarakatText 
         text={verse.text} 
-        className="text-white inline"
+        className={`inline ${textColor}`}
         onHarakatClick={handleHarakatClick}
       />
       
-      {/* Ayah number in Arabic numerals with status indicators */}
-      <span className="inline-flex items-center gap-1 mx-1.5 sm:mx-2 whitespace-nowrap align-middle">
-        <span className="text-green-400 text-[0.9em] inline-block">
+      {/* Ayah number in Arabic numerals - NO ICONS */}
+      <span className={`inline-flex items-center gap-1 mx-1.5 sm:mx-2 whitespace-nowrap align-middle ${textColor}`}>
+        <span className="text-[0.9em] inline-block">
           ﴿{toArabicNumerals(verse.ayahNumber)}﴾
         </span>
-        {(verse.isCompleted || verse.isLiked) && (
-          <span className="inline-flex items-center gap-0.5">
-            {verse.isCompleted && (
-              <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-500" />
-            )}
-            {verse.isLiked && (
-              <Heart className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-red-500 fill-current" />
-            )}
-          </span>
-        )}
       </span>
       
       {/* Hover/active indicator */}
@@ -133,4 +126,3 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
     </motion.span>
   );
 }
-
