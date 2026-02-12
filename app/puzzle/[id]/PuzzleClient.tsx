@@ -200,18 +200,38 @@ export default function PuzzleClient({
   };
 
   const handleToggleLike = async () => {
+    // ============================================================================
+    // PERFORMANCE FIX: Optimistic UI Update (Instant Feedback)
+    // ============================================================================
+    // 1. Update UI immediately (don't wait for API)
+    // 2. Fire API request in background
+    // 3. Revert on error (rollback)
+    // ============================================================================
+    
+    const previousState = isLiked;
+    
+    // 1. OPTIMISTIC UPDATE: Instant visual feedback
+    setIsLiked(!previousState);
+    
+    // 2. HAPTIC FEEDBACK: Provide tactile response (mobile devices)
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(10);
+    }
+
     try {
-      // ============================================================================
-      // PERFORMANCE FIX: Non-Blocking Like/Unlike (keepalive: true)
-      // ============================================================================
-      if (isLiked) {
-        await apiDelete(`/api/puzzles/${puzzle.id}/like`, { keepalive: true });
-      } else {
-        await apiPost(`/api/puzzles/${puzzle.id}/like`, undefined, { keepalive: true });
-      }
-      setIsLiked(!isLiked);
-      showToast(isLiked ? t('puzzle.removedFromFavorites') : t('puzzle.addedToFavorites'), 'success');
+      // 3. BACKGROUND API CALL: Fire and forget (with keepalive)
+      // Use POST for toggle (optimized endpoint handles both like/unlike)
+      await apiPost(`/api/puzzles/${puzzle.id}/like`, undefined, { keepalive: true });
+      
+      // Success! Show confirmation toast
+      showToast(
+        !previousState ? t('puzzle.addedToFavorites') : t('puzzle.removedFromFavorites'), 
+        'success'
+      );
     } catch (error) {
+      // 4. ROLLBACK: Revert to previous state on error
+      setIsLiked(previousState);
+      
       if (error instanceof NetworkError) {
         showToast(t('puzzle.networkError'), 'error');
       } else {
