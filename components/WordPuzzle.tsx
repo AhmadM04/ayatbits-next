@@ -359,7 +359,10 @@ const DraggableWord = memo(function DraggableWord({
               : 'bg-[#1a1a1a] border border-white/10 text-gray-200 hover:bg-[#222] hover:border-white/20 active:scale-95'
         }
       `}
-      style={{ pointerEvents: 'auto' }}
+      style={{ 
+        pointerEvents: 'auto',
+        touchAction: 'none', // MOBILE FIX: Prevent scroll during drag
+      }}
     >
       <span className="flex items-center gap-1 pointer-events-none">
         <HarakatColoredText text={token.text} />
@@ -731,13 +734,20 @@ export default function WordPuzzle({
     playWord(apiIndex);
   }, [playWord, enableWordByWordAudio, muqattaatTokens]);
 
+  // ============================================================================
+  // MOBILE FIX: Optimized Touch Sensors
+  // ============================================================================
+  // - PointerSensor: For mouse/trackpad (desktop)
+  // - TouchSensor: For mobile touch with low distance threshold
+  // - Combined with touch-action: none CSS, this prevents scroll conflicts
+  // ============================================================================
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 8 },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        distance: 10,
+        distance: 5, // MOBILE FIX: Lower distance for instant drag (works with touch-action: none)
       },
     })
   );
