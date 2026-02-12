@@ -38,16 +38,18 @@ export default async function PuzzlePage({
 
   await connectDB();
 
-  // Get user (already checked access above)
-  const dbUser = await User.findOne({ clerkIds: user.id });
+  // PERFORMANCE FIX: Parallel fetching - fetch User and Puzzle simultaneously
+  const [dbUser, puzzle] = await Promise.all([
+    User.findOne({ clerkIds: user.id }),
+    Puzzle.findById(id)
+      .populate('surahId')
+      .populate('juzId')
+      .lean() as any,
+  ]);
+
   if (!dbUser) {
     redirect('/sign-in');
   }
-
-  const puzzle = await Puzzle.findById(id)
-    .populate('surahId')
-    .populate('juzId')
-    .lean() as any;
 
   if (!puzzle) {
     return (
@@ -62,13 +64,19 @@ export default async function PuzzlePage({
     );
   }
 
-  // Find previous and next puzzles in the same surah/juz
-  const puzzles = await Puzzle.find({
-    juzId: puzzle.juzId,
-    surahId: puzzle.surahId,
-  })
-    .sort({ 'content.ayahNumber': 1 })
-    .lean() as any[];
+  // PERFORMANCE FIX: Parallel fetching - fetch related puzzles and liked status simultaneously
+  const [puzzles, likedAyat] = await Promise.all([
+    Puzzle.find({
+      juzId: puzzle.juzId,
+      surahId: puzzle.surahId,
+    })
+      .sort({ 'content.ayahNumber': 1 })
+      .lean() as Promise<any[]>,
+    LikedAyat.findOne({
+      userId: dbUser._id,
+      puzzleId: puzzle._id,
+    }),
+  ]);
 
   const currentIndex = puzzles.findIndex((p: any) => p._id.toString() === id);
   const previousPuzzle = currentIndex > 0 ? puzzles[currentIndex - 1] : null;
@@ -91,12 +99,6 @@ export default async function PuzzlePage({
   const hasPro = checkProAccess(dbUser);
   const shouldFetchTransliteration = dbUser.showTransliteration || false;
   const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
-
-  // Check if liked
-  const likedAyat = await LikedAyat.findOne({
-    userId: dbUser._id,
-    puzzleId: puzzle._id,
-  });
 
   // Serialize the puzzle for the client component
   const serializedPuzzle = {

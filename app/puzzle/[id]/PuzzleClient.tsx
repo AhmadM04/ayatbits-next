@@ -103,31 +103,46 @@ export default function PuzzleClient({
 
     const fetchData = async () => {
       try {
-        // Fetch full-ayah transliteration
-        const translitResponse = await fetch(
-          `/api/transliteration?surah=${surahNumber}&ayah=${ayahNumber}`
-        );
+        // PERFORMANCE FIX: Parallel API calls - fetch both transliterations simultaneously
+        const [translitResult, wordsResult] = await Promise.all([
+          // Fetch full-ayah transliteration (internal API)
+          fetch(`/api/transliteration?surah=${surahNumber}&ayah=${ayahNumber}`)
+            .then(res => res.ok ? res.json() : null)
+            .catch(error => {
+              console.error('Failed to fetch transliteration:', error);
+              return null;
+            }),
+          
+          // Fetch word-by-word transliteration from Quran.com (external API with fail-safe)
+          fetch(
+            `https://api.quran.com/api/v4/verses/by_key/${surahNumber}:${ayahNumber}?words=true&word_fields=transliteration,text_uthmani`
+          )
+            .then(res => res.ok ? res.json() : null)
+            .catch(error => {
+              // FAIL-SAFE: If Quran.com API fails, don't break the page - just log and return null
+              console.error('Failed to fetch word transliterations from Quran.com:', error);
+              return null;
+            }),
+        ]);
         
-        if (!isCancelled && translitResponse.ok) {
-          const translitData = await translitResponse.json();
-          setTransliteration(translitData.text || '');
-        }
-
-        // Fetch word-by-word transliteration from Quran.com
-        const wordsResponse = await fetch(
-          `https://api.quran.com/api/v4/verses/by_key/${surahNumber}:${ayahNumber}?words=true&word_fields=transliteration,text_uthmani`
-        );
-        
-        if (!isCancelled && wordsResponse.ok) {
-          const wordsData = await wordsResponse.json();
-          const words = wordsData.verse?.words || [];
-          setWordTransliterations(words.map((word: any) => ({
-            text: word.text_uthmani || '',
-            transliteration: word.transliteration?.text || '',
-          })));
+        if (!isCancelled) {
+          // Set full-ayah transliteration if available
+          if (translitResult) {
+            setTransliteration(translitResult.text || '');
+          }
+          
+          // Set word-by-word transliterations if available
+          if (wordsResult) {
+            const words = wordsResult.verse?.words || [];
+            setWordTransliterations(words.map((word: any) => ({
+              text: word.text_uthmani || '',
+              transliteration: word.transliteration?.text || '',
+            })));
+          }
         }
       } catch (error) {
-        console.error('Failed to fetch transliteration:', error);
+        // This should rarely trigger since we handle errors in individual promises
+        console.error('Unexpected error fetching transliteration data:', error);
       } finally {
         if (!isCancelled) {
           setIsLoadingTransliteration(false);
