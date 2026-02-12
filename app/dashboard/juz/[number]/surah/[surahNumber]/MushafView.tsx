@@ -1,6 +1,7 @@
 'use client';
 
 import { useLongPress } from '@/lib/hooks/useLongPress';
+import { formatQuranText } from '@/lib/quran-text-utils';
 
 interface Verse {
   id: string;
@@ -21,9 +22,11 @@ export default function MushafView({ verses, onVerseLongPress }: MushafViewProps
     <div className="w-full max-w-4xl mx-auto px-4 pb-24">
       <div className="bg-[#0a0a0a] min-h-[80vh] rounded-xl p-6" dir="rtl">
         
-        {/* THE TEXT BLOCK */}
-        <div className="text-justify text-2xl leading-[2.8] font-arabic" style={{ textAlignLast: 'center' }}>
-          
+        {/* THE TEXT BLOCK - MADANI MUSHAF STYLE */}
+        <div 
+          className="text-justify text-3xl leading-[2.5] font-uthmani" 
+          style={{ textAlignLast: 'center' }}
+        >
           {verses.map((verse) => {
             const longPressHandlers = useLongPress(
               () => onVerseLongPress(verse),
@@ -42,7 +45,8 @@ export default function MushafView({ verses, onVerseLongPress }: MushafViewProps
                   hover:bg-white/5
                 `}
               >
-                {verse.text_uthmani}
+                {/* Quran Text with Waqf marks colored */}
+                {formatQuranText(verse.text_uthmani)}
                 
                 {/* END OF AYAH SYMBOL - JUST TEXT */}
                 <span className={`text-xl mx-2 font-sans ${isCompleted ? 'text-green-500' : 'text-green-800'}`}>

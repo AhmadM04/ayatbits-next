@@ -252,6 +252,39 @@ html {
   background: hsl(var(--muted-foreground) / 0.5);
 }
 
+/* ============================================================================
+   UTHMANI FONT - Authentic Madani Mushaf Style
+   ============================================================================
+   Download: KFGQPC Uthmanic Script HAFS font
+   Place the font file in: /public/fonts/KFGQPC_HAFS.woff2
+   This font matches the official printed Madani Mushaf
+   ============================================================================ */
+@font-face {
+  font-family: 'Uthmani';
+  src: url('/fonts/KFGQPC_HAFS.woff2') format('woff2'),
+       url('/fonts/KFGQPC_HAFS.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Uthmani Font Class - For Mushaf Pages */
+.font-uthmani {
+  font-family: 'Uthmani', var(--font-amiri), 'Amiri Quran', 'Scheherazade New', 'Traditional Arabic', serif;
+  font-feature-settings: 'liga' 1, 'dlig' 1, 'calt' 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Accommodate stacked diacritics */
+  line-height: 2.5;
+  word-spacing: normal;
+  letter-spacing: 0.01em;
+  overflow-wrap: break-word;
+  word-break: normal;
+  line-break: auto;
+  white-space: normal;
+}
+
 /* Arabic Font - Uthmani script for Quranic text */
 .font-arabic {
   font-family: var(--font-amiri), 'Amiri Quran', 'Scheherazade New', 'Traditional Arabic', serif;

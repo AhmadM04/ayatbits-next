@@ -6,6 +6,7 @@ import { toArabicNumerals } from '@/lib/mushaf-utils';
 import { HarakatText } from '@/components/arabic';
 import { type HarakatDefinition } from '@/lib/harakat-utils';
 import { useLongPress } from '@/lib/hooks/useLongPress';
+import { formatQuranText } from '@/lib/quran-text-utils';
 
 export interface MushafVerse {
   id: number;
@@ -65,7 +66,7 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
   return (
     <motion.span
       className={`
-        relative inline-block group cursor-pointer select-none
+        relative inline-block group cursor-pointer select-none font-uthmani
         ${textColor}
         ${isHighlighted ? 'bg-green-500/20 rounded-lg px-1 -mx-1' : ''}
         ${isHolding ? 'bg-blue-500/20 rounded-lg px-1 -mx-1' : ''}
@@ -91,12 +92,10 @@ export default function AyahRow({ verse, onLongPress, onHarakatClick, isHighligh
       }}
       whileTap={!isHolding ? { scale: 0.98, opacity: 0.8 } : {}}
     >
-      {/* Arabic text with harakat coloring */}
-      <HarakatText 
-        text={verse.text} 
-        className={`inline ${textColor}`}
-        onHarakatClick={handleHarakatClick}
-      />
+      {/* Quran text with Waqf marks colored (Madani Mushaf style) */}
+      <span className={`inline ${textColor}`}>
+        {formatQuranText(verse.text)}
+      </span>
       
       {/* Ayah number in Arabic numerals - NO ICONS */}
       <span className={`inline-flex items-center gap-1 mx-1.5 sm:mx-2 whitespace-nowrap align-middle ${textColor}`}>

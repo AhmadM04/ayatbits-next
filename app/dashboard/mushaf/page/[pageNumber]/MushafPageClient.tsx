@@ -209,12 +209,11 @@ export default function MushafPageClient({
             transition={{ duration: 0.2 }}
             className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-6 overflow-hidden"
           >
-            {/* Arabic Text Container */}
+            {/* Arabic Text Container - MADANI MUSHAF STYLE */}
             <div
-              className="text-[1.375rem] sm:text-[1.75rem] md:text-3xl font-arabic text-right"
+              className="text-[1.5rem] sm:text-2xl md:text-3xl font-uthmani text-right"
               dir="rtl"
               style={{ 
-                fontFamily: 'var(--font-amiri), "Amiri Quran", "Traditional Arabic", serif',
                 lineHeight: '2.5',
                 wordSpacing: '0.15em',
                 letterSpacing: '0.01em',
