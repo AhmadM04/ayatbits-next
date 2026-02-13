@@ -466,6 +466,7 @@ export default function DashboardContent({
                 >
                   <Link
                     href={`/dashboard/juz/${juz.number}`}
+                    prefetch={false}
                     className="relative block bg-white/[0.02] border border-white/5 rounded-2xl p-4 hover:border-green-500/50 transition-all group overflow-hidden"
                   >
                     {/* Completion badge with sparkle animation */}
