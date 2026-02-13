@@ -92,7 +92,7 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
             >
               {/* Large harakat character */}
               <div 
-                className="text-7xl font-arabic mb-3"
+                className="text-7xl font-arabic mb-1"
                 style={{ color: definition.color }}
                 dir="rtl"
               >
