@@ -257,23 +257,23 @@ export default function VerseSearch() {
       {/* Search Button - Desktop style */}
       <button
         onClick={() => setIsOpen(true)}
-        className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors w-full sm:w-auto"
+        className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 border border-[#E5E7EB] rounded-xl transition-colors w-full sm:w-auto"
       >
-        <Search className="w-4 h-4 text-gray-400" />
-        <span className="text-sm text-gray-400 flex-1 text-left sm:flex-initial">{t('common.search')}</span>
-        <span className="text-xs text-gray-600 hidden sm:inline">F</span>
+        <Search className="w-4 h-4 text-[#8E7F71]" />
+        <span className="text-sm text-[#8E7F71] flex-1 text-left sm:flex-initial">{t('common.search')}</span>
+        <span className="text-xs text-[#8E7F71] hidden sm:inline">F</span>
       </button>
 
       {/* Search Button - Mobile style matching other items */}
       <button
         onClick={() => setIsOpen(true)}
-        className="md:hidden w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-colors text-left group"
+        className="md:hidden w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-xl transition-colors text-left group"
       >
-        <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
-          <Search className="w-5 h-5 text-emerald-400" />
+        <div className="w-10 h-10 rounded-full bg-emerald-50/50 flex items-center justify-center group-hover:bg-emerald-100/50 transition-colors">
+          <Search className="w-5 h-5 text-[#059669]" />
         </div>
-        <span className="text-sm text-white font-medium flex-1">{t('common.search')}</span>
-        <span className="text-xs text-gray-500 px-2 py-1 bg-white/5 rounded">F</span>
+        <span className="text-sm text-[#4A3728] font-medium flex-1">{t('common.search')}</span>
+        <span className="text-xs text-[#8E7F71] px-2 py-1 bg-gray-100 rounded">F</span>
       </button>
 
       {/* Search Modal - rendered at root level */}
@@ -291,7 +291,7 @@ export default function VerseSearch() {
                 setQuery('');
                 setError('');
               }}
-              className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md"
+              className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-md"
             />
             
             {/* Modal */}
@@ -304,24 +304,24 @@ export default function VerseSearch() {
               onClick={(e: React.MouseEvent) => e.stopPropagation()}
               className="fixed left-4 right-4 top-20 sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md z-[101]"
             >
-              <div className="bg-[#111] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-2xl overflow-hidden">
                 {/* Header with close button */}
-                <div className="flex items-center justify-between p-3 border-b border-white/5">
-                  <span className="text-sm text-gray-400">{t('search.searchVerse')}</span>
+                <div className="flex items-center justify-between p-3 border-b border-[#E5E7EB]">
+                  <span className="text-sm text-[#8E7F71]">{t('search.searchVerse')}</span>
                   <button
                     onClick={() => {
                       setIsOpen(false);
                       setQuery('');
                       setError('');
                     }}
-                    className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+                    className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                   >
-                    <X className="w-4 h-4 text-gray-400" />
+                    <X className="w-4 h-4 text-[#8E7F71]" />
                   </button>
                 </div>
                 {/* Search Input */}
-                <div className="flex items-center gap-3 p-4 border-b border-white/5">
-                  <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                <div className="flex items-center gap-3 p-4 border-b border-[#E5E7EB]">
+                  <Search className="w-5 h-5 text-[#8E7F71] flex-shrink-0" />
                   <input
                     ref={inputRef}
                     type="text"
@@ -332,7 +332,7 @@ export default function VerseSearch() {
                     }}
                     onKeyDown={handleKeyDown}
                     placeholder={t('search.placeholder')}
-                    className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-base"
+                    className="flex-1 bg-transparent text-[#4A3728] placeholder-[#8E7F71] outline-none text-base"
                   />
                   {query && (
                     <button
@@ -340,17 +340,17 @@ export default function VerseSearch() {
                         setQuery('');
                         setError('');
                       }}
-                      className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                      className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
                     >
-                      <X className="w-4 h-4 text-gray-400" />
+                      <X className="w-4 h-4 text-[#8E7F71]" />
                     </button>
                   )}
                 </div>
 
                 {/* Error Message */}
                 {error && (
-                  <div className="px-4 py-3 bg-red-500/10 border-b border-red-500/20">
-                    <p className="text-red-400 text-sm">{error}</p>
+                  <div className="px-4 py-3 bg-red-50/50 border-b border-red-200">
+                    <p className="text-red-600 text-sm">{error}</p>
                     <button
                       onClick={() => {
                         setIsOpen(false);
@@ -358,7 +358,7 @@ export default function VerseSearch() {
                         setError('');
                         router.push('/dashboard');
                       }}
-                      className="mt-2 text-xs text-gray-400 hover:text-white underline"
+                      className="mt-2 text-xs text-[#8E7F71] hover:text-[#4A3728] underline"
                     >
                       {t('search.goToDashboard')}
                     </button>
@@ -367,7 +367,7 @@ export default function VerseSearch() {
 
                 {/* Quick Actions */}
                 <div className="p-3">
-                  <p className="text-xs text-gray-500 mb-2 px-1">{t('search.examples')}:</p>
+                  <p className="text-xs text-[#8E7F71] mb-2 px-1">{t('search.examples')}:</p>
                   <div className="flex flex-wrap gap-2">
                     {['1', '2:255', '36', '67:1'].map((example) => (
                       <button
@@ -376,7 +376,7 @@ export default function VerseSearch() {
                           setQuery(example);
                           setError('');
                         }}
-                        className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-gray-300 text-sm rounded-lg transition-colors"
+                        className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-[#4A3728] text-sm rounded-lg transition-colors"
                       >
                         {example}
                       </button>
@@ -390,7 +390,7 @@ export default function VerseSearch() {
                     <button
                       onClick={handleSearch}
                       disabled={isLoading}
-                      className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 disabled:opacity-50 text-white font-medium rounded-xl transition-colors shadow-lg shadow-green-600/20"
+                      className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-[#059669] to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 disabled:opacity-50 text-white font-medium rounded-xl transition-colors shadow-lg shadow-emerald-600/20"
                     >
                       {isLoading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
