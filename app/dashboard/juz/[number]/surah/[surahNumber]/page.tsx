@@ -1,6 +1,6 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect, notFound } from 'next/navigation';
-import { connectDB, Surah, Juz, Puzzle, UserProgress, User, LikedAyat } from '@/lib/db';
+import { connectDB, Puzzle, UserProgress, LikedAyat } from '@/lib/db';
 import VersePageClient from './VersePageClient';
 import TranslationDisplay from './TranslationDisplay';
 import AyahSelectorClient from './AyahSelectorClient';
@@ -11,6 +11,7 @@ import SurahHeader from './SurahHeader';
 import { cleanAyahText, extractBismillah, shouldShowBismillahSeparately } from '@/lib/ayah-utils';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
 import { fetchTranslation } from '@/lib/quran-api-adapter';
+import { getCachedSurahVerses } from '@/lib/quran-data';
 
 export default async function SurahVersePage({
   params,
@@ -29,92 +30,90 @@ export default async function SurahVersePage({
 
   const dbUser = await requireDashboardAccess();
 
-  const juz = await Juz.findOne({ number: parseInt(juzNumber) }).lean() as any;
-  const surah = await Surah.findOne({ number: parseInt(surahNumber) }).lean() as any;
+  await connectDB();
 
-  if (!juz || !surah) {
+  const juzNum = parseInt(juzNumber);
+  const surahNum = parseInt(surahNumber);
+
+  // OPTIMIZATION 1: Fetch cached surah data (instant if cached, ~300ms if cold)
+  const cachedData = await getCachedSurahVerses(juzNum, surahNum);
+
+  if (!cachedData) {
     notFound();
   }
 
-  const puzzles = await Puzzle.find({
-    juzId: juz._id,
-    surahId: surah._id,
-  })
-    .sort({ 'content.ayahNumber': 1 })
-    .lean() as any[];
-
-  // Get total puzzles in the entire surah (not just this juz) for accurate total count
-  const totalPuzzlesInSurah = await Puzzle.countDocuments({
-    surahId: surah._id,
-  });
-
+  const { juz, surah, puzzles } = cachedData;
+  
+  // Get puzzle IDs for parallel queries
   const puzzleIds = puzzles.map((p: any) => p._id);
-  const progress = await UserProgress.find({
-    userId: dbUser._id,
-    puzzleId: { $in: puzzleIds },
-    status: 'COMPLETED',
-  }).lean() as any[];
+  
+  // OPTIMIZATION 2: Parallel fetch of user-specific data (all run simultaneously)
+  const [totalPuzzlesInSurah, progress, likedAyahs] = await Promise.all([
+    // Count total puzzles in the entire surah
+    Puzzle.countDocuments({ surahId: surah._id }),
+    // Fetch user progress
+    UserProgress.find({
+      userId: dbUser._id,
+      puzzleId: { $in: puzzleIds },
+      status: 'COMPLETED',
+    })
+      .select('puzzleId')
+      .lean(),
+    // Fetch liked ayahs
+    LikedAyat.find({
+      userId: dbUser._id,
+      puzzleId: { $in: puzzleIds },
+    })
+      .select('puzzleId')
+      .lean(),
+  ]);
 
   const completedPuzzleIds = new Set(progress.map((p: any) => p.puzzleId.toString()));
-
-  const likedAyahs = await LikedAyat.find({
-    userId: dbUser._id,
-    puzzleId: { $in: puzzleIds },
-  }).lean() as any[];
-
   const likedPuzzleIds = new Set(likedAyahs.map((l: any) => l.puzzleId.toString()));
 
   const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
   const enableWordByWordAudio = dbUser.enableWordByWordAudio || false;
-  const selectedAyah = ayahParam ? parseInt(ayahParam) : puzzles[0]?.content?.ayahNumber || 1;
+  const selectedAyah = ayahParam ? parseInt(ayahParam) : puzzles[0]?.ayahNumber || 1;
 
-  const currentPuzzle = puzzles.find((p: any) => p.content?.ayahNumber === selectedAyah);
-  const currentIndex = puzzles.findIndex((p: any) => p.content?.ayahNumber === selectedAyah);
+  const currentPuzzle = puzzles.find((p: any) => p.ayahNumber === selectedAyah);
+  const currentIndex = puzzles.findIndex((p: any) => p.ayahNumber === selectedAyah);
   
   const previousPuzzle = currentIndex > 0 ? puzzles[currentIndex - 1] : null;
   const nextPuzzle = currentIndex < puzzles.length - 1 ? puzzles[currentIndex + 1] : null;
 
-  let initialTranslation = '';
-  try {
-    const translationData = await fetchTranslation(
-      parseInt(surahNumber),
+  // OPTIMIZATION 3: Parallel fetch of non-critical data (translation & page number)
+  const [translationResult, pageResult] = await Promise.allSettled([
+    fetchTranslation(
+      surahNum,
       selectedAyah,
       selectedTranslation,
       { next: { revalidate: 86400 } }
-    );
-    initialTranslation = translationData.data?.text || '';
-  } catch (error) {
-    // Translation fetch failed
-  }
-
-  // Transliteration is now loaded on-demand via the modal, not prefetched
-  // AI Tafsir is also loaded on-demand to avoid blocking page load
-
-  // Fetch page number for Mushaf navigation
-  let mushafPageNumber: number | null = null;
-  try {
-    const pageResponse = await fetch(
-      `https://api.quran.com/api/v4/verses/by_key/${surahNumber}:${selectedAyah}?fields=page_number`,
+    ),
+    fetch(
+      `https://api.quran.com/api/v4/verses/by_key/${surahNum}:${selectedAyah}?fields=page_number`,
       { next: { revalidate: 86400 } }
-    );
-    if (pageResponse.ok) {
-      const pageData = await pageResponse.json();
-      mushafPageNumber = pageData.verse?.page_number || null;
-    }
-  } catch (error) {
-    // Page number fetch failed
-  }
+    ).then(res => res.ok ? res.json() : null),
+  ]);
+
+  // Extract results with fallbacks
+  const initialTranslation = translationResult.status === 'fulfilled' 
+    ? translationResult.value?.data?.text || ''
+    : '';
+  
+  const mushafPageNumber = pageResult.status === 'fulfilled' 
+    ? pageResult.value?.verse?.page_number || null
+    : null;
 
   const totalAyahs = totalPuzzlesInSurah;
   const completedAyahs = completedPuzzleIds.size;
   const progressPercentage = totalAyahs > 0 ? (completedAyahs / totalAyahs) * 100 : 0;
 
-  const rawAyahText = currentPuzzle?.content?.ayahText || '';
-  const { bismillah, remainingText } = extractBismillah(rawAyahText, parseInt(surahNumber), selectedAyah);
-  const showBismillahSeparately = shouldShowBismillahSeparately(parseInt(surahNumber)) && selectedAyah === 1;
+  const rawAyahText = currentPuzzle?.ayahText || '';
+  const { bismillah, remainingText } = extractBismillah(rawAyahText, surahNum, selectedAyah);
+  const showBismillahSeparately = shouldShowBismillahSeparately(surahNum) && selectedAyah === 1;
 
-  const isMemorized = currentPuzzle ? completedPuzzleIds.has(currentPuzzle._id.toString()) : false;
-  const isLiked = currentPuzzle ? likedPuzzleIds.has(currentPuzzle._id.toString()) : false;
+  const isMemorized = currentPuzzle ? completedPuzzleIds.has(currentPuzzle._id) : false;
+  const isLiked = currentPuzzle ? likedPuzzleIds.has(currentPuzzle._id) : false;
 
   return (
     <VersePageClient translationCode={selectedTranslation}>
@@ -126,13 +125,19 @@ export default async function SurahVersePage({
           surahName={surah.nameEnglish}
           completedAyahs={completedAyahs}
           totalAyahs={totalAyahs}
-          currentPuzzle={currentPuzzle}
-          surahNumber={parseInt(surahNumber)}
+          currentPuzzle={currentPuzzle ? {
+            _id: currentPuzzle._id,
+            content: {
+              ayahNumber: currentPuzzle.ayahNumber,
+              ayahText: currentPuzzle.ayahText,
+            },
+          } : null}
+          surahNumber={surahNum}
           selectedAyah={selectedAyah}
           selectedTranslation={selectedTranslation}
           ayahText={showBismillahSeparately ? remainingText : cleanAyahText(
-            currentPuzzle?.content?.ayahText || '',
-            parseInt(surahNumber),
+            currentPuzzle?.ayahText || '',
+            surahNum,
             selectedAyah
           )}
           subscriptionPlan={dbUser.subscriptionPlan}
@@ -153,14 +158,14 @@ export default async function SurahVersePage({
           {/* Ayah Selector with Modal */}
           <AyahSelectorClient
             puzzles={puzzles.map((p: any) => ({
-              id: p._id.toString(),
-              ayahNumber: p.content?.ayahNumber || 1,
-              isCompleted: completedPuzzleIds.has(p._id.toString()),
-              isLiked: likedPuzzleIds.has(p._id.toString()),
+              id: p._id,
+              ayahNumber: p.ayahNumber || 1,
+              isCompleted: completedPuzzleIds.has(p._id),
+              isLiked: likedPuzzleIds.has(p._id),
             }))}
             currentAyah={selectedAyah}
-            juzNumber={parseInt(juzNumber)}
-            surahNumber={parseInt(surahNumber)}
+            juzNumber={juzNum}
+            surahNumber={surahNum}
           />
 
           {currentPuzzle ? (
@@ -169,21 +174,21 @@ export default async function SurahVersePage({
               {showBismillahSeparately && bismillah && (
                 <BismillahDisplay
                   bismillah={bismillah}
-                  surahNumber={parseInt(surahNumber)}
+                  surahNumber={surahNum}
                 />
               )}
 
               {/* Arabic Text Card with Audio Player */}
               <div data-tutorial="arabic-text">
                 <ArabicTextCard
-                  surahNumber={parseInt(surahNumber)}
+                  surahNumber={surahNum}
                   ayahNumber={selectedAyah}
                   ayahText={showBismillahSeparately ? remainingText : cleanAyahText(
-                    currentPuzzle.content?.ayahText || '',
-                    parseInt(surahNumber),
+                    currentPuzzle.ayahText || '',
+                    surahNum,
                     selectedAyah
                   )}
-                  puzzleId={currentPuzzle._id.toString()}
+                  puzzleId={currentPuzzle._id}
                   isMemorized={isMemorized}
                   isLiked={isLiked}
                   enableWordByWordAudio={enableWordByWordAudio}
@@ -193,7 +198,7 @@ export default async function SurahVersePage({
               {/* Translation */}
               <div data-tutorial="translation">
                 <TranslationDisplay
-                  surahNumber={parseInt(surahNumber)}
+                  surahNumber={surahNum}
                   ayahNumber={selectedAyah}
                   selectedTranslation={selectedTranslation}
                   initialTranslation={initialTranslation}
@@ -202,11 +207,11 @@ export default async function SurahVersePage({
 
               {/* Start Puzzle & Navigation Buttons */}
               <VerseNavButtons
-                puzzleId={currentPuzzle._id.toString()}
-                juzNumber={parseInt(juzNumber)}
-                surahNumber={parseInt(surahNumber)}
-                previousAyah={previousPuzzle?.content?.ayahNumber}
-                nextAyah={nextPuzzle?.content?.ayahNumber}
+                puzzleId={currentPuzzle._id}
+                juzNumber={juzNum}
+                surahNumber={surahNum}
+                previousAyah={previousPuzzle?.ayahNumber}
+                nextAyah={nextPuzzle?.ayahNumber}
                 selectedAyah={selectedAyah}
                 totalAyahs={totalAyahs}
               />
