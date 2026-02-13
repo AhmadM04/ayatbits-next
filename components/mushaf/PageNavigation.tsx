@@ -93,15 +93,15 @@ export default function PageNavigation({
 
   return (
     <div className="flex items-center justify-between">
-      {/* Previous Button */}
+      {/* Previous Button - LIGHT THEME */}
       <button
         onClick={handlePrevious}
         disabled={!canGoPrevious}
         className={`
           p-1.5 sm:p-2 rounded-lg transition-colors
           ${canGoPrevious 
-            ? 'hover:bg-white/5 text-white' 
-            : 'text-gray-600 cursor-not-allowed'
+            ? 'hover:bg-gray-100 text-gray-900' 
+            : 'text-gray-400 cursor-not-allowed'
           }
         `}
         aria-label="Previous page"
@@ -109,20 +109,20 @@ export default function PageNavigation({
         <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
 
-      {/* Page Info & Dropdown */}
+      {/* Page Info & Dropdown - LIGHT THEME */}
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
+          className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
         >
           <div className="text-center">
-            <span className="text-white font-medium text-sm sm:text-base">{t('common.page')} {currentPage}</span>
+            <span className="text-gray-900 font-medium text-sm sm:text-base">{t('common.page')} {currentPage}</span>
             <span className="text-gray-500 text-xs sm:text-sm ml-1 sm:ml-2">{t('common.of')} {totalPages}</span>
           </div>
-          <ChevronDown className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
         </button>
 
-        {/* Dropdown Panel */}
+        {/* Dropdown Panel - LIGHT THEME */}
         <AnimatePresence>
           {showDropdown && (
             <motion.div
@@ -130,10 +130,10 @@ export default function PageNavigation({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[90vw] max-w-xs bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
+              className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[90vw] max-w-xs bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden z-50"
             >
               {/* Search Input */}
-              <form onSubmit={handleSearchSubmit} className="p-3 border-b border-white/5">
+              <form onSubmit={handleSearchSubmit} className="p-3 border-b border-gray-200">
                 <div className="relative">
                   <input
                     ref={inputRef}
@@ -143,15 +143,15 @@ export default function PageNavigation({
                     value={searchValue}
                     onChange={(e) => setSearchValue(e.target.value)}
                     placeholder="Go to page..."
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-green-500/50 text-sm"
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-sm"
                   />
                   {searchValue && (
                     <button
                       type="button"
                       onClick={() => setSearchValue('')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-white/10 rounded"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 rounded"
                     >
-                      <X className="w-4 h-4 text-gray-400" />
+                      <X className="w-4 h-4 text-gray-600" />
                     </button>
                   )}
                 </div>
@@ -159,7 +159,7 @@ export default function PageNavigation({
 
               {/* Quick Select - Juz Based */}
               <div className="p-2 max-h-64 overflow-y-auto">
-                <p className="text-xs text-gray-500 px-2 py-1 mb-1">Quick Jump by {t('common.juz')}</p>
+                <p className="text-xs text-gray-600 px-2 py-1 mb-1">Quick Jump by {t('common.juz')}</p>
                 <div className="grid grid-cols-5 gap-1">
                   {Array.from({ length: 30 }, (_, i) => i + 1).map((juz) => {
                     const startPage = (juz - 1) * 20 + 1;
@@ -171,8 +171,8 @@ export default function PageNavigation({
                         className={`
                           p-2 rounded-lg text-xs font-medium transition-colors
                           ${isCurrentJuz 
-                            ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-                            : 'hover:bg-white/5 text-gray-400'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                            : 'hover:bg-gray-100 text-gray-700 border border-gray-200'
                           }
                         `}
                       >
@@ -184,8 +184,8 @@ export default function PageNavigation({
               </div>
 
               {/* Current Info */}
-              <div className="p-3 border-t border-white/5 bg-white/[0.02]">
-                <p className="text-xs text-gray-500 text-center">
+              <div className="p-3 border-t border-gray-200 bg-gray-50">
+                <p className="text-xs text-gray-600 text-center">
                   Currently in {t('common.juz')} {currentJuz}
                 </p>
               </div>
@@ -194,15 +194,15 @@ export default function PageNavigation({
         </AnimatePresence>
       </div>
 
-      {/* Next Button */}
+      {/* Next Button - LIGHT THEME */}
       <button
         onClick={handleNext}
         disabled={!canGoNext}
         className={`
           p-1.5 sm:p-2 rounded-lg transition-colors
           ${canGoNext 
-            ? 'hover:bg-white/5 text-white' 
-            : 'text-gray-600 cursor-not-allowed'
+            ? 'hover:bg-gray-100 text-gray-900' 
+            : 'text-gray-400 cursor-not-allowed'
           }
         `}
         aria-label="Next page"

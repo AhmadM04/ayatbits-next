@@ -145,17 +145,18 @@ export default function MushafPageClient({
 
   return (
     <TutorialWrapper sectionId="mushaf_reading" steps={mushafTutorialSteps} delay={1000}>
-      <div className="min-h-screen bg-[#0a0a0a] text-white" data-tutorial="mushaf-page">
-        {/* Header */}
-        <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
+      {/* LIGHT THEME: Clean light gray background */}
+      <div className="min-h-screen bg-gray-50 text-gray-900" data-tutorial="mushaf-page">
+        {/* Header - LIGHT THEME */}
+        <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
           <div className="max-w-3xl mx-auto px-4">
             <div className="flex items-center justify-between h-14">
               {/* Back Button */}
               <Link
                 href="/dashboard"
-                className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors"
+                className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-400" />
+                <ArrowLeft className="w-5 h-5 text-gray-600" />
               </Link>
 
               {/* Page Navigation */}
@@ -170,9 +171,9 @@ export default function MushafPageClient({
               {/* Home Button */}
               <Link
                 href="/dashboard"
-                className="p-2 -mr-2 hover:bg-white/5 rounded-lg transition-colors"
+                className="p-2 -mr-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <Home className="w-5 h-5 text-gray-400" />
+                <Home className="w-5 h-5 text-gray-600" />
               </Link>
             </div>
           </div>
@@ -188,17 +189,17 @@ export default function MushafPageClient({
         onDragEnd={handleDragEnd}
         data-tutorial="page-content"
       >
-        {/* Page Info Badge */}
+        {/* Page Info Badge - LIGHT THEME */}
         <div className="flex items-center justify-center gap-3 mb-6">
-          <span className="px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-xs text-green-400">
+          <span className="px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-xs text-emerald-700 font-medium">
             {t('mushaf.juz')} {currentJuz}
           </span>
-          <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-gray-400">
+          <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600">
             {t('mushaf.page')} {pageNumber}
           </span>
         </div>
 
-        {/* Mushaf Page Content */}
+        {/* Mushaf Page Content - LIGHT THEME */}
         <AnimatePresence mode="wait">
           <motion.div
             key={pageNumber}
@@ -206,7 +207,7 @@ export default function MushafPageClient({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: swipeDirection === 'left' ? -50 : swipeDirection === 'right' ? 50 : 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-6 overflow-hidden"
+            className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 overflow-hidden shadow-sm"
           >
             {/* Arabic Text Container - MADANI MUSHAF STYLE */}
             <div
@@ -231,16 +232,16 @@ export default function MushafPageClient({
           </motion.div>
         </AnimatePresence>
 
-        {/* Swipe Hint */}
+        {/* Swipe Hint - LIGHT THEME */}
         <div className="mt-6 text-center">
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-gray-500">
             {t('mushaf.swipeInstruction')}
           </p>
         </div>
       </motion.main>
 
-      {/* Footer Navigation (Fixed) */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#0a0a0a]/95 backdrop-blur-md border-t border-white/5 safe-area-bottom">
+      {/* Footer Navigation (Fixed) - LIGHT THEME */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 safe-area-bottom shadow-lg">
         <div className="max-w-3xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Previous Page */}
@@ -250,8 +251,8 @@ export default function MushafPageClient({
               className={`
                 flex items-center gap-2 px-4 py-2 rounded-lg transition-colors
                 ${pageNumber > 1 
-                  ? 'bg-white/5 hover:bg-white/10 text-white' 
-                  : 'text-gray-600 cursor-not-allowed'
+                  ? 'bg-gray-100 hover:bg-gray-200 text-gray-900' 
+                  : 'text-gray-400 cursor-not-allowed'
                 }
               `}
             >
@@ -260,7 +261,7 @@ export default function MushafPageClient({
 
             {/* Page Indicator */}
             <div className="text-center">
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-gray-600">
                 {t('mushaf.page')} {pageNumber} / {totalPages}
               </span>
             </div>
@@ -272,8 +273,8 @@ export default function MushafPageClient({
               className={`
                 flex items-center gap-2 px-4 py-2 rounded-lg transition-colors
                 ${pageNumber < totalPages 
-                  ? 'bg-white/5 hover:bg-white/10 text-white' 
-                  : 'text-gray-600 cursor-not-allowed'
+                  ? 'bg-gray-100 hover:bg-gray-200 text-gray-900' 
+                  : 'text-gray-400 cursor-not-allowed'
                 }
               `}
             >

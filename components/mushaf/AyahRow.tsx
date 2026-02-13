@@ -98,12 +98,12 @@ export default function AyahRow({ verse, onLongPress, isHighlighted = false }: A
         </span>
       </span>
       
-      {/* LIGHT THEME: Hover/active indicator with gray background */}
+      {/* LIGHT THEME: Subtle hover/active indicator - FIXED: No solid white boxes */}
       <span className={`
-        absolute inset-0 rounded-lg pointer-events-none transition-opacity duration-150
+        absolute inset-0 rounded-lg pointer-events-none transition-all duration-150
         ${isHolding 
-          ? 'opacity-100 bg-blue-100 animate-pulse' 
-          : 'opacity-0 group-hover:opacity-100 group-active:opacity-100 bg-gray-50'
+          ? 'opacity-100 bg-blue-50/80 animate-pulse' 
+          : 'opacity-0 group-hover:opacity-100 group-active:opacity-100 bg-gray-50/50'
         }
       `} />
       
