@@ -283,21 +283,23 @@ export default function PuzzleClient({
     // Wait for success animation and word audio to complete before navigating
     // This allows the user to see the success animation and hear any playing word audio
     setTimeout(() => {
-      // Use push() to escape the history trap and navigate to next page
-      router.push(targetUrl);
+      // CRITICAL: Use hard navigation to escape the history trap
+      // window.location.href forces a full page reload and ensures navigation works
+      window.location.href = targetUrl;
     }, 1800); // 1.8 seconds delay to allow word audio to finish
   }, [puzzle, nextPuzzleId, nextPuzzleAyahNumber, isLastAyahInSurah, router, showToast, t]);
 
   const handleMistakeLimitExceeded = useCallback(() => {
-    // CRITICAL: Use push() NOT back() to escape the history trap
-    router.push(backUrl);
-  }, [backUrl, router]);
+    // CRITICAL: Use hard navigation to escape the history trap
+    // window.location.href forces a full page reload and clears the trap
+    window.location.href = backUrl;
+  }, [backUrl]);
 
   const handleExitConfirm = () => {
-    setShowExitModal(false);
-    // CRITICAL: Use push() NOT back() to escape the history trap
-    // This ensures we actually leave the page instead of just popping the dummy state
-    router.push(backUrl);
+    // CRITICAL: Use hard navigation to escape the history trap
+    // window.location.href forces a full page reload and bypasses Next.js router
+    // This ensures we actually leave the page instead of just fetching data
+    window.location.href = backUrl;
   };
 
   return (
