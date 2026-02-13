@@ -92,7 +92,7 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
             >
               {/* Large harakat character */}
               <div 
-                className="text-7xl font-arabic mb-1"
+                className="text-7xl font-arabic mb-6"
                 style={{ color: definition.color }}
                 dir="rtl"
               >
@@ -101,7 +101,7 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
 
               {/* Names */}
               <h2 
-                className="text-2xl font-bold mb-1"
+                className="text-2xl font-bold mb-1 mt-2"
                 style={{ color: definition.color }}
               >
                 {getHarakatName(definition.character, locale) || definition.nameEnglish}
