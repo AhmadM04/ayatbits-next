@@ -47,7 +47,7 @@ export default function BottomNav({ resumeData }: BottomNavProps = {}) {
   ];
 
   return (
-    <nav data-tutorial="bottom-nav" className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-[#111]/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 safe-area-bottom pb-2" style={{ zIndex: 1000000 }}>
+    <nav data-tutorial="bottom-nav" className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-[#111111]/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 safe-area-bottom pb-2" style={{ zIndex: 1000000 }}>
       <div className="max-w-lg mx-auto px-1 sm:px-2">
         <div className="flex items-center justify-around h-16">
           {navItems.map((item) => {
@@ -66,7 +66,7 @@ export default function BottomNav({ resumeData }: BottomNavProps = {}) {
                 >
                   <motion.div
                     whileTap={{ scale: 0.95 }}
-                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#059669] dark:bg-green-600 flex items-center justify-center shadow-lg shadow-emerald-600/30"
+                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-600/30"
                   >
                     <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white ml-0.5" />
                   </motion.div>

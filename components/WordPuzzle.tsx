@@ -221,14 +221,14 @@ function DropSlot({
         transition-all duration-150
         ${enableWordAudio && placedToken && placedToken.norm === expectedToken.norm ? 'cursor-pointer' : ''}
         ${placedToken 
-          ? 'bg-success/20 border-2 border-success'
+          ? 'bg-emerald-500/20 border-2 border-emerald-500'
           : isFadingHint
-            ? 'bg-puzzle-slot border-2 border-dashed border-puzzle-slot-border'
+            ? 'bg-gray-50 dark:bg-[#1a1a1a] border-2 border-dashed border-gray-300 dark:border-white/20'
             : isHinted
-            ? 'bg-success/30 border-2 border-success scale-105'
+            ? 'bg-emerald-500/30 border-2 border-emerald-500 scale-105'
             : isOver && isActive
-              ? 'bg-success/30 border-2 border-success scale-105'
-              : 'bg-puzzle-slot border-2 border-dashed border-puzzle-slot-border'
+              ? 'bg-emerald-500/30 border-2 border-emerald-500 scale-105'
+              : 'bg-gray-50 dark:bg-[#1a1a1a] border-2 border-dashed border-gray-300 dark:border-white/20'
         }
       `}
     >
@@ -238,13 +238,13 @@ function DropSlot({
             as="span"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="text-base font-medium font-arabic text-success flex items-center gap-1"
+            className="text-base font-medium font-arabic text-emerald-600 dark:text-emerald-400 flex items-center gap-1"
           >
             <HarakatColoredText text={placedToken.text} />
             {enableWordAudio && (
-              <Volume2 className="w-3 h-3 text-success opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Volume2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" />
             )}
-            {!enableWordAudio && <CheckCircle2 className="w-3 h-3 text-success hidden sm:block" />}
+            {!enableWordAudio && <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400 hidden sm:block" />}
           </ConditionalMotion>
           {showTransliteration && placedToken.transliteration && (
             <ConditionalMotion
@@ -252,14 +252,14 @@ function DropSlot({
               initial={{ opacity: 0, y: -10 }}
               whileHover={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="absolute top-full mt-1 text-xs text-muted-foreground italic whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
+              className="absolute top-full mt-1 text-xs text-gray-600 dark:text-gray-400 italic whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
             >
               {placedToken.transliteration}
             </ConditionalMotion>
           )}
         </ConditionalMotion>
       ) : (
-        <span className="text-muted-foreground text-xs">
+        <span className="text-gray-600 dark:text-gray-400 text-xs">
           {isOver && isActive ? '✓' : (position + 1)}
         </span>
       )}
@@ -349,12 +349,12 @@ const DraggableWord = memo(function DraggableWord({
         ${isDragging ? 'opacity-40' : 'opacity-100'}
         ${
           isOverlay
-            ? 'bg-puzzle-word border-2 border-success shadow-xl text-foreground scale-105 z-50'
+            ? 'bg-white dark:bg-[#222222] border-2 border-emerald-500 shadow-xl text-[#4A3728] dark:text-gray-100 scale-105 z-50'
             : isFadingHint
-              ? 'bg-puzzle-word border border-puzzle-word-border text-foreground'
+              ? 'bg-white dark:bg-[#222222] border border-gray-200 dark:border-white/10 text-[#4A3728] dark:text-gray-100'
               : isHinted
-              ? 'bg-puzzle-word border-2 border-amber-400 text-amber-200 shadow-lg shadow-amber-500/30'
-              : 'bg-puzzle-word border border-puzzle-word-border text-foreground hover:bg-muted hover:border-border active:scale-95 shadow-sm dark:shadow-none'
+              ? 'bg-white dark:bg-[#222222] border-2 border-amber-400 text-amber-600 dark:text-amber-200 shadow-lg shadow-amber-500/30'
+              : 'bg-white dark:bg-[#222222] border border-gray-200 dark:border-white/10 text-[#4A3728] dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-[#2a2a2a] hover:border-gray-300 dark:hover:border-white/20 active:scale-95 shadow-sm dark:shadow-none'
         }
       `}
       style={{ 
@@ -371,7 +371,7 @@ const DraggableWord = memo(function DraggableWord({
           initial={{ opacity: 0, y: -10 }}
           whileHover={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs text-muted-foreground italic whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
+          className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs text-gray-600 dark:text-gray-400 italic whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
         >
           {token.transliteration}
         </ConditionalMotion>
@@ -414,7 +414,7 @@ function AnswerArea({
     <div
       dir="rtl"
       data-tutorial="answer-area"
-      className="min-h-[80px] w-full rounded-xl border-2 border-dashed p-3 transition-all duration-300 border-border bg-muted/30"
+      className="min-h-[80px] w-full rounded-xl border-2 border-dashed p-3 transition-all duration-300 border-gray-300 dark:border-white/20 bg-gray-50/50 dark:bg-[#1a1a1a]/30"
     >
       <div className="flex flex-wrap items-center gap-2" style={{ justifyContent: 'flex-start' }}>
         {originalTokens.map((token, index) => {
@@ -441,7 +441,7 @@ function AnswerArea({
         })}
       </div>
       {placedTokenIds.size === 0 && (
-        <p className="text-muted-foreground text-xs text-center mt-3">
+        <p className="text-gray-600 dark:text-gray-400 text-xs text-center mt-3">
           {t('wordPuzzle.dropEachWord')}
         </p>
       )}
@@ -480,7 +480,7 @@ function WordBank({
   
   return (
     <div className="mt-6" dir="rtl" data-tutorial="word-bank">
-      <p className="text-xs text-muted-foreground text-center mb-3">
+      <p className="text-xs text-gray-600 dark:text-gray-400 text-center mb-3">
         {t('wordPuzzle.dragOrTap')}
       </p>
       <div className="flex flex-wrap justify-center gap-2">
@@ -1139,10 +1139,10 @@ export default function WordPuzzle({
         <div className="flex items-center gap-2 flex-wrap">
           <div className={`px-3 py-1.5 rounded-full border flex items-center gap-2 ${
             hasExceededMistakeLimit 
-              ? 'bg-error-soft border-error/30' 
-              : 'bg-card border-border'
+              ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-500/30' 
+              : 'bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-white/10'
           }`}>
-            <span className={`text-xs font-medium ${hasExceededMistakeLimit ? 'text-error' : 'text-muted-foreground'}`}>
+            <span className={`text-xs font-medium ${hasExceededMistakeLimit ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'}`}>
               {t('wordPuzzle.mistakes')}: {mistakeCount}/{MAX_MISTAKES}
             </span>
           </div>
@@ -1174,8 +1174,8 @@ export default function WordPuzzle({
             }}
             className={`px-3 py-1.5 rounded-full border flex items-center gap-1.5 transition-all ${
               usedTips >= availableTips || hasExceededMistakeLimit
-                ? 'bg-muted border-border cursor-not-allowed opacity-50'
-                : 'bg-success-soft border-success/30 hover:bg-success/20 hover:border-success/50 cursor-pointer active:scale-95'
+                ? 'bg-gray-100 dark:bg-[#1a1a1a] border-gray-200 dark:border-white/10 cursor-not-allowed opacity-50'
+                : 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 hover:border-emerald-400 dark:hover:border-emerald-500/50 cursor-pointer active:scale-95'
             }`}
             title={
               usedTips >= availableTips
@@ -1186,8 +1186,8 @@ export default function WordPuzzle({
             }
             data-tutorial="hint-button"
           >
-            <Lightbulb className={`w-3.5 h-3.5 ${usedTips >= availableTips ? 'text-muted-foreground' : 'text-success'}`} />
-            <span className={`text-xs font-medium ${usedTips >= availableTips ? 'text-muted-foreground' : 'text-success'}`}>
+            <Lightbulb className={`w-3.5 h-3.5 ${usedTips >= availableTips ? 'text-gray-600 dark:text-gray-400' : 'text-emerald-600 dark:text-emerald-400'}`} />
+            <span className={`text-xs font-medium ${usedTips >= availableTips ? 'text-gray-600 dark:text-gray-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
               {t('wordPuzzle.tips')}: {usedTips}/{availableTips}
             </span>
           </motion.button>
@@ -1214,23 +1214,23 @@ export default function WordPuzzle({
           
             <button
             onClick={resetState}
-            className="p-2 rounded-lg bg-muted border border-border text-muted-foreground hover:bg-muted/80 transition-colors"
+            className="p-2 rounded-lg bg-gray-100 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/5 transition-colors"
             title="Reset"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-gray-600 dark:text-gray-400">
           {placedTokenIds.size}/{originalTokens.length}
         </div>
       </div>
 
       {/* Progress bar */}
       <div className="mb-4">
-        <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+        <div className="w-full bg-gray-200 dark:bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden">
           <motion.div
-            className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full"
+            className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${(placedTokenIds.size / originalTokens.length) * 100}%` }}
             transition={{ duration: 0.2 }}
@@ -1280,22 +1280,22 @@ export default function WordPuzzle({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-6 bg-teal-500/5 border border-teal-500/20 rounded-xl p-4"
+          className="mt-6 bg-teal-50 dark:bg-teal-900/10 border border-teal-300 dark:border-teal-500/20 rounded-xl p-4"
         >
           <div className="flex items-center gap-2 mb-2">
-            <Languages className="w-4 h-4 text-teal-400" />
-            <span className="text-xs font-medium text-teal-400">Transliteration</span>
+            <Languages className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+            <span className="text-xs font-medium text-teal-600 dark:text-teal-400">Transliteration</span>
           </div>
-          <p className="text-base text-foreground italic leading-relaxed">
+          <p className="text-base text-[#4A3728] dark:text-gray-100 italic leading-relaxed">
             {transliteration}
           </p>
         </motion.div>
       )}
 
       {isLoadingTransliteration && (
-        <div className="mt-6 bg-teal-500/5 border border-teal-500/20 rounded-xl p-4 flex items-center justify-center">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-teal-400 border-t-transparent" />
-          <span className="ml-2 text-sm text-muted-foreground">Loading transliteration...</span>
+        <div className="mt-6 bg-teal-50 dark:bg-teal-900/10 border border-teal-300 dark:border-teal-500/20 rounded-xl p-4 flex items-center justify-center">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-teal-600 dark:border-teal-400 border-t-transparent" />
+          <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Loading transliteration...</span>
         </div>
       )}
     </div>

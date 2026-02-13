@@ -47,7 +47,7 @@ export default function MushafFAB({ juzNumber, size = 'default' }: MushafFABProp
       
       {/* Tooltip on hover */}
       <div className="absolute right-0 bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-        <div className="bg-[#1a1a1a] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-gray-300 whitespace-nowrap">
+        <div className="bg-gray-800 dark:bg-[#1a1a1a] border border-gray-700 dark:border-white/10 rounded-lg px-3 py-1.5 text-xs text-gray-100 dark:text-gray-300 whitespace-nowrap shadow-lg">
           {juzNumber ? `${t('mushaf.page')} ${startPage} (${t('mushaf.juz')} ${juzNumber})` : `${t('mushaf.page')} ${startPage}`}
         </div>
       </div>

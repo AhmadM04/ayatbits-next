@@ -96,20 +96,20 @@ export default function ProfilePageClient({
         {showOnboardingBanner && (
           <Link
             href="/onboarding"
-            className="block bg-gradient-to-r from-emerald-50/50 to-green-50/50 border border-[#059669]/30 rounded-2xl p-6 hover:border-[#059669]/50 transition-all shadow-sm"
+            className="block bg-gradient-to-r from-gray-50 to-emerald-50 dark:from-emerald-950/30 dark:to-emerald-900/20 border border-emerald-300 dark:border-emerald-500/30 rounded-2xl p-6 hover:border-emerald-400 dark:hover:border-emerald-500/50 transition-all shadow-sm dark:shadow-none"
           >
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-emerald-50/50 rounded-xl border border-[#059669]/30 flex-shrink-0">
-                <AlertCircle className="w-6 h-6 text-[#059669]" />
+              <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl border border-emerald-300 dark:border-emerald-500/30 flex-shrink-0">
+                <AlertCircle className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-[#4A3728] dark:text-white mb-1">
                   {t('onboarding.completeProfile')}
                 </h3>
-                <p className="text-sm text-[#8E7F71] dark:text-gray-400 mb-3">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                   {t('onboarding.completeProfileDescription')}
                 </p>
-                <div className="inline-flex items-center gap-2 text-sm font-medium text-[#059669]">
+                <div className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-400">
                   <span>{t('onboarding.finish')}</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -132,7 +132,7 @@ export default function ProfilePageClient({
         <div className="space-y-6">
           <div className="flex items-center gap-2 px-1">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
-            <span className="text-xs font-medium text-[#8E7F71] dark:text-gray-400 uppercase tracking-wider">{t('preferences.title')}</span>
+            <span className="text-xs font-medium text-[#8E7F71] dark:text-gray-500 uppercase tracking-wider">{t('preferences.title')}</span>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
           </div>
 
@@ -147,7 +147,7 @@ export default function ProfilePageClient({
         <div className="space-y-6">
           <div className="flex items-center gap-2 px-1">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
-            <span className="text-xs font-medium text-[#8E7F71] dark:text-gray-400 uppercase tracking-wider">{t('tutorial.settings')}</span>
+            <span className="text-xs font-medium text-[#8E7F71] dark:text-gray-500 uppercase tracking-wider">{t('tutorial.settings')}</span>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
           </div>
 
@@ -160,7 +160,7 @@ export default function ProfilePageClient({
         <div className="space-y-6">
           <div className="flex items-center gap-2 px-1">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
-            <span className="text-xs font-medium text-[#8E7F71] dark:text-gray-400 uppercase tracking-wider">{t('tutorial.billing')}</span>
+            <span className="text-xs font-medium text-[#8E7F71] dark:text-gray-500 uppercase tracking-wider">{t('tutorial.billing')}</span>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
           </div>
 
@@ -174,7 +174,7 @@ export default function ProfilePageClient({
         <div className="space-y-6">
           <div className="flex items-center gap-2 px-1">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
-            <span className="text-xs font-medium text-[#8E7F71] dark:text-gray-400 uppercase tracking-wider">{t('tutorial.account')}</span>
+            <span className="text-xs font-medium text-[#8E7F71] dark:text-gray-500 uppercase tracking-wider">{t('tutorial.account')}</span>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
           </div>
 

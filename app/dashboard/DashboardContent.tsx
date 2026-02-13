@@ -161,7 +161,7 @@ export default function DashboardContent({
       steps={tutorialSteps}
       delay={800}
     >
-      <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0a0a0a] text-[#4A3728] dark:text-white pb-20">
+      <div className="min-h-screen text-[#4A3728] dark:text-white pb-20">
       {/* Trial Banner */}
       {showTrialBanner && <TrialBanner daysLeft={trialDaysLeft!} />}
       

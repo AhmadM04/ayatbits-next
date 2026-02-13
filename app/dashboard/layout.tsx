@@ -48,10 +48,12 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   // RENDER DASHBOARD WITH PROVIDERS
   // ========================================================================
   return (
-    <UserSyncProvider>
-      <TutorialProvider>
-        {children}
-      </TutorialProvider>
-    </UserSyncProvider>
+    <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0a0a0a]">
+      <UserSyncProvider>
+        <TutorialProvider>
+          {children}
+        </TutorialProvider>
+      </UserSyncProvider>
+    </div>
   );
 }
