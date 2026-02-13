@@ -29,7 +29,8 @@ interface MushafViewProps {
 export default function MushafView({ verses, onVerseLongPress }: MushafViewProps) {
   return (
     <div className="w-full max-w-4xl mx-auto px-4 pb-24">
-      <div className="bg-[#0a0a0a] min-h-[80vh] rounded-xl p-6" dir="rtl">
+      {/* LIGHT THEME: Clean white background with subtle border and shadow */}
+      <div className="bg-white border border-gray-100 shadow-sm min-h-[80vh] rounded-2xl p-6" dir="rtl">
         
         {/* The Block Text Container - Madani Mushaf Style */}
         <div 
@@ -50,14 +51,17 @@ export default function MushafView({ verses, onVerseLongPress }: MushafViewProps
                 {...longPressHandlers}
                 className={`
                   relative inline px-1 cursor-pointer transition-colors select-none
-                  ${isCompleted ? 'text-emerald-500' : 'text-gray-200'}
-                  hover:bg-white/5
+                  ${isCompleted ? 'text-emerald-600 font-medium' : 'text-gray-900'}
+                  hover:bg-gray-50 rounded
                 `}
               >
                 {verse.text_uthmani}
 
-                {/* End of Ayah Symbol */}
-                <span className="font-sans text-2xl mx-2 opacity-80">
+                {/* End of Ayah Symbol - Emerald for completed, gray for incomplete */}
+                <span className={`
+                  font-sans text-2xl mx-2 opacity-70
+                  ${isCompleted ? 'text-emerald-600' : 'text-gray-400'}
+                `}>
                   ۝{verse.verse_key.split(':')[1]}
                 </span>
               </span>

@@ -49,22 +49,22 @@ export default function HarakatLegend({
               exit={{ opacity: 0 }}
               onClick={(e) => e.target === e.currentTarget && setIsExpanded(false)}
             >
-              {/* Backdrop */}
-              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+              {/* Backdrop - Lighter for day mode */}
+              <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" />
 
-              {/* Panel */}
+              {/* Panel - LIGHT THEME */}
               <motion.div
-                className="relative bg-[#0f0f0f] border border-white/10 rounded-2xl 
-                           w-full max-w-md max-h-[80vh] overflow-hidden"
+                className="relative bg-white border border-gray-200 rounded-2xl 
+                           w-full max-w-md max-h-[80vh] overflow-hidden shadow-xl"
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 100, opacity: 0 }}
                 transition={{ type: 'spring', damping: 25 }}
               >
                 {/* Header */}
-                <div className="sticky top-0 bg-[#0f0f0f] border-b border-white/5 p-4 flex items-center justify-between">
+                <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
                   <div>
-                    <h3 className="text-lg font-semibold text-white">
+                    <h3 className="text-lg font-semibold text-gray-900">
                       {t('harakat.guide')}
                     </h3>
                     <p className="text-sm text-gray-500">
@@ -73,10 +73,10 @@ export default function HarakatLegend({
                   </div>
                   <button
                     onClick={() => setIsExpanded(false)}
-                    className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                    className="p-2 rounded-full hover:bg-gray-100 transition-colors"
                     aria-label={t('harakat.closeGuide')}
                   >
-                    <X className="w-5 h-5 text-gray-400" />
+                    <X className="w-5 h-5 text-gray-600" />
                   </button>
                 </div>
 
@@ -98,18 +98,18 @@ export default function HarakatLegend({
     );
   }
 
-  // Inline collapsible variant
+  // Inline collapsible variant - LIGHT THEME
   return (
-    <div className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden">
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
       {/* Toggle Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full px-4 py-3 flex items-center justify-between 
-                   hover:bg-white/[0.02] transition-colors"
+                   hover:bg-gray-50 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <HelpCircle className="w-4 h-4 text-blue-400" />
-          <span className="text-sm font-medium text-gray-300">
+          <HelpCircle className="w-4 h-4 text-blue-600" />
+          <span className="text-sm font-medium text-gray-900">
             {t('harakat.guide')}
           </span>
         </div>
@@ -130,7 +130,7 @@ export default function HarakatLegend({
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="px-4 pb-4 border-t border-white/5">
+            <div className="px-4 pb-4 border-t border-gray-200">
               <LegendContent 
                 categories={categories}
                 onSelect={onHarakatSelect}
@@ -165,25 +165,25 @@ function LegendContent({ categories, onSelect, compact = false }: LegendContentP
     <div className={compact ? 'pt-3 space-y-4' : 'space-y-6'}>
       {categories.map((category) => (
         <div key={category.name}>
-          {/* Category Header */}
+          {/* Category Header - LIGHT THEME */}
           <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm font-medium text-gray-400">
+            <h4 className="text-sm font-medium text-gray-600">
               {getCategoryName(category.name)}
             </h4>
-            <span className="text-xs text-gray-600 font-arabic" dir="rtl">
+            <span className="text-xs text-gray-500 font-arabic" dir="rtl">
               {category.nameArabic}
             </span>
           </div>
 
-          {/* Harakat Grid */}
+          {/* Harakat Grid - LIGHT THEME */}
           <div className={`grid ${compact ? 'grid-cols-3 gap-2' : 'grid-cols-2 gap-3'}`}>
             {category.harakat.map((harakat) => (
               <button
                 key={harakat.unicode}
                 onClick={() => onSelect?.(harakat)}
                 className={`
-                  flex items-center gap-2 p-2 rounded-lg border border-white/5
-                  hover:bg-white/5 transition-colors text-left
+                  flex items-center gap-2 p-2 rounded-lg border border-gray-200
+                  hover:bg-gray-50 hover:border-gray-300 transition-colors text-left
                   ${compact ? 'flex-col text-center' : ''}
                 `}
               >
@@ -216,8 +216,8 @@ function LegendContent({ categories, onSelect, compact = false }: LegendContentP
         </div>
       ))}
 
-      {/* Tip */}
-      <p className="text-xs text-gray-600 pt-2 border-t border-white/5">
+      {/* Tip - LIGHT THEME */}
+      <p className="text-xs text-gray-500 pt-2 border-t border-gray-200">
         {t('harakat.tapToSeeDetails')}
       </p>
     </div>
