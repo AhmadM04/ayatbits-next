@@ -770,7 +770,12 @@
     "emailNotificationsDesc": "Receive updates and reminders via email",
     "inAppNotifications": "In-App Notifications",
     "inAppNotificationsDesc": "Receive notifications while using the app",
-    "comingSoon": "Coming Soon"
+    "comingSoon": "Coming Soon",
+    "language": "Interface Language",
+    "selectInterfaceLanguage": "Choose your preferred language for the interface",
+    "languageUpdated": "Language updated successfully",
+    "failedToUpdateLanguage": "Failed to update language preference",
+    "languageNote": "The interface language only affects menus and buttons. Quran text and translations are not affected."
   },
   "tos": {
     "title": "Terms of Service",

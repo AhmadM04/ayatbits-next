@@ -568,7 +568,12 @@
     "emailNotificationsDesc": "تلقي التحديثات والتذكيرات عبر البريد الإلكتروني",
     "inAppNotifications": "الإشعارات داخل التطبيق",
     "inAppNotificationsDesc": "تلقي الإشعارات أثناء استخدام التطبيق",
-    "comingSoon": "قريباً"
+    "comingSoon": "قريباً",
+    "language": "لغة الواجهة",
+    "selectInterfaceLanguage": "اختر لغتك المفضلة للواجهة",
+    "languageUpdated": "تم تحديث اللغة بنجاح",
+    "failedToUpdateLanguage": "فشل تحديث اللغة",
+    "languageNote": "لغة الواجهة تؤثر فقط على القوائم والأزرار. نص القرآن والترجمات لا تتأثر."
   },
   "tos": {
     "title": "شروط الخدمة",

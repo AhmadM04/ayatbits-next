@@ -133,10 +133,33 @@ export default function VerseSearch() {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
+  // Focus input when modal opens
   useEffect(() => {
     if (isOpen && inputRef.current) {
       inputRef.current.focus();
     }
+  }, [isOpen]);
+
+  // Global keyboard shortcut: Press "F" to open search
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Only trigger if:
+      // - "F" key is pressed
+      // - Not already in an input/textarea
+      // - Modal is not already open
+      if (
+        e.key === 'f' &&
+        !isOpen &&
+        !(e.target instanceof HTMLInputElement) &&
+        !(e.target instanceof HTMLTextAreaElement)
+      ) {
+        e.preventDefault();
+        setIsOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
   }, [isOpen]);
 
   const parseQuery = (input: string): { surah: number; ayah: number } | null => {
@@ -238,7 +261,7 @@ export default function VerseSearch() {
       >
         <Search className="w-4 h-4 text-gray-400" />
         <span className="text-sm text-gray-400 flex-1 text-left sm:flex-initial">{t('common.search')}</span>
-        <span className="text-xs text-gray-600 hidden sm:inline">⌘K</span>
+        <span className="text-xs text-gray-600 hidden sm:inline">F</span>
       </button>
 
       {/* Search Button - Mobile style matching other items */}
@@ -250,7 +273,7 @@ export default function VerseSearch() {
           <Search className="w-5 h-5 text-emerald-400" />
         </div>
         <span className="text-sm text-white font-medium flex-1">{t('common.search')}</span>
-        <span className="text-xs text-gray-500 px-2 py-1 bg-white/5 rounded">⌘K</span>
+        <span className="text-xs text-gray-500 px-2 py-1 bg-white/5 rounded">F</span>
       </button>
 
       {/* Search Modal - rendered at root level */}
@@ -263,8 +286,7 @@ export default function VerseSearch() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onPointerDown={(e) => {
-                e.stopPropagation();
+              onClick={() => {
                 setIsOpen(false);
                 setQuery('');
                 setError('');
@@ -279,6 +301,7 @@ export default function VerseSearch() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.15, ease: 'easeOut' }}
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
               className="fixed left-4 right-4 top-20 sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md z-[101]"
             >
               <div className="bg-[#111] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">

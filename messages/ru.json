@@ -527,7 +527,12 @@
     "emailNotificationsDesc": "Получать обновления и напоминания по email",
     "inAppNotifications": "Уведомления в приложении",
     "inAppNotificationsDesc": "Получать уведомления при использовании приложения",
-    "comingSoon": "Скоро"
+    "comingSoon": "Скоро",
+    "language": "Язык интерфейса",
+    "selectInterfaceLanguage": "Выберите предпочитаемый язык интерфейса",
+    "languageUpdated": "Язык успешно обновлён",
+    "failedToUpdateLanguage": "Не удалось обновить язык",
+    "languageNote": "Язык интерфейса влияет только на меню и кнопки. Текст Корана и переводы не затрагиваются."
   },
   "tos": {
     "title": "Условия использования",

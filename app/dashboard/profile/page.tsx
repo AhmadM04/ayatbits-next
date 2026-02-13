@@ -110,6 +110,7 @@ export default async function ProfilePage() {
           trialDaysLeft={trialDaysLeft}
           initialTranslation={user.selectedTranslation || 'en.sahih'}
           initialAudioEnabled={user.enableWordByWordAudio || false}
+          initialLanguage={user.preferredLanguage || 'en'}
           onboardingStatus={onboardingStatus}
           userPreferences={userPreferences}
         />

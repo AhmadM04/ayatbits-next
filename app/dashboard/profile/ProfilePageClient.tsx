@@ -9,6 +9,7 @@ import TranslationSelector from './TranslationSelector';
 import AudioSettings from './AudioSettings';
 import BillingSection from './BillingSection';
 import UserPreferences from './UserPreferences';
+import LanguageSelectorProfile from './LanguageSelectorProfile';
 
 // Dynamically import UserProfile to ensure UI components are loaded
 const UserProfile = dynamic(
@@ -43,6 +44,7 @@ interface ProfilePageClientProps {
   trialDaysLeft: number;
   initialTranslation: string;
   initialAudioEnabled: boolean;
+  initialLanguage?: string;
   onboardingStatus: {
     completed: boolean;
     skipped: boolean;
@@ -60,6 +62,7 @@ export default function ProfilePageClient({
   trialDaysLeft,
   initialTranslation,
   initialAudioEnabled,
+  initialLanguage,
   onboardingStatus,
   userPreferences,
 }: ProfilePageClientProps) {
@@ -148,6 +151,7 @@ export default function ProfilePageClient({
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
           </div>
 
+          <LanguageSelectorProfile initialLanguage={initialLanguage as any} />
           <TranslationSelector initialTranslation={initialTranslation} />
           <AudioSettings initialEnabled={initialAudioEnabled} />
         </div>
