@@ -15,7 +15,11 @@ export default async function DashboardPage() {
   const user = await requireDashboardAccess();
   
   // Step 2: PARALLEL FETCHING - Fetch all independent data simultaneously
-  const [completedProgress, juzDocs, allJuzPuzzles, allSurahPuzzles] = await Promise.all([
+  // ============================================================================
+  // PERFORMANCE FIX: Added resume data fetching (replaces /api/user/resume)
+  // This eliminates 2 duplicate API calls (6 seconds saved!)
+  // ============================================================================
+  const [completedProgress, juzDocs, allJuzPuzzles, allSurahPuzzles, lastActivePuzzle] = await Promise.all([
     // Fetch completed progress
     UserProgress.find({ 
       userId: user._id, 
@@ -31,6 +35,15 @@ export default async function DashboardPage() {
     // Fetch all puzzles (will be filtered by completed ones)
     // We fetch all at once to avoid N+1 queries later
     Puzzle.find({}).select('_id surahId').lean() as Promise<any[]>,
+    
+    // Fetch last active puzzle for Resume button
+    // This replaces the /api/user/resume endpoint (eliminates duplicate fetches)
+    user.lastPuzzleId 
+      ? Puzzle.findById(user.lastPuzzleId)
+          .populate('juzId')
+          .populate('surahId')
+          .lean() as Promise<any>
+      : Promise.resolve(null),
   ]);
   
   // Process completed puzzle IDs
@@ -123,6 +136,16 @@ export default async function DashboardPage() {
   const translationCode = user.selectedTranslation || 'en.sahih';
   const enableWordByWordAudio = user.enableWordByWordAudio || false;
 
+  // Process resume data (replaces /api/user/resume endpoint)
+  const resumeData = lastActivePuzzle ? {
+    resumeUrl: `/dashboard/juz/${lastActivePuzzle.juzId?.number || 1}/surah/${lastActivePuzzle.surahId?.number || 1}?ayah=${lastActivePuzzle.content?.ayahNumber || 1}`,
+    puzzleId: lastActivePuzzle._id.toString(),
+    juzNumber: lastActivePuzzle.juzId?.number || 1,
+    surahNumber: lastActivePuzzle.surahId?.number || 1,
+    ayahNumber: lastActivePuzzle.content?.ayahNumber || 1,
+    surahName: lastActivePuzzle.surahId?.nameEnglish || 'Al-Fatiha',
+  } : null;
+
   // All data is now serialized as plain JSON (no Mongoose documents)
   return (
     <DashboardContent 
@@ -137,6 +160,7 @@ export default async function DashboardPage() {
       subscriptionEndDate={user.subscriptionEndDate?.toISOString()}
       juzs={juzs}
       stats={stats}
+      resumeData={resumeData}
     />
   );
 }

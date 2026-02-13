@@ -23,6 +23,15 @@ import { resetTutorial } from '@/lib/tutorial-manager';
 import { MushafFAB } from '@/components/mushaf';
 import { useI18n } from '@/lib/i18n';
 
+interface ResumeData {
+  resumeUrl: string;
+  puzzleId: string;
+  juzNumber: number;
+  surahNumber: number;
+  ayahNumber: number;
+  surahName: string;
+}
+
 interface DashboardContentProps {
   userFirstName: string | null | undefined;
   currentStreak: number;
@@ -33,6 +42,7 @@ interface DashboardContentProps {
   trialDaysLeft?: number;
   subscriptionStatus?: string;
   subscriptionEndDate?: string;
+  resumeData?: ResumeData | null;
   juzs: Array<{
     _id: string;
     number: number;
@@ -59,6 +69,7 @@ export default function DashboardContent({
   subscriptionStatus,
   subscriptionEndDate,
   juzs,
+  resumeData,
 }: DashboardContentProps) {
   const [showHelpMenu, setShowHelpMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -509,7 +520,7 @@ export default function DashboardContent({
       {/* Mushaf FAB - Opens Mushaf from the beginning */}
       <MushafFAB />
 
-      <BottomNav />
+      <BottomNav resumeData={resumeData} />
     </div>
 
     {/* Sign Out Confirmation Dialog - Positioned outside main container for proper centering */}

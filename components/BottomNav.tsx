@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Heart, Trophy, Play, Home, User } from 'lucide-react';
@@ -8,54 +7,36 @@ import { motion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n';
 
 interface ResumeData {
-  resumeUrl: string | null;
-  surahName?: string;
-  ayahNumber?: number;
+  resumeUrl: string;
+  surahName: string;
+  ayahNumber: number;
+  juzNumber: number;
+  surahNumber: number;
+  puzzleId: string;
+}
+
+interface BottomNavProps {
+  resumeData?: ResumeData | null;
 }
 
 // Default resume URL if user hasn't started yet
 const DEFAULT_RESUME_URL = '/dashboard/juz/1/surah/1?ayah=1';
 
-export default function BottomNav() {
+// ============================================================================
+// PERFORMANCE FIX: Resume data now comes from server (no API calls!)
+// ============================================================================
+// Before: 2 duplicate /api/user/resume calls (6 seconds)
+// After: Server-side fetch in dashboard page (0 API calls, instant!)
+// ============================================================================
+
+export default function BottomNav({ resumeData }: BottomNavProps = {}) {
   const pathname = usePathname();
   const { t } = useI18n();
-  const [resumeData, setResumeData] = useState<ResumeData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isMounted, setIsMounted] = useState(false);
 
   // Hide BottomNav on puzzle pages
   if (pathname?.startsWith('/puzzle/')) {
     return null;
   }
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const fetchResumeData = async () => {
-    try {
-      const res = await fetch('/api/user/resume');
-      const data = await res.json();
-      setResumeData(data);
-    } catch (error) {
-      console.error('Failed to fetch resume data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isMounted) {
-      fetchResumeData();
-    }
-  }, [isMounted]);
-
-  // Refresh resume data when navigating away from verse pages
-  useEffect(() => {
-    if (pathname === '/dashboard' && isMounted) {
-      fetchResumeData();
-    }
-  }, [pathname, isMounted]);
 
   const navItems = [
     { href: '/dashboard', icon: Home, labelKey: 'common.home' },
@@ -75,7 +56,7 @@ export default function BottomNav() {
             
             if (isResume) {
               const resumeUrl = resumeData?.resumeUrl || DEFAULT_RESUME_URL;
-              const displayName = resumeData?.surahName || (isLoading ? '' : 'Al-Fatiha');
+              const displayName = resumeData?.surahName || 'Al-Fatiha';
               
               return (
                 <Link
@@ -87,11 +68,7 @@ export default function BottomNav() {
                     whileTap={{ scale: 0.95 }}
                     className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-green-600 flex items-center justify-center shadow-lg shadow-green-600/30"
                   >
-                    {isLoading && !isMounted ? (
-                      <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white ml-0.5" />
-                    )}
+                    <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white ml-0.5" />
                   </motion.div>
                   {displayName && (
                     <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[60px] sm:max-w-none">
