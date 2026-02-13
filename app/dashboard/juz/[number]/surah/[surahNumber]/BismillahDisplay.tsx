@@ -27,9 +27,9 @@ export default function BismillahDisplay({
 
   return (
     <>
-      <div className="bg-green-500/5 border border-green-500/20 rounded-xl p-4 text-center">
+      <div className="bg-emerald-50/50 border border-[#059669]/30 rounded-xl p-4 text-center">
         <p
-          className="text-xl sm:text-2xl leading-loose text-green-400"
+          className="text-xl sm:text-2xl leading-loose text-[#059669]"
           dir="rtl"
           style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
         >

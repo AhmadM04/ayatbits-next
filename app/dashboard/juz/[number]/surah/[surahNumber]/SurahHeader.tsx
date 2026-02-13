@@ -37,18 +37,18 @@ export default function SurahHeader({
   const { t } = useI18n();
 
   return (
-    <header className="sticky top-0 z-10 bg-[#0a0a0a] border-b border-white/10">
+    <header className="sticky top-0 z-10 bg-white border-b border-[#E5E7EB]">
       <div className="max-w-3xl mx-auto px-3 sm:px-4">
         <div className="flex items-center justify-between h-14">
           <Link
             href={`/dashboard/juz/${juzNumber}`}
-            className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors"
+            className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-400" />
+            <ArrowLeft className="w-5 h-5 text-[#8E7F71]" />
           </Link>
           <div className="flex-1 min-w-0 mx-3">
-            <h1 className="text-base font-semibold truncate">{surahName}</h1>
-            <p className="text-xs text-gray-500 truncate">
+            <h1 className="text-base font-semibold truncate text-[#4A3728]">{surahName}</h1>
+            <p className="text-xs text-[#8E7F71] truncate">
               {t('juz.juzProgressHeader', { 
                 number: juzNumberValue, 
                 completed: completedAyahs, 
@@ -70,10 +70,10 @@ export default function SurahHeader({
             {mushafPageNumber && (
               <Link
                 href={`/dashboard/mushaf/page/${mushafPageNumber}`}
-                className="p-2 hover:bg-white/5 rounded-lg transition-colors flex-shrink-0"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
                 title="View in Mushaf"
               >
-                <BookOpen className="w-5 h-5 text-gray-400" />
+                <BookOpen className="w-5 h-5 text-[#8E7F71]" />
               </Link>
             )}
           </div>

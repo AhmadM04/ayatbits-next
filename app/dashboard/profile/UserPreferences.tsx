@@ -68,10 +68,10 @@ export default function UserPreferences({
   return (
     <div className="space-y-6">
       {/* Theme Selection */}
-      <div className="bg-[#111] border border-white/10 rounded-2xl p-6 transition-colors hover:border-white/20">
+      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 transition-colors hover:border-gray-300 shadow-sm">
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-white mb-1">{t('preferences.appearance')}</h3>
-          <p className="text-sm text-gray-400">{t('preferences.appearanceDescription')}</p>
+          <h3 className="text-lg font-semibold text-[#4A3728] mb-1">{t('preferences.appearance')}</h3>
+          <p className="text-sm text-[#8E7F71]">{t('preferences.appearanceDescription')}</p>
         </div>
         
         <div className="grid grid-cols-3 gap-3">
@@ -87,18 +87,18 @@ export default function UserPreferences({
                 className={`
                   relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all
                   ${isSelected 
-                    ? 'border-green-500 bg-green-500/10' 
-                    : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+                    ? 'border-[#059669] bg-emerald-50/50' 
+                    : 'border-[#E5E7EB] bg-gray-50 hover:border-gray-300 hover:bg-gray-100'
                   }
                   ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                 `}
               >
-                <Icon className={`w-6 h-6 ${isSelected ? 'text-green-400' : 'text-gray-400'}`} />
-                <span className={`text-sm font-medium ${isSelected ? 'text-white' : 'text-gray-400'}`}>
+                <Icon className={`w-6 h-6 ${isSelected ? 'text-[#059669]' : 'text-[#8E7F71]'}`} />
+                <span className={`text-sm font-medium ${isSelected ? 'text-[#4A3728]' : 'text-[#8E7F71]'}`}>
                   {option.label}
                 </span>
                 {isSelected && (
-                  <div className="absolute top-2 right-2 w-2 h-2 bg-green-500 rounded-full" />
+                  <div className="absolute top-2 right-2 w-2 h-2 bg-[#059669] rounded-full" />
                 )}
               </button>
             );
@@ -107,22 +107,22 @@ export default function UserPreferences({
       </div>
 
       {/* Notification Settings */}
-      <div className="bg-[#111] border border-white/10 rounded-2xl p-6 transition-colors hover:border-white/20">
+      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 transition-colors hover:border-gray-300 shadow-sm">
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-white mb-1">{t('preferences.notifications')}</h3>
-          <p className="text-sm text-gray-400">{t('preferences.notificationsDescription')}</p>
+          <h3 className="text-lg font-semibold text-[#4A3728] mb-1">{t('preferences.notifications')}</h3>
+          <p className="text-sm text-[#8E7F71]">{t('preferences.notificationsDescription')}</p>
         </div>
         
         <div className="space-y-4">
           {/* Email Notifications */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-[#E5E7EB] hover:border-gray-300 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-500/20 rounded-lg border border-green-500/30">
-                <Mail className="w-5 h-5 text-green-400" />
+              <div className="p-2 bg-emerald-50/50 rounded-lg border border-[#059669]/30">
+                <Mail className="w-5 h-5 text-[#059669]" />
               </div>
               <div>
-                <p className="font-medium text-white">{t('preferences.emailNotifications')}</p>
-                <p className="text-xs text-gray-400">{t('preferences.emailNotificationsDesc')}</p>
+                <p className="font-medium text-[#4A3728]">{t('preferences.emailNotifications')}</p>
+                <p className="text-xs text-[#8E7F71]">{t('preferences.emailNotificationsDesc')}</p>
               </div>
             </div>
             
@@ -131,7 +131,7 @@ export default function UserPreferences({
               disabled={isUpdating}
               className={`
                 relative w-14 h-8 rounded-full transition-colors
-                ${emailNotifications ? 'bg-green-600' : 'bg-white/10'}
+                ${emailNotifications ? 'bg-[#059669]' : 'bg-gray-200'}
                 ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >
@@ -145,23 +145,23 @@ export default function UserPreferences({
           </div>
 
           {/* In-App Notifications */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-[#E5E7EB] hover:border-gray-300 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-500/20 rounded-lg border border-blue-500/30">
+              <div className="p-2 bg-blue-50/50 rounded-lg border border-blue-200">
                 {inAppNotifications ? (
-                  <Bell className="w-5 h-5 text-blue-400" />
+                  <Bell className="w-5 h-5 text-blue-600" />
                 ) : (
-                  <BellOff className="w-5 h-5 text-blue-400" />
+                  <BellOff className="w-5 h-5 text-blue-600" />
                 )}
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <p className="font-medium text-white">{t('preferences.inAppNotifications')}</p>
-                  <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-md">
+                  <p className="font-medium text-[#4A3728]">{t('preferences.inAppNotifications')}</p>
+                  <span className="text-xs px-2 py-0.5 bg-blue-50/50 text-blue-600 border border-blue-200 rounded-md">
                     {t('preferences.comingSoon')}
                   </span>
                 </div>
-                <p className="text-xs text-gray-400">{t('preferences.inAppNotificationsDesc')}</p>
+                <p className="text-xs text-[#8E7F71]">{t('preferences.inAppNotificationsDesc')}</p>
               </div>
             </div>
             
@@ -170,7 +170,7 @@ export default function UserPreferences({
               disabled={isUpdating}
               className={`
                 relative w-14 h-8 rounded-full transition-colors
-                ${inAppNotifications ? 'bg-green-600' : 'bg-white/10'}
+                ${inAppNotifications ? 'bg-[#059669]' : 'bg-gray-200'}
                 ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >

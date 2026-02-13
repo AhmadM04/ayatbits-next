@@ -17,9 +17,9 @@ const UserProfile = dynamic(
   { 
     ssr: false,
     loading: () => (
-      <div className="bg-[#111] rounded-2xl border border-white/10 p-8 flex items-center justify-center">
-        <div className="flex items-center gap-3 text-gray-400">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-green-500 border-t-transparent" />
+      <div className="bg-white rounded-2xl border border-[#E5E7EB] p-8 flex items-center justify-center shadow-sm">
+        <div className="flex items-center gap-3 text-[#8E7F71]">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#059669] border-t-transparent" />
           <span>Loading...</span>
         </div>
       </div>
@@ -96,11 +96,11 @@ export default function ProfilePageClient({
         {showOnboardingBanner && (
           <Link
             href="/onboarding"
-            className="block bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/30 rounded-2xl p-6 hover:border-green-500/50 transition-all"
+            className="block bg-gradient-to-r from-emerald-50/50 to-green-50/50 border border-[#059669]/30 rounded-2xl p-6 hover:border-[#059669]/50 transition-all shadow-sm"
           >
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-green-500/20 rounded-xl border border-green-500/30 flex-shrink-0">
-                <AlertCircle className="w-6 h-6 text-green-400" />
+              <div className="p-3 bg-emerald-50/50 rounded-xl border border-[#059669]/30 flex-shrink-0">
+                <AlertCircle className="w-6 h-6 text-[#059669]" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-[#4A3728] mb-1">

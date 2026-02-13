@@ -31,12 +31,12 @@ export default function VerseNavButtons({
       <div className="flex items-center justify-center mb-4">
         <button
           id="search-ayah-button"
-          className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all"
+          className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-[#E5E7EB] rounded-lg transition-all"
         >
-          <span className="text-sm font-medium text-green-400">
+          <span className="text-sm font-medium text-[#059669]">
             {t('wordPuzzle.ayahOf', { current: selectedAyah, total: totalAyahs })}
           </span>
-          <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-4 h-4 text-[#8E7F71]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
           </svg>
         </button>
@@ -45,7 +45,7 @@ export default function VerseNavButtons({
       {/* Start Puzzle Button */}
       <Link
         href={`/puzzle/${puzzleId}`}
-        className="group flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 rounded-2xl font-bold text-lg shadow-lg shadow-green-500/20 hover:shadow-green-500/30 transition-all active:scale-[0.98]"
+        className="group flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-r from-[#059669] to-emerald-500 hover:from-emerald-600 hover:to-emerald-400 rounded-2xl font-bold text-lg text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all active:scale-[0.98]"
       >
         <Play className="w-6 h-6 fill-current" />
         <span>{t('wordPuzzle.startPuzzle')}</span>
@@ -56,18 +56,18 @@ export default function VerseNavButtons({
         {previousAyah && (
           <Link
             href={`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${previousAyah}`}
-            className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+            className="text-sm text-[#8E7F71] hover:text-[#4A3728] transition-colors"
           >
             ← {t('wordPuzzle.previous')}
           </Link>
         )}
         {previousAyah && nextAyah && (
-          <span className="text-gray-700">•</span>
+          <span className="text-[#E5E7EB]">•</span>
         )}
         {nextAyah && (
           <Link
             href={`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${nextAyah}`}
-            className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+            className="text-sm text-[#8E7F71] hover:text-[#4A3728] transition-colors"
           >
             {t('wordPuzzle.next')} →
           </Link>

@@ -179,7 +179,7 @@ export default async function ProfilePage() {
       steps={profileTutorialSteps}
       delay={800}
     >
-      <div className="min-h-screen bg-[#0a0a0a] text-white">
+      <div className="min-h-screen bg-[#F8F9FA]">
         <ProfilePageClient
           userData={userData}
           stats={JSON.parse(JSON.stringify(stats))}

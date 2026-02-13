@@ -117,7 +117,7 @@ export default async function SurahVersePage({
 
   return (
     <VersePageClient translationCode={selectedTranslation}>
-      <div className="min-h-screen bg-[#0a0a0a] text-white pb-6">
+      <div className="min-h-screen bg-[#F8F9FA] text-[#4A3728] pb-6">
         {/* Header - Solid background */}
         <SurahHeader
           juzNumber={juzNumber}
@@ -147,9 +147,9 @@ export default async function SurahVersePage({
         <main className="max-w-3xl mx-auto px-3 sm:px-4 py-4">
           {/* Progress Bar */}
           <div className="mb-4">
-            <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+            <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full transition-all duration-500"
+                className="h-full bg-gradient-to-r from-[#059669] to-emerald-500 rounded-full transition-all duration-500"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
@@ -218,7 +218,7 @@ export default async function SurahVersePage({
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-500">No puzzles found for this selection.</p>
+              <p className="text-[#8E7F71]">No puzzles found for this selection.</p>
             </div>
           )}
         </main>
