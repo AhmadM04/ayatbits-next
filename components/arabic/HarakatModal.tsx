@@ -87,13 +87,17 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
 
             {/* Header with large harakat display */}
             <div 
-              className="pt-8 pb-6 px-6 text-center border-b border-white/5"
+              className="pt-12 pb-6 px-6 text-center border-b border-white/5"
               style={{ background: `linear-gradient(135deg, ${definition.color}10, transparent)` }}
             >
               {/* Large harakat character */}
               <div 
                 className="text-7xl font-arabic mb-6"
-                style={{ color: definition.color }}
+                style={{ 
+                  color: definition.color,
+                  lineHeight: '1.4',
+                  paddingBottom: '0.5rem'
+                }}
                 dir="rtl"
               >
                 {definition.example}
