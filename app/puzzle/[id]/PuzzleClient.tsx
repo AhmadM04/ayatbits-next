@@ -96,10 +96,9 @@ export default function PuzzleClient({
   const hasHandledCompletion = useRef(false);
   const backUrl = versePageUrl || '/dashboard';
   
-  // PWA FIX: Use the reusable hook to prevent back navigation
-  const isIntentionalExit = usePreventBack({
-    onBackAttempt: () => setShowExitModal(true),
-  });
+  // PWA FIX: Prevent accidental back navigation (swipe-to-back on mobile)
+  // The hook will re-arm the trap every time user tries to go back
+  usePreventBack(true, () => setShowExitModal(true));
 
   // Reset completion handler when puzzle changes
   useEffect(() => {
@@ -227,6 +226,7 @@ export default function PuzzleClient({
       return;
     }
     
+    // Mark as handled to prevent double-completion
     if (hasHandledCompletion.current) {
       return;
     }
@@ -283,20 +283,21 @@ export default function PuzzleClient({
     // Wait for success animation and word audio to complete before navigating
     // This allows the user to see the success animation and hear any playing word audio
     setTimeout(() => {
-      isIntentionalExit.current = true;
-      router.replace(targetUrl);
+      // Use push() to escape the history trap and navigate to next page
+      router.push(targetUrl);
     }, 1800); // 1.8 seconds delay to allow word audio to finish
-  }, [puzzle, nextPuzzleId, nextPuzzleAyahNumber, isLastAyahInSurah, router, showToast]);
+  }, [puzzle, nextPuzzleId, nextPuzzleAyahNumber, isLastAyahInSurah, router, showToast, t]);
 
   const handleMistakeLimitExceeded = useCallback(() => {
-    isIntentionalExit.current = true;
-    router.replace(backUrl);
+    // CRITICAL: Use push() NOT back() to escape the history trap
+    router.push(backUrl);
   }, [backUrl, router]);
 
   const handleExitConfirm = () => {
-    isIntentionalExit.current = true;
     setShowExitModal(false);
-    router.replace(backUrl);
+    // CRITICAL: Use push() NOT back() to escape the history trap
+    // This ensures we actually leave the page instead of just popping the dummy state
+    router.push(backUrl);
   };
 
   return (

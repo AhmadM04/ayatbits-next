@@ -1,83 +1,56 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-
-interface UsePreventBackOptions {
-  /**
-   * Callback to show the exit confirmation modal
-   */
-  onBackAttempt: () => void;
-  
-  /**
-   * Optional: State key to identify the guard state in history
-   * @default 'guardState'
-   */
-  stateKey?: string;
-}
+import { useEffect, useCallback } from 'react';
 
 /**
  * Hook to prevent back navigation (swipe-to-back on mobile, browser back button)
  * and show a confirmation modal instead.
  * 
+ * IMPORTANT: When user confirms exit, use router.push() NOT router.back()
+ * to escape the history trap.
+ * 
  * @example
  * ```tsx
  * const [showExitModal, setShowExitModal] = useState(false);
- * const isIntentionalExit = usePreventBack({
- *   onBackAttempt: () => setShowExitModal(true)
- * });
+ * 
+ * usePreventBack(true, () => setShowExitModal(true));
  * 
  * const handleConfirmExit = () => {
- *   isIntentionalExit.current = true;
- *   router.push('/dashboard');
+ *   setShowExitModal(false);
+ *   router.push('/dashboard'); // ← Use push(), NOT back()
  * };
  * ```
  */
-export function usePreventBack({ 
-  onBackAttempt, 
-  stateKey = 'guardState' 
-}: UsePreventBackOptions) {
-  // Track if exit is intentional (e.g., user confirmed or navigated to next puzzle)
-  const isIntentionalExit = useRef(false);
+export function usePreventBack(
+  shouldPrevent: boolean,
+  onPrevent: () => void
+) {
+  const armTrap = useCallback(() => {
+    // Push a dummy state to create a "history entry" we can intercept
+    window.history.pushState({ trap: true }, '', window.location.href);
+  }, []);
 
   useEffect(() => {
-    // STEP 1: Push a "guard" state onto history stack
-    // This creates a dummy entry that we can intercept
-    window.history.pushState({ [stateKey]: true }, '', window.location.href);
-    
-    const handlePopState = (event: PopStateEvent) => {
-      // Don't intercept if user has confirmed they want to leave
-      if (isIntentionalExit.current) {
-        return;
-      }
+    if (!shouldPrevent) return;
+
+    // STEP 1: Arm the trap on mount
+    armTrap();
+
+    // STEP 2: Intercept back navigation (swipe or button)
+    const handlePopState = (e: PopStateEvent) => {
+      // User tried to go back - immediately re-arm the trap
+      // This keeps them on the page
+      armTrap();
       
-      // Check if this is our guard state being popped
-      if (event.state?.[stateKey]) {
-        // STEP 2: Prevent navigation by preventing default
-        event.preventDefault();
-        
-        // STEP 3: Re-arm the trap by pushing the state again
-        window.history.pushState({ [stateKey]: true }, '', window.location.href);
-        
-        // STEP 4: Show the exit confirmation modal
-        onBackAttempt();
-      }
+      // Show the "Are you sure?" modal
+      onPrevent();
     };
 
-    // Listen for popstate events (triggered by back button / swipe gestures)
     window.addEventListener('popstate', handlePopState);
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
-      
-      // Clean up: Remove the guard state when component unmounts
-      // Only do this if the exit wasn't intentional
-      if (!isIntentionalExit.current && window.history.state?.[stateKey]) {
-        window.history.back();
-      }
     };
-  }, [onBackAttempt, stateKey]);
-
-  // Return the ref so caller can mark intentional exits
-  return isIntentionalExit;
+  }, [shouldPrevent, onPrevent, armTrap]);
 }
 
