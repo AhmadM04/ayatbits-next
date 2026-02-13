@@ -17,8 +17,8 @@ const UserProfile = dynamic(
   { 
     ssr: false,
     loading: () => (
-      <div className="bg-white rounded-2xl border border-[#E5E7EB] p-8 flex items-center justify-center shadow-sm">
-        <div className="flex items-center gap-3 text-[#8E7F71]">
+      <div className="bg-white dark:bg-[#111] rounded-2xl border border-[#E5E7EB] dark:border-white/10 p-8 flex items-center justify-center shadow-sm">
+        <div className="flex items-center gap-3 text-[#8E7F71] dark:text-gray-400">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#059669] border-t-transparent" />
           <span>Loading...</span>
         </div>
@@ -74,18 +74,18 @@ export default function ProfilePageClient({
   return (
     <>
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
+      <header className="sticky top-0 z-10 bg-white dark:bg-[#0a0a0a] border-b border-gray-200 dark:border-white/10">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center h-14 gap-3">
             <Link
               href="/dashboard"
-              className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 -ml-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-[#8E7F71]" />
+              <ArrowLeft className="w-5 h-5 text-[#8E7F71] dark:text-gray-400" />
             </Link>
             <div>
-              <h1 className="text-lg font-semibold text-[#4A3728]">{t('profile.myProfile')}</h1>
-              <p className="text-xs text-[#8E7F71]">{t('tutorial.manageAccount')}</p>
+              <h1 className="text-lg font-semibold text-[#4A3728] dark:text-white">{t('profile.myProfile')}</h1>
+              <p className="text-xs text-[#8E7F71] dark:text-gray-400">{t('tutorial.manageAccount')}</p>
             </div>
           </div>
         </div>
@@ -103,10 +103,10 @@ export default function ProfilePageClient({
                 <AlertCircle className="w-6 h-6 text-[#059669]" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-[#4A3728] mb-1">
+                <h3 className="text-lg font-semibold text-[#4A3728] dark:text-white mb-1">
                   {t('onboarding.completeProfile')}
                 </h3>
-                <p className="text-sm text-[#8E7F71] mb-3">
+                <p className="text-sm text-[#8E7F71] dark:text-gray-400 mb-3">
                   {t('onboarding.completeProfileDescription')}
                 </p>
                 <div className="inline-flex items-center gap-2 text-sm font-medium text-[#059669]">
@@ -131,9 +131,9 @@ export default function ProfilePageClient({
         {/* User Preferences Section */}
         <div className="space-y-6">
           <div className="flex items-center gap-2 px-1">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-            <span className="text-xs font-medium text-[#8E7F71] uppercase tracking-wider">{t('preferences.title')}</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
+            <span className="text-xs font-medium text-[#8E7F71] dark:text-gray-400 uppercase tracking-wider">{t('preferences.title')}</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
           </div>
 
           <UserPreferences 
@@ -146,9 +146,9 @@ export default function ProfilePageClient({
         {/* Settings Section */}
         <div className="space-y-6">
           <div className="flex items-center gap-2 px-1">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-            <span className="text-xs font-medium text-[#8E7F71] uppercase tracking-wider">{t('tutorial.settings')}</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
+            <span className="text-xs font-medium text-[#8E7F71] dark:text-gray-400 uppercase tracking-wider">{t('tutorial.settings')}</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
           </div>
 
           <LanguageSelectorProfile initialLanguage={initialLanguage as any} />
@@ -159,9 +159,9 @@ export default function ProfilePageClient({
         {/* Billing Section */}
         <div className="space-y-6">
           <div className="flex items-center gap-2 px-1">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-            <span className="text-xs font-medium text-[#8E7F71] uppercase tracking-wider">{t('tutorial.billing')}</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
+            <span className="text-xs font-medium text-[#8E7F71] dark:text-gray-400 uppercase tracking-wider">{t('tutorial.billing')}</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
           </div>
 
           <BillingSection 
@@ -173,12 +173,12 @@ export default function ProfilePageClient({
         {/* Account Management Section */}
         <div className="space-y-6">
           <div className="flex items-center gap-2 px-1">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-            <span className="text-xs font-medium text-[#8E7F71] uppercase tracking-wider">{t('tutorial.account')}</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
+            <span className="text-xs font-medium text-[#8E7F71] dark:text-gray-400 uppercase tracking-wider">{t('tutorial.account')}</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent"></div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" data-tutorial="account-section">
+          <div className="bg-white dark:bg-[#111] rounded-2xl border border-gray-100 dark:border-white/10 shadow-sm overflow-hidden" data-tutorial="account-section">
             <UserProfile 
               appearance={{
                 elements: {

@@ -41,8 +41,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: "#F8F9FA",
-  colorScheme: "light",
+  themeColor: "#0a0a0a",
+  colorScheme: "dark",
 };
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.ayatbits.com";
@@ -132,41 +132,41 @@ export const metadata: Metadata = {
 };
 
 const clerkAppearance: any = {
-  baseTheme: "light",
+  baseTheme: "dark",
   variables: {
-    colorPrimary: "#059669",
-    colorBackground: "#F8F9FA",
-    colorInputBackground: "#ffffff",
-    colorText: "#4A3728",
-    colorTextSecondary: "#8E7F71",
-    colorInputText: "#4A3728",
+    colorPrimary: "#10b981",
+    colorBackground: "#0a0a0a",
+    colorInputBackground: "#1a1a1a",
+    colorText: "#ffffff",
+    colorTextSecondary: "#9ca3af",
+    colorInputText: "#ffffff",
     borderRadius: "0.75rem",
     fontFamily: "var(--font-geist-sans)",
   },
   elements: {
     rootBox: "shadow-none",
-    card: "bg-white border border-gray-200 shadow-sm",
-    headerTitle: "text-[#4A3728]",
-    headerSubtitle: "text-[#8E7F71]",
-    socialButtonsBlockButton: "bg-gray-100 hover:bg-gray-200 border border-gray-200 text-[#4A3728]",
-    socialButtonsBlockButtonText: "text-[#4A3728]",
-    alternativeMethodsBlockButton: "bg-gray-100 hover:bg-gray-200 border border-gray-200 text-[#4A3728]",
-    alternativeMethodsBlockButtonText: "text-[#4A3728] font-medium",
-    alternativeMethodsBlockButtonArrow: "text-[#4A3728]",
-    formButtonPrimary: "bg-[#059669] hover:bg-emerald-700 text-white",
-    formFieldInput: "bg-white border-gray-200 text-[#4A3728]",
-    formFieldLabel: "text-[#8E7F71]",
-    footerActionLink: "text-[#059669] hover:text-emerald-700",
-    identityPreviewText: "text-[#4A3728]",
-    identityPreviewEditButton: "text-[#059669]",
-    formResendCodeLink: "text-[#059669]",
-    otpCodeFieldInput: "bg-white border-gray-200 text-[#4A3728]",
-    alertText: "text-[#4A3728]",
-    formFieldSuccessText: "text-[#059669]",
-    formFieldErrorText: "text-[#EF4444]",
-    dividerText: "text-[#8E7F71]",
-    dividerLine: "bg-gray-200",
-    formFieldInputShowPasswordButton: "text-[#8E7F71] hover:text-[#4A3728]",
+    card: "bg-[#1a1a1a] border border-white/10 shadow-sm",
+    headerTitle: "text-white",
+    headerSubtitle: "text-gray-400",
+    socialButtonsBlockButton: "bg-white/5 hover:bg-white/10 border border-white/10 text-white",
+    socialButtonsBlockButtonText: "text-white",
+    alternativeMethodsBlockButton: "bg-white/5 hover:bg-white/10 border border-white/10 text-white",
+    alternativeMethodsBlockButtonText: "text-white font-medium",
+    alternativeMethodsBlockButtonArrow: "text-white",
+    formButtonPrimary: "bg-green-600 hover:bg-green-700 text-white",
+    formFieldInput: "bg-white/5 border-white/10 text-white",
+    formFieldLabel: "text-gray-400",
+    footerActionLink: "text-green-500 hover:text-green-400",
+    identityPreviewText: "text-white",
+    identityPreviewEditButton: "text-green-500",
+    formResendCodeLink: "text-green-500",
+    otpCodeFieldInput: "bg-white/5 border-white/10 text-white",
+    alertText: "text-white",
+    formFieldSuccessText: "text-green-500",
+    formFieldErrorText: "text-red-500",
+    dividerText: "text-gray-500",
+    dividerLine: "bg-white/10",
+    formFieldInputShowPasswordButton: "text-gray-400 hover:text-white",
   },
 };
 
@@ -222,7 +222,7 @@ export default function RootLayout({
       afterSignInUrl="/dashboard"
       afterSignUpUrl="/onboarding"
     >
-      <html lang="en" className="light">
+      <html lang="en" className="dark">
         <head>
           {/* Set theme before page renders to prevent flash */}
           <script
@@ -230,8 +230,8 @@ export default function RootLayout({
               __html: `
                 (function() {
                   try {
-                    const theme = localStorage.getItem('theme') || 'light';
-                    let effectiveTheme = 'light';
+                    const theme = localStorage.getItem('theme') || 'dark';
+                    let effectiveTheme = 'dark';
                     if (theme === 'system') {
                       effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
                     } else {
@@ -283,7 +283,7 @@ export default function RootLayout({
           <link rel="preconnect" href="https://everyayah.com" crossOrigin="anonymous" />
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} ${amiriQuran.variable} antialiased bg-[#F8F9FA] text-[#4A3728]`}
+          className={`${geistSans.variable} ${geistMono.variable} ${amiriQuran.variable} antialiased bg-[#0a0a0a] text-white dark:bg-[#0a0a0a] dark:text-white`}
         >
           <ThemeProvider>
             <MotionProvider>

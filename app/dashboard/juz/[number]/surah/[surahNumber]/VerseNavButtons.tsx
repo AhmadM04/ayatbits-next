@@ -31,12 +31,12 @@ export default function VerseNavButtons({
       <div className="flex items-center justify-center mb-4">
         <button
           id="search-ayah-button"
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-[#E5E7EB] rounded-lg transition-all"
+          className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-[#E5E7EB] dark:border-white/10 rounded-lg transition-all"
         >
           <span className="text-sm font-medium text-[#059669]">
             {t('wordPuzzle.ayahOf', { current: selectedAyah, total: totalAyahs })}
           </span>
-          <svg className="w-4 h-4 text-[#8E7F71]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-4 h-4 text-[#8E7F71] dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
           </svg>
         </button>
@@ -56,7 +56,7 @@ export default function VerseNavButtons({
         {previousAyah && (
           <Link
             href={`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${previousAyah}`}
-            className="text-sm text-[#8E7F71] hover:text-[#4A3728] transition-colors"
+            className="text-sm text-[#8E7F71] dark:text-gray-400 hover:text-[#4A3728] dark:hover:text-white transition-colors"
           >
             ← {t('wordPuzzle.previous')}
           </Link>
@@ -67,7 +67,7 @@ export default function VerseNavButtons({
         {nextAyah && (
           <Link
             href={`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${nextAyah}`}
-            className="text-sm text-[#8E7F71] hover:text-[#4A3728] transition-colors"
+            className="text-sm text-[#8E7F71] dark:text-gray-400 hover:text-[#4A3728] dark:hover:text-white transition-colors"
           >
             {t('wordPuzzle.next')} →
           </Link>

@@ -146,17 +146,17 @@ export default function MushafPageClient({
   return (
     <TutorialWrapper sectionId="mushaf_reading" steps={mushafTutorialSteps} delay={1000}>
       {/* SEPIA THEME: Clean parchment background */}
-      <div className="min-h-screen bg-[#F8F9FA] text-[#4A3728]" data-tutorial="mushaf-page">
+      <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0a0a0a] text-[#4A3728] dark:text-white" data-tutorial="mushaf-page">
         {/* Header - SEPIA THEME */}
-        <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+        <header className="sticky top-0 z-10 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5 shadow-sm">
           <div className="max-w-3xl mx-auto px-4">
             <div className="flex items-center justify-between h-14">
               {/* Back Button */}
               <Link
                 href="/dashboard"
-                className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 -ml-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
               >
-                <ArrowLeft className="w-5 h-5 text-[#8E7F71]" />
+                <ArrowLeft className="w-5 h-5 text-[#8E7F71] dark:text-gray-400" />
               </Link>
 
               {/* Page Navigation */}
@@ -171,9 +171,9 @@ export default function MushafPageClient({
               {/* Home Button */}
               <Link
                 href="/dashboard"
-                className="p-2 -mr-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 -mr-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
               >
-                <Home className="w-5 h-5 text-[#8E7F71]" />
+                <Home className="w-5 h-5 text-[#8E7F71] dark:text-gray-400" />
               </Link>
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function MushafPageClient({
           <span className="px-3 py-1 bg-emerald-50 border border-[#059669]/30 rounded-full text-xs text-[#059669] font-medium">
             {t('mushaf.juz')} {currentJuz}
           </span>
-          <span className="px-3 py-1 bg-white border border-gray-200 shadow-sm rounded-full text-xs text-[#8E7F71]">
+          <span className="px-3 py-1 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm rounded-full text-xs text-[#8E7F71] dark:text-gray-400">
             {t('mushaf.page')} {pageNumber}
           </span>
         </div>
@@ -207,7 +207,7 @@ export default function MushafPageClient({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: swipeDirection === 'left' ? -50 : swipeDirection === 'right' ? 50 : 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-white border border-gray-100 rounded-2xl p-4 sm:p-6 overflow-hidden shadow-sm"
+            className="bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 rounded-2xl p-4 sm:p-6 overflow-hidden shadow-sm"
           >
             {/* Arabic Text Container - MADANI MUSHAF STYLE */}
             <div
@@ -234,14 +234,14 @@ export default function MushafPageClient({
 
         {/* Swipe Hint - SEPIA THEME */}
         <div className="mt-6 text-center">
-          <p className="text-xs text-[#8E7F71]">
+          <p className="text-xs text-[#8E7F71] dark:text-gray-500">
             {t('mushaf.swipeInstruction')}
           </p>
         </div>
       </motion.main>
 
       {/* Footer Navigation (Fixed) - SEPIA THEME */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 safe-area-bottom shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 safe-area-bottom shadow-lg">
         <div className="max-w-3xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Previous Page */}
@@ -261,7 +261,7 @@ export default function MushafPageClient({
 
             {/* Page Indicator */}
             <div className="text-center">
-              <span className="text-sm text-[#8E7F71]">
+              <span className="text-sm text-[#8E7F71] dark:text-gray-400">
                 {t('mushaf.page')} {pageNumber} / {totalPages}
               </span>
             </div>

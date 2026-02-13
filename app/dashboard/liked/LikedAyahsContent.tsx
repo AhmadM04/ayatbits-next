@@ -58,12 +58,12 @@ export default function LikedAyahsContent() {
   // Show loading during SSR to avoid hydration mismatch
   if (!isMounted) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA] text-[#4A3728] pb-20">
-        <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-200">
+      <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0a0a0a] text-[#4A3728] dark:text-white pb-20">
+        <header className="sticky top-0 z-10 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5">
           <div className="max-w-2xl mx-auto px-4">
             <div className="flex items-center h-14 gap-3">
-              <div className="w-9 h-9 bg-gray-200 rounded-lg animate-pulse" />
-              <div className="w-32 h-6 bg-gray-200 rounded animate-pulse" />
+              <div className="w-9 h-9 bg-gray-200 dark:bg-white/5 rounded-lg animate-pulse" />
+              <div className="w-32 h-6 bg-gray-200 dark:bg-white/5 rounded animate-pulse" />
             </div>
           </div>
         </header>
@@ -79,20 +79,20 @@ export default function LikedAyahsContent() {
 
   return (
     <TutorialWrapper sectionId="liked_collection" steps={likedTutorialSteps} delay={800}>
-      <div className="min-h-screen bg-[#F8F9FA] text-[#4A3728] pb-20">
+      <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0a0a0a] text-[#4A3728] dark:text-white pb-20">
         {/* Header */}
-        <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-200">
+        <header className="sticky top-0 z-10 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5">
           <div className="max-w-2xl mx-auto px-4">
             <div className="flex items-center h-14 gap-3" data-tutorial="liked-header">
               <Link
                 href="/dashboard"
-                className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 -ml-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
               >
-                <ArrowLeft className="w-5 h-5 text-[#8E7F71]" />
+                <ArrowLeft className="w-5 h-5 text-[#8E7F71] dark:text-gray-400" />
               </Link>
               <div>
-                <h1 className="text-lg font-semibold text-[#4A3728]">{t('liked.title')}</h1>
-                <p className="text-xs text-[#8E7F71]">{t('liked.ayahsSaved', { count: likedAyahs.length })}</p>
+                <h1 className="text-lg font-semibold text-[#4A3728] dark:text-white">{t('liked.title')}</h1>
+                <p className="text-xs text-[#8E7F71] dark:text-gray-400">{t('liked.ayahsSaved', { count: likedAyahs.length })}</p>
               </div>
             </div>
           </div>
@@ -106,8 +106,8 @@ export default function LikedAyahsContent() {
         ) : likedAyahs.length === 0 ? (
           <div className="text-center py-20">
             <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-[#4A3728] mb-2">{t('liked.noLikedYet')}</h2>
-            <p className="text-[#8E7F71] text-sm mb-6">
+            <h2 className="text-xl font-semibold text-[#4A3728] dark:text-white mb-2">{t('liked.noLikedYet')}</h2>
+            <p className="text-[#8E7F71] dark:text-gray-400 text-sm mb-6">
               {t('liked.tapHeartToSave')}
             </p>
             <Link
@@ -125,21 +125,21 @@ export default function LikedAyahsContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white border border-gray-100 shadow-sm rounded-2xl p-4 hover:shadow-md transition-shadow"
+                className="bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 shadow-sm rounded-2xl p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div>
-                    <div className="text-sm font-medium text-[#4A3728]">
+                    <div className="text-sm font-medium text-[#4A3728] dark:text-white">
                       {ayah.surahNameArabic || ayah.surahNameEnglish}
                     </div>
-                    <div className="text-xs text-[#8E7F71]">
+                    <div className="text-xs text-[#8E7F71] dark:text-gray-400">
                       {t('liked.ayahInfo', { ayahNumber: ayah.ayahNumber, juzNumber: ayah.juzNumber })}
                     </div>
                   </div>
                   <div className="flex items-center gap-2" data-tutorial="liked-actions">
                     <Link
                       href={`/dashboard/juz/${ayah.juzNumber}/surah/${ayah.surahNumber}?ayah=${ayah.ayahNumber}`}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-[#8E7F71]"
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors text-[#8E7F71] dark:text-gray-400"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </Link>
@@ -152,7 +152,7 @@ export default function LikedAyahsContent() {
                   </div>
                 </div>
                 <p 
-                  className="text-3xl leading-relaxed text-[#4A3728] text-right font-arabic"
+                  className="text-3xl leading-relaxed text-[#4A3728] dark:text-white text-right font-arabic"
                   dir="rtl"
                   style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
                 >

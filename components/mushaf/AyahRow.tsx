@@ -53,16 +53,16 @@ export default function AyahRow({ verse, onLongPress, isHighlighted = false }: A
   // SEPIA THEME: Determine text color based on completion status
   // Emerald green for completed verses, deep sepia for regular verses
   const textColor = verse.isCompleted 
-    ? 'text-[#059669] font-medium' 
-    : 'text-[#4A3728]';
+    ? 'text-[#059669] dark:text-green-400 font-medium' 
+    : 'text-[#4A3728] dark:text-white';
 
   return (
     <motion.span
       className={`
         relative inline-block group cursor-pointer select-none font-uthmani
         ${textColor}
-        ${isHighlighted ? 'bg-emerald-50 rounded-lg px-1 -mx-1' : ''}
-        ${isHolding ? 'bg-blue-50 rounded-lg px-1 -mx-1' : ''}
+        ${isHighlighted ? 'bg-emerald-50 dark:bg-emerald-500/20 rounded-lg px-1 -mx-1' : ''}
+        ${isHolding ? 'bg-blue-50 dark:bg-blue-500/20 rounded-lg px-1 -mx-1' : ''}
       `}
       style={{ 
         wordBreak: 'keep-all',
@@ -91,7 +91,7 @@ export default function AyahRow({ verse, onLongPress, isHighlighted = false }: A
       {/* SEPIA THEME: Ayah number with emerald color for completed verses */}
       <span className={`
         inline-flex items-center gap-1 mx-1.5 sm:mx-2 whitespace-nowrap align-middle
-        ${verse.isCompleted ? 'text-[#059669]' : 'text-[#8E7F71]'}
+        ${verse.isCompleted ? 'text-[#059669] dark:text-green-400' : 'text-[#8E7F71] dark:text-gray-400'}
       `}>
         <span className="text-[0.85em] inline-block opacity-80">
           ﴿{toArabicNumerals(verse.ayahNumber)}﴾

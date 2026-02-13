@@ -106,7 +106,7 @@ export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }
   };
 
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-sm">
+    <div className="bg-white dark:bg-white/[0.02] border border-[#E5E7EB] dark:border-white/5 rounded-xl p-3 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         {/* Play button */}
         <button
@@ -115,14 +115,14 @@ export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }
           className={`
             flex items-center justify-center w-12 h-12 rounded-full transition-all
             ${isPlaying 
-              ? 'bg-[#059669] text-white shadow-lg shadow-emerald-500/30' 
-              : 'bg-emerald-50/50 text-[#059669] hover:bg-emerald-100/50'
+              ? 'bg-[#059669] dark:bg-green-600 text-white shadow-lg shadow-emerald-500/30' 
+              : 'bg-emerald-50/50 dark:bg-green-500/20 text-[#059669] dark:text-green-400 hover:bg-emerald-100/50 dark:hover:bg-green-500/30'
             }
             ${isLoading ? 'opacity-50' : ''}
           `}
         >
           {isLoading ? (
-            <div className="w-5 h-5 border-2 border-[#059669] border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-[#059669] dark:border-green-400 border-t-transparent rounded-full animate-spin" />
           ) : isPlaying ? (
             <Pause className="w-5 h-5 fill-current" />
           ) : (
@@ -133,8 +133,8 @@ export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }
         {/* Label */}
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <Volume2 className="w-4 h-4 text-[#8E7F71]" />
-            <span className="text-sm text-[#8E7F71]">
+            <Volume2 className="w-4 h-4 text-[#8E7F71] dark:text-gray-400" />
+            <span className="text-sm text-[#8E7F71] dark:text-gray-400">
               {isLoading ? t('common.loading') : isPlaying ? t('common.playing') : t('common.listen')}
             </span>
           </div>
@@ -149,8 +149,8 @@ export default function AudioPlayer({ surahNumber, ayahNumber, onPlayingChange }
               className={`
                 px-3 py-1.5 rounded-lg text-sm font-medium transition-all
                 ${playbackRate === speed
-                  ? 'bg-emerald-50/50 text-[#059669] border border-[#059669]/30'
-                  : 'bg-gray-100 text-[#8E7F71] hover:bg-gray-200 border border-transparent'
+                  ? 'bg-emerald-50/50 dark:bg-green-500/20 text-[#059669] dark:text-green-400 border border-[#059669]/30 dark:border-green-500/30'
+                  : 'bg-gray-100 dark:bg-white/5 text-[#8E7F71] dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10 border border-transparent'
                 }
               `}
             >

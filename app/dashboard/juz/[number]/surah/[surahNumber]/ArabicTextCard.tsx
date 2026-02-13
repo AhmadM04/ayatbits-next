@@ -32,19 +32,19 @@ export default function ArabicTextCard({
       {/* Arabic Text Card with icons on top right */}
       <div
         className={`
-          bg-white border-2 rounded-xl p-4 sm:p-5 shadow-sm
+          bg-white dark:bg-[#0f0f0f] border-2 rounded-xl p-4 sm:p-5 shadow-sm
           transition-all duration-300
           ${isPlayingRecitation
-            ? 'border-[#059669]/50 shadow-[0_0_30px_rgba(5,150,105,0.3)] ring-2 ring-[#059669]/20'
-            : 'border-[#E5E7EB]'
+            ? 'border-[#059669]/50 dark:border-green-500/50 shadow-[0_0_30px_rgba(5,150,105,0.3)] ring-2 ring-[#059669]/20 dark:ring-green-500/20'
+            : 'border-[#E5E7EB] dark:border-white/10'
           }
         `}
       >
         {/* Top icons row - explicitly right aligned */}
         <div className="flex items-center gap-2 mb-3" style={{ justifyContent: 'flex-end' }}>
           {isMemorized && (
-            <div className="w-7 h-7 rounded-full bg-emerald-50/50 flex items-center justify-center" title="Memorized">
-              <CheckCircle className="w-4 h-4 text-[#059669]" />
+            <div className="w-7 h-7 rounded-full bg-emerald-50/50 dark:bg-green-500/20 flex items-center justify-center" title="Memorized">
+              <CheckCircle className="w-4 h-4 text-[#059669] dark:text-green-400" />
             </div>
           )}
           <LikeButton

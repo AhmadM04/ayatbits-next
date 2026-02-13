@@ -79,14 +79,14 @@ export default function TranslationDisplay({
   const translationName = translationNames[selectedTranslation] || 'Translation';
 
   return (
-    <div className="bg-white rounded-xl p-4 border border-[#E5E7EB] shadow-sm">
+    <div className="bg-white dark:bg-white/[0.02] rounded-xl p-4 border border-[#E5E7EB] dark:border-white/5 shadow-sm">
       <div className="flex items-center gap-2 mb-3">
-        <Globe className="w-3.5 h-3.5 text-[#8E7F71]" />
-        <span className="text-xs font-medium text-[#8E7F71] uppercase tracking-wide">
+        <Globe className="w-3.5 h-3.5 text-[#8E7F71] dark:text-gray-500" />
+        <span className="text-xs font-medium text-[#8E7F71] dark:text-gray-500 uppercase tracking-wide">
           {translationName}
         </span>
       </div>
-      <p className="text-[#4A3728] text-sm leading-relaxed">
+      <p className="text-[#4A3728] dark:text-gray-300 text-sm leading-relaxed">
         {isLoading ? 'Loading translation...' : translation || 'Translation not available'}
       </p>
     </div>

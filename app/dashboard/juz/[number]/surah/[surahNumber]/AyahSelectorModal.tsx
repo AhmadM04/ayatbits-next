@@ -88,15 +88,15 @@ export default function AyahSelectorModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white border border-[#E5E7EB] rounded-2xl shadow-2xl w-full max-w-md mx-4 flex flex-col">
+      <div className="relative bg-white dark:bg-[#111] border border-[#E5E7EB] dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-md mx-4 flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-[#E5E7EB]">
-          <h2 className="text-xl font-semibold text-[#4A3728]">Select Ayah</h2>
+        <div className="flex items-center justify-between p-6 border-b border-[#E5E7EB] dark:border-white/10">
+          <h2 className="text-xl font-semibold text-[#4A3728] dark:text-white">Select Ayah</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-[#8E7F71]" />
+            <X className="w-5 h-5 text-[#8E7F71] dark:text-gray-400" />
           </button>
         </div>
 
@@ -104,7 +104,7 @@ export default function AyahSelectorModal({
         <div className="p-6">
           <div className="space-y-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#8E7F71]" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#8E7F71] dark:text-gray-400" />
               <input
                 ref={inputRef}
                 type="number"
@@ -114,7 +114,7 @@ export default function AyahSelectorModal({
                 onKeyPress={handleKeyPress}
                 min={minAyah}
                 max={maxAyah}
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#059669] focus:border-transparent text-lg text-[#4A3728] placeholder:text-[#8E7F71]"
+                className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-white/5 border border-[#E5E7EB] dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#059669] dark:focus:ring-green-500 focus:border-transparent text-lg text-[#4A3728] dark:text-white placeholder:text-[#8E7F71] dark:placeholder:text-gray-500"
               />
             </div>
 

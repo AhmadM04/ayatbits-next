@@ -257,23 +257,23 @@ export default function VerseSearch() {
       {/* Search Button - Desktop style */}
       <button
         onClick={() => setIsOpen(true)}
-        className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 border border-[#E5E7EB] rounded-xl transition-colors w-full sm:w-auto"
+        className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-[#E5E7EB] dark:border-white/10 rounded-xl transition-colors w-full sm:w-auto"
       >
-        <Search className="w-4 h-4 text-[#8E7F71]" />
-        <span className="text-sm text-[#8E7F71] flex-1 text-left sm:flex-initial">{t('common.search')}</span>
-        <span className="text-xs text-[#8E7F71] hidden sm:inline">F</span>
+        <Search className="w-4 h-4 text-[#8E7F71] dark:text-gray-400" />
+        <span className="text-sm text-[#8E7F71] dark:text-gray-400 flex-1 text-left sm:flex-initial">{t('common.search')}</span>
+        <span className="text-xs text-[#8E7F71] dark:text-gray-500 hidden sm:inline">F</span>
       </button>
 
       {/* Search Button - Mobile style matching other items */}
       <button
         onClick={() => setIsOpen(true)}
-        className="md:hidden w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-xl transition-colors text-left group"
+        className="md:hidden w-full flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition-colors text-left group"
       >
         <div className="w-10 h-10 rounded-full bg-emerald-50/50 flex items-center justify-center group-hover:bg-emerald-100/50 transition-colors">
           <Search className="w-5 h-5 text-[#059669]" />
         </div>
-        <span className="text-sm text-[#4A3728] font-medium flex-1">{t('common.search')}</span>
-        <span className="text-xs text-[#8E7F71] px-2 py-1 bg-gray-100 rounded">F</span>
+        <span className="text-sm text-[#4A3728] dark:text-white font-medium flex-1">{t('common.search')}</span>
+        <span className="text-xs text-[#8E7F71] dark:text-gray-400 px-2 py-1 bg-gray-100 dark:bg-white/5 rounded">F</span>
       </button>
 
       {/* Search Modal - rendered at root level */}
@@ -304,24 +304,24 @@ export default function VerseSearch() {
               onClick={(e: React.MouseEvent) => e.stopPropagation()}
               className="fixed left-4 right-4 top-20 sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md z-[101]"
             >
-              <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-2xl overflow-hidden">
+              <div className="bg-white dark:bg-[#111] border border-[#E5E7EB] dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden">
                 {/* Header with close button */}
-                <div className="flex items-center justify-between p-3 border-b border-[#E5E7EB]">
-                  <span className="text-sm text-[#8E7F71]">{t('search.searchVerse')}</span>
+                <div className="flex items-center justify-between p-3 border-b border-[#E5E7EB] dark:border-white/10">
+                  <span className="text-sm text-[#8E7F71] dark:text-gray-400">{t('search.searchVerse')}</span>
                   <button
                     onClick={() => {
                       setIsOpen(false);
                       setQuery('');
                       setError('');
                     }}
-                    className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="p-1.5 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                   >
-                    <X className="w-4 h-4 text-[#8E7F71]" />
+                    <X className="w-4 h-4 text-[#8E7F71] dark:text-gray-400" />
                   </button>
                 </div>
                 {/* Search Input */}
-                <div className="flex items-center gap-3 p-4 border-b border-[#E5E7EB]">
-                  <Search className="w-5 h-5 text-[#8E7F71] flex-shrink-0" />
+                <div className="flex items-center gap-3 p-4 border-b border-[#E5E7EB] dark:border-white/10">
+                  <Search className="w-5 h-5 text-[#8E7F71] dark:text-gray-400 flex-shrink-0" />
                   <input
                     ref={inputRef}
                     type="text"

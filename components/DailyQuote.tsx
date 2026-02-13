@@ -248,7 +248,7 @@ export default function DailyQuote({
             </button>
             <Link
               href={`/dashboard/juz/${quote.juzNumber}/surah/${quote.surahNumber}?ayah=${quote.ayahNumber}`}
-              className="p-2 bg-white hover:bg-gray-50 rounded-lg transition-colors text-[#8E7F71] hover:text-[#4A3728]"
+              className="p-2 bg-white dark:bg-white/5 hover:bg-gray-50 dark:hover:bg-white/10 rounded-lg transition-colors text-[#8E7F71] dark:text-gray-400 hover:text-[#4A3728] dark:hover:text-white"
               title={t('dailyQuote.openAyah')}
             >
               <ExternalLink className="w-4 h-4" />
@@ -266,7 +266,7 @@ export default function DailyQuote({
             className="mb-3 sm:mb-4"
           >
             <p 
-              className="text-lg sm:text-2xl md:text-3xl leading-loose text-[#4A3728] text-right break-words"
+              className="text-lg sm:text-2xl md:text-3xl leading-loose text-[#4A3728] dark:text-white text-right break-words"
               dir="rtl"
               style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
             >
@@ -333,11 +333,11 @@ export default function DailyQuote({
             className="mb-3 sm:mb-4"
           >
             {quote.translation ? (
-              <p className="text-[#4A3728] text-xs sm:text-sm md:text-base leading-relaxed">
+              <p className="text-[#4A3728] dark:text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed">
                 "{quote.translation}"
               </p>
             ) : (
-              <p className="text-[#8E7F71] text-xs sm:text-sm italic">
+              <p className="text-[#8E7F71] dark:text-gray-500 text-xs sm:text-sm italic">
                 {t('dailyQuote.translationNotAvailable')}
               </p>
             )}
@@ -347,14 +347,14 @@ export default function DailyQuote({
         {/* Footer */}
         <div className="flex items-center justify-between pt-4 border-t border-gray-200">
           <div>
-            <p className="text-[#4A3728] font-medium text-sm">
+            <p className="text-[#4A3728] dark:text-white font-medium text-sm">
               {quote.surahNameEnglish}
             </p>
-            <p className="text-[#8E7F71] text-xs">
+            <p className="text-[#8E7F71] dark:text-gray-400 text-xs">
               {t('common.ayah')} {quote.ayahNumber} • {t('common.juz')} {quote.juzNumber}
             </p>
           </div>
-          <p className="text-[#8E7F71] text-xs" dir="rtl">
+          <p className="text-[#8E7F71] dark:text-gray-500 text-xs" dir="rtl">
             {quote.surahNameArabic}
           </p>
         </div>

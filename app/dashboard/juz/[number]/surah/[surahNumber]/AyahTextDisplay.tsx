@@ -131,7 +131,7 @@ export default function AyahTextDisplay({
   return (
     <>
       <p
-        className="text-xl sm:text-2xl md:text-3xl leading-[2] text-[#4A3728] text-right"
+        className="text-xl sm:text-2xl md:text-3xl leading-[2] text-[#4A3728] dark:text-white text-right"
         dir="rtl"
         style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
       >

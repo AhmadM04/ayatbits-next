@@ -117,7 +117,7 @@ export default async function SurahVersePage({
 
   return (
     <VersePageClient translationCode={selectedTranslation}>
-      <div className="min-h-screen bg-[#F8F9FA] text-[#4A3728] pb-6">
+      <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0a0a0a] text-[#4A3728] dark:text-white pb-6">
         {/* Header - Solid background */}
         <SurahHeader
           juzNumber={juzNumber}
@@ -218,7 +218,7 @@ export default async function SurahVersePage({
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-[#8E7F71]">No puzzles found for this selection.</p>
+              <p className="text-[#8E7F71] dark:text-gray-400">No puzzles found for this selection.</p>
             </div>
           )}
         </main>

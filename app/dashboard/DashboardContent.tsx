@@ -161,7 +161,7 @@ export default function DashboardContent({
       steps={tutorialSteps}
       delay={800}
     >
-      <div className="min-h-screen bg-[#F8F9FA] text-[#4A3728] pb-20">
+      <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0a0a0a] text-[#4A3728] dark:text-white pb-20">
       {/* Trial Banner */}
       {showTrialBanner && <TrialBanner daysLeft={trialDaysLeft!} />}
       
@@ -187,7 +187,7 @@ export default function DashboardContent({
       )}
       
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-200">
+      <header className="sticky top-0 z-10 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between items-center h-14">
             <Link href="/dashboard" className="hover:opacity-80 transition-opacity">
@@ -211,7 +211,7 @@ export default function DashboardContent({
               {currentStreak > 0 && (
                 <Link 
                   href="/dashboard/achievements"
-                  className="group flex items-center gap-1.5 text-orange-500 hover:bg-gray-100 px-2 py-1.5 rounded-lg transition-colors"
+                  className="group flex items-center gap-1.5 text-orange-500 hover:bg-gray-100 dark:hover:bg-white/5 px-2 py-1.5 rounded-lg transition-colors"
                   data-tutorial="stats-cards"
                 >
                   <div className="transition-transform hover:scale-110">
@@ -228,7 +228,7 @@ export default function DashboardContent({
               <div className="relative">
                 <button
                   onClick={() => setShowHelpMenu(!showHelpMenu)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-[#8E7F71] hover:text-[#4A3728]"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors text-[#8E7F71] dark:text-gray-400 hover:text-[#4A3728] dark:hover:text-white"
                   aria-label="Help"
                 >
                   <HelpCircle className="w-5 h-5" />
@@ -249,11 +249,11 @@ export default function DashboardContent({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.15, ease: 'easeOut' }}
-                        className="absolute right-0 top-12 bg-white border border-gray-200 rounded-lg shadow-2xl p-2 min-w-[200px] z-30"
+                        className="absolute right-0 top-12 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-lg shadow-2xl p-2 min-w-[200px] z-30"
                       >
                         <button
                           onClick={handleRestartTutorial}
-                          className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-[#4A3728] transition-colors"
+                          className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-md text-sm text-[#4A3728] dark:text-white transition-colors"
                         >
                           🎓 {t('dashboard.restartTutorial')}
                         </button>
@@ -266,7 +266,7 @@ export default function DashboardContent({
               {/* Logout Button */}
               <button 
                 onClick={() => setShowSignOutConfirm(true)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-[#8E7F71] hover:text-red-400"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors text-[#8E7F71] dark:text-gray-400 hover:text-red-400"
                 aria-label="Logout"
               >
                 <LogOut className="w-5 h-5" />
@@ -286,7 +286,7 @@ export default function DashboardContent({
             <div className="md:hidden flex items-center gap-2">
               <button
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-[#8E7F71] hover:text-[#4A3728]"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors text-[#8E7F71] dark:text-gray-400 hover:text-[#4A3728] dark:hover:text-white"
                 aria-label="Menu"
               >
                 {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -303,7 +303,7 @@ export default function DashboardContent({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15, ease: 'easeOut' }}
-              className="md:hidden border-t border-gray-200 bg-white/98 backdrop-blur-md overflow-hidden"
+              className="md:hidden border-t border-gray-200 dark:border-white/5 bg-white/98 dark:bg-[#0a0a0a]/98 backdrop-blur-md overflow-hidden"
             >
               <div className="max-w-6xl mx-auto px-4 py-4 space-y-2">
                 {/* User Profile Section */}
@@ -311,7 +311,7 @@ export default function DashboardContent({
                   <Link 
                     href="/dashboard/profile"
                     onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors border border-gray-200"
+                    className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors border border-gray-200 dark:border-white/10"
                   >
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#059669] to-emerald-600 flex items-center justify-center shadow-lg">
                       <span className="text-white font-bold text-base">
@@ -319,10 +319,10 @@ export default function DashboardContent({
                       </span>
                     </div>
                     <div className="flex-1">
-                      <div className="text-sm font-semibold text-[#4A3728]">{userFirstName || 'User'}</div>
-                      <div className="text-xs text-[#8E7F71]">View Profile</div>
+                      <div className="text-sm font-semibold text-[#4A3728] dark:text-white">{userFirstName || 'User'}</div>
+                      <div className="text-xs text-[#8E7F71] dark:text-gray-400">View Profile</div>
                     </div>
-                    <div className="text-[#8E7F71]">
+                    <div className="text-[#8E7F71] dark:text-gray-400">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -341,18 +341,18 @@ export default function DashboardContent({
                       <Flame className="w-5 h-5 text-orange-500" />
                     </div>
                     <div className="flex-1">
-                      <div className="text-xs text-[#8E7F71]">Current Streak</div>
-                      <div className="text-sm font-semibold text-[#4A3728]">{currentStreak} days 🔥</div>
+                      <div className="text-xs text-[#8E7F71] dark:text-gray-400">Current Streak</div>
+                      <div className="text-sm font-semibold text-[#4A3728] dark:text-white">{currentStreak} days 🔥</div>
                     </div>
                   </Link>
                 )}
 
                 {/* Divider */}
-                <div className="h-px bg-gray-200 my-3" />
+                <div className="h-px bg-gray-200 dark:bg-white/10 my-3" />
 
                 {/* Quick Access Section */}
                 <div className="space-y-1">
-                  <div className="text-xs font-medium text-[#8E7F71] px-1 mb-2">Quick Access</div>
+                  <div className="text-xs font-medium text-[#8E7F71] dark:text-gray-400 px-1 mb-2">Quick Access</div>
                   
                   {/* Search Button */}
                   <div className="w-full">
@@ -366,11 +366,11 @@ export default function DashboardContent({
                 </div>
 
                 {/* Divider */}
-                <div className="h-px bg-gray-200 my-3" />
+                <div className="h-px bg-gray-200 dark:bg-white/10 my-3" />
 
                 {/* Settings Section */}
                 <div className="space-y-1">
-                  <div className="text-xs font-medium text-[#8E7F71] px-1 mb-2">Settings</div>
+                  <div className="text-xs font-medium text-[#8E7F71] dark:text-gray-400 px-1 mb-2">Settings</div>
                   
                   {/* Help */}
                   <button
@@ -378,12 +378,12 @@ export default function DashboardContent({
                       handleRestartTutorial();
                       setShowMobileMenu(false);
                     }}
-                    className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors text-left group"
+                    className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group"
                   >
                     <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
                       <HelpCircle className="w-5 h-5 text-blue-400" />
                     </div>
-                    <span className="text-sm text-[#4A3728] font-medium">🎓 {t('dashboard.restartTutorial')}</span>
+                    <span className="text-sm text-[#4A3728] dark:text-white font-medium">🎓 {t('dashboard.restartTutorial')}</span>
                   </button>
 
                   {/* Logout */}
@@ -397,7 +397,7 @@ export default function DashboardContent({
                     <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
                       <LogOut className="w-5 h-5 text-red-400" />
                     </div>
-                    <span className="text-sm text-[#4A3728] font-medium">{t('common.signOut')}</span>
+                    <span className="text-sm text-[#4A3728] dark:text-white font-medium">{t('common.signOut')}</span>
                   </button>
                 </div>
               </div>
@@ -409,10 +409,10 @@ export default function DashboardContent({
       <main className="max-w-6xl mx-auto px-4 py-6">
         {/* Welcome Section */}
         <div className="mb-6" data-tutorial="welcome-section">
-          <h1 className="text-2xl font-bold mb-1 text-[#4A3728]">
+          <h1 className="text-2xl font-bold mb-1 text-[#4A3728] dark:text-white">
             {t('dashboard.welcome', { name: userFirstName || t('dashboard.learner') })}
           </h1>
-          <p className="text-[#8E7F71] text-sm">
+          <p className="text-[#8E7F71] dark:text-gray-400 text-sm">
             {t('dashboard.continueJourney')}
           </p>
         </div>
@@ -460,11 +460,11 @@ export default function DashboardContent({
             >
               <BookOpen className="w-5 h-5 text-[#059669]" />
             </motion.div>
-            <h2 className="text-lg font-semibold text-[#4A3728]">{t('dashboard.selectJuz')}</h2>
+            <h2 className="text-lg font-semibold text-[#4A3728] dark:text-white">{t('dashboard.selectJuz')}</h2>
           </motion.div>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3" data-tutorial="juz-grid">
             {juzs.length === 0 ? (
-              <div className="col-span-full text-center py-8 text-[#8E7F71]">
+              <div className="col-span-full text-center py-8 text-[#8E7F71] dark:text-gray-400">
                 <p className="text-sm">{t('dashboard.noJuzsFound')}</p>
               </div>
             ) : (
@@ -478,7 +478,7 @@ export default function DashboardContent({
                   <Link
                     href={`/dashboard/juz/${juz.number}`}
                     prefetch={false}
-                    className="relative block bg-white border border-gray-100 shadow-sm rounded-2xl p-4 hover:border-[#059669]/50 hover:shadow-md transition-all group overflow-hidden"
+                    className="relative block bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 shadow-sm rounded-2xl p-4 hover:border-[#059669]/50 dark:hover:border-green-500/50 hover:shadow-md transition-all group overflow-hidden"
                   >
                     {/* Completion badge with sparkle animation */}
                     {juz.progress >= 100 && (
@@ -496,8 +496,8 @@ export default function DashboardContent({
                       <div className="text-2xl font-bold text-[#059669] mb-1 transition-transform hover:scale-110">
                         {juz.number}
                       </div>
-                      <div className="text-xs text-[#8E7F71] mb-2 truncate">{juz.name}</div>
-                      <div className="w-full bg-gray-100 rounded-full h-1.5 mb-1 overflow-hidden">
+                      <div className="text-xs text-[#8E7F71] dark:text-gray-500 mb-2 truncate">{juz.name}</div>
+                      <div className="w-full bg-gray-100 dark:bg-white/5 rounded-full h-1.5 mb-1 overflow-hidden">
                         <motion.div
                           className="bg-gradient-to-r from-[#059669] to-emerald-500 h-1.5 rounded-full"
                           initial={{ width: 0 }}
@@ -505,7 +505,7 @@ export default function DashboardContent({
                           transition={{ duration: 0.8, delay: index * 0.03 + 0.2, ease: 'easeOut' }}
                         />
                       </div>
-                      <div className="text-[10px] text-[#8E7F71]">
+                      <div className="text-[10px] text-[#8E7F71] dark:text-gray-600">
                         {juz.completedPuzzles}/{juz._count.puzzles}
                       </div>
                     </div>
@@ -526,17 +526,17 @@ export default function DashboardContent({
     {/* Sign Out Confirmation Dialog - Positioned outside main container for proper centering */}
     {showSignOutConfirm && (
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] animate-in fade-in">
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl w-[90%] max-w-md p-6 animate-in zoom-in-95 mx-4">
-          <h3 className="text-lg font-semibold text-[#4A3728] mb-2">
+        <div className="bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl w-[90%] max-w-md p-6 animate-in zoom-in-95 mx-4">
+          <h3 className="text-lg font-semibold text-[#4A3728] dark:text-white mb-2">
             {t('settings.signOutTitle')}
           </h3>
-          <p className="text-sm text-[#8E7F71] mb-6">
+          <p className="text-sm text-[#8E7F71] dark:text-gray-400 mb-6">
             {t('settings.signOutMessage')}
           </p>
           <div className="flex gap-3">
             <button
               onClick={() => setShowSignOutConfirm(false)}
-              className="flex-1 px-4 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-[#4A3728] font-medium transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-lg bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-[#4A3728] dark:text-white font-medium transition-colors"
             >
               {t('common.cancel')}
             </button>

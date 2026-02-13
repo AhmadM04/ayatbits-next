@@ -75,14 +75,14 @@ export default function TranslationSelector({ initialTranslation = 'en.sahih' }:
   };
 
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 transition-colors hover:border-gray-300 shadow-sm" data-tutorial="translation-selector">
+    <div className="bg-white dark:bg-[#111] border border-[#E5E7EB] dark:border-white/10 rounded-2xl p-6 transition-colors hover:border-gray-300 dark:hover:border-white/20 shadow-sm" data-tutorial="translation-selector">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-200">
           <Globe className="w-6 h-6 text-blue-600" />
         </div>
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-[#4A3728]">{t('tutorial.translationPreference')}</h3>
-          <p className="text-sm text-[#8E7F71]">{t('tutorial.translationPreferenceMsg')}</p>
+          <h3 className="text-lg font-semibold text-[#4A3728] dark:text-white">{t('tutorial.translationPreference')}</h3>
+          <p className="text-sm text-[#8E7F71] dark:text-gray-400">{t('tutorial.translationPreferenceMsg')}</p>
         </div>
       </div>
 
@@ -95,17 +95,17 @@ export default function TranslationSelector({ initialTranslation = 'en.sahih' }:
                 disabled={isLoading}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
                   selectedTranslation === option.code
-                    ? 'bg-emerald-50/50 text-[#4A3728] border border-[#059669]/30'
-                    : 'text-[#8E7F71] hover:bg-gray-50 border border-transparent'
+                    ? 'bg-emerald-50/50 dark:bg-green-500/20 text-[#4A3728] dark:text-white border border-[#059669]/30 dark:border-green-500/30'
+                    : 'text-[#8E7F71] dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 border border-transparent'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 <span className="text-sm font-medium">{option.name}</span>
                 {selectedTranslation === option.code && (
                   <div className="flex items-center gap-2">
                     {isLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-[#059669]" />
+                      <Loader2 className="w-4 h-4 animate-spin text-[#059669] dark:text-green-400" />
                     ) : (
-                      <Check className="w-4 h-4 text-[#059669]" />
+                      <Check className="w-4 h-4 text-[#059669] dark:text-green-400" />
                     )}
                   </div>
                 )}

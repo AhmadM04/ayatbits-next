@@ -58,21 +58,21 @@ export default function AudioSettings({ initialEnabled = false }: AudioSettingsP
   };
 
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 transition-colors hover:border-gray-300 shadow-sm" data-tutorial="audio-settings">
+    <div className="bg-white dark:bg-[#111] border border-[#E5E7EB] dark:border-white/10 rounded-2xl p-6 transition-colors hover:border-gray-300 dark:hover:border-white/20 shadow-sm" data-tutorial="audio-settings">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-200">
           <Volume2 className="w-6 h-6 text-blue-600" />
         </div>
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-[#4A3728]">{t('tutorial.wordByWordAudio')}</h3>
-          <p className="text-sm text-[#8E7F71]">{t('tutorial.wordByWordAudioMsg')}</p>
+          <h3 className="text-lg font-semibold text-[#4A3728] dark:text-white">{t('tutorial.wordByWordAudio')}</h3>
+          <p className="text-sm text-[#8E7F71] dark:text-gray-400">{t('tutorial.wordByWordAudioMsg')}</p>
         </div>
       </div>
 
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-[#4A3728] mb-1 font-medium">{t('tutorial.enableWordAudio')}</p>
-          <p className="text-xs text-[#8E7F71]">
+          <p className="text-sm text-[#4A3728] dark:text-white mb-1 font-medium">{t('tutorial.enableWordAudio')}</p>
+          <p className="text-xs text-[#8E7F71] dark:text-gray-400">
             {t('tutorial.enableWordAudioMsg')}
           </p>
         </div>
@@ -80,8 +80,8 @@ export default function AudioSettings({ initialEnabled = false }: AudioSettingsP
         <button
           onClick={handleToggle}
           disabled={isLoading}
-          className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 ${
-            enabled ? 'bg-blue-600' : 'bg-gray-200'
+          className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-[#111] disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 ${
+            enabled ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
           }`}
           role="switch"
           aria-checked={enabled}
