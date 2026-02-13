@@ -28,13 +28,13 @@ export default function ProfileContent({ user, stats, trialDaysLeft }: ProfileCo
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Profile Header */}
-      <div className="bg-[#111] border border-white/10 rounded-2xl p-6 md:col-span-2 transition-colors hover:border-white/20" data-tutorial="profile-stats">
+      <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6 md:col-span-2 transition-colors hover:border-gray-200" data-tutorial="profile-stats">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex-1 min-w-0">
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 className="text-2xl font-bold text-[#4A3728] mb-2">
               {user.firstName ? t('profile.userProfile', { name: user.firstName }) : t('profile.myProfile')}
             </h2>
-            <p className="text-gray-400 text-sm truncate">
+            <p className="text-[#8E7F71] text-sm truncate">
               {user.email}
             </p>
           </div>
@@ -59,24 +59,24 @@ export default function ProfileContent({ user, stats, trialDaysLeft }: ProfileCo
       </div>
 
       {/* Stats Cards */}
-      <div className="bg-[#111] border border-white/10 rounded-2xl p-6 transition-colors hover:border-white/20">
+      <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6 transition-colors hover:border-gray-200">
         <div className="flex items-center gap-4 mb-4">
-          <div className="p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
-            <BookOpen className="w-6 h-6 text-blue-400" />
+          <div className="p-3 bg-blue-100 rounded-xl border border-blue-200">
+            <BookOpen className="w-6 h-6 text-blue-600" />
           </div>
-          <span className="text-sm text-gray-400 font-medium">{t('profile.surahsCompleted')}</span>
+          <span className="text-sm text-[#8E7F71] font-medium">{t('profile.surahsCompleted')}</span>
         </div>
-        <p className="text-4xl font-bold text-white">{stats.surahsCompleted}</p>
+        <p className="text-4xl font-bold text-[#4A3728]">{stats.surahsCompleted}</p>
       </div>
 
-      <div className="bg-[#111] border border-white/10 rounded-2xl p-6 transition-colors hover:border-white/20">
+      <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6 transition-colors hover:border-gray-200">
         <div className="flex items-center gap-4 mb-4">
-          <div className="p-3 bg-green-500/20 rounded-xl border border-green-500/30">
-            <CheckCircle className="w-6 h-6 text-green-400" />
+          <div className="p-3 bg-emerald-100 rounded-xl border border-emerald-200">
+            <CheckCircle className="w-6 h-6 text-[#059669]" />
           </div>
-          <span className="text-sm text-gray-400 font-medium">{t('profile.puzzlesSolved')}</span>
+          <span className="text-sm text-[#8E7F71] font-medium">{t('profile.puzzlesSolved')}</span>
         </div>
-        <p className="text-4xl font-bold text-white">{stats.puzzlesSolved}</p>
+        <p className="text-4xl font-bold text-[#4A3728]">{stats.puzzlesSolved}</p>
       </div>
 
     </div>

@@ -50,11 +50,11 @@ export default function AyahRow({ verse, onLongPress, isHighlighted = false }: A
     }
   );
 
-  // LIGHT THEME: Determine text color based on completion status
-  // Darker green for completed verses to ensure readability on white background
+  // SEPIA THEME: Determine text color based on completion status
+  // Emerald green for completed verses, deep sepia for regular verses
   const textColor = verse.isCompleted 
-    ? 'text-emerald-700 font-medium' 
-    : 'text-gray-900';
+    ? 'text-[#059669] font-medium' 
+    : 'text-[#4A3728]';
 
   return (
     <motion.span
@@ -88,22 +88,22 @@ export default function AyahRow({ verse, onLongPress, isHighlighted = false }: A
       {/* Simple, Clean Quran Text Rendering */}
       {verse.text}{' '}
       
-      {/* LIGHT THEME: Ayah number with emerald color for completed verses */}
+      {/* SEPIA THEME: Ayah number with emerald color for completed verses */}
       <span className={`
         inline-flex items-center gap-1 mx-1.5 sm:mx-2 whitespace-nowrap align-middle
-        ${verse.isCompleted ? 'text-emerald-600' : 'text-gray-400'}
+        ${verse.isCompleted ? 'text-[#059669]' : 'text-[#8E7F71]'}
       `}>
         <span className="text-[0.85em] inline-block opacity-80">
           ﴿{toArabicNumerals(verse.ayahNumber)}﴾
         </span>
       </span>
       
-      {/* LIGHT THEME: Subtle hover/active indicator - FIXED: No solid white boxes */}
+      {/* SEPIA THEME: Subtle hover/active indicator */}
       <span className={`
         absolute inset-0 rounded-lg pointer-events-none transition-all duration-150
         ${isHolding 
           ? 'opacity-100 bg-blue-50/80 animate-pulse' 
-          : 'opacity-0 group-hover:opacity-100 group-active:opacity-100 bg-gray-50/50'
+          : 'opacity-0 group-hover:opacity-100 group-active:opacity-100 bg-emerald-50/40'
         }
       `} />
       

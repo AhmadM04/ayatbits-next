@@ -60,18 +60,18 @@ export default function AchievementsContent() {
   // Show loading during SSR to avoid hydration mismatch
   if (!isMounted || isLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
-        <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
+      <div className="min-h-screen bg-[#F8F9FA] text-[#4A3728] pb-20">
+        <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-200">
           <div className="max-w-2xl mx-auto px-4">
             <div className="flex items-center h-14 gap-3">
-              <div className="w-9 h-9 bg-white/5 rounded-lg animate-pulse" />
-              <div className="w-32 h-6 bg-white/5 rounded animate-pulse" />
+              <div className="w-9 h-9 bg-gray-200 rounded-lg animate-pulse" />
+              <div className="w-32 h-6 bg-gray-200 rounded animate-pulse" />
             </div>
           </div>
         </header>
         <main className="max-w-2xl mx-auto px-4 py-6">
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-[#059669] border-t-transparent rounded-full animate-spin" />
           </div>
         </main>
         <BottomNav />
@@ -81,20 +81,20 @@ export default function AchievementsContent() {
 
   return (
     <TutorialWrapper sectionId="achievements_trophies" steps={achievementsTutorialSteps} delay={800}>
-      <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
+      <div className="min-h-screen bg-[#F8F9FA] text-[#4A3728] pb-20">
         {/* Header */}
-        <header className="sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
+        <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-200">
           <div className="max-w-2xl mx-auto px-4">
             <div className="flex items-center h-14 gap-3" data-tutorial="achievements-header">
               <Link
                 href="/dashboard"
-                className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors"
+                className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-400" />
+                <ArrowLeft className="w-5 h-5 text-[#8E7F71]" />
               </Link>
               <div>
-                <h1 className="text-lg font-semibold">{t('achievements.title')}</h1>
-                <p className="text-xs text-gray-500">
+                <h1 className="text-lg font-semibold text-[#4A3728]">{t('achievements.title')}</h1>
+                <p className="text-xs text-[#8E7F71]">
                   {t('achievements.unlockedOf', { unlocked: stats?.totalUnlocked || 0, total: stats?.totalAchievements || 0 })}
                 </p>
               </div>
@@ -108,34 +108,34 @@ export default function AchievementsContent() {
           {stats && (
             <div className="grid grid-cols-3 gap-3 mb-8" data-tutorial="stats-overview">
               <motion.div 
-                className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-center"
-                whileHover={{ scale: 1.02, borderColor: 'rgba(34, 197, 94, 0.3)' }}
+                className="bg-white border border-gray-100 shadow-sm rounded-2xl p-4 text-center"
+                whileHover={{ scale: 1.02, borderColor: 'rgba(5, 150, 105, 0.5)' }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="text-2xl font-bold text-green-500">
+                <div className="text-2xl font-bold text-[#059669]">
                   {stats.completedPuzzles}
                 </div>
-                <div className="text-xs text-gray-500">{t('achievements.puzzles')}</div>
+                <div className="text-xs text-[#8E7F71]">{t('achievements.puzzles')}</div>
               </motion.div>
               <motion.div 
-                className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-center"
-                whileHover={{ scale: 1.02, borderColor: 'rgba(249, 115, 22, 0.3)' }}
+                className="bg-white border border-gray-100 shadow-sm rounded-2xl p-4 text-center"
+                whileHover={{ scale: 1.02, borderColor: 'rgba(249, 115, 22, 0.5)' }}
                 transition={{ duration: 0.2 }}
               >
                 <div className="text-2xl font-bold text-orange-500">
                   {stats.longestStreak}
                 </div>
-                <div className="text-xs text-gray-500">{t('achievements.bestStreak')}</div>
+                <div className="text-xs text-[#8E7F71]">{t('achievements.bestStreak')}</div>
               </motion.div>
               <motion.div 
-                className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-center"
-                whileHover={{ scale: 1.02, borderColor: 'rgba(168, 85, 247, 0.3)' }}
+                className="bg-white border border-gray-100 shadow-sm rounded-2xl p-4 text-center"
+                whileHover={{ scale: 1.02, borderColor: 'rgba(59, 130, 246, 0.5)' }}
                 transition={{ duration: 0.2 }}
               >
                 <div className="text-2xl font-bold text-blue-500">
                   {stats.totalUnlocked}
                 </div>
-                <div className="text-xs text-gray-500">{t('achievements.trophies')}</div>
+                <div className="text-xs text-[#8E7F71]">{t('achievements.trophies')}</div>
               </motion.div>
             </div>
           )}
@@ -143,8 +143,8 @@ export default function AchievementsContent() {
           {/* Unlocked Achievements */}
           {unlockedAchievements.length > 0 && (
             <div className="mb-8" data-tutorial="unlocked-section">
-              <h2 className="text-sm font-semibold text-gray-400 mb-3 flex items-center gap-2">
-                <Check className="w-4 h-4 text-green-500" />
+              <h2 className="text-sm font-semibold text-[#8E7F71] mb-3 flex items-center gap-2">
+                <Check className="w-4 h-4 text-[#059669]" />
                 {t('achievements.unlocked', { count: unlockedAchievements.length })}
               </h2>
               <div className="grid grid-cols-2 gap-3">
@@ -161,15 +161,15 @@ export default function AchievementsContent() {
                       scale: 1.02,
                       transition: { duration: 0.2 }
                     }}
-                    className="bg-gradient-to-br from-green-500/10 via-emerald-500/10 to-green-500/5 border border-green-500/30 rounded-2xl p-4"
+                    className="bg-gradient-to-br from-emerald-50 via-green-50 to-emerald-50 border border-[#059669]/30 shadow-sm rounded-2xl p-4"
                   >
                     <div className="text-3xl mb-2">
                       {achievement.icon}
                     </div>
-                    <div className="font-semibold text-white text-sm mb-1">
+                    <div className="font-semibold text-[#4A3728] text-sm mb-1">
                       {achievement.name}
                     </div>
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-[#8E7F71]">
                       {achievement.description}
                     </div>
                   </motion.div>
@@ -181,7 +181,7 @@ export default function AchievementsContent() {
           {/* Locked Achievements */}
           {lockedAchievements.length > 0 && (
             <div data-tutorial="progress-section">
-              <h2 className="text-sm font-semibold text-gray-400 mb-3 flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-[#8E7F71] mb-3 flex items-center gap-2">
                 <Lock className="w-4 h-4" />
                 {t('achievements.inProgress', { count: lockedAchievements.length })}
               </h2>
@@ -192,28 +192,28 @@ export default function AchievementsContent() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05, duration: 0.3 }}
-                    className="bg-white/[0.02] border border-white/5 hover:border-white/10 rounded-2xl p-4 transition-colors"
+                    className="bg-white border border-gray-100 shadow-sm hover:border-gray-200 rounded-2xl p-4 transition-colors"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="text-2xl opacity-50 grayscale">
+                      <div className="text-2xl opacity-40 grayscale sepia">
                         {achievement.icon}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-white text-sm mb-1">
+                        <div className="font-semibold text-[#4A3728] text-sm mb-1">
                           {achievement.name}
                         </div>
-                        <div className="text-xs text-gray-500 mb-2">
+                        <div className="text-xs text-[#8E7F71] mb-2">
                           {achievement.description}
                         </div>
-                        <div className="w-full bg-white/5 rounded-full h-1.5 mb-1 overflow-hidden">
+                        <div className="w-full bg-gray-100 rounded-full h-1.5 mb-1 overflow-hidden">
                           <motion.div
-                            className="bg-gradient-to-r from-green-600 to-emerald-500 h-1.5 rounded-full"
+                            className="bg-gradient-to-r from-[#059669] to-emerald-500 h-1.5 rounded-full"
                             initial={{ width: 0 }}
                             animate={{ width: `${achievement.progress}%` }}
                             transition={{ duration: 0.5, delay: index * 0.03 }}
                           />
                         </div>
-                        <div className="text-xs text-gray-600">
+                        <div className="text-xs text-[#8E7F71]">
                           {achievement.currentProgress} / {achievement.requirement}
                         </div>
                       </div>

@@ -74,18 +74,18 @@ export default function ProfilePageClient({
   return (
     <>
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-[#0a0a0a] border-b border-white/10">
+      <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center h-14 gap-3">
             <Link
               href="/dashboard"
-              className="p-2 -ml-2 hover:bg-white/5 rounded-lg transition-colors"
+              className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-400" />
+              <ArrowLeft className="w-5 h-5 text-[#8E7F71]" />
             </Link>
             <div>
-              <h1 className="text-lg font-semibold">{t('profile.myProfile')}</h1>
-              <p className="text-xs text-gray-500">{t('tutorial.manageAccount')}</p>
+              <h1 className="text-lg font-semibold text-[#4A3728]">{t('profile.myProfile')}</h1>
+              <p className="text-xs text-[#8E7F71]">{t('tutorial.manageAccount')}</p>
             </div>
           </div>
         </div>
@@ -103,13 +103,13 @@ export default function ProfilePageClient({
                 <AlertCircle className="w-6 h-6 text-green-400" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-white mb-1">
+                <h3 className="text-lg font-semibold text-[#4A3728] mb-1">
                   {t('onboarding.completeProfile')}
                 </h3>
-                <p className="text-sm text-gray-300 mb-3">
+                <p className="text-sm text-[#8E7F71] mb-3">
                   {t('onboarding.completeProfileDescription')}
                 </p>
-                <div className="inline-flex items-center gap-2 text-sm font-medium text-green-400">
+                <div className="inline-flex items-center gap-2 text-sm font-medium text-[#059669]">
                   <span>{t('onboarding.finish')}</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -131,9 +131,9 @@ export default function ProfilePageClient({
         {/* User Preferences Section */}
         <div className="space-y-6">
           <div className="flex items-center gap-2 px-1">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{t('preferences.title')}</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+            <span className="text-xs font-medium text-[#8E7F71] uppercase tracking-wider">{t('preferences.title')}</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
           </div>
 
           <UserPreferences 
@@ -146,9 +146,9 @@ export default function ProfilePageClient({
         {/* Settings Section */}
         <div className="space-y-6">
           <div className="flex items-center gap-2 px-1">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{t('tutorial.settings')}</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+            <span className="text-xs font-medium text-[#8E7F71] uppercase tracking-wider">{t('tutorial.settings')}</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
           </div>
 
           <LanguageSelectorProfile initialLanguage={initialLanguage as any} />
@@ -159,9 +159,9 @@ export default function ProfilePageClient({
         {/* Billing Section */}
         <div className="space-y-6">
           <div className="flex items-center gap-2 px-1">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{t('tutorial.billing')}</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+            <span className="text-xs font-medium text-[#8E7F71] uppercase tracking-wider">{t('tutorial.billing')}</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
           </div>
 
           <BillingSection 
@@ -173,33 +173,33 @@ export default function ProfilePageClient({
         {/* Account Management Section */}
         <div className="space-y-6">
           <div className="flex items-center gap-2 px-1">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{t('tutorial.account')}</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+            <span className="text-xs font-medium text-[#8E7F71] uppercase tracking-wider">{t('tutorial.account')}</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
           </div>
 
-          <div className="bg-[#111] rounded-2xl border border-white/10 overflow-hidden" data-tutorial="account-section">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" data-tutorial="account-section">
             <UserProfile 
               appearance={{
                 elements: {
                   rootBox: "w-full",
                   card: "bg-transparent shadow-none w-full border-none",
                   navbar: "hidden",
-                  headerTitle: "text-white",
-                  headerSubtitle: "text-gray-400",
-                  profileSectionTitleText: "text-white font-semibold",
-                  profileSectionTitle: "text-white",
-                  profileSectionContent: "text-gray-300",
-                  formButtonPrimary: "bg-green-600 hover:bg-green-700 text-white transition-colors",
-                  formFieldInput: "bg-white/5 border-white/10 text-white",
-                  formFieldLabel: "text-gray-300",
-                  identityPreviewText: "text-gray-300",
-                  identityPreviewEditButton: "text-gray-400 hover:text-white",
-                  userPreviewMainIdentifier: "text-white",
-                  userPreviewSecondaryIdentifier: "text-gray-400",
-                  accordionTriggerButton: "text-white hover:bg-white/5",
-                  accordionContent: "text-gray-300",
-                  badge: "bg-green-600/20 text-green-400 border-green-600/30",
+                  headerTitle: "text-[#4A3728]",
+                  headerSubtitle: "text-[#8E7F71]",
+                  profileSectionTitleText: "text-[#4A3728] font-semibold",
+                  profileSectionTitle: "text-[#4A3728]",
+                  profileSectionContent: "text-[#4A3728]",
+                  formButtonPrimary: "bg-[#059669] hover:bg-emerald-700 text-white transition-colors",
+                  formFieldInput: "bg-gray-50 border-gray-200 text-[#4A3728]",
+                  formFieldLabel: "text-[#4A3728]",
+                  identityPreviewText: "text-[#4A3728]",
+                  identityPreviewEditButton: "text-[#8E7F71] hover:text-[#4A3728]",
+                  userPreviewMainIdentifier: "text-[#4A3728]",
+                  userPreviewSecondaryIdentifier: "text-[#8E7F71]",
+                  accordionTriggerButton: "text-[#4A3728] hover:bg-gray-50",
+                  accordionContent: "text-[#4A3728]",
+                  badge: "bg-emerald-100 text-[#059669] border-emerald-200",
                   // Hide profile image section
                   avatarBox: "hidden",
                   avatarImage: "hidden",

@@ -351,7 +351,7 @@ export default function AyahContextMenu({
             onClick={onClose}
           />
 
-          {/* Menu */}
+          {/* Menu - SEPIA THEME */}
           <motion.div
             ref={menuRef}
             initial={{ opacity: 0, y: 10 }}
@@ -360,22 +360,22 @@ export default function AyahContextMenu({
             transition={{ duration: 0.15, ease: 'easeOut' }}
             className="fixed left-4 right-4 bottom-6 z-50 max-w-md mx-auto"
           >
-            <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-2xl">
               {/* Header */}
-              <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+              <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between bg-gray-50">
                 <div>
-                  <p className="text-sm font-medium text-white">
+                  <p className="text-sm font-medium text-[#4A3728]">
                     {t('verse.surahAyahFormat', { surah: verse.surahNumber, ayah: verse.ayahNumber })}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-[#8E7F71]">
                     {t('verse.pageJuzFormat', { page: verse.pageNumber, juz: verse.juzNumber })}
                   </p>
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-400" />
+                  <X className="w-5 h-5 text-[#8E7F71]" />
                 </button>
               </div>
 
@@ -388,17 +388,17 @@ export default function AyahContextMenu({
                   className={`
                     w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left
                     ${verse.puzzleId 
-                      ? 'hover:bg-green-500/10 text-white' 
-                      : 'opacity-50 cursor-not-allowed text-gray-500'
+                      ? 'hover:bg-emerald-50 text-[#4A3728]' 
+                      : 'opacity-50 cursor-not-allowed text-[#8E7F71]'
                     }
                   `}
                 >
-                  <div className={`p-2 rounded-lg ${verse.puzzleId ? 'bg-green-500/20' : 'bg-gray-500/20'}`}>
-                    <Play className={`w-5 h-5 ${verse.puzzleId ? 'text-green-400' : 'text-gray-500'}`} />
+                  <div className={`p-2 rounded-lg ${verse.puzzleId ? 'bg-emerald-100 border border-[#059669]/20' : 'bg-gray-100'}`}>
+                    <Play className={`w-5 h-5 ${verse.puzzleId ? 'text-[#059669]' : 'text-[#8E7F71]'}`} />
                   </div>
                   <div>
                     <p className="font-medium">{t('mushaf.practice')}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[#8E7F71]">
                       {verse.puzzleId 
                         ? (verse.isCompleted ? 'Completed - Practice again' : 'Learn this ayah')
                         : 'Puzzle not available'
@@ -411,18 +411,18 @@ export default function AyahContextMenu({
                 <button
                   onClick={handlePlayAudio}
                   disabled={isLoadingAudio}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-500/10 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 transition-colors text-left"
                 >
-                  <div className={`p-2 rounded-lg ${isPlaying ? 'bg-blue-500/30' : 'bg-blue-500/20'}`}>
+                  <div className={`p-2 rounded-lg ${isPlaying ? 'bg-blue-100 border border-blue-200' : 'bg-blue-50 border border-blue-100'}`}>
                     {isLoadingAudio ? (
-                      <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <Volume2 className={`w-5 h-5 text-blue-400 ${isPlaying ? 'animate-pulse' : ''}`} />
+                      <Volume2 className={`w-5 h-5 text-blue-600 ${isPlaying ? 'animate-pulse' : ''}`} />
                     )}
                   </div>
                   <div>
-                    <p className="font-medium text-white">{t('mushaf.playAudio')}</p>
-                    <p className="text-xs text-gray-500">Listen to recitation</p>
+                    <p className="font-medium text-[#4A3728]">{t('mushaf.playAudio')}</p>
+                    <p className="text-xs text-[#8E7F71]">Listen to recitation</p>
                   </div>
                 </button>
 
@@ -433,17 +433,17 @@ export default function AyahContextMenu({
                   className={`
                     w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left
                     ${verse.puzzleId 
-                      ? 'hover:bg-red-500/10 text-white' 
-                      : 'opacity-50 cursor-not-allowed text-gray-500'
+                      ? 'hover:bg-red-50 text-[#4A3728]' 
+                      : 'opacity-50 cursor-not-allowed text-[#8E7F71]'
                     }
                   `}
                 >
-                  <div className={`p-2 rounded-lg ${isLiked ? 'bg-red-500/30' : 'bg-red-500/20'}`}>
-                    <Heart className={`w-5 h-5 text-red-400 ${isLiked ? 'fill-current' : ''}`} />
+                  <div className={`p-2 rounded-lg ${isLiked ? 'bg-red-100 border border-red-200' : 'bg-red-50 border border-red-100'}`}>
+                    <Heart className={`w-5 h-5 text-[#EF4444] ${isLiked ? 'fill-current' : ''}`} />
                   </div>
                   <div>
                     <p className="font-medium">{t('mushaf.likeAyah')}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[#8E7F71]">
                       {verse.puzzleId ? 'Save to your favorites' : 'Not available'}
                     </p>
                   </div>
@@ -453,20 +453,20 @@ export default function AyahContextMenu({
                 <button
                   onClick={handleShowTranslation}
                   disabled={isLoadingTranslation}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-teal-500/10 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-teal-50 transition-colors text-left"
                 >
-                  <div className={`p-2 rounded-lg ${showTranslation ? 'bg-teal-500/30' : 'bg-teal-500/20'}`}>
+                  <div className={`p-2 rounded-lg ${showTranslation ? 'bg-teal-100 border border-teal-200' : 'bg-teal-50 border border-teal-100'}`}>
                     {isLoadingTranslation ? (
-                      <div className="w-5 h-5 border-2 border-teal-400 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <Languages className="w-5 h-5 text-teal-400" />
+                      <Languages className="w-5 h-5 text-teal-600" />
                     )}
                   </div>
                   <div>
-                    <p className="font-medium text-white">
+                    <p className="font-medium text-[#4A3728]">
                       {t('mushaf.viewTranslation')}
                     </p>
-                    <p className="text-xs text-gray-500">View meaning</p>
+                    <p className="text-xs text-[#8E7F71]">View meaning</p>
                   </div>
                 </button>
 
@@ -474,21 +474,21 @@ export default function AyahContextMenu({
                 <button
                   onClick={handleShowTafsir}
                   disabled={isLoadingTafsir}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-500/10 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 transition-colors text-left"
                   data-tutorial="tafsir-button"
                 >
-                  <div className={`p-2 rounded-lg ${showTafsir ? 'bg-blue-500/30' : 'bg-blue-500/20'}`}>
+                  <div className={`p-2 rounded-lg ${showTafsir ? 'bg-blue-100 border border-blue-200' : 'bg-blue-50 border border-blue-100'}`}>
                     {isLoadingTafsir ? (
-                      <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <BookText className="w-5 h-5 text-blue-400" />
+                      <BookText className="w-5 h-5 text-blue-600" />
                     )}
                   </div>
                   <div>
-                    <p className="font-medium text-white">
+                    <p className="font-medium text-[#4A3728]">
                       {t('mushaf.readTafsir')}
                     </p>
-                    <p className="text-xs text-gray-500">View explanation</p>
+                    <p className="text-xs text-[#8E7F71]">View explanation</p>
                   </div>
                 </button>
 
@@ -496,26 +496,26 @@ export default function AyahContextMenu({
                 <button
                   onClick={handleShowAiTafsir}
                   disabled={isLoadingAiTafsir}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-pink-500/10 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-pink-50 transition-colors text-left"
                   data-tutorial="ai-tafsir-button"
                 >
-                  <div className={`p-2 rounded-lg ${showAiTafsir ? 'bg-pink-500/30' : 'bg-pink-500/20'}`}>
+                  <div className={`p-2 rounded-lg ${showAiTafsir ? 'bg-pink-100 border border-pink-200' : 'bg-pink-50 border border-pink-100'}`}>
                     {isLoadingAiTafsir ? (
-                      <div className="w-5 h-5 border-2 border-pink-400 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-pink-600 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <Sparkles className="w-5 h-5 text-pink-400" />
+                      <Sparkles className="w-5 h-5 text-pink-600" />
                     )}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-white">
+                      <p className="font-medium text-[#4A3728]">
                         {showAiTafsir ? 'Hide AI Tafsir' : 'AI Tafsir'}
                       </p>
                       <span className="px-1.5 py-0.5 bg-gradient-to-r from-pink-500 to-blue-500 rounded text-[10px] font-bold text-white">
                         PRO
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[#8E7F71]">
                       {requiresPro ? 'Upgrade to Pro' : 'AI-powered explanation'}
                     </p>
                   </div>
@@ -524,29 +524,29 @@ export default function AyahContextMenu({
                 {/* Share */}
                 <button
                   onClick={handleShare}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-amber-500/10 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-amber-50 transition-colors text-left"
                 >
-                  <div className="p-2 rounded-lg bg-amber-500/20">
-                    <Share2 className="w-5 h-5 text-amber-400" />
+                  <div className="p-2 rounded-lg bg-amber-50 border border-amber-100">
+                    <Share2 className="w-5 h-5 text-amber-600" />
                   </div>
                   <div>
-                    <p className="font-medium text-white">Share</p>
-                    <p className="text-xs text-gray-500">Share this ayah</p>
+                    <p className="font-medium text-[#4A3728]">Share</p>
+                    <p className="text-xs text-[#8E7F71]">Share this ayah</p>
                   </div>
                 </button>
               </div>
 
-              {/* Translation Display */}
+              {/* Translation Display - SEPIA THEME */}
               <AnimatePresence>
                 {showTranslation && translation && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="border-t border-white/5 overflow-hidden"
+                    className="border-t border-gray-200 overflow-hidden"
                   >
-                    <div className="p-4 bg-teal-500/5">
-                      <p className="text-sm text-gray-300 leading-relaxed">
+                    <div className="p-4 bg-teal-50">
+                      <p className="text-sm text-[#4A3728] leading-relaxed">
                         {translation}
                       </p>
                     </div>
@@ -554,31 +554,31 @@ export default function AyahContextMenu({
                 )}
               </AnimatePresence>
 
-              {/* Tafsir Display */}
+              {/* Tafsir Display - SEPIA THEME */}
               <AnimatePresence>
                 {showTafsir && tafsir && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="border-t border-white/5 overflow-hidden"
+                    className="border-t border-gray-200 overflow-hidden"
                   >
-                    <div className="p-4 bg-blue-500/5 max-h-80 overflow-y-auto">
+                    <div className="p-4 bg-blue-50 max-h-80 overflow-y-auto">
                       <div className="flex items-center gap-2 mb-2">
-                        <BookText className="w-3.5 h-3.5 text-blue-400" />
-                        <span className="text-xs font-medium text-blue-400 uppercase tracking-wide">
+                        <BookText className="w-3.5 h-3.5 text-blue-600" />
+                        <span className="text-xs font-medium text-blue-600 uppercase tracking-wide">
                           {tafsirResource}
                         </span>
                       </div>
                       {isTafsirFallback && (
-                        <div className="mb-2 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg p-2">
+                        <div className="mb-2 text-xs text-amber-800 bg-amber-100 border border-amber-300 rounded-lg p-2">
                           ℹ️ Showing English tafsir (native tafsir not available in your language)
                         </div>
                       )}
                       <div 
-                        className="text-sm text-gray-300 leading-relaxed prose prose-sm prose-invert max-w-none
-                          prose-p:my-2 prose-strong:text-white prose-strong:font-semibold
-                          prose-em:text-gray-300"
+                        className="text-sm text-[#4A3728] leading-relaxed prose prose-sm max-w-none
+                          prose-p:my-2 prose-strong:text-[#4A3728] prose-strong:font-semibold
+                          prose-em:text-[#8E7F71]"
                         dangerouslySetInnerHTML={{ __html: tafsir }}
                       />
                     </div>
@@ -586,19 +586,19 @@ export default function AyahContextMenu({
                 )}
               </AnimatePresence>
 
-              {/* AI Tafsir Display */}
+              {/* AI Tafsir Display - SEPIA THEME */}
               <AnimatePresence>
                 {showAiTafsir && (aiTafsir || aiError) && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="border-t border-white/5 overflow-hidden"
+                    className="border-t border-gray-200 overflow-hidden"
                   >
-                    <div className="p-4 bg-gradient-to-br from-pink-500/5 to-blue-500/5 max-h-80 overflow-y-auto">
+                    <div className="p-4 bg-gradient-to-br from-pink-50 to-purple-50 max-h-80 overflow-y-auto">
                       <div className="flex items-center gap-2 mb-2">
-                        <Sparkles className="w-3.5 h-3.5 text-pink-400" />
-                        <span className="text-xs font-medium text-pink-400 uppercase tracking-wide">
+                        <Sparkles className="w-3.5 h-3.5 text-pink-600" />
+                        <span className="text-xs font-medium text-pink-600 uppercase tracking-wide">
                           AI-Generated Tafsir
                         </span>
                         <span className="px-1.5 py-0.5 bg-gradient-to-r from-pink-500 to-blue-500 rounded text-[9px] font-bold text-white">
@@ -607,12 +607,12 @@ export default function AyahContextMenu({
                       </div>
                       
                       {aiError ? (
-                        <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                        <div className="text-sm text-red-700 bg-red-100 border border-red-300 rounded-lg p-3">
                           {aiError}
                           {requiresPro && (
                             <a 
                               href="/pricing" 
-                              className="block mt-2 text-pink-400 hover:text-pink-300 font-medium"
+                              className="block mt-2 text-pink-600 hover:text-pink-700 font-medium"
                               onClick={onClose}
                             >
                               View Pro Plans →
@@ -621,10 +621,10 @@ export default function AyahContextMenu({
                         </div>
                       ) : aiTafsir && (
                         <>
-                          <div className="mb-2 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg p-2">
+                          <div className="mb-2 text-xs text-amber-800 bg-amber-100 border border-amber-300 rounded-lg p-2">
                             ⚠️ AI-generated content. Please consult traditional scholars for authoritative guidance.
                           </div>
-                          <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
+                          <div className="text-sm text-[#4A3728] leading-relaxed whitespace-pre-wrap">
                             {aiTafsir}
                           </div>
                         </>

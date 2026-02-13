@@ -27,34 +27,34 @@ export default function SurahHeader({ surahNumber, showBismillah = true }: Surah
       animate={{ opacity: 1, y: 0 }}
       className="my-6"
     >
-      {/* Surah Name Header - LIGHT THEME */}
+      {/* Surah Name Header - SEPIA THEME */}
       <div className="relative flex items-center justify-center mb-4">
         {/* Decorative lines */}
-        <div className="absolute left-0 right-0 top-1/2 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
+        <div className="absolute left-0 right-0 top-1/2 h-px bg-gradient-to-r from-transparent via-[#059669]/30 to-transparent" />
         
-        {/* Surah Name Container - LIGHT THEME: Changed from dark to light gray */}
-        <div className="relative bg-gray-50 px-4 sm:px-6">
-          <div className="bg-gradient-to-r from-emerald-50 via-emerald-100 to-emerald-50 border border-emerald-300 rounded-xl px-4 sm:px-6 py-2 sm:py-3 shadow-sm">
+        {/* Surah Name Container - SEPIA THEME */}
+        <div className="relative bg-[#F8F9FA] px-4 sm:px-6">
+          <div className="bg-gradient-to-r from-emerald-50 via-emerald-100 to-emerald-50 border border-[#059669]/30 rounded-xl px-4 sm:px-6 py-2 sm:py-3 shadow-sm">
             {/* Decorative corner ornaments */}
-            <div className="absolute -top-1 -left-1 w-2 h-2 sm:w-3 sm:h-3 border-t-2 border-l-2 border-emerald-400 rounded-tl" />
-            <div className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 border-t-2 border-r-2 border-emerald-400 rounded-tr" />
-            <div className="absolute -bottom-1 -left-1 w-2 h-2 sm:w-3 sm:h-3 border-b-2 border-l-2 border-emerald-400 rounded-bl" />
-            <div className="absolute -bottom-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 border-b-2 border-r-2 border-emerald-400 rounded-br" />
+            <div className="absolute -top-1 -left-1 w-2 h-2 sm:w-3 sm:h-3 border-t-2 border-l-2 border-[#059669] rounded-tl" />
+            <div className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 border-t-2 border-r-2 border-[#059669] rounded-tr" />
+            <div className="absolute -bottom-1 -left-1 w-2 h-2 sm:w-3 sm:h-3 border-b-2 border-l-2 border-[#059669] rounded-bl" />
+            <div className="absolute -bottom-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 border-b-2 border-r-2 border-[#059669] rounded-br" />
             
             <p
-              className="text-xl sm:text-2xl font-arabic text-emerald-700 text-center font-medium"
+              className="text-xl sm:text-2xl font-arabic text-[#059669] text-center font-medium"
               dir="rtl"
             >
               سُورَةُ {surahName}
             </p>
-            <p className="text-xs text-gray-600 text-center mt-0.5 sm:mt-1">
+            <p className="text-xs text-[#8E7F71] text-center mt-0.5 sm:mt-1">
               {t('mushaf.surah')} {surahNumber}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Bismillah - LIGHT THEME */}
+      {/* Bismillah - SEPIA THEME */}
       {shouldShowBismillah && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -63,7 +63,7 @@ export default function SurahHeader({ surahNumber, showBismillah = true }: Surah
           className="text-center mb-4"
         >
           <p
-            className="text-lg sm:text-xl font-arabic text-gray-800"
+            className="text-lg sm:text-xl font-arabic text-[#4A3728]"
             dir="rtl"
           >
             <HarakatColoredText text={BISMILLAH} />

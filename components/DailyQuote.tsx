@@ -170,11 +170,11 @@ export default function DailyQuote({
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-br from-green-900/20 to-emerald-900/10 border border-green-500/20 rounded-2xl p-6"
+        className="bg-gradient-to-br from-emerald-50 to-green-50 border border-[#059669]/20 shadow-sm rounded-2xl p-6"
       >
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="w-5 h-5 text-green-500" />
-          <span className="text-sm font-medium text-green-500">{t('dailyQuote.verseOfTheDay')}</span>
+          <Sparkles className="w-5 h-5 text-[#059669]" />
+          <span className="text-sm font-medium text-[#059669]">{t('dailyQuote.verseOfTheDay')}</span>
         </div>
         <div className="flex items-center justify-center py-8">
           <SparkleAnimation size={80} loop={true} />
@@ -185,14 +185,14 @@ export default function DailyQuote({
 
   if (error) {
     return (
-      <div className="bg-gradient-to-br from-orange-900/20 to-red-900/10 border border-orange-500/20 rounded-2xl p-6">
-        <div className="flex items-center gap-3 text-orange-400">
+      <div className="bg-gradient-to-br from-orange-50 to-red-50 border border-orange-300 shadow-sm rounded-2xl p-6">
+        <div className="flex items-center gap-3 text-orange-700">
           <WifiOff className="w-5 h-5" />
           <span className="text-sm">{error}</span>
         </div>
         <button
           onClick={fetchDailyQuote}
-          className="mt-3 flex items-center gap-2 text-sm text-orange-400 hover:text-orange-300 transition-colors"
+          className="mt-3 flex items-center gap-2 text-sm text-orange-700 hover:text-orange-800 transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
           {t('common.retry')}
@@ -209,11 +209,11 @@ export default function DailyQuote({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden bg-gradient-to-br from-green-900/30 via-emerald-900/20 to-teal-900/10 border border-green-500/20 rounded-2xl p-4 sm:p-6"
+      className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 border border-[#059669]/20 shadow-sm rounded-2xl p-4 sm:p-6"
     >
       {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl" />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100/30 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-24 h-24 bg-green-100/30 rounded-full blur-2xl" />
       
       <div className="relative">
         {/* Header */}
@@ -230,17 +230,17 @@ export default function DailyQuote({
                 ease: "easeInOut"
               }}
             >
-              <Sparkles className="w-5 h-5 text-green-400" />
+              <Sparkles className="w-5 h-5 text-[#059669]" />
             </motion.div>
-            <span className="text-sm font-medium text-green-400">{t('dailyQuote.verseOfTheDay')}</span>
+            <span className="text-sm font-medium text-[#059669]">{t('dailyQuote.verseOfTheDay')}</span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={playAudio}
               className={`p-2 rounded-lg transition-colors ${
                 isPlaying 
-                  ? 'bg-green-500 text-white' 
-                  : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                  ? 'bg-[#059669] text-white' 
+                  : 'bg-white text-[#8E7F71] hover:bg-gray-50 hover:text-[#4A3728]'
               }`}
               title={t('dailyQuote.playRecitation')}
             >
@@ -248,7 +248,7 @@ export default function DailyQuote({
             </button>
             <Link
               href={`/dashboard/juz/${quote.juzNumber}/surah/${quote.surahNumber}?ayah=${quote.ayahNumber}`}
-              className="p-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"
+              className="p-2 bg-white hover:bg-gray-50 rounded-lg transition-colors text-[#8E7F71] hover:text-[#4A3728]"
               title={t('dailyQuote.openAyah')}
             >
               <ExternalLink className="w-4 h-4" />
@@ -266,7 +266,7 @@ export default function DailyQuote({
             className="mb-3 sm:mb-4"
           >
             <p 
-              className="text-lg sm:text-2xl md:text-3xl leading-loose text-white/90 text-right break-words"
+              className="text-lg sm:text-2xl md:text-3xl leading-loose text-[#4A3728] text-right break-words"
               dir="rtl"
               style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
             >
@@ -303,8 +303,8 @@ export default function DailyQuote({
                     }
                     className={`inline-block cursor-pointer px-1 rounded transition-colors ${
                       isPlayingWord && currentWordIndex === index
-                        ? 'bg-green-500/30 text-green-300'
-                        : 'hover:bg-green-500/10'
+                        ? 'bg-[#059669]/20 text-[#059669]'
+                        : 'hover:bg-emerald-100'
                     }`}
                   >
                     <HarakatText 
@@ -333,11 +333,11 @@ export default function DailyQuote({
             className="mb-3 sm:mb-4"
           >
             {quote.translation ? (
-              <p className="text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed">
+              <p className="text-[#4A3728] text-xs sm:text-sm md:text-base leading-relaxed">
                 "{quote.translation}"
               </p>
             ) : (
-              <p className="text-gray-500 text-xs sm:text-sm italic">
+              <p className="text-[#8E7F71] text-xs sm:text-sm italic">
                 {t('dailyQuote.translationNotAvailable')}
               </p>
             )}
@@ -345,16 +345,16 @@ export default function DailyQuote({
         </AnimatePresence>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
           <div>
-            <p className="text-white font-medium text-sm">
+            <p className="text-[#4A3728] font-medium text-sm">
               {quote.surahNameEnglish}
             </p>
-            <p className="text-gray-500 text-xs">
+            <p className="text-[#8E7F71] text-xs">
               {t('common.ayah')} {quote.ayahNumber} • {t('common.juz')} {quote.juzNumber}
             </p>
           </div>
-          <p className="text-gray-600 text-xs" dir="rtl">
+          <p className="text-[#8E7F71] text-xs" dir="rtl">
             {quote.surahNameArabic}
           </p>
         </div>
