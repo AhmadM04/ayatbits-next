@@ -1,6 +1,6 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { connectDB, Puzzle, LikedAyat, User } from '@/lib/db';
+import { connectDB, Puzzle, LikedAyat, User, UserProgress } from '@/lib/db';
 import mongoose from 'mongoose';
 import PuzzleClient from './PuzzleClient';
 import { cleanAyahText } from '@/lib/ayah-utils';
@@ -40,7 +40,7 @@ export default async function PuzzlePage({
 
   // PERFORMANCE FIX: Parallel fetching - fetch User and Puzzle simultaneously
   const [dbUser, puzzle] = await Promise.all([
-    User.findOne({ clerkIds: user.id }),
+    User.findOne({ clerkIds: user.id }).lean(),
     Puzzle.findById(id)
       .populate('surahId')
       .populate('juzId')
@@ -64,8 +64,8 @@ export default async function PuzzlePage({
     );
   }
 
-  // PERFORMANCE FIX: Parallel fetching - fetch related puzzles and liked status simultaneously
-  const [puzzles, likedAyat] = await Promise.all([
+  // PERFORMANCE FIX: Parallel fetching - fetch puzzles, liked status, AND user progress simultaneously
+  const [puzzles, likedAyat, userProgress] = await Promise.all([
     Puzzle.find({
       juzId: puzzle.juzId,
       surahId: puzzle.surahId,
@@ -75,7 +75,11 @@ export default async function PuzzlePage({
     LikedAyat.findOne({
       userId: dbUser._id,
       puzzleId: puzzle._id,
-    }),
+    }).lean(),
+    UserProgress.findOne({
+      userId: dbUser._id,
+      puzzleId: puzzle._id,
+    }).lean(),
   ]);
 
   const currentIndex = puzzles.findIndex((p: any) => p._id.toString() === id);
@@ -96,7 +100,7 @@ export default async function PuzzlePage({
   // User sees page instantly, then data streams in
   
   // Just pass flags to client about what to fetch
-  const hasPro = checkProAccess(dbUser);
+  const hasPro = checkProAccess(dbUser as any);
   const shouldFetchTransliteration = dbUser.showTransliteration || false;
   const selectedTranslation = dbUser.selectedTranslation || 'en.sahih';
 
@@ -129,6 +133,11 @@ export default async function PuzzlePage({
   const nextPuzzleContent = nextPuzzle?.content as { ayahNumber?: number } | undefined;
   const nextPuzzleAyahNumber = nextPuzzleContent?.ayahNumber ?? null;
 
+  // Serialize user progress for client (convert MongoDB objects to plain JSON)
+  const serializedProgress = userProgress 
+    ? JSON.parse(JSON.stringify(userProgress)) 
+    : null;
+
   return (
     <PuzzleClient
       puzzle={serializedPuzzle}
@@ -147,6 +156,8 @@ export default async function PuzzlePage({
       selectedTranslation={selectedTranslation}
       surahNumber={surahNum}
       ayahNumber={ayahNum}
+      // OPTIMIZATION: Pass initial progress data (fetched in parallel on server)
+      initialProgress={serializedProgress}
     />
   );
 }

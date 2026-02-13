@@ -12,6 +12,7 @@ import { TutorialWrapper, useTutorial } from '@/components/tutorial';
 import { puzzleTutorialSteps } from '@/lib/tutorial-configs';
 import { resetTutorial } from '@/lib/tutorial-manager';
 import { useI18n } from '@/lib/i18n';
+import { usePreventBack } from '@/lib/hooks/usePreventBack';
 
 // OPTIMIZED: Dynamically import heavy components
 const WordPuzzle = dynamic(() => import('@/components/WordPuzzle'), {
@@ -50,6 +51,15 @@ interface PuzzleClientProps {
   selectedTranslation?: string;
   surahNumber?: number;
   ayahNumber?: number;
+  // OPTIMIZATION: Initial progress data (fetched in parallel on server)
+  initialProgress?: {
+    _id: string;
+    userId: string;
+    puzzleId: string;
+    status: string;
+    score: number;
+    completedAt?: string;
+  } | null;
 }
 
 export default function PuzzleClient({
@@ -67,6 +77,7 @@ export default function PuzzleClient({
   selectedTranslation = 'en.sahih',
   surahNumber,
   ayahNumber,
+  initialProgress,
 }: PuzzleClientProps) {
   const { t } = useI18n();
   const { startTutorial } = useTutorial();
@@ -83,8 +94,12 @@ export default function PuzzleClient({
   const [isLoadingTransliteration, setIsLoadingTransliteration] = useState(false);
   
   const hasHandledCompletion = useRef(false);
-  const isIntentionalExit = useRef(false);
   const backUrl = versePageUrl || '/dashboard';
+  
+  // PWA FIX: Use the reusable hook to prevent back navigation
+  const isIntentionalExit = usePreventBack({
+    onBackAttempt: () => setShowExitModal(true),
+  });
 
   // Reset completion handler when puzzle changes
   useEffect(() => {
@@ -158,40 +173,6 @@ export default function PuzzleClient({
       clearTimeout(timer);
     };
   }, [shouldFetchTransliteration, surahNumber, ayahNumber]);
-
-  // Handle browser back button / swipe gestures
-  useEffect(() => {
-    // Add a dummy history entry so we can intercept the back navigation
-    window.history.pushState({ puzzleInterceptor: true }, '');
-    
-    const handlePopState = (event: PopStateEvent) => {
-      // Don't intercept if we're intentionally exiting
-      if (isIntentionalExit.current) {
-        return;
-      }
-      
-      // Check if this is our interceptor state
-      if (event.state?.puzzleInterceptor) {
-        // Prevent the default back navigation
-        event.preventDefault();
-        // Push the state back so we stay on the same page
-        window.history.pushState({ puzzleInterceptor: true }, '');
-        // Show the exit confirmation modal
-        setShowExitModal(true);
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-      // Only clean up the interceptor state if we're not intentionally exiting
-      if (!isIntentionalExit.current && window.history.state?.puzzleInterceptor) {
-        window.history.back();
-      }
-    };
-  }, []);
-
 
   const handleRestartTutorial = () => {
     resetTutorial('puzzle_guide');
