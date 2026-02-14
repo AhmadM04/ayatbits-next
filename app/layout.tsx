@@ -222,24 +222,49 @@ export default function RootLayout({
       afterSignInUrl="/dashboard"
       afterSignUpUrl="/onboarding"
     >
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <head>
-          {/* Set theme before page renders to prevent flash */}
+          {/* ============================================================================
+              CRITICAL: Theme Injection Before React Hydration
+              ============================================================================
+              This script runs BEFORE React mounts to prevent FOUC (Flash of Unstyled Content)
+              Uses cookie fallback for SSR compatibility + localStorage for client persistence
+              ============================================================================ */}
           <script
             dangerouslySetInnerHTML={{
               __html: `
                 (function() {
                   try {
-                    const theme = localStorage.getItem('theme') || 'dark';
+                    // Priority 1: Read from cookie (survives SSR)
+                    const cookieTheme = document.cookie.match(/theme=([^;]+)/)?.[1];
+                    // Priority 2: Read from localStorage (client-side)
+                    const localTheme = typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null;
+                    // Priority 3: Default to dark
+                    const theme = cookieTheme || localTheme || 'dark';
+                    
                     let effectiveTheme = 'dark';
                     if (theme === 'system') {
                       effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
                     } else {
                       effectiveTheme = theme;
                     }
-                    document.documentElement.classList.remove('light', 'dark');
-                    document.documentElement.classList.add(effectiveTheme);
-                  } catch (e) {}
+                    
+                    // Force DOM update before React hydrates
+                    const root = document.documentElement;
+                    root.classList.remove('light', 'dark');
+                    root.classList.add(effectiveTheme);
+                    
+                    // Sync cookie and localStorage
+                    if (!cookieTheme && localTheme) {
+                      document.cookie = 'theme=' + localTheme + '; path=/; max-age=31536000; SameSite=Lax';
+                    }
+                    if (!localTheme && cookieTheme) {
+                      localStorage.setItem('theme', cookieTheme);
+                    }
+                  } catch (e) {
+                    // Fallback to dark mode on error
+                    document.documentElement.classList.add('dark');
+                  }
                 })();
               `,
             }}
@@ -281,6 +306,27 @@ export default function RootLayout({
           <link rel="dns-prefetch" href="https://everyayah.com" />
           <link rel="preconnect" href="https://api.quran.com" crossOrigin="anonymous" />
           <link rel="preconnect" href="https://everyayah.com" crossOrigin="anonymous" />
+          
+          {/* ============================================================================
+              CSS BURIAL: Force-hide all progress bars and loading indicators
+              ============================================================================ */}
+          <style dangerouslySetInnerHTML={{
+            __html: `
+              #nprogress, 
+              #nprogress .bar, 
+              #nprogress .peg, 
+              #nprogress .spinner,
+              .next-top-loader, 
+              .loading-bar,
+              [role="progressbar"]:not([aria-label*="audio"]):not([aria-label*="video"]) {
+                display: none !important;
+                height: 0 !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+              }
+            `
+          }} />
         </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${amiriQuran.variable} antialiased bg-[#0a0a0a] text-white dark:bg-[#0a0a0a] dark:text-white`}

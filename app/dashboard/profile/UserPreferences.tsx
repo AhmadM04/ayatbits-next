@@ -20,13 +20,26 @@ export default function UserPreferences({
   const [emailNotifications, setEmailNotifications] = useState(initialEmailNotifications);
   const [inAppNotifications, setInAppNotifications] = useState(initialInAppNotifications);
 
-  // Sync database preference with localStorage and apply theme on mount
+  // Sync database preference with localStorage/cookie and apply theme on mount
   useEffect(() => {
-    const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
-    const themeToApply = storedTheme || initialTheme;
+    // Priority 1: Cookie (survives hard reload)
+    const cookieTheme = document.cookie.match(/theme=([^;]+)/)?.[1] as 'light' | 'dark' | 'system' | null;
+    // Priority 2: LocalStorage (client backup)
+    const localTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
+    // Priority 3: Server-provided initial theme
+    const themeToApply = cookieTheme || localTheme || initialTheme;
+    
+    console.log('🎨 Theme initialization:', { cookieTheme, localTheme, initialTheme, final: themeToApply });
     
     setCurrentTheme(themeToApply);
     applyThemeToDom(themeToApply);
+    
+    // Sync storage layers if they're out of sync
+    if (cookieTheme && !localTheme) {
+      localStorage.setItem('theme', cookieTheme);
+    } else if (localTheme && !cookieTheme) {
+      document.cookie = `theme=${localTheme}; path=/; max-age=31536000; SameSite=Lax`;
+    }
   }, [initialTheme]);
 
   // Apply theme to DOM immediately
@@ -36,41 +49,54 @@ export default function UserPreferences({
     console.log('🎨 Applying theme to DOM:', theme);
     console.log('📋 Current classes BEFORE:', root.className);
     
+    let effectiveTheme: 'dark' | 'light' = 'dark';
+    
     if (theme === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
+      effectiveTheme = 'dark';
     } else if (theme === 'light') {
-      root.classList.remove('dark');
-      root.classList.add('light');
+      effectiveTheme = 'light';
     } else {
       // System preference
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.classList.toggle('dark', isDark);
-      root.classList.toggle('light', !isDark);
-      console.log('💻 System preference detected:', isDark ? 'dark' : 'light');
+      effectiveTheme = isDark ? 'dark' : 'light';
+      console.log('💻 System preference detected:', effectiveTheme);
     }
+    
+    // Force DOM update with toggle (more reliable than add/remove)
+    root.classList.toggle('dark', effectiveTheme === 'dark');
+    root.classList.toggle('light', effectiveTheme === 'light');
     
     console.log('✅ Current classes AFTER:', root.className);
   };
 
   const handleThemeChange = async (newTheme: 'light' | 'dark' | 'system') => {
     // ============================================================================
-    // OPTIMISTIC UI UPDATE - User sees changes INSTANTLY
+    // FORCED SYNCHRONIZATION - Multi-layer persistence
     // ============================================================================
-    // The order matters: DOM → State → Storage → Network
-    // This ensures zero perceived latency for the user
+    // 1. DOM (instant visual change)
+    // 2. State (React component update)
+    // 3. Cookie (SSR-compatible, survives hard reload)
+    // 4. LocalStorage (client-side backup)
+    // 5. Database (background sync)
     // ============================================================================
     
-    // 1. INSTANT DOM UPDATE (Changes colors immediately - most important!)
+    console.log('🔄 Theme change initiated:', newTheme);
+    
+    // 1. INSTANT DOM UPDATE (Force colors to change immediately)
     applyThemeToDom(newTheme);
     
     // 2. INSTANT STATE UPDATE (Moves the button highlight)
     setCurrentTheme(newTheme);
     
-    // 3. PERSIST TO LOCALSTORAGE (Survives page refresh)
-    localStorage.setItem('theme', newTheme);
+    // 3. COOKIE PERSISTENCE (Survives hard reload + SSR)
+    document.cookie = `theme=${newTheme}; path=/; max-age=31536000; SameSite=Lax`;
+    console.log('🍪 Cookie set:', document.cookie);
     
-    // 4. BACKGROUND NETWORK SYNC (Fire and forget - don't block UI)
+    // 4. LOCALSTORAGE BACKUP (Client-side persistence)
+    localStorage.setItem('theme', newTheme);
+    console.log('💾 LocalStorage set:', newTheme);
+    
+    // 5. BACKGROUND DATABASE SYNC (Fire and forget - don't block UI)
     updatePreference('theme', newTheme).catch(error => {
       console.error("❌ Failed to save theme to DB (non-blocking):", error);
       // Don't revert UI - user experience comes first
