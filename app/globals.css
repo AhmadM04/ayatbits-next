@@ -371,3 +371,25 @@ html {
 .motion-safe\:animation-complete {
   will-change: auto;
 }
+
+/* ============================================================================
+   HIDE NEXT.JS DEFAULT LOADING INDICATOR
+   ============================================================================
+   Next.js 13+ shows a yellow progress bar at the top during navigation
+   We replace it with our custom theme-aware loading skeletons
+   ============================================================================ */
+#nprogress {
+  display: none !important;
+}
+
+#nprogress .bar {
+  display: none !important;
+}
+
+#nprogress .peg {
+  display: none !important;
+}
+
+#nprogress .spinner {
+  display: none !important;
+}
