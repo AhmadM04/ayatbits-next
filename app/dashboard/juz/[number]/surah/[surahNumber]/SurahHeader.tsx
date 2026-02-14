@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, BookOpen } from 'lucide-react';
+import { ArrowLeft, BookOpen, Home } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import TafseerButtons from './TafseerButtons';
 
@@ -76,6 +76,14 @@ export default function SurahHeader({
                 <BookOpen className="w-5 h-5 text-[#8E7F71] dark:text-gray-400" />
               </Link>
             )}
+            {/* Home Button */}
+            <Link
+              href="/dashboard"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors flex-shrink-0"
+              title={t('common.home')}
+            >
+              <Home className="w-5 h-5 text-[#8E7F71] dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400" />
+            </Link>
           </div>
         </div>
       </div>
