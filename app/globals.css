@@ -201,6 +201,60 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+/* ============================================================================
+   PREMIUM BASE TYPOGRAPHY - Inter Font System
+   ============================================================================
+   Professional, academic typography with proper weights and spacing
+   ============================================================================ */
+
+/* Base Font - Inter (Applied globally via Tailwind) */
+body {
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+  font-weight: 400;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  text-rendering: optimizeLegibility;
+}
+
+/* Headings - Professional Hierarchy */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans), sans-serif;
+  font-weight: 600;         /* Semi-bold for headers */
+  letter-spacing: -0.02em;  /* Tighter tracking for large text */
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 2.5rem;        /* 40px */
+  font-weight: 700;         /* Bold */
+}
+
+h2 {
+  font-size: 2rem;          /* 32px */
+  font-weight: 600;         /* Semi-bold */
+}
+
+h3 {
+  font-size: 1.5rem;        /* 24px */
+  font-weight: 600;
+}
+
+/* Paragraphs - Comfortable Reading */
+p {
+  line-height: 1.75;        /* leading-7 */
+  margin-bottom: 1rem;
+}
+
+/* Strong/Bold Text */
+strong, b {
+  font-weight: 600;         /* Semi-bold instead of bold for Inter */
+}
+
+/* Code and Mono */
+code, pre {
+  font-family: var(--font-mono), Monaco, 'Courier New', monospace;
+  font-feature-settings: 'liga' 0;
+}
+
 /* 
  * Smooth animations - applied only to interactive elements for better mobile performance
  * Removed global * selector to prevent layout thrashing on mobile devices
@@ -308,21 +362,57 @@ html {
   white-space: normal;
 }
 
-/* Arabic Font - Uthmani script for Quranic text */
+/* ============================================================================
+   PROFESSIONAL ARABIC TYPOGRAPHY - Mushaf-Quality Rendering
+   ============================================================================
+   Premium Arabic font rendering with proper harakat spacing and ligatures
+   Prevents clipping of diacritics and ensures authentic Quranic appearance
+   ============================================================================ */
+
 .font-arabic {
-  font-family: var(--font-amiri), 'Amiri Quran', 'Scheherazade New', 'Traditional Arabic', serif;
-  font-feature-settings: 'liga' 1, 'dlig' 1, 'calt' 1;
+  font-family: var(--font-arabic), 'Amiri Quran', 'Scheherazade New', 'Traditional Arabic', serif;
+  
+  /* OpenType Features - Enable ligatures and contextual alternatives */
+  font-feature-settings: 
+    'liga' 1,    /* Standard ligatures */
+    'dlig' 1,    /* Discretionary ligatures */
+    'calt' 1,    /* Contextual alternates */
+    'cv01' 1,    /* Character variant 01 */
+    'cv02' 1;    /* Character variant 02 */
+  
+  /* High-Quality Rendering */
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Improve Arabic text wrapping */
-  word-spacing: normal;
-  letter-spacing: 0.01em;
+  
+  /* Prevent Harakat Clipping - Extra line height for diacritics */
+  line-height: 2;           /* Generous spacing for harakat */
+  
+  /* Text Layout Optimization */
+  word-spacing: 0.05em;     /* Slight word spacing for readability */
+  letter-spacing: 0.01em;   /* Minimal letter spacing */
+  
+  /* Text Wrapping */
   overflow-wrap: break-word;
   word-break: normal;
-  /* Better line breaking for Arabic */
   line-break: auto;
   white-space: normal;
+  
+  /* Direction */
+  direction: rtl;
+  text-align: right;
+}
+
+/* Arabic Text in Headings - Larger, bolder, more prominent */
+h1 .font-arabic,
+h2 .font-arabic,
+h3 .font-arabic,
+.font-arabic.text-2xl,
+.font-arabic.text-3xl,
+.font-arabic.text-4xl,
+.font-arabic.text-5xl {
+  line-height: 2.2;         /* More space for larger text */
+  font-weight: 400;         /* Keep regular weight for Arabic */
 }
 
 /* Clerk Social Button Overrides */

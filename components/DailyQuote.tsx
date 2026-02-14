@@ -266,9 +266,8 @@ export default function DailyQuote({
             className="mb-3 sm:mb-4"
           >
             <p 
-              className="text-lg sm:text-2xl md:text-3xl leading-loose text-[#4A3728] dark:text-gray-100 text-right break-words"
+              className="font-arabic text-2xl sm:text-3xl md:text-4xl text-[#4A3728] dark:text-gray-100"
               dir="rtl"
-              style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
             >
               {enableWordByWordAudio && segments && segments.segments.length > 0 ? (
                 segments.segments.map((wordSegment, index) => (

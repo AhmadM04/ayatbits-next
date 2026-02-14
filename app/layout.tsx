@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Amiri_Quran } from "next/font/google";
+import { Inter, Amiri_Quran, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ToastProvider } from "@/components/Toast";
 import { ThemeProvider } from "@/lib/theme-context";
@@ -10,30 +10,42 @@ import { AccessProvider } from "@/lib/providers/access-provider";
 import "./globals.css";
 import Script from "next/script";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// ============================================================================
+// PREMIUM TYPOGRAPHY SYSTEM - Professional Mushaf Look
+// ============================================================================
+// Inter: Clean, academic sans-serif with excellent readability
+// Amiri Quran: Authentic Quranic script with proper harakat rendering
+// Geist Mono: Code and technical content
+// ============================================================================
+
+// Primary Sans-Serif - Inter (Premium, Academic Feel)
+const inter = Inter({
+  variable: "--font-sans",
+  subsets: ["latin", "latin-ext", "cyrillic"],
   display: "swap",
   preload: true,
-  fallback: ["system-ui", "arial"],
+  fallback: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "system-ui"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
-  preload: false,
-});
-
-// Amiri Quran font for proper Uthmani script display
+// Arabic/Quranic Font - Amiri Quran (Uthmani Script)
 const amiriQuran = Amiri_Quran({
   weight: "400",
   subsets: ["arabic", "latin"],
-  variable: "--font-amiri",
+  variable: "--font-arabic",
   display: "swap",
   preload: true,
-  fallback: ["serif"],
-  adjustFontFallback: false, // Skip font optimization during build to avoid connection errors
+  fallback: ["Scheherazade New", "Traditional Arabic", "serif"],
+  adjustFontFallback: false, // Prevents build errors with custom fonts
+});
+
+// Monospace - Geist Mono (Code/Technical)
+const geistMono = Geist_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  display: "swap",
+  preload: false,
+  fallback: ["Monaco", "Courier New", "monospace"],
 });
 
 export const viewport: Viewport = {
@@ -329,7 +341,7 @@ export default function RootLayout({
           }} />
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} ${amiriQuran.variable} antialiased bg-[#F8F9FA] dark:bg-[#0a0a0a] text-[#4A3728] dark:text-gray-100 transition-colors duration-200`}
+          className={`${inter.variable} ${geistMono.variable} ${amiriQuran.variable} font-sans antialiased bg-[#F8F9FA] dark:bg-[#0a0a0a] text-[#4A3728] dark:text-gray-100 transition-colors duration-200`}
         >
           <ThemeProvider>
             <MotionProvider>

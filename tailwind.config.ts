@@ -35,10 +35,38 @@ const config: Config = {
         ring: 'hsl(var(--ring))',
       },
       fontFamily: {
-        sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
-        mono: ['var(--font-geist-mono)', 'monospace'],
-        arabic: ['var(--font-amiri)', 'Amiri Quran', 'serif'],
-        uthmani: ['Uthmani', 'var(--font-amiri)', 'Amiri Quran', 'serif'],
+        // Primary sans-serif (Inter) - Used for all English/Russian text
+        sans: [
+          'var(--font-sans)',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Roboto',
+          'system-ui',
+          'sans-serif'
+        ],
+        // Monospace (Geist Mono) - Code and technical content
+        mono: [
+          'var(--font-mono)',
+          'Monaco',
+          'Courier New',
+          'monospace'
+        ],
+        // Arabic/Quranic text (Amiri Quran) - All Quranic verses
+        arabic: [
+          'var(--font-arabic)',
+          'Amiri Quran',
+          'Scheherazade New',
+          'Traditional Arabic',
+          'serif'
+        ],
+        // Uthmani Mushaf script (Local font file) - Mushaf page view
+        uthmani: [
+          'Uthmani',
+          'var(--font-arabic)',
+          'Amiri Quran',
+          'serif'
+        ],
       },
     },
   },
