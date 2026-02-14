@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
+import { useState, useEffect } from 'react';
 import ProfileContent from './ProfileContent';
 import TranslationSelector from './TranslationSelector';
 import AudioSettings from './AudioSettings';
@@ -67,6 +68,27 @@ export default function ProfilePageClient({
   userPreferences,
 }: ProfilePageClientProps) {
   const { t } = useI18n();
+  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('dark');
+
+  // Track theme changes from DOM
+  useEffect(() => {
+    const updateTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setCurrentTheme(isDark ? 'dark' : 'light');
+    };
+
+    // Initial check
+    updateTheme();
+
+    // Watch for class changes on html element
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   // Show banner if user skipped onboarding and hasn't completed it
   const showOnboardingBanner = onboardingStatus.skipped && !onboardingStatus.completed;
@@ -181,25 +203,37 @@ export default function ProfilePageClient({
           <div className="bg-white dark:bg-[#111] rounded-2xl border border-gray-100 dark:border-white/10 shadow-sm overflow-hidden" data-tutorial="account-section">
             <UserProfile 
               appearance={{
+                variables: {
+                  colorPrimary: "#10b981",
+                  colorBackground: currentTheme === 'dark' ? "#0a0a0a" : "#ffffff",
+                  colorInputBackground: currentTheme === 'dark' ? "#1a1a1a" : "#f9fafb",
+                  colorText: currentTheme === 'dark' ? "#ffffff" : "#4A3728",
+                  colorTextSecondary: currentTheme === 'dark' ? "#9ca3af" : "#8E7F71",
+                  colorInputText: currentTheme === 'dark' ? "#ffffff" : "#4A3728",
+                  borderRadius: "0.75rem",
+                },
                 elements: {
                   rootBox: "w-full",
                   card: "bg-transparent shadow-none w-full border-none",
                   navbar: "hidden",
-                  headerTitle: "text-[#4A3728]",
-                  headerSubtitle: "text-[#8E7F71]",
-                  profileSectionTitleText: "text-[#4A3728] font-semibold",
-                  profileSectionTitle: "text-[#4A3728]",
-                  profileSectionContent: "text-[#4A3728]",
+                  headerTitle: currentTheme === 'dark' ? "text-white" : "text-[#4A3728]",
+                  headerSubtitle: currentTheme === 'dark' ? "text-gray-400" : "text-[#8E7F71]",
+                  profileSectionTitleText: currentTheme === 'dark' ? "text-white font-semibold" : "text-[#4A3728] font-semibold",
+                  profileSectionTitle: currentTheme === 'dark' ? "text-white" : "text-[#4A3728]",
+                  profileSectionContent: currentTheme === 'dark' ? "text-gray-300" : "text-[#4A3728]",
                   formButtonPrimary: "bg-[#059669] hover:bg-emerald-700 text-white transition-colors",
-                  formFieldInput: "bg-gray-50 border-gray-200 text-[#4A3728]",
-                  formFieldLabel: "text-[#4A3728]",
-                  identityPreviewText: "text-[#4A3728]",
-                  identityPreviewEditButton: "text-[#8E7F71] hover:text-[#4A3728]",
-                  userPreviewMainIdentifier: "text-[#4A3728]",
-                  userPreviewSecondaryIdentifier: "text-[#8E7F71]",
-                  accordionTriggerButton: "text-[#4A3728] hover:bg-gray-50",
-                  accordionContent: "text-[#4A3728]",
-                  badge: "bg-emerald-100 text-[#059669] border-emerald-200",
+                  formFieldInput: currentTheme === 'dark' ? "bg-white/5 border-white/10 text-white" : "bg-gray-50 border-gray-200 text-[#4A3728]",
+                  formFieldLabel: currentTheme === 'dark' ? "text-gray-400" : "text-[#4A3728]",
+                  identityPreviewText: currentTheme === 'dark' ? "text-white" : "text-[#4A3728]",
+                  identityPreviewEditButton: currentTheme === 'dark' ? "text-gray-400 hover:text-white" : "text-[#8E7F71] hover:text-[#4A3728]",
+                  userPreviewMainIdentifier: currentTheme === 'dark' ? "text-white" : "text-[#4A3728]",
+                  userPreviewSecondaryIdentifier: currentTheme === 'dark' ? "text-gray-400" : "text-[#8E7F71]",
+                  accordionTriggerButton: currentTheme === 'dark' ? "text-white hover:bg-white/5" : "text-[#4A3728] hover:bg-gray-50",
+                  accordionContent: currentTheme === 'dark' ? "text-gray-300" : "text-[#4A3728]",
+                  badge: currentTheme === 'dark' ? "bg-emerald-900/30 text-emerald-400 border-emerald-500/30" : "bg-emerald-100 text-[#059669] border-emerald-200",
+                  formFieldSuccessText: currentTheme === 'dark' ? "text-green-400" : "text-green-600",
+                  formFieldErrorText: currentTheme === 'dark' ? "text-red-400" : "text-red-600",
+                  footerActionLink: "text-green-500 hover:text-green-400",
                   // Hide profile image section
                   avatarBox: "hidden",
                   avatarImage: "hidden",

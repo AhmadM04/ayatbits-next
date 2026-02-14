@@ -269,8 +269,8 @@ export default function VerseSearch() {
         onClick={() => setIsOpen(true)}
         className="md:hidden w-full flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition-colors text-left group"
       >
-        <div className="w-10 h-10 rounded-full bg-emerald-50/50 flex items-center justify-center group-hover:bg-emerald-100/50 transition-colors">
-          <Search className="w-5 h-5 text-[#059669]" />
+        <div className="w-10 h-10 rounded-full bg-emerald-50/50 dark:bg-green-500/10 flex items-center justify-center group-hover:bg-emerald-100/50 dark:group-hover:bg-green-500/20 transition-colors">
+          <Search className="w-5 h-5 text-emerald-600 dark:text-green-400" />
         </div>
         <span className="text-sm text-[#4A3728] dark:text-white font-medium flex-1">{t('common.search')}</span>
         <span className="text-xs text-[#8E7F71] dark:text-gray-400 px-2 py-1 bg-gray-100 dark:bg-white/5 rounded">F</span>
@@ -332,7 +332,7 @@ export default function VerseSearch() {
                     }}
                     onKeyDown={handleKeyDown}
                     placeholder={t('search.placeholder')}
-                    className="flex-1 bg-transparent text-[#4A3728] placeholder-[#8E7F71] outline-none text-base"
+                    className="flex-1 bg-transparent text-[#4A3728] dark:text-white placeholder-[#8E7F71] dark:placeholder-gray-400 outline-none text-base"
                   />
                   {query && (
                     <button
@@ -340,17 +340,17 @@ export default function VerseSearch() {
                         setQuery('');
                         setError('');
                       }}
-                      className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-1 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                     >
-                      <X className="w-4 h-4 text-[#8E7F71]" />
+                      <X className="w-4 h-4 text-[#8E7F71] dark:text-gray-400" />
                     </button>
                   )}
                 </div>
 
                 {/* Error Message */}
                 {error && (
-                  <div className="px-4 py-3 bg-red-50/50 border-b border-red-200">
-                    <p className="text-red-600 text-sm">{error}</p>
+                  <div className="px-4 py-3 bg-red-50/50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-500/30">
+                    <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
                     <button
                       onClick={() => {
                         setIsOpen(false);
@@ -358,7 +358,7 @@ export default function VerseSearch() {
                         setError('');
                         router.push('/dashboard');
                       }}
-                      className="mt-2 text-xs text-[#8E7F71] hover:text-[#4A3728] underline"
+                      className="mt-2 text-xs text-[#8E7F71] dark:text-gray-400 hover:text-[#4A3728] dark:hover:text-white underline"
                     >
                       {t('search.goToDashboard')}
                     </button>
@@ -367,7 +367,7 @@ export default function VerseSearch() {
 
                 {/* Quick Actions */}
                 <div className="p-3">
-                  <p className="text-xs text-[#8E7F71] mb-2 px-1">{t('search.examples')}:</p>
+                  <p className="text-xs text-[#8E7F71] dark:text-gray-400 mb-2 px-1">{t('search.examples')}:</p>
                   <div className="flex flex-wrap gap-2">
                     {['1', '2:255', '36', '67:1'].map((example) => (
                       <button
@@ -376,7 +376,7 @@ export default function VerseSearch() {
                           setQuery(example);
                           setError('');
                         }}
-                        className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-[#4A3728] text-sm rounded-lg transition-colors"
+                        className="px-3 py-1.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-[#4A3728] dark:text-white text-sm rounded-lg transition-colors"
                       >
                         {example}
                       </button>

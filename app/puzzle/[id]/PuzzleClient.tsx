@@ -356,14 +356,41 @@ export default function PuzzleClient({
                 <SparkleAnimation size={50} loop={true} />
               </motion.div>
               
-              {/* Main success animation */}
+              {/* Main success animation with checkmark */}
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.1, type: 'spring', damping: 12 }}
-                className="mb-4"
+                className="mb-4 relative"
               >
                 <SuccessAnimation size={160} loop={false} />
+                
+                {/* Large Checkmark Overlay */}
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.3, type: 'spring', damping: 15 }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <svg 
+                    width="80" 
+                    height="80" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    className="text-white drop-shadow-lg"
+                  >
+                    <motion.path
+                      d="M20 6L9 17L4 12"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ delay: 0.4, duration: 0.5, ease: "easeOut" }}
+                    />
+                  </svg>
+                </motion.div>
               </motion.div>
               
               <motion.h2

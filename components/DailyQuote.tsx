@@ -173,8 +173,8 @@ export default function DailyQuote({
         className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6"
       >
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="w-5 h-5 text-[#059669]" />
-          <span className="text-sm font-medium text-[#059669]">{t('dailyQuote.verseOfTheDay')}</span>
+          <Sparkles className="w-5 h-5 text-emerald-600 dark:text-green-400" />
+          <span className="text-sm font-medium text-emerald-600 dark:text-green-400">{t('dailyQuote.verseOfTheDay')}</span>
         </div>
         <div className="flex items-center justify-center py-8">
           <SparkleAnimation size={80} loop={true} />
@@ -230,16 +230,16 @@ export default function DailyQuote({
                 ease: "easeInOut"
               }}
             >
-              <Sparkles className="w-5 h-5 text-[#059669]" />
+              <Sparkles className="w-5 h-5 text-emerald-600 dark:text-green-400" />
             </motion.div>
-            <span className="text-sm font-medium text-[#059669]">{t('dailyQuote.verseOfTheDay')}</span>
+            <span className="text-sm font-medium text-emerald-600 dark:text-green-400">{t('dailyQuote.verseOfTheDay')}</span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={playAudio}
               className={`p-2 rounded-lg transition-colors ${
                 isPlaying 
-                  ? 'bg-[#059669] text-white' 
+                  ? 'bg-emerald-600 dark:bg-green-500 text-white' 
                   : 'bg-gray-100 dark:bg-white/5 text-[#8E7F71] dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-[#4A3728] dark:hover:text-white'
               }`}
               title={t('dailyQuote.playRecitation')}
@@ -303,8 +303,8 @@ export default function DailyQuote({
                     }
                     className={`inline-block cursor-pointer px-1 rounded transition-colors ${
                       isPlayingWord && currentWordIndex === index
-                        ? 'bg-[#059669]/20 text-[#059669]'
-                        : 'hover:bg-emerald-100'
+                        ? 'bg-emerald-100 dark:bg-green-500/20 text-emerald-600 dark:text-green-400'
+                        : 'hover:bg-emerald-100 dark:hover:bg-green-500/10'
                     }`}
                   >
                     <HarakatText 
