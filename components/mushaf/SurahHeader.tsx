@@ -42,7 +42,7 @@ export default function SurahHeader({ surahNumber, showBismillah = true }: Surah
             <div className="absolute -bottom-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 border-b-2 border-r-2 border-[#059669] dark:border-green-500 rounded-br" />
             
             <p
-              className="text-xl sm:text-2xl font-arabic text-[#059669] dark:text-green-400 text-center font-medium"
+              className="font-arabic text-lg sm:text-xl text-[#059669] dark:text-green-400 text-center font-medium"
               dir="rtl"
             >
               سُورَةُ {surahName}
@@ -63,7 +63,7 @@ export default function SurahHeader({ surahNumber, showBismillah = true }: Surah
           className="text-center mb-4"
         >
           <p
-            className="text-lg sm:text-xl font-arabic text-[#4A3728] dark:text-white"
+            className="font-arabic text-base sm:text-lg text-[#4A3728] dark:text-white"
             dir="rtl"
           >
             <HarakatColoredText text={BISMILLAH} />

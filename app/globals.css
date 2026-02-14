@@ -386,7 +386,7 @@ html {
   -moz-osx-font-smoothing: grayscale;
   
   /* Prevent Harakat Clipping - Extra line height for diacritics */
-  line-height: 2;           /* Generous spacing for harakat */
+  line-height: 1.75;        /* Balanced spacing for harakat without excessive gaps */
   
   /* Text Layout Optimization */
   word-spacing: 0.05em;     /* Slight word spacing for readability */
@@ -403,7 +403,7 @@ html {
   text-align: right;
 }
 
-/* Arabic Text in Headings - Larger, bolder, more prominent */
+/* Arabic Text in Headings - Adjust line height for larger sizes */
 h1 .font-arabic,
 h2 .font-arabic,
 h3 .font-arabic,
@@ -411,8 +411,15 @@ h3 .font-arabic,
 .font-arabic.text-3xl,
 .font-arabic.text-4xl,
 .font-arabic.text-5xl {
-  line-height: 2.2;         /* More space for larger text */
+  line-height: 1.9;         /* Slightly more space for larger text */
   font-weight: 400;         /* Keep regular weight for Arabic */
+}
+
+/* Smaller Arabic text - Tighter line height */
+.font-arabic.text-sm,
+.font-arabic.text-base,
+.font-arabic.text-lg {
+  line-height: 1.65;        /* Less spacing for smaller text */
 }
 
 /* Clerk Social Button Overrides */

@@ -266,7 +266,7 @@ export default function DailyQuote({
             className="mb-3 sm:mb-4"
           >
             <p 
-              className="font-arabic text-2xl sm:text-3xl md:text-4xl text-[#4A3728] dark:text-gray-100"
+              className="font-arabic text-xl sm:text-2xl md:text-3xl text-[#4A3728] dark:text-gray-100"
               dir="rtl"
             >
               {enableWordByWordAudio && segments && segments.segments.length > 0 ? (

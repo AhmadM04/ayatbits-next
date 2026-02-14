@@ -131,9 +131,8 @@ export default function AyahTextDisplay({
   return (
     <>
       <p
-        className="text-xl sm:text-2xl md:text-3xl leading-[2] text-[#4A3728] dark:text-white text-right"
+        className="font-arabic text-lg sm:text-xl md:text-2xl text-[#4A3728] dark:text-white"
         dir="rtl"
-        style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
       >
         {enableWordByWordAudio && segments && segments.segments.length > 0 ? (
           segments.segments.map((wordSegment, index) => (

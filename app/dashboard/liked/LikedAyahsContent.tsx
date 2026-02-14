@@ -152,9 +152,8 @@ export default function LikedAyahsContent() {
                   </div>
                 </div>
                 <p 
-                  className="text-3xl leading-relaxed text-[#4A3728] dark:text-white text-right font-arabic"
+                  className="font-arabic text-lg sm:text-xl text-[#4A3728] dark:text-white"
                   dir="rtl"
-                  style={{ fontFamily: 'var(--font-arabic, "Amiri", serif)' }}
                 >
                   <HarakatColoredText text={ayah.ayahText} />
                 </p>
