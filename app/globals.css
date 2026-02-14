@@ -174,10 +174,31 @@
   --color-neutral-dark: var(--neutral-dark-gray);
 }
 
-body {
-  background: hsl(var(--background));
+/* ============================================================================
+   ROOT BACKGROUND SANITY CHECK - Prevents "Ghost" Yellow Background
+   ============================================================================
+   Forces html and body to match our theme colors exactly
+   Prevents any bleed-through during overscroll or page transitions
+   ============================================================================ */
+html, body {
+  /* Light Mode: Warm Off-White (Modern Parchment) */
+  background-color: #F8F9FA !important;
   color: hsl(var(--foreground));
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+html.dark, 
+html.dark body {
+  /* Dark Mode: Void Black (Cyber-Mushaf) */
+  background-color: #0a0a0a !important;
+  color: #fafafa;
+}
+
+/* Mobile Overscroll Protection - Prevents background bleed on "pull" */
+body {
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* 

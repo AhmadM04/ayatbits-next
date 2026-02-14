@@ -329,7 +329,7 @@ export default function RootLayout({
           }} />
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} ${amiriQuran.variable} antialiased bg-[#0a0a0a] text-white dark:bg-[#0a0a0a] dark:text-white`}
+          className={`${geistSans.variable} ${geistMono.variable} ${amiriQuran.variable} antialiased bg-[#F8F9FA] dark:bg-[#0a0a0a] text-[#4A3728] dark:text-gray-100 transition-colors duration-200`}
         >
           <ThemeProvider>
             <MotionProvider>

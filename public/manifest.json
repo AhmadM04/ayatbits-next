@@ -4,8 +4,8 @@
   "description": "Learn and memorize Quranic verses through fun, interactive puzzles",
   "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#16a34a",
+  "background_color": "#F8F9FA",
+  "theme_color": "#10B981",
   "orientation": "portrait-primary",
   "icons": [
     {

@@ -419,8 +419,8 @@ export default function DashboardContent({
 
         {/* Subscription Required Banner */}
         {needsSubscription && (
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-300 rounded-xl">
-            <p className="text-sm text-yellow-800 mb-2">
+          <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-300 dark:border-orange-500/30 rounded-xl">
+            <p className="text-sm text-orange-800 dark:text-orange-400 mb-2">
               Start your 7-day free trial to access all puzzles and features.
             </p>
             <Link
