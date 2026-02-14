@@ -33,6 +33,9 @@ export default function UserPreferences({
   const applyThemeToDom = (theme: 'light' | 'dark' | 'system') => {
     const root = document.documentElement;
     
+    console.log('🎨 Applying theme to DOM:', theme);
+    console.log('📋 Current classes BEFORE:', root.className);
+    
     if (theme === 'dark') {
       root.classList.add('dark');
       root.classList.remove('light');
@@ -44,7 +47,10 @@ export default function UserPreferences({
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       root.classList.toggle('dark', isDark);
       root.classList.toggle('light', !isDark);
+      console.log('💻 System preference detected:', isDark ? 'dark' : 'light');
     }
+    
+    console.log('✅ Current classes AFTER:', root.className);
   };
 
   const handleThemeChange = async (newTheme: 'light' | 'dark' | 'system') => {
