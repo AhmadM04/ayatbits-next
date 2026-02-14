@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@variant dark (&:where(.dark, .dark *));
 /* ============================================================================
    AYATBITS THEME SYSTEM - Semantic Color Variables
    ============================================================================
@@ -15,6 +15,7 @@
      Avoids harsh pure white backgrounds to reduce eye strain. */
   
   /* Backgrounds */
+  
   --background: 250 248 245; /* #FAF8F5 - Warm Off-White (Paper-like) */
   --foreground: 15 23 42;    /* #0F172A - Deep Slate (High contrast text) */
   
@@ -71,6 +72,7 @@
   --neutral-medium-gray: #9ca3af;
   --neutral-dark-gray: #4b5563;
 }
+
 
 /* Dark mode */
 .dark {
