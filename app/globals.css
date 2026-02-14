@@ -373,23 +373,68 @@ html {
 }
 
 /* ============================================================================
-   HIDE NEXT.JS DEFAULT LOADING INDICATOR
+   SURGICAL REMOVAL: ALL PROGRESS BARS (Especially Light Mode Yellow Bar)
    ============================================================================
    Next.js 13+ shows a yellow progress bar at the top during navigation
+   This bar is hardcoded and most visible in Light Mode / PWA
    We replace it with our custom theme-aware loading skeletons
    ============================================================================ */
 #nprogress {
   display: none !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 #nprogress .bar {
   display: none !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 #nprogress .peg {
   display: none !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 #nprogress .spinner {
   display: none !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Force-hide any library-injected progress bars (Light Mode fix) */
+.next-top-loader,
+[role="progressbar"],
+.loading-bar-custom,
+.progress-bar,
+[class*="progress"],
+[class*="loader"]:not(.animate-spin) {
+  display: none !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Specifically target any yellow/amber progress bars in Light Mode */
+[style*="background: rgb(250, 204, 21)"],
+[style*="background: #facc15"],
+[style*="background: #fbbf24"],
+[style*="background-color: rgb(250, 204, 21)"],
+[style*="background-color: #facc15"],
+[style*="background-color: #fbbf24"] {
+  display: none !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
