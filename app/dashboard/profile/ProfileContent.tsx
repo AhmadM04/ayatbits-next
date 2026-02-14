@@ -31,7 +31,7 @@ export default function ProfileContent({ user, stats, trialDaysLeft }: ProfileCo
       <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6 md:col-span-2 transition-colors hover:border-gray-300 dark:hover:border-white/20" data-tutorial="profile-stats">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex-1 min-w-0">
-            <h2 className="text-2xl font-bold text-[#4A3728] dark:text-white mb-2">
+            <h2 className="text-xl font-bold text-[#4A3728] dark:text-white mb-2">
               {user.firstName ? t('profile.userProfile', { name: user.firstName }) : t('profile.myProfile')}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 text-sm truncate">
@@ -66,7 +66,7 @@ export default function ProfileContent({ user, stats, trialDaysLeft }: ProfileCo
           </div>
           <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">{t('profile.surahsCompleted')}</span>
         </div>
-        <p className="text-4xl font-bold text-[#4A3728] dark:text-white">{stats.surahsCompleted}</p>
+        <p className="text-3xl font-bold text-[#4A3728] dark:text-white">{stats.surahsCompleted}</p>
       </div>
 
       <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-6 transition-colors hover:border-gray-300 dark:hover:border-white/20">
@@ -76,7 +76,7 @@ export default function ProfileContent({ user, stats, trialDaysLeft }: ProfileCo
           </div>
           <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">{t('profile.puzzlesSolved')}</span>
         </div>
-        <p className="text-4xl font-bold text-[#4A3728] dark:text-white">{stats.puzzlesSolved}</p>
+        <p className="text-3xl font-bold text-[#4A3728] dark:text-white">{stats.puzzlesSolved}</p>
       </div>
 
     </div>

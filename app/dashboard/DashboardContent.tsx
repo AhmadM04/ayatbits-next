@@ -409,7 +409,7 @@ export default function DashboardContent({
       <main className="max-w-6xl mx-auto px-4 py-6">
         {/* Welcome Section */}
         <div className="mb-6" data-tutorial="welcome-section">
-          <h1 className="text-2xl font-bold mb-1 text-[#4A3728] dark:text-white">
+          <h1 className="text-xl font-bold mb-1 text-[#4A3728] dark:text-white">
             {t('dashboard.welcome', { name: userFirstName || t('dashboard.learner') })}
           </h1>
           <p className="text-[#8E7F71] dark:text-gray-400 text-sm">
@@ -493,7 +493,7 @@ export default function DashboardContent({
                     )}
                     
                     <div className="text-center relative z-0">
-                      <div className="text-2xl font-bold text-[#059669] mb-1 transition-transform hover:scale-110">
+                      <div className="text-xl font-bold text-[#059669] mb-1 transition-transform hover:scale-110">
                         {juz.number}
                       </div>
                       <div className="text-xs text-[#8E7F71] dark:text-gray-500 mb-2 truncate">{juz.name}</div>

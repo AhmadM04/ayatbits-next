@@ -112,7 +112,7 @@ export default function AchievementsContent() {
                 whileHover={{ scale: 1.02, borderColor: 'rgba(5, 150, 105, 0.5)' }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="text-2xl font-bold text-[#059669]">
+                <div className="text-xl font-bold text-[#059669]">
                   {stats.completedPuzzles}
                 </div>
                 <div className="text-xs text-[#8E7F71] dark:text-gray-400">{t('achievements.puzzles')}</div>
@@ -122,7 +122,7 @@ export default function AchievementsContent() {
                 whileHover={{ scale: 1.02, borderColor: 'rgba(249, 115, 22, 0.5)' }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="text-2xl font-bold text-orange-500">
+                <div className="text-xl font-bold text-orange-500">
                   {stats.longestStreak}
                 </div>
                 <div className="text-xs text-[#8E7F71] dark:text-gray-400">{t('achievements.bestStreak')}</div>
@@ -132,7 +132,7 @@ export default function AchievementsContent() {
                 whileHover={{ scale: 1.02, borderColor: 'rgba(59, 130, 246, 0.5)' }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="text-2xl font-bold text-blue-500">
+                <div className="text-xl font-bold text-blue-500">
                   {stats.totalUnlocked}
                 </div>
                 <div className="text-xs text-[#8E7F71] dark:text-gray-400">{t('achievements.trophies')}</div>
