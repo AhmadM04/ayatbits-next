@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme-context';
 import { Sun, Moon, Monitor, Bell, BellOff, Mail } from 'lucide-react';
@@ -22,8 +22,21 @@ export default function UserPreferences({
   const [inAppNotifications, setInAppNotifications] = useState(initialInAppNotifications);
   const [isUpdating, setIsUpdating] = useState(false);
 
+  // Sync database preference with localStorage and theme context on mount
+  useEffect(() => {
+    // Check if localStorage theme differs from database theme
+    const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
+    if (initialTheme && storedTheme !== initialTheme) {
+      // Database theme takes precedence - update localStorage and apply theme
+      setTheme(initialTheme);
+    }
+  }, [initialTheme, setTheme]);
+
   const handleThemeChange = async (newTheme: 'light' | 'dark' | 'system') => {
+    // 1. Immediately update UI (optimistic update)
     setTheme(newTheme);
+    
+    // 2. Persist to database in background
     await updatePreference('theme', newTheme);
   };
 
@@ -51,9 +64,18 @@ export default function UserPreferences({
       if (!response.ok) {
         throw new Error('Failed to update preference');
       }
+      
+      // Successfully saved to database
+      console.log(`✅ Preference '${key}' saved to database:`, value);
     } catch (error) {
       console.error('Failed to update preference:', error);
-      // Optionally show an error toast/notification
+      // If theme update failed, revert to previous theme
+      if (key === 'theme') {
+        const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
+        if (storedTheme) {
+          setTheme(storedTheme);
+        }
+      }
     } finally {
       setIsUpdating(false);
     }
@@ -68,10 +90,10 @@ export default function UserPreferences({
   return (
     <div className="space-y-6">
       {/* Theme Selection */}
-      <div className="bg-white dark:bg-[#111] border border-[#E5E7EB] dark:border-white/10 rounded-2xl p-6 transition-colors hover:border-gray-300 dark:hover:border-white/20 shadow-sm">
+      <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-white/10 rounded-2xl p-6 transition-colors hover:border-gray-300 dark:hover:border-white/20 shadow-sm">
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-[#4A3728] dark:text-white mb-1">{t('preferences.appearance')}</h3>
-          <p className="text-sm text-[#8E7F71] dark:text-gray-400">{t('preferences.appearanceDescription')}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('preferences.appearanceDescription')}</p>
         </div>
         
         <div className="grid grid-cols-3 gap-3">
@@ -87,18 +109,18 @@ export default function UserPreferences({
                 className={`
                   relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all
                   ${isSelected 
-                    ? 'border-[#059669] dark:border-green-500 bg-emerald-50/50 dark:bg-green-500/20' 
-                    : 'border-[#E5E7EB] dark:border-white/10 bg-gray-50 dark:bg-white/5 hover:border-gray-300 dark:hover:border-white/20 hover:bg-gray-100 dark:hover:bg-white/10'
+                    ? 'border-emerald-500 dark:border-emerald-500/70 bg-emerald-50 dark:bg-emerald-900/20' 
+                    : 'border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 hover:border-gray-300 dark:hover:border-white/20 hover:bg-gray-100 dark:hover:bg-white/10'
                   }
                   ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                 `}
               >
-                <Icon className={`w-6 h-6 ${isSelected ? 'text-[#059669] dark:text-green-400' : 'text-[#8E7F71] dark:text-gray-400'}`} />
-                <span className={`text-sm font-medium ${isSelected ? 'text-[#4A3728] dark:text-white' : 'text-[#8E7F71] dark:text-gray-400'}`}>
+                <Icon className={`w-6 h-6 ${isSelected ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-400'}`} />
+                <span className={`text-sm font-medium ${isSelected ? 'text-[#4A3728] dark:text-white' : 'text-gray-600 dark:text-gray-400'}`}>
                   {option.label}
                 </span>
                 {isSelected && (
-                  <div className="absolute top-2 right-2 w-2 h-2 bg-[#059669] rounded-full" />
+                  <div className="absolute top-2 right-2 w-2 h-2 bg-emerald-600 dark:bg-emerald-400 rounded-full" />
                 )}
               </button>
             );
@@ -107,22 +129,22 @@ export default function UserPreferences({
       </div>
 
       {/* Notification Settings */}
-      <div className="bg-white dark:bg-[#111] border border-[#E5E7EB] dark:border-white/10 rounded-2xl p-6 transition-colors hover:border-gray-300 dark:hover:border-white/20 shadow-sm">
+      <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-white/10 rounded-2xl p-6 transition-colors hover:border-gray-300 dark:hover:border-white/20 shadow-sm">
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-[#4A3728] dark:text-white mb-1">{t('preferences.notifications')}</h3>
-          <p className="text-sm text-[#8E7F71] dark:text-gray-400">{t('preferences.notificationsDescription')}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('preferences.notificationsDescription')}</p>
         </div>
         
         <div className="space-y-4">
           {/* Email Notifications */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-[#E5E7EB] dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 transition-colors">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-50/50 rounded-lg border border-[#059669]/30">
-                <Mail className="w-5 h-5 text-[#059669]" />
+              <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-300 dark:border-emerald-500/30">
+                <Mail className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
                 <p className="font-medium text-[#4A3728] dark:text-white">{t('preferences.emailNotifications')}</p>
-                <p className="text-xs text-[#8E7F71] dark:text-gray-400">{t('preferences.emailNotificationsDesc')}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">{t('preferences.emailNotificationsDesc')}</p>
               </div>
             </div>
             
@@ -131,7 +153,7 @@ export default function UserPreferences({
               disabled={isUpdating}
               className={`
                 relative w-14 h-8 rounded-full transition-colors
-                ${emailNotifications ? 'bg-[#059669] dark:bg-green-600' : 'bg-gray-200 dark:bg-gray-700'}
+                ${emailNotifications ? 'bg-emerald-600' : 'bg-gray-200 dark:bg-gray-700'}
                 ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >
@@ -145,23 +167,23 @@ export default function UserPreferences({
           </div>
 
           {/* In-App Notifications */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-[#E5E7EB] dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 transition-colors">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-50/50 rounded-lg border border-blue-200">
+              <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-500/30">
                 {inAppNotifications ? (
-                  <Bell className="w-5 h-5 text-blue-600" />
+                  <Bell className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 ) : (
-                  <BellOff className="w-5 h-5 text-blue-600" />
+                  <BellOff className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 )}
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-[#4A3728] dark:text-white">{t('preferences.inAppNotifications')}</p>
-                  <span className="text-xs px-2 py-0.5 bg-blue-50/50 text-blue-600 border border-blue-200 rounded-md">
+                  <span className="text-xs px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 rounded-md">
                     {t('preferences.comingSoon')}
                   </span>
                 </div>
-                <p className="text-xs text-[#8E7F71] dark:text-gray-400">{t('preferences.inAppNotificationsDesc')}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">{t('preferences.inAppNotificationsDesc')}</p>
               </div>
             </div>
             
@@ -170,7 +192,7 @@ export default function UserPreferences({
               disabled={isUpdating}
               className={`
                 relative w-14 h-8 rounded-full transition-colors
-                ${inAppNotifications ? 'bg-[#059669] dark:bg-green-600' : 'bg-gray-200 dark:bg-gray-700'}
+                ${inAppNotifications ? 'bg-emerald-600' : 'bg-gray-200 dark:bg-gray-700'}
                 ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >

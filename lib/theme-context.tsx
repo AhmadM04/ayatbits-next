@@ -19,6 +19,8 @@ export function ThemeProvider({ children, initialTheme }: { children: ReactNode;
 
   // Apply theme to DOM
   const applyTheme = (themeToApply: Theme) => {
+    if (typeof window === 'undefined') return;
+    
     const root = document.documentElement;
     let effectiveTheme: 'dark' | 'light' = 'dark';
 
@@ -30,9 +32,16 @@ export function ThemeProvider({ children, initialTheme }: { children: ReactNode;
       effectiveTheme = themeToApply;
     }
 
+    // Remove both classes first, then add the correct one
     root.classList.remove('light', 'dark');
     root.classList.add(effectiveTheme);
     setResolvedTheme(effectiveTheme);
+    
+    // Also update viewport theme-color meta tag
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', effectiveTheme === 'dark' ? '#0a0a0a' : '#F8F9FA');
+    }
   };
 
   // Initialize theme
@@ -48,14 +57,15 @@ export function ThemeProvider({ children, initialTheme }: { children: ReactNode;
     // Listen for system theme changes when in system mode
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = () => {
-      if (themeToUse === 'system') {
+      const currentTheme = localStorage.getItem('theme') as Theme | null;
+      if (currentTheme === 'system') {
         applyTheme('system');
       }
     };
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
+  }, [initialTheme]);
 
   // Update theme when it changes
   useEffect(() => {
