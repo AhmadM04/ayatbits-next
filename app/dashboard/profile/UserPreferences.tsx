@@ -20,7 +20,6 @@ export default function UserPreferences({
   const { theme, setTheme } = useTheme();
   const [emailNotifications, setEmailNotifications] = useState(initialEmailNotifications);
   const [inAppNotifications, setInAppNotifications] = useState(initialInAppNotifications);
-  const [isUpdating, setIsUpdating] = useState(false);
 
   // Sync database preference with localStorage and theme context on mount
   useEffect(() => {
@@ -33,11 +32,20 @@ export default function UserPreferences({
   }, [initialTheme, setTheme]);
 
   const handleThemeChange = async (newTheme: 'light' | 'dark' | 'system') => {
-    // 1. Immediately update UI (optimistic update)
+    // 1. Instant UI Feedback (Update the theme context immediately so button highlight moves)
     setTheme(newTheme);
     
-    // 2. Persist to database in background
-    await updatePreference('theme', newTheme);
+    // 2. Instant Visual Change (DOM manipulation is already handled by theme context)
+    // The theme context's setTheme function handles the DOM update
+    
+    // 3. Save to DB (Background)
+    try {
+      await updatePreference('theme', newTheme);
+      console.log(`✅ Preference 'theme' saved: ${newTheme}`);
+    } catch (error) {
+      console.error("Failed to save theme:", error);
+      // Don't revert UI since we want optimistic updates
+    }
   };
 
   const handleEmailNotificationsToggle = async () => {
@@ -53,7 +61,6 @@ export default function UserPreferences({
   };
 
   const updatePreference = async (key: string, value: any) => {
-    setIsUpdating(true);
     try {
       const response = await fetch('/api/user/preferences', {
         method: 'POST',
@@ -66,18 +73,10 @@ export default function UserPreferences({
       }
       
       // Successfully saved to database
-      console.log(`✅ Preference '${key}' saved to database:`, value);
+      return response.json();
     } catch (error) {
       console.error('Failed to update preference:', error);
-      // If theme update failed, revert to previous theme
-      if (key === 'theme') {
-        const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
-        if (storedTheme) {
-          setTheme(storedTheme);
-        }
-      }
-    } finally {
-      setIsUpdating(false);
+      throw error;
     }
   };
 
@@ -105,14 +104,12 @@ export default function UserPreferences({
               <button
                 key={option.value}
                 onClick={() => handleThemeChange(option.value)}
-                disabled={isUpdating}
                 className={`
-                  relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all
+                  relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer
                   ${isSelected 
                     ? 'border-emerald-500 dark:border-emerald-500/70 bg-emerald-50 dark:bg-emerald-900/20' 
                     : 'border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 hover:border-gray-300 dark:hover:border-white/20 hover:bg-gray-100 dark:hover:bg-white/10'
                   }
-                  ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                 `}
               >
                 <Icon className={`w-6 h-6 ${isSelected ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-400'}`} />
@@ -150,11 +147,9 @@ export default function UserPreferences({
             
             <button
               onClick={handleEmailNotificationsToggle}
-              disabled={isUpdating}
               className={`
-                relative w-14 h-8 rounded-full transition-colors
+                relative w-14 h-8 rounded-full transition-colors cursor-pointer
                 ${emailNotifications ? 'bg-emerald-600' : 'bg-gray-200 dark:bg-gray-700'}
-                ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >
               <div
@@ -189,11 +184,9 @@ export default function UserPreferences({
             
             <button
               onClick={handleInAppNotificationsToggle}
-              disabled={isUpdating}
               className={`
-                relative w-14 h-8 rounded-full transition-colors
+                relative w-14 h-8 rounded-full transition-colors cursor-pointer
                 ${inAppNotifications ? 'bg-emerald-600' : 'bg-gray-200 dark:bg-gray-700'}
-                ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >
               <div

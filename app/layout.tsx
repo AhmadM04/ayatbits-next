@@ -222,7 +222,7 @@ export default function RootLayout({
       afterSignInUrl="/dashboard"
       afterSignUpUrl="/onboarding"
     >
-      <html lang="en" className="dark">
+      <html lang="en">
         <head>
           {/* Set theme before page renders to prevent flash */}
           <script
