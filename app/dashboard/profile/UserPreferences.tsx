@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
-import { useTheme } from '@/lib/theme-context';
 import { Sun, Moon, Monitor, Bell, BellOff, Mail } from 'lucide-react';
 
 interface UserPreferencesProps {
@@ -17,28 +16,48 @@ export default function UserPreferences({
   initialInAppNotifications = true,
 }: UserPreferencesProps) {
   const { t } = useI18n();
-  const { theme, setTheme } = useTheme();
+  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark' | 'system'>(initialTheme);
   const [emailNotifications, setEmailNotifications] = useState(initialEmailNotifications);
   const [inAppNotifications, setInAppNotifications] = useState(initialInAppNotifications);
 
-  // Sync database preference with localStorage and theme context on mount
+  // Sync database preference with localStorage and apply theme on mount
   useEffect(() => {
-    // Check if localStorage theme differs from database theme
     const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
-    if (initialTheme && storedTheme !== initialTheme) {
-      // Database theme takes precedence - update localStorage and apply theme
-      setTheme(initialTheme);
+    const themeToApply = storedTheme || initialTheme;
+    
+    setCurrentTheme(themeToApply);
+    applyThemeToDom(themeToApply);
+  }, [initialTheme]);
+
+  // Apply theme to DOM immediately
+  const applyThemeToDom = (theme: 'light' | 'dark' | 'system') => {
+    const root = document.documentElement;
+    
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else if (theme === 'light') {
+      root.classList.remove('dark');
+      root.classList.add('light');
+    } else {
+      // System preference
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.classList.toggle('dark', isDark);
+      root.classList.toggle('light', !isDark);
     }
-  }, [initialTheme, setTheme]);
+  };
 
   const handleThemeChange = async (newTheme: 'light' | 'dark' | 'system') => {
-    // 1. Instant UI Feedback (Update the theme context immediately so button highlight moves)
-    setTheme(newTheme);
+    // 1. Instant State Update (Moves the button highlight)
+    setCurrentTheme(newTheme);
     
-    // 2. Instant Visual Change (DOM manipulation is already handled by theme context)
-    // The theme context's setTheme function handles the DOM update
+    // 2. Instant DOM Update (Changes colors immediately)
+    applyThemeToDom(newTheme);
     
-    // 3. Save to DB (Background)
+    // 3. Update localStorage
+    localStorage.setItem('theme', newTheme);
+    
+    // 4. Background Database Save
     try {
       await updatePreference('theme', newTheme);
       console.log(`✅ Preference 'theme' saved: ${newTheme}`);
@@ -98,7 +117,7 @@ export default function UserPreferences({
         <div className="grid grid-cols-3 gap-3">
           {themeOptions.map((option) => {
             const Icon = option.icon;
-            const isSelected = theme === option.value;
+            const isSelected = currentTheme === option.value;
             
             return (
               <button
