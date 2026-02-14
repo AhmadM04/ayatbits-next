@@ -212,13 +212,13 @@ export default function DailyQuote({
       className="relative overflow-hidden bg-white dark:bg-[#111111] border border-gray-200 dark:border-white/10 shadow-sm rounded-2xl p-4 sm:p-6"
     >
       {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100/30 dark:bg-emerald-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-24 h-24 bg-green-100/30 dark:bg-green-500/5 rounded-full blur-2xl" />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50/50 dark:bg-emerald-500/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-50/30 dark:bg-green-500/5 rounded-full blur-2xl" />
       
       <div className="relative">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-[#4A3728] dark:text-gray-100">
             <motion.div
               animate={{ 
                 rotate: [0, 10, -10, 0],

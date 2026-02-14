@@ -54,23 +54,27 @@ export default function UserPreferences({
   };
 
   const handleThemeChange = async (newTheme: 'light' | 'dark' | 'system') => {
-    // 1. Instant State Update (Moves the button highlight)
-    setCurrentTheme(newTheme);
+    // ============================================================================
+    // OPTIMISTIC UI UPDATE - User sees changes INSTANTLY
+    // ============================================================================
+    // The order matters: DOM → State → Storage → Network
+    // This ensures zero perceived latency for the user
+    // ============================================================================
     
-    // 2. Instant DOM Update (Changes colors immediately)
+    // 1. INSTANT DOM UPDATE (Changes colors immediately - most important!)
     applyThemeToDom(newTheme);
     
-    // 3. Update localStorage
+    // 2. INSTANT STATE UPDATE (Moves the button highlight)
+    setCurrentTheme(newTheme);
+    
+    // 3. PERSIST TO LOCALSTORAGE (Survives page refresh)
     localStorage.setItem('theme', newTheme);
     
-    // 4. Background Database Save
-    try {
-      await updatePreference('theme', newTheme);
-      console.log(`✅ Preference 'theme' saved: ${newTheme}`);
-    } catch (error) {
-      console.error("Failed to save theme:", error);
-      // Don't revert UI since we want optimistic updates
-    }
+    // 4. BACKGROUND NETWORK SYNC (Fire and forget - don't block UI)
+    updatePreference('theme', newTheme).catch(error => {
+      console.error("❌ Failed to save theme to DB (non-blocking):", error);
+      // Don't revert UI - user experience comes first
+    });
   };
 
   const handleEmailNotificationsToggle = async () => {

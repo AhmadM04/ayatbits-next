@@ -1,14 +1,28 @@
 // ============================================================================
-// PERFORMANCE OPTIMIZATION: Instant Loading UI
+// NATIVE LOADING EXPERIENCE - Replaces Yellow Progress Bar
 // ============================================================================
 // Displays immediately while server fetches data in parallel
-// Provides visual feedback and improves perceived performance
-// Theme-aware with emerald green accents matching the app design
+// Theme-aware emerald spinner with proper background colors
+// Hides the default Next.js yellow progress bar (see globals.css)
 // ============================================================================
 
 export default function DashboardLoading() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0a0a0a] text-[#4A3728] dark:text-white pb-20">
+      {/* Centered Loading Spinner - Replaces Yellow Bar */}
+      <div className="fixed inset-0 flex items-center justify-center bg-[#F8F9FA] dark:bg-[#0a0a0a] z-50">
+        <div className="flex flex-col items-center gap-4">
+          {/* Emerald Spinner */}
+          <div className="relative w-16 h-16">
+            <div className="absolute inset-0 border-4 border-emerald-200 dark:border-emerald-900/30 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-transparent border-t-emerald-600 dark:border-t-emerald-500 rounded-full animate-spin"></div>
+          </div>
+          {/* Optional Loading Text */}
+          <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading...</p>
+        </div>
+      </div>
+
+      {/* Original Skeleton UI (kept as backup) */}
       {/* Header Skeleton */}
       <header className="sticky top-0 z-10 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5">
         <div className="max-w-6xl mx-auto px-4">
