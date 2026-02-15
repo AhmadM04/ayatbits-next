@@ -556,3 +556,44 @@ h3 .font-arabic,
   visibility: hidden !important;
   opacity: 0 !important;
 }
+
+/* ============================================================================
+   TUTORIAL/TOUR SYSTEM - Mobile Fixes
+   ============================================================================ */
+
+/* Force proper positioning for tour tooltips on mobile */
+.tour-tooltip-container {
+  max-width: 90vw !important;
+  right: auto !important; /* Force calculation from left/top */
+  left: auto !important;
+  transition: transform 0.3s ease-out, left 0.3s ease-out, top 0.3s ease-out;
+  z-index: 1000004 !important;
+  will-change: transform, left, top;
+}
+
+/* Ensure tour backdrop prevents interaction but not visibility */
+.tour-backdrop {
+  touch-action: none;
+  -webkit-overflow-scrolling: none;
+}
+
+/* Smooth transitions for spotlight on mobile */
+.tour-spotlight {
+  will-change: left, top, width, height;
+}
+
+/* Prevent horizontal scroll during tour on mobile */
+body:has(.tour-backdrop) {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Ensure mobile menu items are accessible during tour */
+@media (max-width: 768px) {
+  .tour-tooltip-container {
+    max-width: calc(100vw - 32px) !important;
+    margin: 0 16px;
+  }
+}

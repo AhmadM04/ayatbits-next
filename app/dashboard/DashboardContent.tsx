@@ -288,6 +288,8 @@ export default function DashboardContent({
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors text-[#8E7F71] dark:text-gray-400 hover:text-[#4A3728] dark:hover:text-white"
                 aria-label="Menu"
+                data-mobile-menu-toggle
+                data-menu-open={showMobileMenu}
               >
                 {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>

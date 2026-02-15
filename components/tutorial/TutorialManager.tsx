@@ -57,21 +57,8 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     }
   }, [currentStep, steps.length, skipTutorial]);
 
-  // Allow scrolling during tutorial but manage pointer events
-  useEffect(() => {
-    if (isActive) {
-      // Don't prevent scrolling - users need to scroll to see all tutorial sections
-      document.body.style.overflow = '';
-      document.body.style.pointerEvents = 'auto';
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.pointerEvents = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.pointerEvents = '';
-    };
-  }, [isActive]);
+  // Scroll lock is now managed by TutorialOverlay component
+  // This provides better control over mobile scrolling behavior
 
   return (
     <TutorialContext.Provider
