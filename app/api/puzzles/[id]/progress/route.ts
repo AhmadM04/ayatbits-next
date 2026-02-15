@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB, UserProgress, User } from '@/lib/db';
 import mongoose from 'mongoose';
 import { checkAndSendHighestStreakEmail } from '@/lib/email-triggers';
+import { getCurrentPlan } from '@/lib/subscription';
 
 async function updateStreak(userId: mongoose.Types.ObjectId) {
   const user = await User.findById(userId);
@@ -87,6 +88,68 @@ export async function POST(
         name: user.fullName,
         imageUrl: user.imageUrl,
       });
+    }
+
+    // ============================================================================
+    // FREE TIER LIMIT ENFORCEMENT
+    // ============================================================================
+    // Check if user is on free tier and enforce 10 puzzle/day limit
+    const currentPlan = getCurrentPlan(dbUser);
+    
+    if (currentPlan === 'free' && body.status === 'COMPLETED') {
+      // Check if this is a new puzzle completion (not a retry)
+      const existingCompletion = await UserProgress.findOne({
+        userId: dbUser._id,
+        puzzleId: new mongoose.Types.ObjectId(id),
+        status: 'COMPLETED',
+      });
+
+      // Only enforce limit for NEW completions
+      if (!existingCompletion) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const lastPuzzleDate = dbUser.lastPuzzleDate ? new Date(dbUser.lastPuzzleDate) : null;
+        if (lastPuzzleDate) {
+          lastPuzzleDate.setHours(0, 0, 0, 0);
+        }
+
+        // Reset counter if it's a new day
+        if (!lastPuzzleDate || lastPuzzleDate.getTime() !== today.getTime()) {
+          dbUser.dailyPuzzleCount = 0;
+          dbUser.lastPuzzleDate = today;
+        }
+
+        // Check if user has reached the daily limit
+        if ((dbUser.dailyPuzzleCount || 0) >= 10) {
+          console.log('[puzzle-progress] ❌ Free tier daily limit reached:', {
+            userId: dbUser._id,
+            email: dbUser.email,
+            count: dbUser.dailyPuzzleCount,
+          });
+
+          return NextResponse.json(
+            { 
+              error: 'Daily puzzle limit reached',
+              message: 'You have completed 10 puzzles today. Upgrade to continue or come back tomorrow!',
+              limit: 10,
+              used: dbUser.dailyPuzzleCount,
+              plan: 'free',
+            },
+            { status: 429 } // 429 Too Many Requests
+          );
+        }
+
+        // Increment daily counter
+        dbUser.dailyPuzzleCount = (dbUser.dailyPuzzleCount || 0) + 1;
+        await dbUser.save();
+        
+        console.log('[puzzle-progress] ✅ Free tier puzzle counted:', {
+          userId: dbUser._id,
+          count: dbUser.dailyPuzzleCount,
+          limit: 10,
+        });
+      }
     }
 
     await UserProgress.findOneAndUpdate(

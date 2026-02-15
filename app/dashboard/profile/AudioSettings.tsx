@@ -60,8 +60,8 @@ export default function AudioSettings({ initialEnabled = false }: AudioSettingsP
   return (
     <div className="bg-white dark:bg-[#111] border border-[#E5E7EB] dark:border-white/10 rounded-2xl p-6 transition-colors hover:border-gray-300 dark:hover:border-white/20 shadow-sm" data-tutorial="audio-settings">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-200">
-          <Volume2 className="w-6 h-6 text-blue-600" />
+        <div className="p-3 bg-blue-50/50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-500/30">
+          <Volume2 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
         </div>
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-[#4A3728] dark:text-white">{t('tutorial.wordByWordAudio')}</h3>

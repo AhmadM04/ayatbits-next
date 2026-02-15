@@ -68,8 +68,8 @@ export default function LanguageSelectorProfile({ initialLanguage = 'en' }: Lang
   return (
     <div className="bg-white dark:bg-[#111] border border-[#E5E7EB] dark:border-white/10 rounded-2xl p-6 transition-colors hover:border-gray-300 dark:hover:border-white/20 shadow-sm" data-tutorial="language-selector">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-purple-50/50 rounded-xl border border-purple-200">
-          <Globe className="w-6 h-6 text-purple-600" />
+        <div className="p-3 bg-purple-50/50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-500/30">
+          <Globe className="w-6 h-6 text-purple-600 dark:text-purple-400" />
         </div>
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-[#4A3728] dark:text-white">{t('preferences.language')}</h3>

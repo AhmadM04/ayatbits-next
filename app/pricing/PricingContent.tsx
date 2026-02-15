@@ -14,6 +14,7 @@ export default function PricingContent() {
   const { t } = useI18n();
   const { user, isLoaded } = useUser();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [startingTrial, setStartingTrial] = useState<string | null>(null); // 'basic' or 'pro'
   // PERFORMANCE FIX: Use centralized access provider instead of manual fetch
   const { hasAccess, isLoading: checkingAccess, refetch: refetchAccess } = useAccess();
   const [mounted, setMounted] = useState(false);
@@ -27,6 +28,14 @@ export default function PricingContent() {
     plan: string;
     tier: string;
     daysUntilExpiry?: number | null;
+  } | null>(null);
+  
+  // Trial state
+  const [trialStatus, setTrialStatus] = useState<{
+    hasUsedTrial: boolean;
+    isTrialActive: boolean;
+    trialDaysLeft: number;
+    trialPlan?: 'basic' | 'pro';
   } | null>(null);
   
   const searchParams = useSearchParams();
@@ -71,30 +80,38 @@ export default function PricingContent() {
   useEffect(() => {
     if (!mounted || !isLoaded || !user || hasAccess === null) return;
     
-    // Fetch subscription details if user has access
-    if (hasAccess) {
-      const fetchDetails = async () => {
-        try {
-          const response = await fetch('/api/check-access', {
-            cache: 'no-store',
-            headers: { 'Cache-Control': 'no-cache' },
+    // Fetch subscription details and trial status
+    const fetchDetails = async () => {
+      try {
+        const response = await fetch('/api/check-access', {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' },
+        });
+        const data = await response.json();
+        
+        if (data.hasAccess) {
+          setSubscriptionDetails({
+            plan: data.plan,
+            tier: data.tier,
+            daysUntilExpiry: data.daysUntilExpiry,
           });
-          const data = await response.json();
-          
-          if (data.hasAccess) {
-            setSubscriptionDetails({
-              plan: data.plan,
-              tier: data.tier,
-              daysUntilExpiry: data.daysUntilExpiry,
-            });
-          }
-        } catch (error) {
-          console.error('[PricingContent] Error fetching subscription details:', error);
         }
-      };
-      
-      fetchDetails();
-    } else {
+
+        // Set trial status (available in API response)
+        setTrialStatus({
+          hasUsedTrial: data.hasUsedTrial || false,
+          isTrialActive: data.isTrialActive || false,
+          trialDaysLeft: data.trialDaysLeft || 0,
+          trialPlan: data.trialPlan,
+        });
+      } catch (error) {
+        console.error('[PricingContent] Error fetching subscription details:', error);
+      }
+    };
+    
+    fetchDetails();
+    
+    if (!hasAccess) {
       setSubscriptionDetails(null);
     }
     
@@ -211,13 +228,44 @@ export default function PricingContent() {
     }
   };
 
-  // Handle subscription
+  // Handle trial start
+  const handleStartTrial = async (tier: 'basic' | 'pro') => {
+    setStartingTrial(tier);
+    
+    try {
+      const response = await fetch('/api/user/start-trial', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: tier }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('[PricingContent] ✅ Trial started successfully');
+        // Refresh access status
+        await refetchAccess();
+        // Redirect to dashboard
+        router.push('/dashboard');
+      } else {
+        console.error('[PricingContent] ❌ Trial start failed:', data.error);
+        alert(data.error || 'Failed to start trial');
+        setStartingTrial(null);
+      }
+    } catch (error) {
+      console.error('[PricingContent] Trial start error:', error);
+      alert('Failed to start trial. Please try again.');
+      setStartingTrial(null);
+    }
+  };
+
+  // Handle subscription (for upgrades after trial or direct purchase)
   const handleSubscribe = async (priceId: string, tier: 'basic' | 'pro') => {
     setLoadingPlan(priceId);
     
     try {
       // PERFORMANCE FIX: Use centralized access state instead of manual fetch
-      if (hasAccess) {
+      if (hasAccess && !trialStatus?.isTrialActive) {
         alert(t('pricing.alreadyHaveAccessAlert'));
         window.location.href = '/dashboard';
         return;
@@ -557,45 +605,102 @@ export default function PricingContent() {
                   </SignUpButton>
                 </SignedOut>
                 <SignedIn>
-                  {hasAccess ? (
-                    <Link href="/dashboard">
-                      <button className="w-full h-12 rounded-xl font-semibold bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all">
-                        <span className="flex items-center justify-center gap-2">
-                          {t('pricing.goToDashboard')}
-                          <ArrowRight className="w-4 h-4" />
+                  {(() => {
+                    // User has active subscription (non-trial)
+                    if (hasAccess && !trialStatus?.isTrialActive) {
+                      return (
+                        <Link href="/dashboard">
+                          <button className="w-full h-12 rounded-xl font-semibold bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all">
+                            <span className="flex items-center justify-center gap-2">
+                              {t('pricing.goToDashboard')}
+                              <ArrowRight className="w-4 h-4" />
+                            </span>
+                          </button>
+                        </Link>
+                      );
+                    }
+
+                    // Trial is currently active for THIS plan
+                    if (trialStatus?.isTrialActive && trialStatus.trialPlan === plan.tier) {
+                      return (
+                        <button
+                          disabled
+                          className="w-full h-12 rounded-xl font-semibold bg-green-600/20 text-green-400 border border-green-500/30 cursor-not-allowed"
+                        >
+                          <span className="flex items-center justify-center gap-2">
+                            <Clock className="w-4 h-4" />
+                            {t('pricing.trialActive', { days: trialStatus.trialDaysLeft })} ({trialStatus.trialDaysLeft} {trialStatus.trialDaysLeft === 1 ? 'day' : 'days'} left)
+                          </span>
+                        </button>
+                      );
+                    }
+
+                    // Trial has been used (expired or converted) - show upgrade
+                    if (trialStatus?.hasUsedTrial && !trialStatus.isTrialActive) {
+                      return (
+                        <button
+                          onClick={() => handleSubscribe(plan.priceId, plan.tier)}
+                          disabled={loadingPlan !== null || checkingAccess}
+                          className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                            plan.popular
+                              ? 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white'
+                              : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
+                          }`}
+                        >
+                          <span className="relative z-10 flex items-center justify-center gap-2">
+                            {checkingAccess ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                {t('pricing.checking')}
+                              </>
+                            ) : loadingPlan === plan.priceId ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                {t('pricing.processing')}
+                              </>
+                            ) : (
+                              <>
+                                Upgrade to {plan.tier === 'basic' ? 'Basic' : 'Pro'}
+                                <ArrowRight className="w-4 h-4" />
+                              </>
+                            )}
+                          </span>
+                        </button>
+                      );
+                    }
+
+                    // User hasn't used trial yet - show trial button
+                    return (
+                      <button
+                        onClick={() => handleStartTrial(plan.tier)}
+                        disabled={startingTrial !== null || checkingAccess}
+                        className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                          plan.popular
+                            ? 'bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white'
+                            : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
+                        }`}
+                      >
+                        <span className="relative z-10 flex items-center justify-center gap-2">
+                          {checkingAccess ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              {t('pricing.checking')}
+                            </>
+                          ) : startingTrial === plan.tier ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              Starting Trial...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-4 h-4" />
+                              Start 7-Day Free Trial
+                            </>
+                          )}
                         </span>
                       </button>
-                    </Link>
-                  ) : (
-                    <button
-                      onClick={() => handleSubscribe(plan.priceId, plan.tier)}
-                      disabled={loadingPlan !== null || checkingAccess}
-                      className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-                        plan.popular
-                          ? 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white'
-                          : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
-                      }`}
-                    >
-                      <span className="relative z-10 flex items-center justify-center gap-2">
-                        {checkingAccess ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            {t('pricing.checking')}
-                          </>
-                        ) : loadingPlan === plan.priceId ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            {t('pricing.processing')}
-                          </>
-                        ) : (
-                          <>
-                            {t('pricing.startFreeTrial')}
-                            <ArrowRight className="w-4 h-4" />
-                          </>
-                        )}
-                      </span>
-                    </button>
-                  )}
+                    );
+                  })()}
                 </SignedIn>
               </motion.div>
             ))}
@@ -607,6 +712,25 @@ export default function PricingContent() {
               {t('pricing.securePayment')}
             </p>
           </motion.div>
+
+          {/* Free Tier Link (Subtle) */}
+          <SignedIn>
+            {!hasAccess && !trialStatus?.isTrialActive && (
+              <motion.div 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                transition={{ delay: 0.5 }} 
+                className="mt-8 text-center"
+              >
+                <Link 
+                  href="/dashboard" 
+                  className="text-sm text-gray-600 hover:text-gray-400 transition-colors underline decoration-dotted"
+                >
+                  Continue with limited Free version (10 puzzles/day)
+                </Link>
+              </motion.div>
+            )}
+          </SignedIn>
         </div>
       </main>
     </div>

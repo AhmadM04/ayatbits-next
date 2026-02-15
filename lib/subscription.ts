@@ -186,3 +186,98 @@ export const getTrialDaysRemaining = (user: IUser) => {
   }
   return 0;
 };
+
+/**
+ * Gets the current effective plan for a user.
+ * Returns: 'free' | 'basic' | 'pro'
+ * 
+ * Logic:
+ * 1. If user has active Stripe subscription -> return subscriptionTier
+ * 2. If user has admin access -> return 'pro'
+ * 3. If user has active trial -> return trialPlan
+ * 4. Otherwise -> return 'free' (10 puzzle/day limit)
+ */
+export const getCurrentPlan = (user: IUser): 'free' | 'basic' | 'pro' => {
+  // Admin or Direct Access gets Pro
+  if (user.hasDirectAccess || user.role === 'admin') {
+    return 'pro';
+  }
+
+  // Active Stripe Subscription
+  if (
+    user.stripeCustomerId &&
+    (user.subscriptionStatus === SubscriptionStatusEnum.ACTIVE ||
+     user.subscriptionStatus === SubscriptionStatusEnum.TRIALING) &&
+    user.subscriptionEndDate &&
+    new Date(user.subscriptionEndDate).getTime() > Date.now()
+  ) {
+    return user.subscriptionTier || 'basic';
+  }
+
+  // Lifetime subscription
+  if (
+    user.subscriptionPlan === 'lifetime' &&
+    user.subscriptionStatus === SubscriptionStatusEnum.ACTIVE
+  ) {
+    return user.subscriptionTier || 'pro';
+  }
+
+  // Active Trial (new trial system)
+  if (
+    user.trialStartedAt &&
+    user.trialPlan &&
+    !user.hasUsedTrial // Safety check
+  ) {
+    const trialStart = new Date(user.trialStartedAt).getTime();
+    const trialEnd = trialStart + (7 * DAY_IN_MS);
+    
+    if (Date.now() < trialEnd) {
+      return user.trialPlan; // Return 'basic' or 'pro'
+    }
+  }
+
+  // Legacy trial check (trialEndsAt)
+  if (
+    user.trialEndsAt &&
+    new Date(user.trialEndsAt).getTime() > Date.now()
+  ) {
+    return user.subscriptionTier || 'basic';
+  }
+
+  // Default: Free tier (10 puzzles/day limit + unlimited Mushaf)
+  return 'free';
+};
+
+/**
+ * Check if user's trial is currently active.
+ */
+export const isTrialActive = (user: IUser): boolean => {
+  if (!user.trialStartedAt || !user.trialPlan) {
+    return false;
+  }
+
+  const trialStart = new Date(user.trialStartedAt).getTime();
+  const trialEnd = trialStart + (7 * DAY_IN_MS);
+  
+  return Date.now() < trialEnd;
+};
+
+/**
+ * Get days remaining in trial.
+ * Returns 0 if no trial is active.
+ */
+export const getTrialDaysLeft = (user: IUser): number => {
+  if (!user.trialStartedAt || !user.trialPlan) {
+    return 0;
+  }
+
+  const trialStart = new Date(user.trialStartedAt).getTime();
+  const trialEnd = trialStart + (7 * DAY_IN_MS);
+  const now = Date.now();
+
+  if (now >= trialEnd) {
+    return 0;
+  }
+
+  return Math.ceil((trialEnd - now) / DAY_IN_MS);
+};

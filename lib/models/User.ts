@@ -36,6 +36,13 @@ export interface IUser extends Document {
   trialEndsAt?: Date; // Specific field for the 7-day trial
   subscriptionPlatform?: SubscriptionPlatform; // Track where user subscribed
   iosTransactionId?: string; // Track iOS transaction for verification
+  // Trial Management
+  trialStartedAt?: Date; // When the user started their trial
+  trialPlan?: 'basic' | 'pro'; // Which plan they're trialing
+  hasUsedTrial?: boolean; // Prevent multiple trials
+  // Daily Puzzle Limit (for free tier)
+  dailyPuzzleCount?: number;
+  lastPuzzleDate?: Date; // Track when daily limit resets
   preferredLanguage?: string;
   preferredTranslation?: string;
   selectedTranslation?: string;
@@ -103,6 +110,13 @@ const userSchema = new mongoose.Schema<IUser>(
     trialEndsAt: { type: Date },
     subscriptionPlatform: { type: String, enum: ['web', 'ios'] },
     iosTransactionId: { type: String },
+    // Trial Management
+    trialStartedAt: { type: Date },
+    trialPlan: { type: String, enum: ['basic', 'pro'] },
+    hasUsedTrial: { type: Boolean, default: false },
+    // Daily Puzzle Limit (for free tier)
+    dailyPuzzleCount: { type: Number, default: 0 },
+    lastPuzzleDate: { type: Date },
     lastActivityDate: { type: Date },
     currentStreak: { type: Number, default: 0 },
     longestStreak: { type: Number, default: 0 },

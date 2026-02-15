@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { connectDB, SubscriptionStatusEnum, UserRole } from '@/lib/db';
-import { findUserRobust, checkProAccess } from '@/lib/subscription';
+import { findUserRobust, checkProAccess, getCurrentPlan, isTrialActive, getTrialDaysLeft } from '@/lib/subscription';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -49,6 +49,11 @@ export async function GET() {
     // Check if user has Pro tier access
     const hasProTier = checkProAccess(user);
     
+    // Calculate trial status (NEW TRIAL SYSTEM)
+    const trialActive = isTrialActive(user);
+    const trialDaysLeft = getTrialDaysLeft(user);
+    const currentPlan = getCurrentPlan(user);
+    
     // Calculate grant metadata
     const hasStripeSubscription = !!user.stripeCustomerId;
     let grantType: 'lifetime' | 'temporary' | 'none' = 'none';
@@ -77,6 +82,12 @@ export async function GET() {
         grantType: 'none',
         daysUntilExpiry: null,
         hasStripeSubscription,
+        // Trial status
+        hasUsedTrial: user.hasUsedTrial || false,
+        isTrialActive: false,
+        trialDaysLeft: 0,
+        trialPlan: user.trialPlan,
+        currentPlan: 'pro',
       });
     }
 
@@ -91,6 +102,12 @@ export async function GET() {
         grantType,
         daysUntilExpiry,
         hasStripeSubscription,
+        // Trial status
+        hasUsedTrial: user.hasUsedTrial || false,
+        isTrialActive: trialActive,
+        trialDaysLeft: trialDaysLeft,
+        trialPlan: user.trialPlan,
+        currentPlan,
       });
     }
 
@@ -108,6 +125,12 @@ export async function GET() {
         grantType: 'none',
         daysUntilExpiry: null,
         hasStripeSubscription,
+        // Trial status
+        hasUsedTrial: user.hasUsedTrial || false,
+        isTrialActive: false,
+        trialDaysLeft: 0,
+        trialPlan: user.trialPlan,
+        currentPlan,
       });
     }
 
@@ -140,6 +163,12 @@ export async function GET() {
         grantType: 'none',
         daysUntilExpiry: user.subscriptionStatus === SubscriptionStatusEnum.TRIALING ? daysRemaining : null,
         hasStripeSubscription,
+        // Trial status
+        hasUsedTrial: user.hasUsedTrial || false,
+        isTrialActive: trialActive,
+        trialDaysLeft: trialDaysLeft,
+        trialPlan: user.trialPlan,
+        currentPlan,
       });
     }
 
@@ -162,10 +191,36 @@ export async function GET() {
         grantType: 'none',
         daysUntilExpiry: daysRemaining,
         hasStripeSubscription,
+        // Trial status
+        hasUsedTrial: user.hasUsedTrial || false,
+        isTrialActive: trialActive,
+        trialDaysLeft: trialDaysLeft,
+        trialPlan: user.trialPlan,
+        currentPlan,
       });
     }
 
-    console.log('[check-access] ❌ No valid access method found - denying access', {
+    // Check NEW TRIAL SYSTEM (trialStartedAt, trialPlan)
+    if (trialActive) {
+      console.log('[check-access] ✅ User has ACTIVE NEW TRIAL - granting access');
+      return NextResponse.json({
+        hasAccess: true,
+        plan: 'trial',
+        tier: user.trialPlan || 'basic',
+        hasPro: user.trialPlan === 'pro',
+        grantType: 'none',
+        daysUntilExpiry: trialDaysLeft,
+        hasStripeSubscription,
+        // Trial status
+        hasUsedTrial: true,
+        isTrialActive: true,
+        trialDaysLeft: trialDaysLeft,
+        trialPlan: user.trialPlan,
+        currentPlan: user.trialPlan || 'basic',
+      });
+    }
+
+    console.log('[check-access] ❌ No valid access method found - FREE TIER', {
       subscriptionStatus: user.subscriptionStatus,
       subscriptionPlan: user.subscriptionPlan,
       subscriptionTier: user.subscriptionTier,
@@ -181,6 +236,12 @@ export async function GET() {
       grantType: 'none',
       daysUntilExpiry: null,
       hasStripeSubscription,
+      // Trial status (user on free tier)
+      hasUsedTrial: user.hasUsedTrial || false,
+      isTrialActive: false,
+      trialDaysLeft: 0,
+      trialPlan: user.trialPlan,
+      currentPlan: 'free',
     });
   } catch (error) {
     console.error('[check-access] ❌ Error:', error);

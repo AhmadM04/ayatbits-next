@@ -58,41 +58,41 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
           exit={{ opacity: 0 }}
           onClick={handleBackdropClick}
         >
-          {/* Backdrop - Lighter for day mode */}
+          {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           />
 
-          {/* Modal Content - LIGHT THEME */}
+          {/* Modal Content - Theme-aware */}
           <motion.div
-            className="relative bg-white border border-gray-200 rounded-2xl shadow-2xl 
+            className="relative bg-white dark:bg-[#111111] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl 
                        w-full max-w-sm overflow-hidden"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
           >
-            {/* Close button - Dark on light */}
+            {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-100 
+              className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 
                          transition-colors z-10"
               aria-label="Close"
             >
-              <X className="w-5 h-5 text-gray-600" />
+              <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
 
             {/* Header with large harakat display */}
             <div 
-              className="pt-12 pb-6 px-6 text-center border-b border-gray-100"
+              className="pt-12 pb-6 px-6 text-center border-b border-gray-100 dark:border-white/10"
               style={{ background: `linear-gradient(135deg, ${definition.color}08, transparent)` }}
             >
-              {/* Large harakat character */}
+              {/* Large harakat character - Centered */}
               <div 
-                className="text-7xl font-arabic mb-6"
+                className="text-7xl font-arabic mb-6 flex items-center justify-center"
                 style={{ 
                   color: definition.color,
                   lineHeight: '1.4',
@@ -110,50 +110,50 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
               >
                 {getHarakatName(definition.character, locale) || definition.nameEnglish}
               </h2>
-              <p className="text-xl text-gray-600 font-arabic" dir="rtl">
+              <p className="text-xl text-gray-600 dark:text-gray-400 font-arabic flex items-center justify-center" dir="rtl">
                 {definition.nameArabic}
               </p>
             </div>
 
-            {/* Content - LIGHT THEME */}
+            {/* Content - Theme-aware */}
             <div className="p-6 space-y-4">
               {/* Transliteration */}
-              <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                <span className="text-sm text-gray-500 uppercase tracking-wider">
+              <div className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-white/10">
+                <span className="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('harakat.transliteration').toUpperCase()}
                 </span>
-                <span className="text-lg font-mono text-gray-900">
+                <span className="text-lg font-mono text-gray-900 dark:text-white">
                   {definition.transliteration}
                 </span>
               </div>
 
               {/* Sound */}
-              <div className="flex items-start justify-between py-2 border-b border-gray-200">
-                <span className="text-sm text-gray-500 uppercase tracking-wider">
+              <div className="flex items-start justify-between py-2 border-b border-gray-200 dark:border-white/10">
+                <span className="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('harakat.sound').toUpperCase()}
                 </span>
-                <span className="text-base text-gray-800 text-right max-w-[60%]">
+                <span className="text-base text-gray-800 dark:text-gray-200 text-right max-w-[60%]">
                   {getHarakatSound(definition.character, locale) || definition.sound}
                 </span>
               </div>
 
               {/* Description */}
-              <div className="py-2 border-b border-gray-200">
-                <span className="text-sm text-gray-500 uppercase tracking-wider block mb-2">
+              <div className="py-2 border-b border-gray-200 dark:border-white/10">
+                <span className="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-2">
                   {t('harakat.description').toUpperCase()}
                 </span>
-                <p className="text-sm text-gray-700 leading-relaxed">
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   {getHarakatDescription(definition.character, locale) || definition.description}
                 </p>
               </div>
 
               {/* Example Word */}
               <div className="py-2">
-                <span className="text-sm text-gray-500 uppercase tracking-wider block mb-2">
+                <span className="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-2">
                   {t('harakat.examples').toUpperCase()}
                 </span>
                 <p 
-                  className="text-lg text-gray-900 font-arabic text-right"
+                  className="text-lg text-gray-900 dark:text-white font-arabic text-right"
                   dir="rtl"
                 >
                   {getHarakatExampleWord(definition.character, locale) || definition.exampleWord}
@@ -161,12 +161,13 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
               </div>
             </div>
 
-            {/* Footer - LIGHT THEME */}
+            {/* Footer - Theme-aware */}
             <div className="px-6 pb-6">
               <button
                 onClick={onClose}
-                className="w-full py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 
-                           rounded-xl text-gray-900 font-medium transition-colors"
+                className="w-full py-3 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 
+                           border border-gray-200 dark:border-white/10 rounded-xl 
+                           text-gray-900 dark:text-white font-medium transition-colors"
               >
                 {t('common.gotIt')}
               </button>
