@@ -110,6 +110,14 @@ export default function MushafPageClient({
     [pageNumber, totalPages, router]
   );
 
+  // Helper to check if a verse is on a title page
+  const isTitlePageVerse = (surahNum: number, ayahNum: number) => {
+    return surahNum === 1 || (surahNum === 2 && ayahNum <= 5);
+  };
+
+  // Check if ANY verse on this page is a title page verse
+  const hasAnyTitlePageVerse = verses.some(v => isTitlePageVerse(v.surahNumber, v.ayahNumber));
+
   // Group verses by surah for rendering with headers
   const renderVerses = () => {
     const elements: React.ReactNode[] = [];
@@ -131,11 +139,15 @@ export default function MushafPageClient({
         currentSurah = verse.surahNumber;
       }
 
+      // Determine if this specific verse needs title page layout
+      const isTitleVerse = isTitlePageVerse(verse.surahNumber, verse.ayahNumber);
+
       elements.push(
         <AyahRow
           key={verse.id}
           verse={verse}
           onLongPress={handleLongPress}
+          isTitlePage={isTitleVerse}
         />
       );
     });
@@ -211,9 +223,18 @@ export default function MushafPageClient({
           >
             {/* Arabic Text Container - MADANI MUSHAF STYLE */}
             <div
-              className="text-[1.5rem] sm:text-2xl md:text-3xl font-uthmani text-right"
+              className={`
+                text-[1.5rem] sm:text-2xl md:text-3xl font-uthmani
+                ${hasAnyTitlePageVerse ? 'text-center flex flex-col items-center' : 'text-right'}
+              `}
               dir="rtl"
-              style={{ 
+              style={hasAnyTitlePageVerse ? {
+                lineHeight: '3',
+                wordSpacing: '0.15em',
+                letterSpacing: '0.01em',
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+              } : { 
                 lineHeight: '2.5',
                 wordSpacing: '0.15em',
                 letterSpacing: '0.01em',

@@ -22,11 +22,20 @@ interface AyahRowProps {
   verse: MushafVerse;
   onLongPress: (verse: MushafVerse) => void;
   isHighlighted?: boolean;
+  isTitlePage?: boolean; // NEW: For special title page layout
 }
 
 const LONG_PRESS_DURATION = 500; // 500ms for long press
 
-export default function AyahRow({ verse, onLongPress, isHighlighted = false }: AyahRowProps) {
+/**
+ * Helper function to check if a verse is on a title page
+ * Title pages: Surah 1 (Al-Fatiha) OR Surah 2 (Al-Baqarah) verses 1-5
+ */
+export function isTitlePageVerse(surahNumber: number, ayahNumber: number): boolean {
+  return surahNumber === 1 || (surahNumber === 2 && ayahNumber <= 5);
+}
+
+export default function AyahRow({ verse, onLongPress, isHighlighted = false, isTitlePage = false }: AyahRowProps) {
   const [isHolding, setIsHolding] = useState(false);
 
   // ============================================================================
@@ -56,6 +65,84 @@ export default function AyahRow({ verse, onLongPress, isHighlighted = false }: A
     ? 'text-[#059669] dark:text-green-400 font-medium' 
     : 'text-[#4A3728] dark:text-white';
 
+  // For title page verses, render as centered block
+  if (isTitlePage) {
+    return (
+      <motion.div
+        className={`
+          relative block w-full text-center cursor-pointer select-none font-uthmani py-3 sm:py-4
+          ${textColor}
+          ${isHighlighted ? 'bg-emerald-50 dark:bg-emerald-500/20 rounded-lg' : ''}
+          ${isHolding ? 'bg-blue-50 dark:bg-blue-500/20 rounded-lg' : ''}
+        `}
+        style={{ 
+          lineHeight: '2.8',
+        }}
+        {...longPressHandlers}
+        animate={isHolding ? {
+          scale: [1, 1.01, 1.01],
+          backgroundColor: 'rgba(239, 246, 255, 0.8)',
+        } : {
+          scale: 1,
+          backgroundColor: 'rgba(255, 255, 255, 0)',
+        }}
+        transition={{
+          duration: 0.5,
+          ease: 'easeInOut',
+        }}
+        whileTap={!isHolding ? { scale: 0.98, opacity: 0.8 } : {}}
+      >
+        {/* Centered Quran Text */}
+        {verse.text}{' '}
+        
+        {/* Decorative Ayah number circle (like in the screenshots) */}
+        <span className={`
+          inline-flex items-center justify-center mx-2 whitespace-nowrap
+          ${verse.isCompleted ? 'text-[#059669] dark:text-green-400' : 'text-[#8E7F71] dark:text-gray-400'}
+        `}>
+          <span className="relative inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7">
+            {/* Circle border */}
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 24 24">
+              <circle 
+                cx="12" 
+                cy="12" 
+                r="10" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="1.5"
+                className="opacity-60"
+              />
+            </svg>
+            {/* Number */}
+            <span className="relative text-[0.7em] font-medium">
+              {toArabicNumerals(verse.ayahNumber)}
+            </span>
+          </span>
+        </span>
+        
+        {/* Hover indicator */}
+        <span className={`
+          absolute inset-0 rounded-lg pointer-events-none transition-all duration-150
+          ${isHolding 
+            ? 'opacity-100 bg-blue-50/80' 
+            : 'opacity-0 group-hover:opacity-100 bg-emerald-50/40'
+          }
+        `} />
+        
+        {/* Long-press progress indicator */}
+        {isHolding && (
+          <motion.span
+            className="absolute bottom-0 left-0 h-0.5 bg-blue-500 rounded-full"
+            initial={{ width: '0%' }}
+            animate={{ width: '100%' }}
+            transition={{ duration: LONG_PRESS_DURATION / 1000, ease: 'linear' }}
+          />
+        )}
+      </motion.div>
+    );
+  }
+
+  // Regular inline layout for other verses
   return (
     <motion.span
       className={`

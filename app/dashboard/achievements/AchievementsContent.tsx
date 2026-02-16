@@ -161,7 +161,7 @@ export default function AchievementsContent() {
                       scale: 1.02,
                       transition: { duration: 0.2 }
                     }}
-                    className="bg-gradient-to-br from-emerald-50 via-green-50 to-emerald-50 border border-[#059669]/30 shadow-sm rounded-2xl p-4"
+                    className="bg-gradient-to-br from-emerald-50 via-green-50 to-emerald-50 dark:from-emerald-950/30 dark:via-green-950/20 dark:to-emerald-950/30 border border-[#059669]/30 dark:border-emerald-500/30 shadow-sm rounded-2xl p-4"
                   >
                     <div className="text-3xl mb-2">
                       {achievement.icon}
@@ -169,7 +169,7 @@ export default function AchievementsContent() {
                     <div className="font-semibold text-[#4A3728] dark:text-white text-sm mb-1">
                       {achievement.name}
                     </div>
-                    <div className="text-xs text-[#8E7F71] dark:text-gray-500">
+                    <div className="text-xs text-[#8E7F71] dark:text-gray-400">
                       {achievement.description}
                     </div>
                   </motion.div>
@@ -192,7 +192,7 @@ export default function AchievementsContent() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05, duration: 0.3 }}
-                    className="bg-white border border-gray-100 shadow-sm hover:border-gray-200 rounded-2xl p-4 transition-colors"
+                    className="bg-white dark:bg-[#111111] border border-gray-100 dark:border-white/10 shadow-sm hover:border-gray-200 dark:hover:border-white/20 rounded-2xl p-4 transition-colors"
                   >
                     <div className="flex items-start gap-3">
                       <div className="text-2xl opacity-40 grayscale sepia">
@@ -202,7 +202,7 @@ export default function AchievementsContent() {
                         <div className="font-semibold text-[#4A3728] dark:text-white text-sm mb-1">
                           {achievement.name}
                         </div>
-                        <div className="text-xs text-[#8E7F71] mb-2">
+                        <div className="text-xs text-[#8E7F71] dark:text-gray-400 mb-2">
                           {achievement.description}
                         </div>
                         <div className="w-full bg-gray-100 dark:bg-white/5 rounded-full h-1.5 mb-1 overflow-hidden">

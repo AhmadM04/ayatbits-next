@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, HelpCircle, X } from 'lucide-react';
 import { getHarakatByCategory, type HarakatDefinition } from '@/lib/harakat-utils';
 import { useI18n } from '@/lib/i18n';
-import { getHarakatName } from '@/lib/harakat-i18n';
+import { getHarakatName, getHarakatSound } from '@/lib/harakat-i18n';
 
 interface HarakatLegendProps {
   variant?: 'inline' | 'floating';
@@ -49,12 +49,12 @@ export default function HarakatLegend({
               exit={{ opacity: 0 }}
               onClick={(e) => e.target === e.currentTarget && setIsExpanded(false)}
             >
-              {/* Backdrop - Lighter for day mode */}
-              <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" />
+              {/* Backdrop - Theme-aware */}
+              <div className="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm" />
 
-              {/* Panel - LIGHT THEME */}
+              {/* Panel - Theme-aware */}
               <motion.div
-                className="relative bg-white border border-gray-200 rounded-2xl 
+                className="relative bg-white dark:bg-[#111111] border border-gray-200 dark:border-white/10 rounded-2xl 
                            w-full max-w-md max-h-[80vh] overflow-hidden shadow-xl"
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -62,21 +62,21 @@ export default function HarakatLegend({
                 transition={{ type: 'spring', damping: 25 }}
               >
                 {/* Header */}
-                <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
+                <div className="sticky top-0 bg-white dark:bg-[#111111] border-b border-gray-200 dark:border-white/10 p-4 flex items-center justify-between z-10">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {t('harakat.guide')}
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {t('harakat.diacriticalMarks')}
                     </p>
                   </div>
                   <button
                     onClick={() => setIsExpanded(false)}
-                    className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
                     aria-label={t('harakat.closeGuide')}
                   >
-                    <X className="w-5 h-5 text-gray-600" />
+                    <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                   </button>
                 </div>
 
@@ -98,18 +98,18 @@ export default function HarakatLegend({
     );
   }
 
-  // Inline collapsible variant - LIGHT THEME
+  // Inline collapsible variant - Theme-aware
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+    <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-white/10 rounded-xl overflow-hidden shadow-sm">
       {/* Toggle Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full px-4 py-3 flex items-center justify-between 
-                   hover:bg-gray-50 transition-colors"
+                   hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <HelpCircle className="w-4 h-4 text-blue-600" />
-          <span className="text-sm font-medium text-gray-900">
+          <HelpCircle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <span className="text-sm font-medium text-gray-900 dark:text-white">
             {t('harakat.guide')}
           </span>
         </div>
@@ -117,7 +117,7 @@ export default function HarakatLegend({
           animate={{ rotate: isExpanded ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDown className="w-4 h-4 text-gray-500" />
+          <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
         </motion.div>
       </button>
 
@@ -130,7 +130,7 @@ export default function HarakatLegend({
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="px-4 pb-4 border-t border-gray-200">
+            <div className="px-4 pb-4 border-t border-gray-200 dark:border-white/10">
               <LegendContent 
                 categories={categories}
                 onSelect={onHarakatSelect}
@@ -165,25 +165,25 @@ function LegendContent({ categories, onSelect, compact = false }: LegendContentP
     <div className={compact ? 'pt-3 space-y-4' : 'space-y-6'}>
       {categories.map((category) => (
         <div key={category.name}>
-          {/* Category Header - LIGHT THEME */}
+          {/* Category Header - Theme-aware */}
           <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm font-medium text-gray-600">
+            <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400">
               {getCategoryName(category.name)}
             </h4>
-            <span className="text-xs text-gray-500 font-arabic" dir="rtl">
+            <span className="text-xs text-gray-500 dark:text-gray-400 font-arabic" dir="rtl">
               {category.nameArabic}
             </span>
           </div>
 
-          {/* Harakat Grid - LIGHT THEME */}
+          {/* Harakat Grid - Theme-aware */}
           <div className={`grid ${compact ? 'grid-cols-3 gap-2' : 'grid-cols-2 gap-3'}`}>
             {category.harakat.map((harakat) => (
               <button
                 key={harakat.unicode}
                 onClick={() => onSelect?.(harakat)}
                 className={`
-                  flex items-center gap-2 p-2 rounded-lg border border-gray-200
-                  hover:bg-gray-50 hover:border-gray-300 transition-colors text-left
+                  flex items-center gap-2 p-2 rounded-lg border border-gray-200 dark:border-white/10
+                  hover:bg-gray-50 dark:hover:bg-white/5 hover:border-gray-300 dark:hover:border-white/20 transition-colors text-left
                   ${compact ? 'flex-col text-center' : ''}
                 `}
               >
@@ -205,8 +205,8 @@ function LegendContent({ categories, onSelect, compact = false }: LegendContentP
                     {getHarakatName(harakat.character, locale) || harakat.nameEnglish}
                   </span>
                   {!compact && (
-                    <span className="text-xs text-gray-500 truncate block">
-                      {harakat.sound}
+                    <span className="text-xs text-gray-500 dark:text-gray-400 truncate block">
+                      {getHarakatSound(harakat.character, locale)}
                     </span>
                   )}
                 </div>
@@ -216,8 +216,8 @@ function LegendContent({ categories, onSelect, compact = false }: LegendContentP
         </div>
       ))}
 
-      {/* Tip - LIGHT THEME */}
-      <p className="text-xs text-gray-500 pt-2 border-t border-gray-200">
+      {/* Tip - Theme-aware */}
+      <p className="text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-white/10">
         {t('harakat.tapToSeeDetails')}
       </p>
     </div>
