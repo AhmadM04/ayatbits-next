@@ -13,14 +13,31 @@ import { cleanAyahText } from '@/lib/ayah-utils';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const juzNumber = searchParams.get('juz');
-    const surahNumber = searchParams.get('surah');
-    const ayahNumber = searchParams.get('ayah');
+    
+    // ========================================================================
+    // STEP 1: Parse Query Parameters (Explicit Type Casting)
+    // ========================================================================
+    const surahParam = searchParams.get('surah');
+    const ayahParam = searchParams.get('ayah');
+    const juzParam = searchParams.get('juz');
 
-    // Validate params
-    if (!juzNumber || !surahNumber || !ayahNumber) {
+    // Validate params exist
+    if (!surahParam || !ayahParam) {
       return NextResponse.json(
-        { error: 'Missing required parameters: juz, surah, ayah' },
+        { error: 'Missing required parameters: surah, ayah' },
+        { status: 400 }
+      );
+    }
+
+    // Parse to integers (enforce strict type casting)
+    const surahNum = parseInt(surahParam);
+    const ayahNum = parseInt(ayahParam);
+    const juzNum = juzParam ? parseInt(juzParam) : null;
+
+    // Validate parsed numbers
+    if (isNaN(surahNum) || isNaN(ayahNum) || surahNum < 1 || surahNum > 114 || ayahNum < 1) {
+      return NextResponse.json(
+        { error: 'Invalid surah or ayah number' },
         { status: 400 }
       );
     }
@@ -33,32 +50,45 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    const juzNum = parseInt(juzNumber);
-    const surahNum = parseInt(surahNumber);
-    const ayahNum = parseInt(ayahNumber);
-
     // ========================================================================
-    // OPTIMIZATION: Parallel data fetching with .lean()
+    // STEP 2: Parallel data fetching with .lean()
     // ========================================================================
     const [cachedData, dbUser] = await Promise.all([
-      getCachedSurahVerses(juzNum, surahNum),
-      User.findOne({ clerkUserId: user.id })
+      getCachedSurahVerses(juzNum || 1, surahNum),
+      User.findOne({ clerkIds: user.id }) // FIX: Use 'clerkIds' not 'clerkUserId'
         .select('selectedTranslation enableWordByWordAudio subscriptionPlan')
         .lean(),
     ]);
 
-    if (!cachedData || !dbUser) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    // ========================================================================
+    // STEP 3: Debugging - Log what was queried vs what failed
+    // ========================================================================
+    if (!cachedData) {
+      console.log('[API /api/ayah] Failed to find cached data with query:', {
+        juzNum: juzNum || 1,
+        surahNum,
+      });
+      return NextResponse.json({ error: 'Surah data not found' }, { status: 404 });
+    }
+
+    if (!dbUser) {
+      console.log('[API /api/ayah] Failed to find user with clerkIds:', user.id);
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     const { juz, surah, puzzles } = cachedData;
 
-    // Find current puzzle
+    // Find current puzzle (ayahNumber is already a number in the DB)
     const currentPuzzle = puzzles.find((p: any) => p.ayahNumber === ayahNum);
     const currentIndex = puzzles.findIndex((p: any) => p.ayahNumber === ayahNum);
 
     if (!currentPuzzle) {
-      return NextResponse.json({ error: 'Ayah not found' }, { status: 404 });
+      console.log('[API /api/ayah] Failed to find ayah with query:', {
+        surahNum,
+        ayahNum,
+        availableAyahs: puzzles.map((p: any) => p.ayahNumber),
+      });
+      return NextResponse.json({ error: 'Ayah not found in this surah' }, { status: 404 });
     }
 
     const previousPuzzle = currentIndex > 0 ? puzzles[currentIndex - 1] : null;
@@ -153,7 +183,7 @@ export async function GET(request: NextRequest) {
         // User settings
         selectedTranslation: dbUser.selectedTranslation || 'en.sahih',
         enableWordByWordAudio: dbUser.enableWordByWordAudio || false,
-        subscriptionPlan: dbUser.subscriptionPlan,
+        subscriptionPlan: dbUser.subscriptionPlan || 'FREE',
         
         // All puzzles for ayah selector
         puzzles: puzzles.map((p: any) => ({

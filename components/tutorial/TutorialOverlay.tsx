@@ -124,11 +124,19 @@ export function TutorialOverlay({
         const menuOpened = tryOpenMobileMenu();
         
         if (menuOpened) {
-          // Wait for menu animation to complete
-          await new Promise(resolve => setTimeout(resolve, 200));
+          // Wait for menu animation to complete (increased to 400ms for safety)
+          await new Promise(resolve => setTimeout(resolve, 400));
           
           // Re-query element after menu opens
           element = document.querySelector(selector) as HTMLElement;
+          
+          // If element still hidden or not found after opening menu, skip to next step
+          if (!element || isElementHidden(element)) {
+            console.warn(`Tutorial target still not accessible after opening menu: ${step.target}`);
+            // Auto-skip to next step if element is not available
+            setTimeout(() => onNext(), 500);
+            return;
+          }
         }
       }
       
@@ -144,6 +152,10 @@ export function TutorialOverlay({
         
         // Update position after scroll completes
         setTimeout(updatePosition, 600);
+      } else {
+        console.warn(`Tutorial target not found: ${step.target}`);
+        // Auto-skip to next step if element doesn't exist
+        setTimeout(() => onNext(), 500);
       }
     };
 
