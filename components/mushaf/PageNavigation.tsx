@@ -100,8 +100,8 @@ export default function PageNavigation({
         className={`
           p-1.5 sm:p-2 rounded-lg transition-colors
           ${canGoPrevious 
-            ? 'hover:bg-gray-100 text-[#4A3728]' 
-            : 'text-gray-400 cursor-not-allowed'
+            ? 'hover:bg-gray-100 dark:hover:bg-white/5 text-[#4A3728] dark:text-white' 
+            : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
           }
         `}
         aria-label="Previous page"
@@ -133,7 +133,7 @@ export default function PageNavigation({
               className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[90vw] max-w-xs bg-white dark:bg-[#111] border border-gray-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
             >
               {/* Search Input */}
-              <form onSubmit={handleSearchSubmit} className="p-3 border-b border-gray-200">
+              <form onSubmit={handleSearchSubmit} className="p-3 border-b border-gray-200 dark:border-white/10">
                 <div className="relative">
                   <input
                     ref={inputRef}
@@ -171,8 +171,8 @@ export default function PageNavigation({
                         className={`
                           p-2 rounded-lg text-xs font-medium transition-colors
                           ${isCurrentJuz 
-                            ? 'bg-emerald-50 text-[#059669] border border-[#059669]/30' 
-                            : 'hover:bg-gray-100 text-[#4A3728] border border-gray-200'
+                            ? 'bg-emerald-50 dark:bg-emerald-500/10 text-[#059669] dark:text-green-400 border border-[#059669]/30 dark:border-green-500/30' 
+                            : 'hover:bg-gray-100 dark:hover:bg-white/10 text-[#4A3728] dark:text-white border border-gray-200 dark:border-white/10'
                           }
                         `}
                       >
@@ -201,8 +201,8 @@ export default function PageNavigation({
         className={`
           p-1.5 sm:p-2 rounded-lg transition-colors
           ${canGoNext 
-            ? 'hover:bg-gray-100 text-[#4A3728]' 
-            : 'text-gray-400 cursor-not-allowed'
+            ? 'hover:bg-gray-100 dark:hover:bg-white/5 text-[#4A3728] dark:text-white' 
+            : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
           }
         `}
         aria-label="Next page"

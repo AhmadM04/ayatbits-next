@@ -60,10 +60,10 @@ export default function SurahHeader({ surahNumber, showBismillah = true }: Surah
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="text-center mb-4"
+          className="flex justify-center mb-4"
         >
           <p
-            className="font-arabic text-base sm:text-lg text-[#4A3728] dark:text-white"
+            className="font-arabic text-base sm:text-lg text-[#4A3728] dark:text-white text-center"
             dir="rtl"
           >
             <HarakatColoredText text={BISMILLAH} />

@@ -272,8 +272,8 @@ export default function MushafPageClient({
               className={`
                 flex items-center gap-2 px-4 py-2 rounded-lg transition-colors
                 ${pageNumber > 1 
-                  ? 'bg-gray-100 hover:bg-gray-200 text-[#4A3728]' 
-                  : 'text-gray-400 cursor-not-allowed'
+                  ? 'bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#4A3728] dark:text-white' 
+                  : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
                 }
               `}
             >
@@ -294,8 +294,8 @@ export default function MushafPageClient({
               className={`
                 flex items-center gap-2 px-4 py-2 rounded-lg transition-colors
                 ${pageNumber < totalPages 
-                  ? 'bg-gray-100 hover:bg-gray-200 text-[#4A3728]' 
-                  : 'text-gray-400 cursor-not-allowed'
+                  ? 'bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#4A3728] dark:text-white' 
+                  : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
                 }
               `}
             >

@@ -16,17 +16,22 @@ interface HarakatModalProps {
 export default function HarakatModal({ definition, isOpen, onClose }: HarakatModalProps) {
   const { t, locale } = useI18n();
 
+  // INSTANT CLOSE: Reset state immediately on close
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
   // Close on escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
-        onClose();
+        handleClose();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -42,20 +47,23 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
 
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      handleClose();
     }
-  }, [onClose]);
+  }, [handleClose]);
 
   if (!definition) return null;
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          className={`fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity duration-100 ${
+            isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.08 }}
           onClick={handleBackdropClick}
         >
           {/* Backdrop */}
@@ -64,20 +72,21 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.08 }}
           />
 
           {/* Modal Content - Theme-aware */}
           <motion.div
             className="relative bg-white dark:bg-[#111111] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl 
                        w-full max-w-sm overflow-hidden"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.08, ease: 'easeOut' }}
           >
             {/* Close button */}
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 
                          transition-colors z-10"
               aria-label="Close"
@@ -164,7 +173,7 @@ export default function HarakatModal({ definition, isOpen, onClose }: HarakatMod
             {/* Footer - Theme-aware */}
             <div className="px-6 pb-6">
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="w-full py-3 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 
                            border border-gray-200 dark:border-white/10 rounded-xl 
                            text-gray-900 dark:text-white font-medium transition-colors"

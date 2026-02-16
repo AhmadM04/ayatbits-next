@@ -243,10 +243,22 @@ export default function PricingContent() {
       
       if (data.success) {
         console.log('[PricingContent] ✅ Trial started successfully');
-        // Refresh access status
+        console.log('[PricingContent] 🔄 Refreshing access context...');
+        
+        // 1. Update access context to get the new "Pro" status
         await refetchAccess();
-        // Redirect to dashboard
+        
+        console.log('[PricingContent] ✅ Access refreshed, redirecting to dashboard...');
+        
+        // 2. Force a router refresh to update server components
+        router.refresh();
+        
+        // 3. Force navigation to dashboard
         router.push('/dashboard');
+        
+        // 4. Keep loading state active - let the page navigation handle cleanup
+        // DO NOT call setStartingTrial(null) here
+        return;
       } else {
         console.error('[PricingContent] ❌ Trial start failed:', data.error);
         alert(data.error || 'Failed to start trial');

@@ -20,6 +20,11 @@ export default function HarakatLegend({
   const [isExpanded, setIsExpanded] = useState(false);
   const categories = getHarakatByCategory();
 
+  // INSTANT CLOSE: Reset state immediately on close
+  const handleClose = () => {
+    setIsExpanded(false);
+  };
+
   if (variant === 'floating') {
     return (
       <>
@@ -40,26 +45,35 @@ export default function HarakatLegend({
         </motion.button>
 
         {/* Floating Panel Modal */}
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {isExpanded && (
             <motion.div
-              className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+              className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 transition-opacity duration-100 ${
+                isExpanded ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+              }`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={(e) => e.target === e.currentTarget && setIsExpanded(false)}
+              transition={{ duration: 0.1 }}
+              onClick={(e) => e.target === e.currentTarget && handleClose()}
             >
               {/* Backdrop - Theme-aware */}
-              <div className="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm" />
+              <motion.div 
+                className="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.1 }}
+              />
 
               {/* Panel - Theme-aware */}
               <motion.div
                 className="relative bg-white dark:bg-[#111111] border border-gray-200 dark:border-white/10 rounded-2xl 
                            w-full max-w-md max-h-[80vh] overflow-hidden shadow-xl"
-                initial={{ y: 100, opacity: 0 }}
+                initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 100, opacity: 0 }}
-                transition={{ type: 'spring', damping: 25 }}
+                exit={{ y: 50, opacity: 0 }}
+                transition={{ duration: 0.1 }}
               >
                 {/* Header */}
                 <div className="sticky top-0 bg-white dark:bg-[#111111] border-b border-gray-200 dark:border-white/10 p-4 flex items-center justify-between z-10">
@@ -72,7 +86,7 @@ export default function HarakatLegend({
                     </p>
                   </div>
                   <button
-                    onClick={() => setIsExpanded(false)}
+                    onClick={handleClose}
                     className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
                     aria-label={t('harakat.closeGuide')}
                   >
@@ -86,7 +100,7 @@ export default function HarakatLegend({
                     categories={categories} 
                     onSelect={(def) => {
                       onHarakatSelect?.(def);
-                      setIsExpanded(false);
+                      handleClose();
                     }}
                   />
                 </div>
@@ -115,20 +129,23 @@ export default function HarakatLegend({
         </div>
         <motion.div
           animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.15 }}
         >
           <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
         </motion.div>
       </button>
 
       {/* Collapsible Content */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {isExpanded && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.1 }}
+            className={`transition-opacity duration-100 ${
+              isExpanded ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            }`}
           >
             <div className="px-4 pb-4 border-t border-gray-200 dark:border-white/10">
               <LegendContent 
