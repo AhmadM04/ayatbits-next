@@ -243,20 +243,14 @@ export default function PricingContent() {
       
       if (data.success) {
         console.log('[PricingContent] ✅ Trial started successfully');
-        console.log('[PricingContent] 🔄 Refreshing access context...');
+        console.log('[PricingContent] 🚀 Performing hard redirect to clear stale state...');
         
-        // 1. Update access context to get the new "Pro" status
-        await refetchAccess();
+        // NUCLEAR FIX: Use hard browser reload instead of client-side navigation
+        // This forces a complete server-side re-fetch and prevents redirect loops
+        // caused by stale client state not syncing with fresh DB data
+        window.location.href = '/dashboard';
         
-        console.log('[PricingContent] ✅ Access refreshed, redirecting to dashboard...');
-        
-        // 2. Force a router refresh to update server components
-        router.refresh();
-        
-        // 3. Force navigation to dashboard
-        router.push('/dashboard');
-        
-        // 4. Keep loading state active - let the page navigation handle cleanup
+        // Keep loading state active during redirect
         // DO NOT call setStartingTrial(null) here
         return;
       } else {
