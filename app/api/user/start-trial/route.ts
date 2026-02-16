@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { auth, currentUser, clerkClient } from '@clerk/nextjs/server';
 import { connectDB, User, UserProgress, Puzzle } from '@/lib/db';
 import { findUserRobust } from '@/lib/subscription';
 
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     const now = new Date();
     
     const [updateResult] = await Promise.all([
-      // Update user with trial info
+      // Update user with trial info AND onboarding completion
       User.findByIdAndUpdate(
         user._id,
         {
@@ -94,9 +94,10 @@ export async function POST(request: Request) {
           trialPlan: plan,
           hasUsedTrial: true,
           subscriptionStatus: 'trialing',
+          onboardingCompleted: true, // CRITICAL: Mark onboarding as complete to prevent redirects
         },
         { new: true }
-      ).select('trialStartedAt trialPlan hasUsedTrial subscriptionStatus email').lean(),
+      ).select('trialStartedAt trialPlan hasUsedTrial subscriptionStatus email onboardingCompleted').lean(),
       
       // Background: Get puzzle count (non-blocking, for analytics)
       UserProgress.countDocuments({ 
@@ -108,11 +109,41 @@ export async function POST(request: Request) {
       }).catch(() => 0),
     ]);
 
-    console.log('[start-trial] ✅ Trial activated:', {
+    console.log('[start-trial] ✅ Trial activated in MongoDB:', {
       email: user.email,
       plan,
       trialStartedAt: now,
+      onboardingCompleted: true,
     });
+
+    // ========================================================================
+    // CRITICAL FIX: Update Clerk metadata to sync with database
+    // ========================================================================
+    // This prevents redirect loops caused by middleware/layout checks
+    // that rely on Clerk metadata for onboarding status
+    try {
+      const client = await clerkClient();
+      await client.users.updateUser(userId, {
+        publicMetadata: {
+          onboardingCompleted: true,
+          trialActive: true,
+          trialPlan: plan,
+          role: plan, // Sync the role for middleware checks
+        },
+      });
+      console.log('[start-trial] ✅ Clerk metadata updated:', {
+        onboardingCompleted: true,
+        trialActive: true,
+        trialPlan: plan,
+      });
+    } catch (clerkError) {
+      // Log error but don't fail the request
+      // MongoDB is the source of truth, Clerk metadata is supplementary
+      console.error('[start-trial] ⚠️ Failed to update Clerk metadata:', clerkError);
+      console.log('[start-trial] Trial will still work (MongoDB is source of truth)');
+    }
+
+    console.log('[start-trial] ✅ Trial activation complete');
 
     return NextResponse.json({
       success: true,

@@ -31,11 +31,22 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       // Direct database query - FAST, no HTTP overhead
       const dbUser = await User.findOne({ 
         clerkIds: clerkUser.id 
-      }).select('onboardingCompleted onboardingSkipped').lean();
+      }).select('onboardingCompleted onboardingSkipped trialStartedAt hasUsedTrial subscriptionStatus').lean();
       
       // If user exists and hasn't completed/skipped onboarding, redirect
+      // EXCEPTION: Allow users with active trials (they bypassed onboarding by starting trial)
       if (dbUser && !dbUser.onboardingCompleted && !dbUser.onboardingSkipped) {
-        redirect('/onboarding');
+        // Check if user has an active trial (trial start bypasses onboarding)
+        const hasActiveTrial = dbUser.trialStartedAt && 
+                              dbUser.hasUsedTrial && 
+                              dbUser.subscriptionStatus === 'trialing';
+        
+        if (!hasActiveTrial) {
+          console.log('[Dashboard Layout] User needs onboarding, redirecting...');
+          redirect('/onboarding');
+        } else {
+          console.log('[Dashboard Layout] User has active trial, allowing access without onboarding');
+        }
       }
     } catch (error) {
       // Log error but don't block access
