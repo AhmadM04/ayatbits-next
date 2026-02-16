@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { Play } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Play, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
+import { useEffect } from 'react';
 
 interface VerseNavButtonsProps {
   puzzleId: string;
@@ -24,6 +26,37 @@ export default function VerseNavButtons({
   totalAyahs,
 }: VerseNavButtonsProps) {
   const { t } = useI18n();
+  const router = useRouter();
+
+  // ============================================================================
+  // OPTIMIZATION: Pre-fetch next ayah data in background
+  // ============================================================================
+  useEffect(() => {
+    if (nextAyah) {
+      // Pre-fetch the next ayah's JSON data so it's cached when user clicks "Next"
+      const prefetchUrl = `/api/ayah?juz=${juzNumber}&surah=${surahNumber}&ayah=${nextAyah}`;
+      
+      // Use fetch with low priority to not block other requests
+      fetch(prefetchUrl, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        // @ts-ignore - priority is supported but not in types yet
+        priority: 'low',
+      }).catch(err => {
+        // Silent fail - prefetch is optional optimization
+        console.debug('[Prefetch] Failed to prefetch next ayah:', err);
+      });
+    }
+  }, [nextAyah, juzNumber, surahNumber]);
+
+  // ============================================================================
+  // CLIENT-SIDE NAVIGATION: Instant transitions without full page refresh
+  // ============================================================================
+  const handleNavigation = (ayahNumber: number) => {
+    // Use router.push with scroll: false for instant, smooth transitions
+    const newUrl = `/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${ayahNumber}`;
+    router.push(newUrl, { scroll: false });
+  };
 
   return (
     <>
@@ -51,26 +84,28 @@ export default function VerseNavButtons({
         <span>{t('wordPuzzle.startPuzzle')}</span>
       </Link>
 
-      {/* Navigation Links */}
+      {/* Navigation Buttons - Client-side navigation */}
       <div className="flex items-center justify-center gap-4 pt-2">
         {previousAyah && (
-          <Link
-            href={`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${previousAyah}`}
-            className="text-sm text-[#8E7F71] dark:text-gray-400 hover:text-[#4A3728] dark:hover:text-white transition-colors"
+          <button
+            onClick={() => handleNavigation(previousAyah)}
+            className="flex items-center gap-1.5 text-sm text-[#8E7F71] dark:text-gray-400 hover:text-[#4A3728] dark:hover:text-white transition-colors active:scale-95"
           >
-            ← {t('wordPuzzle.previous')}
-          </Link>
+            <ArrowLeft className="w-4 h-4" />
+            <span>{t('wordPuzzle.previous')}</span>
+          </button>
         )}
         {previousAyah && nextAyah && (
           <span className="text-[#E5E7EB]">•</span>
         )}
         {nextAyah && (
-          <Link
-            href={`/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${nextAyah}`}
-            className="text-sm text-[#8E7F71] dark:text-gray-400 hover:text-[#4A3728] dark:hover:text-white transition-colors"
+          <button
+            onClick={() => handleNavigation(nextAyah)}
+            className="flex items-center gap-1.5 text-sm text-[#8E7F71] dark:text-gray-400 hover:text-[#4A3728] dark:hover:text-white transition-colors active:scale-95"
           >
-            {t('wordPuzzle.next')} →
-          </Link>
+            <span>{t('wordPuzzle.next')}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         )}
       </div>
     </>

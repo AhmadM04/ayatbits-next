@@ -73,7 +73,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { RefreshCw, CheckCircle2, Volume2, Lightbulb, X, Languages } from 'lucide-react';
+import { RefreshCw, CheckCircle2, Volume2, Lightbulb, Languages } from 'lucide-react';
 import {
   shuffleArray,
   tokenizeAyah,
@@ -1191,26 +1191,6 @@ export default function WordPuzzle({
               {t('wordPuzzle.tips')}: {usedTips}/{availableTips}
             </span>
           </motion.button>
-          
-          {/* Dismiss Hint Button - only shows when hint is active */}
-          {activeHint && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              onClick={() => {
-                setActiveHint(null);
-                setIsFadingHint(false);
-                // Don't count dismissed tip - decrement used tips
-                setUsedTips((prev) => Math.max(0, prev - 1));
-              }}
-              className="px-3 py-1.5 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 hover:bg-orange-500/30 transition-colors flex items-center gap-1.5"
-              title="Dismiss hint"
-            >
-              <X className="w-3.5 h-3.5" />
-              <span className="text-xs font-medium">{t('wordPuzzle.dismiss')}</span>
-            </motion.button>
-          )}
           
             <button
             onClick={resetState}

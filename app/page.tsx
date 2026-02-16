@@ -965,7 +965,10 @@ export default function Home() {
           <footer className="border-t border-white/5 py-8 mt-20">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <Link href="/dashboard" className="flex items-center hover:opacity-80 transition-opacity">
+                <button 
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="flex items-center hover:opacity-80 transition-opacity cursor-pointer"
+                >
                   <Image 
                     src="/ayatbits-logo.svg" 
                     alt="AyatBits" 
@@ -973,7 +976,7 @@ export default function Home() {
                     height={48}
                     className="h-10 w-auto"
                   />
-                </Link>
+                </button>
               <div className="flex gap-6 text-sm text-gray-500">
                 <Link href="/terms" className="hover:text-white transition-colors">{t('landing.termsLink')}</Link>
                 <Link href="/faq" className="hover:text-white transition-colors">{t('landing.faqLink')}</Link>

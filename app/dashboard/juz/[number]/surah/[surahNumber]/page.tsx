@@ -2,11 +2,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { redirect, notFound } from 'next/navigation';
 import { connectDB, Puzzle, UserProgress, LikedAyat } from '@/lib/db';
 import VersePageClient from './VersePageClient';
-import TranslationDisplay from './TranslationDisplay';
-import AyahSelectorClient from './AyahSelectorClient';
-import BismillahDisplay from './BismillahDisplay';
-import VerseNavButtons from './VerseNavButtons';
-import ArabicTextCard from './ArabicTextCard';
+import AyahPageContent from './AyahPageContent';
 import SurahHeader from './SurahHeader';
 import { cleanAyahText, extractBismillah, shouldShowBismillahSeparately } from '@/lib/ayah-utils';
 import { requireDashboardAccess } from '@/lib/dashboard-access';
@@ -115,6 +111,34 @@ export default async function SurahVersePage({
   const isMemorized = currentPuzzle ? completedPuzzleIds.has(currentPuzzle._id) : false;
   const isLiked = currentPuzzle ? likedPuzzleIds.has(currentPuzzle._id) : false;
 
+  // Prepare initial data for client-side data manager
+  const initialAyahData = {
+    ayahText: cleanAyahText(currentPuzzle?.ayahText || '', surahNum, selectedAyah),
+    ayahNumber: selectedAyah,
+    translation: initialTranslation,
+    mushafPageNumber,
+    puzzleId: currentPuzzle?._id || '',
+    isMemorized,
+    isLiked,
+    previousAyah: previousPuzzle?.ayahNumber || null,
+    nextAyah: nextPuzzle?.ayahNumber || null,
+    completedAyahs,
+    totalAyahs,
+    progressPercentage,
+    surahName: surah.nameEnglish,
+    surahNameArabic: surah.nameArabic,
+    juzNumber: juz.number,
+    selectedTranslation,
+    enableWordByWordAudio,
+    subscriptionPlan: dbUser.subscriptionPlan || 'FREE',
+    puzzles: puzzles.map((p: any) => ({
+      id: p._id.toString(),
+      ayahNumber: p.ayahNumber || 1,
+      isCompleted: completedPuzzleIds.has(p._id),
+      isLiked: likedPuzzleIds.has(p._id),
+    })),
+  };
+
   return (
     <VersePageClient translationCode={selectedTranslation}>
       <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0a0a0a] text-[#4A3728] dark:text-white pb-6">
@@ -145,77 +169,12 @@ export default async function SurahVersePage({
         />
 
         <main className="max-w-3xl mx-auto px-3 sm:px-4 py-4">
-          {/* Progress Bar */}
-          <div className="mb-4">
-            <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-[#059669] to-emerald-500 rounded-full transition-all duration-500"
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Ayah Selector with Modal */}
-          <AyahSelectorClient
-            puzzles={puzzles.map((p: any) => ({
-              id: p._id,
-              ayahNumber: p.ayahNumber || 1,
-              isCompleted: completedPuzzleIds.has(p._id),
-              isLiked: likedPuzzleIds.has(p._id),
-            }))}
-            currentAyah={selectedAyah}
-            juzNumber={juzNum}
-            surahNumber={surahNum}
-          />
-
           {currentPuzzle ? (
-            <div className="space-y-4">
-              {/* Bismillah - Shown separately for surahs 2-114 (except 9) on first ayah */}
-              {showBismillahSeparately && bismillah && (
-                <BismillahDisplay
-                  bismillah={bismillah}
-                  surahNumber={surahNum}
-                />
-              )}
-
-              {/* Arabic Text Card with Audio Player */}
-              <div data-tutorial="arabic-text">
-                <ArabicTextCard
-                  surahNumber={surahNum}
-                  ayahNumber={selectedAyah}
-                  ayahText={showBismillahSeparately ? remainingText : cleanAyahText(
-                    currentPuzzle.ayahText || '',
-                    surahNum,
-                    selectedAyah
-                  )}
-                  puzzleId={currentPuzzle._id}
-                  isMemorized={isMemorized}
-                  isLiked={isLiked}
-                  enableWordByWordAudio={enableWordByWordAudio}
-                />
-              </div>
-
-              {/* Translation */}
-              <div data-tutorial="translation">
-                <TranslationDisplay
-                  surahNumber={surahNum}
-                  ayahNumber={selectedAyah}
-                  selectedTranslation={selectedTranslation}
-                  initialTranslation={initialTranslation}
-                />
-              </div>
-
-              {/* Start Puzzle & Navigation Buttons */}
-              <VerseNavButtons
-                puzzleId={currentPuzzle._id}
-                juzNumber={juzNum}
-                surahNumber={surahNum}
-                previousAyah={previousPuzzle?.ayahNumber}
-                nextAyah={nextPuzzle?.ayahNumber}
-                selectedAyah={selectedAyah}
-                totalAyahs={totalAyahs}
-              />
-            </div>
+            <AyahPageContent
+              initialData={initialAyahData}
+              juzNumber={juzNum}
+              surahNumber={surahNum}
+            />
           ) : (
             <div className="text-center py-12">
               <p className="text-[#8E7F71] dark:text-gray-400">No puzzles found for this selection.</p>
