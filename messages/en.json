@@ -222,7 +222,15 @@
     "mashallah": "Mashallah!",
     "youCompleted": "You completed",
     "achievementsUnlocked": "Achievements Unlocked",
-    "continueTo": "Continue to {surah}"
+    "continueTo": "Continue to {surah}",
+    "limitReached": "Daily Limit Reached",
+    "limitReachedMessage": "You've completed your 10 free puzzles for today! Upgrade to Pro for unlimited access to all puzzles, features, and more.",
+    "unlimitedPuzzles": "Unlimited puzzles every day",
+    "aiTafsir": "AI-powered Tafsir explanations",
+    "wordByWord": "Word-by-word audio recitation",
+    "upgradeToPro": "Upgrade to Pro",
+    "returnToDashboard": "Return to Dashboard",
+    "limitResetsDaily": "Your free limit resets every 24 hours"
   },
   "liked": {
     "title": "Liked Ayahs",

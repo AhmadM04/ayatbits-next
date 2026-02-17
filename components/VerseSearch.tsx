@@ -5,6 +5,7 @@ import { Search, X, Sparkles, Loader2, BookOpen } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ConditionalMotion, ConditionalAnimatePresence } from '@/components/ConditionalMotion';
 import { useI18n } from '@/lib/i18n';
+import { SURAHS, searchSurahs, findSurahByText, normalizeSearchText, type SurahData } from '@/lib/constants/surahs';
 
 // Complete mapping of all 114 surahs to their primary juz
 const SURAH_TO_JUZ: { [key: number]: number } = {
@@ -130,6 +131,8 @@ export default function VerseSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [searchResults, setSearchResults] = useState<SurahData[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -161,25 +164,77 @@ export default function VerseSearch() {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [isOpen]);
+  
+  // Update search results as user types
+  useEffect(() => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setSelectedIndex(0);
+      return;
+    }
+    
+    // Check if query is a coordinate pattern (don't show dropdown)
+    const isCoordinate = /^(\d+)[:\s]+(\d+)$/.test(query.trim()) || 
+                        /^([a-zA-Z\s\u0600-\u06FF-]+)[:\s]+(\d+)$/.test(query.trim());
+    
+    if (isCoordinate) {
+      setSearchResults([]);
+      return;
+    }
+    
+    // Search for Surahs matching the query
+    const results = searchSurahs(query);
+    setSearchResults(results);
+    setSelectedIndex(0);
+  }, [query]);
 
   const parseQuery = (input: string): { surah: number; ayah: number } | null => {
     const trimmed = input.trim();
     
-    // Format: surah:ayah (e.g., 2:255)
-    if (trimmed.includes(':')) {
-      const [surahPart, ayahPart] = trimmed.split(':');
-      const surah = parseInt(surahPart);
-      const ayah = parseInt(ayahPart);
+    // ========================================================================
+    // STEP A: COORDINATE REGEX - Detect patterns like "2:255" or "Baqarah:255"
+    // ========================================================================
+    
+    // Pattern 1: Number:Number (e.g., "2:255" or "2 255")
+    const numCoordMatch = trimmed.match(/^(\d+)[:\s]+(\d+)$/);
+    if (numCoordMatch) {
+      const surah = parseInt(numCoordMatch[1]);
+      const ayah = parseInt(numCoordMatch[2]);
       
-      if (!isNaN(surah) && !isNaN(ayah) && surah >= 1 && surah <= 114 && ayah >= 1) {
+      if (surah >= 1 && surah <= 114 && ayah >= 1) {
         return { surah, ayah };
       }
     }
     
-    // Format: just surah number (e.g., 2)
+    // Pattern 2: Text:Number (e.g., "Baqarah:255" or "البقرة:255")
+    const textCoordMatch = trimmed.match(/^([a-zA-Z\s\u0600-\u06FF-]+)[:\s]+(\d+)$/);
+    if (textCoordMatch) {
+      const surahText = textCoordMatch[1].trim();
+      const ayah = parseInt(textCoordMatch[2]);
+      
+      // Find surah by text (transliteration or Arabic)
+      const foundSurah = findSurahByText(surahText);
+      if (foundSurah && ayah >= 1) {
+        return { surah: foundSurah.id, ayah };
+      }
+    }
+    
+    // ========================================================================
+    // STEP B: SIMPLE SURAH LOOKUP (without verse number)
+    // ========================================================================
+    
+    // Pattern 3: Just a number (e.g., "2")
     const surahNum = parseInt(trimmed);
     if (!isNaN(surahNum) && surahNum >= 1 && surahNum <= 114) {
       return { surah: surahNum, ayah: 1 };
+    }
+    
+    // Pattern 4: Just text (Surah name - go to first verse)
+    if (trimmed && isNaN(parseInt(trimmed))) {
+      const foundSurah = findSurahByText(trimmed);
+      if (foundSurah) {
+        return { surah: foundSurah.id, ayah: 1 };
+      }
     }
     
     return null;
@@ -209,33 +264,14 @@ export default function VerseSearch() {
 
       if (data.found && data.juz) {
         // Navigate to the verse
-        router.push(`/dashboard/juz/${data.juz}/surah/${result.surah}?ayah=${result.ayah}`);
-        setIsOpen(false);
-        setQuery('');
-        setError('');
+        navigateToSurah(result.surah, result.ayah);
       } else {
         // Use the static mapping as fallback
-        const juz = SURAH_TO_JUZ[result.surah];
-        if (juz) {
-          router.push(`/dashboard/juz/${juz}/surah/${result.surah}?ayah=${result.ayah}`);
-          setIsOpen(false);
-          setQuery('');
-          setError('');
-        } else {
-          setError('This verse is not available yet');
-        }
+        navigateToSurah(result.surah, result.ayah);
       }
     } catch {
       // Fallback to static mapping if API fails
-      const juz = SURAH_TO_JUZ[result.surah];
-      if (juz) {
-        router.push(`/dashboard/juz/${juz}/surah/${result.surah}?ayah=${result.ayah}`);
-        setIsOpen(false);
-        setQuery('');
-        setError('');
-      } else {
-        setError('This verse is not available yet');
-      }
+      navigateToSurah(result.surah, result.ayah);
     } finally {
       setIsLoading(false);
     }
@@ -243,12 +279,45 @@ export default function VerseSearch() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !isLoading) {
-      handleSearch();
+      // If search results are showing, navigate to selected result
+      if (searchResults.length > 0 && selectedIndex >= 0) {
+        const selectedSurah = searchResults[selectedIndex];
+        navigateToSurah(selectedSurah.id, 1);
+      } else {
+        // Otherwise try to parse and search as coordinate
+        handleSearch();
+      }
     }
+    
     if (e.key === 'Escape') {
       setIsOpen(false);
       setQuery('');
       setError('');
+      setSearchResults([]);
+    }
+    
+    // Arrow key navigation through results
+    if (e.key === 'ArrowDown' && searchResults.length > 0) {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev + 1) % searchResults.length);
+    }
+    
+    if (e.key === 'ArrowUp' && searchResults.length > 0) {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev - 1 + searchResults.length) % searchResults.length);
+    }
+  };
+  
+  const navigateToSurah = (surahId: number, ayah: number) => {
+    const juz = SURAH_TO_JUZ[surahId];
+    if (juz) {
+      router.push(`/dashboard/juz/${juz}/surah/${surahId}?ayah=${ayah}`);
+      setIsOpen(false);
+      setQuery('');
+      setError('');
+      setSearchResults([]);
+    } else {
+      setError('This surah is not available yet');
     }
   };
 
@@ -339,6 +408,7 @@ export default function VerseSearch() {
                       onClick={() => {
                         setQuery('');
                         setError('');
+                        setSearchResults([]);
                       }}
                       className="p-1 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                     >
@@ -346,6 +416,36 @@ export default function VerseSearch() {
                     </button>
                   )}
                 </div>
+
+                {/* Search Results Dropdown */}
+                {searchResults.length > 0 && (
+                  <div className="max-h-64 overflow-y-auto border-b border-[#E5E7EB] dark:border-white/10">
+                    {searchResults.map((surah, index) => (
+                      <button
+                        key={surah.id}
+                        onClick={() => navigateToSurah(surah.id, 1)}
+                        className={`w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors text-left ${
+                          index === selectedIndex ? 'bg-gray-50 dark:bg-white/5' : ''
+                        }`}
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-[#8E7F71] dark:text-gray-400 font-mono w-8">
+                              {surah.id}
+                            </span>
+                            <span className="text-sm text-[#4A3728] dark:text-white font-medium">
+                              {surah.transliteration}
+                            </span>
+                          </div>
+                          <div className="text-xs text-[#8E7F71] dark:text-gray-400 mt-0.5 ml-10 font-arabic" dir="rtl">
+                            {surah.arabic}
+                          </div>
+                        </div>
+                        <BookOpen className="w-4 h-4 text-[#8E7F71] dark:text-gray-400" />
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 {/* Error Message */}
                 {error && (
@@ -356,6 +456,7 @@ export default function VerseSearch() {
                         setIsOpen(false);
                         setQuery('');
                         setError('');
+                        setSearchResults([]);
                         router.push('/dashboard');
                       }}
                       className="mt-2 text-xs text-[#8E7F71] dark:text-gray-400 hover:text-[#4A3728] dark:hover:text-white underline"
@@ -366,26 +467,34 @@ export default function VerseSearch() {
                 )}
 
                 {/* Quick Actions */}
-                <div className="p-3">
-                  <p className="text-xs text-[#8E7F71] dark:text-gray-400 mb-2 px-1">{t('search.examples')}:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {['1', '2:255', '36', '67:1'].map((example) => (
-                      <button
-                        key={example}
-                        onClick={() => {
-                          setQuery(example);
-                          setError('');
-                        }}
-                        className="px-3 py-1.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-[#4A3728] dark:text-white text-sm rounded-lg transition-colors"
-                      >
-                        {example}
-                      </button>
-                    ))}
+                {!query && (
+                  <div className="p-3">
+                    <p className="text-xs text-[#8E7F71] dark:text-gray-400 mb-2 px-1">{t('search.examples')}:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { label: '2:255', desc: 'Ayat al-Kursi' },
+                        { label: 'Baqarah', desc: '' },
+                        { label: 'Kahf', desc: '' },
+                        { label: 'يس', desc: '' },
+                        { label: 'الرحمن', desc: '' },
+                      ].map((example) => (
+                        <button
+                          key={example.label}
+                          onClick={() => {
+                            setQuery(example.label);
+                            setError('');
+                          }}
+                          className="px-3 py-1.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-[#4A3728] dark:text-white text-sm rounded-lg transition-colors"
+                        >
+                          {example.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {/* Go Button */}
-                {query && (
+                {/* Go Button - Only show for coordinate queries */}
+                {query && searchResults.length === 0 && (
                   <div className="p-3 pt-0">
                     <button
                       onClick={handleSearch}

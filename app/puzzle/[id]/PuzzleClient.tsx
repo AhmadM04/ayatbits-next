@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useToast } from '@/components/Toast';
-import { apiPost, apiDelete, getErrorMessage, NetworkError } from '@/lib/api-client';
+import { apiPost, apiDelete, getErrorMessage, NetworkError, ApiError } from '@/lib/api-client';
 import { ArrowLeft, Heart, HelpCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -26,6 +26,11 @@ const WordPuzzle = dynamic(() => import('@/components/WordPuzzle'), {
 
 // OPTIMIZED: Lazy load ConfirmExitModal - only loads when user attempts to exit
 const ConfirmExitModal = dynamic(() => import('@/components/ConfirmExitModal'), {
+  ssr: false,
+});
+
+// OPTIMIZED: Lazy load LimitReachedModal - only loads when user hits daily limit
+const LimitReachedModal = dynamic(() => import('@/components/LimitReachedModal'), {
   ssr: false,
 });
 
@@ -85,6 +90,7 @@ export default function PuzzleClient({
   const [showSuccessTransition, setShowSuccessTransition] = useState(false);
   const [showHelpMenu, setShowHelpMenu] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false); // NEW: Limit reached modal
   const { showToast } = useToast();
   const router = useRouter();
   
@@ -234,23 +240,45 @@ export default function PuzzleClient({
     hasHandledCompletion.current = true;
 
     // ============================================================================
-    // PERFORMANCE FIX: Non-Blocking Progress Save (keepalive: true)
+    // CRITICAL FIX: Handle 403 Forbidden (Daily Limit Reached)
     // ============================================================================
-    // Use keepalive to save progress in the background without blocking the UI
-    // This ensures progress is saved even if the user navigates away quickly
+    // Check for 403 status BEFORE showing success animation
+    // This prevents optimistic UI updates when user has hit their limit
     // ============================================================================
-    apiPost(`/api/puzzles/${puzzle.id}/progress`, {
-      status: 'COMPLETED',
-      score: 100,
-    }, {
-      keepalive: true, // Ensures request completes even if user navigates away
-    }).catch((error) => {
+    try {
+      await apiPost(`/api/puzzles/${puzzle.id}/progress`, {
+        status: 'COMPLETED',
+        score: 100,
+      }, {
+        keepalive: false, // CHANGED: Don't use keepalive so we can catch errors properly
+      });
+    } catch (error) {
+      // CRITICAL: Check if it's a 403 Forbidden error (daily limit reached)
+      if (error instanceof ApiError && error.status === 403) {
+        console.log('[PuzzleClient] 403 Forbidden - Daily limit reached');
+        
+        // 1. Show the "Limit Reached" modal
+        setShowLimitModal(true);
+        
+        // 2. Reset completion handler so user can't try again
+        hasHandledCompletion.current = false;
+        
+        // 3. Stop execution - don't show success animation
+        return;
+      }
+      
+      // Handle other errors
       if (error instanceof NetworkError) {
         showToast(t('puzzle.failedToSaveProgress'), 'error');
-      } else {
-        console.error('Failed to save progress:', error);
+        hasHandledCompletion.current = false; // Allow retry on network error
+        return;
       }
-    });
+      
+      // Log unexpected errors
+      console.error('Failed to save progress:', error);
+      hasHandledCompletion.current = false; // Allow retry
+      return;
+    }
 
     setShowSuccessTransition(true);
     
@@ -506,6 +534,16 @@ export default function PuzzleClient({
         onClose={() => setShowExitModal(false)}
         onConfirm={handleExitConfirm}
       />
+
+      {/* Limit Reached Modal - Free Tier Daily Limit */}
+      {showLimitModal && (
+        <LimitReachedModal
+          onClose={() => setShowLimitModal(false)}
+          onUpgrade={() => {
+            window.location.href = '/pricing';
+          }}
+        />
+      )}
     </div>
     // </TutorialWrapper>
   );
