@@ -5,6 +5,7 @@ import { Lock, Sparkles, ArrowRight, X } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 
 interface LimitReachedModalProps {
+  isOpen: boolean;
   onClose: () => void;
   onUpgrade: () => void;
 }
@@ -21,12 +22,13 @@ interface LimitReachedModalProps {
  * - Prominent "Upgrade to Pro" CTA
  * - Optional close button (returns to dashboard)
  */
-export default function LimitReachedModal({ onClose, onUpgrade }: LimitReachedModalProps) {
+export default function LimitReachedModal({ isOpen, onClose, onUpgrade }: LimitReachedModalProps) {
   const { t } = useI18n();
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+      {isOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
         {/* Backdrop - Semi-transparent overlay */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -151,6 +153,7 @@ export default function LimitReachedModal({ onClose, onUpgrade }: LimitReachedMo
           </motion.p>
         </motion.div>
       </div>
+      )}
     </AnimatePresence>
   );
 }

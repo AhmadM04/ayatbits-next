@@ -253,9 +253,9 @@ export default function PuzzleClient({
         keepalive: false, // CHANGED: Don't use keepalive so we can catch errors properly
       });
     } catch (error) {
-      // CRITICAL: Check if it's a 403 Forbidden error (daily limit reached)
-      if (error instanceof ApiError && error.status === 403) {
-        console.log('[PuzzleClient] 403 Forbidden - Daily limit reached');
+      // CRITICAL: Check if it's a 403/429 error (daily limit reached)
+      if (error instanceof ApiError && (error.status === 403 || error.status === 429)) {
+        console.log(`[PuzzleClient] ${error.status} - Daily limit reached`);
         
         // 1. Show the "Limit Reached" modal
         setShowLimitModal(true);
@@ -536,14 +536,13 @@ export default function PuzzleClient({
       />
 
       {/* Limit Reached Modal - Free Tier Daily Limit */}
-      {showLimitModal && (
-        <LimitReachedModal
-          onClose={() => setShowLimitModal(false)}
-          onUpgrade={() => {
-            window.location.href = '/pricing';
-          }}
-        />
-      )}
+      <LimitReachedModal
+        isOpen={showLimitModal}
+        onClose={() => setShowLimitModal(false)}
+        onUpgrade={() => {
+          window.location.href = '/pricing';
+        }}
+      />
     </div>
     // </TutorialWrapper>
   );
