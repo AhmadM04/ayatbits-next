@@ -103,8 +103,8 @@ export default function AudioSettings({ initialEnabled = false }: AudioSettingsP
       </div>
 
       {/* Additional info */}
-      <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
-        <p className="text-xs text-[#8E7F71]">
+      <div className="mt-4 pt-4 border-t border-[#E5E7EB] dark:border-white/10">
+        <p className="text-xs text-[#8E7F71] dark:text-gray-400">
           {t('tutorial.audioApiInfo')}
         </p>
       </div>
