@@ -135,6 +135,9 @@ export async function POST(request: NextRequest) {
               subscriptionTier: tier || 'basic',
               subscriptionPlatform: 'web',
               subscriptionEndDate: subscriptionEndDate,
+              hasUsedTrial: true, // Mark trial as used
+              trialStartedAt: subscriptionStatus === 'trialing' ? new Date() : undefined,
+              trialPlan: subscriptionStatus === 'trialing' ? (tier as 'basic' | 'pro') : undefined,
             });
 
             logger.info('User created from Stripe checkout', {
@@ -160,17 +163,26 @@ export async function POST(request: NextRequest) {
             }
 
             // Update subscription details while preserving hasDirectAccess flag
+            const updateData: any = {
+              stripeCustomerId: session.customer as string,
+              subscriptionStatus: subscriptionStatus,
+              subscriptionPlan: plan || 'monthly',
+              subscriptionTier: tier || 'basic',
+              subscriptionPlatform: 'web',
+              subscriptionEndDate: subscriptionEndDate,
+              hasUsedTrial: true, // Mark trial as used
+              // Note: hasDirectAccess remains unchanged if it exists
+            };
+
+            // If starting a trial, record trial details
+            if (subscriptionStatus === 'trialing') {
+              updateData.trialStartedAt = new Date();
+              updateData.trialPlan = tier as 'basic' | 'pro';
+            }
+
             existingUser = await User.findOneAndUpdate(
               { clerkIds: userId },
-              {
-                stripeCustomerId: session.customer as string,
-                subscriptionStatus: subscriptionStatus,
-                subscriptionPlan: plan || 'monthly',
-                subscriptionTier: tier || 'basic',
-                subscriptionPlatform: 'web',
-                subscriptionEndDate: subscriptionEndDate,
-                // Note: hasDirectAccess remains unchanged if it exists
-              },
+              updateData,
               { new: true }
             );
 
@@ -267,10 +279,12 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.deleted': {
+        console.log('[stripe-webhook] 🔴 Processing customer.subscription.deleted');
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         
         const existingUser = await User.findOne({ stripeCustomerId: customerId });
+        console.log('[stripe-webhook] User found:', existingUser ? 'Yes' : 'No');
         
         // If user has hasDirectAccess, mark Stripe subscription as canceled but they keep admin-granted access
         if (existingUser?.hasDirectAccess) {
@@ -281,13 +295,38 @@ export async function POST(request: NextRequest) {
             route: '/api/webhook/stripe',
             event: 'customer.subscription.deleted',
           });
+          
+          // Just mark as canceled, don't remove subscription details (they keep admin access)
+          await User.findOneAndUpdate(
+            { stripeCustomerId: customerId },
+            { subscriptionStatus: 'canceled' }
+          );
+        } else {
+          // Regular user - downgrade to free tier
+          logger.info('Subscription deleted - downgrading user to free tier', {
+            customerId,
+            email: existingUser?.email,
+            route: '/api/webhook/stripe',
+            event: 'customer.subscription.deleted',
+          });
+          
+          // Downgrade to free tier (clear subscription but keep trial history)
+          await User.findOneAndUpdate(
+            { stripeCustomerId: customerId },
+            {
+              subscriptionStatus: 'inactive', // Mark as inactive (free tier)
+              subscriptionPlan: undefined, // Clear plan
+              subscriptionTier: undefined, // Clear tier
+              subscriptionEndDate: undefined, // Clear end date
+              // Keep trial history: hasUsedTrial, trialStartedAt, trialPlan
+              // Keep stripeCustomerId for potential re-subscription
+            }
+          );
+          
+          console.log('[stripe-webhook] ✅ User downgraded to free tier');
         }
         
-        await User.findOneAndUpdate(
-          { stripeCustomerId: customerId },
-          { subscriptionStatus: 'canceled' }
-        );
-        logger.info('Subscription canceled', {
+        logger.info('Subscription deletion processed', {
           customerId,
           route: '/api/webhook/stripe',
         });

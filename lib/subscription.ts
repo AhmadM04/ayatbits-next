@@ -222,11 +222,13 @@ export const getCurrentPlan = (user: IUser): 'free' | 'basic' | 'pro' => {
     return user.subscriptionTier || 'pro';
   }
 
-  // Active Trial (new trial system)
+  // Active Trial (Stripe-managed trials)
+  // Note: With Stripe-managed trials, hasUsedTrial is set to true immediately when trial starts
+  // So we check subscriptionStatus for 'trialing' instead of hasUsedTrial
   if (
     user.trialStartedAt &&
     user.trialPlan &&
-    !user.hasUsedTrial // Safety check
+    user.subscriptionStatus === SubscriptionStatusEnum.TRIALING
   ) {
     const trialStart = new Date(user.trialStartedAt).getTime();
     const trialEnd = trialStart + (7 * DAY_IN_MS);

@@ -228,30 +228,34 @@ export default function PricingContent() {
     }
   };
 
-  // Handle trial start
+  // Handle trial start - now uses Stripe checkout with no-card trial
   const handleStartTrial = async (tier: 'basic' | 'pro') => {
     setStartingTrial(tier);
     
     try {
-      const response = await fetch('/api/user/start-trial', {
+      // Determine the appropriate price ID based on tier (default to monthly for trial)
+      const priceId = tier === 'pro' 
+        ? process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID 
+        : process.env.NEXT_PUBLIC_STRIPE_BASIC_MONTHLY_PRICE_ID;
+
+      // Call checkout endpoint - it will handle trial logic automatically
+      const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: tier }),
+        body: JSON.stringify({ priceId: priceId || 'price_monthly', tier }),
       });
       
       const data = await response.json();
       
-      if (data.success) {
-        console.log('[PricingContent] ✅ Trial started successfully');
-        console.log('[PricingContent] 🚀 Performing hard redirect to clear stale state...');
-        
-        // NUCLEAR FIX: Use hard browser reload instead of client-side navigation
-        // This forces a complete server-side re-fetch and prevents redirect loops
-        // caused by stale client state not syncing with fresh DB data
-        window.location.href = '/dashboard';
-        
+      if (data.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
         // Keep loading state active during redirect
-        // DO NOT call setStartingTrial(null) here
+        return;
+      } else if (data.redirect) {
+        // User already has access
+        alert(data.error || t('pricing.alreadyHaveAccess'));
+        window.location.href = data.redirect;
         return;
       } else {
         console.error('[PricingContent] ❌ Trial start failed:', data.error);
@@ -432,6 +436,26 @@ export default function PricingContent() {
                 {t('pricing.goToDashboard')}
                 <ArrowRight className="w-4 h-4" />
               </Link>
+            </motion.div>
+          )}
+
+          {/* Trial Ended Banner - Encourage Upgrade */}
+          {!hasAccess && trialStatus?.hasUsedTrial && !trialStatus.isTrialActive && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8 p-6 bg-blue-500/10 border border-blue-500/30 rounded-2xl text-center"
+            >
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Sparkles className="w-5 h-5 text-blue-400" />
+                <h3 className="text-lg font-semibold text-blue-400">Hope you enjoyed your trial!</h3>
+              </div>
+              <p className="text-gray-300 mb-2">
+                Choose a plan below to continue your journey and unlock unlimited access.
+              </p>
+              <p className="text-sm text-gray-400">
+                You're currently on the Free tier with 10 puzzles per day.
+              </p>
             </motion.div>
           )}
 

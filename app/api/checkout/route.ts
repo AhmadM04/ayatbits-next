@@ -165,28 +165,77 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Determine if user is eligible for trial (hasn't used it yet)
+    const hasUsedTrial = finalCheck?.hasUsedTrial || false;
+    const existingStripeCustomerId = finalCheck?.stripeCustomerId;
+
+    logger.info('Checkout session setup', {
+      userId: user.id,
+      hasUsedTrial,
+      existingStripeCustomerId: !!existingStripeCustomerId,
+      tier,
+      plan,
+      route: '/api/checkout',
+    });
+
     // Create Stripe Checkout Session
     const sessionParams: any = {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'subscription',
+      // CRITICAL: Skip card requirement if total is $0 (during trial)
+      payment_method_collection: 'if_required',
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?success=true`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?canceled=true`,
-      customer_email: user.emailAddresses[0]?.emailAddress,
       metadata: {
         clerkId: user.id,
         tier: tier,
         plan: plan,
       },
-      subscription_data: {
-        trial_period_days: 7,
+    };
+
+    // Reuse existing Stripe customer if available (important for returning users)
+    if (existingStripeCustomerId) {
+      sessionParams.customer = existingStripeCustomerId;
+    } else {
+      sessionParams.customer_email = user.emailAddresses[0]?.emailAddress;
+    }
+
+    // Configure trial settings based on user's trial status
+    if (hasUsedTrial) {
+      // User already had a trial - no trial this time, they pay immediately
+      logger.info('User has used trial - creating paid checkout session', {
+        userId: user.id,
+        route: '/api/checkout',
+      });
+      sessionParams.subscription_data = {
         metadata: {
           clerkId: user.id,
           tier: tier,
           plan: plan,
         },
-      },
-    };
+      };
+    } else {
+      // First-time user - give them a 7-day trial with no card required
+      logger.info('User eligible for trial - creating no-card trial checkout session', {
+        userId: user.id,
+        route: '/api/checkout',
+      });
+      sessionParams.subscription_data = {
+        trial_period_days: 7,
+        trial_settings: {
+          end_behavior: {
+            // CRITICAL: Cancel subscription if no payment method added by end of trial
+            missing_payment_method: 'cancel',
+          },
+        },
+        metadata: {
+          clerkId: user.id,
+          tier: tier,
+          plan: plan,
+        },
+      };
+    }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
 
