@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation';
 import { Heart, Trophy, Play, Home, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n';
+import { ErrorBoundary, StartReadingButton } from '@/components/ErrorBoundary';
+import { useEffect } from 'react';
 
 interface ResumeData {
   resumeUrl: string;
@@ -21,6 +23,7 @@ interface BottomNavProps {
 
 // Default resume URL if user hasn't started yet
 const DEFAULT_RESUME_URL = '/dashboard/juz/1/surah/1?ayah=1';
+const DEFAULT_SURAH_NAME = 'Al-Fatiha';
 
 // ============================================================================
 // PERFORMANCE FIX: Resume data now comes from server (no API calls!)
@@ -32,6 +35,18 @@ const DEFAULT_RESUME_URL = '/dashboard/juz/1/surah/1?ayah=1';
 export default function BottomNav({ resumeData }: BottomNavProps = {}) {
   const pathname = usePathname();
   const { t } = useI18n();
+
+  // DEBUG: Log resume data to help diagnose crashes
+  useEffect(() => {
+    console.log('[BottomNav] Resume data received:', {
+      hasData: !!resumeData,
+      resumeUrl: resumeData?.resumeUrl,
+      surahName: resumeData?.surahName,
+      ayahNumber: resumeData?.ayahNumber,
+      juzNumber: resumeData?.juzNumber,
+      surahNumber: resumeData?.surahNumber,
+    });
+  }, [resumeData]);
 
   // Hide BottomNav on puzzle pages
   if (pathname?.startsWith('/puzzle/')) {
@@ -55,29 +70,54 @@ export default function BottomNav({ resumeData }: BottomNavProps = {}) {
             const isResume = item.isResume;
             
             if (isResume) {
-              const resumeUrl = resumeData?.resumeUrl || DEFAULT_RESUME_URL;
-              const displayName = resumeData?.surahName || 'Al-Fatiha';
+              // SAFETY CHECK #1: Ensure resumeData is valid before accessing properties
+              // If resumeData is null/undefined, use safe defaults
+              const hasValidResumeData = resumeData && 
+                                        typeof resumeData === 'object' && 
+                                        resumeData.resumeUrl;
               
+              // SAFETY CHECK #2: Safe URL construction with fallback values
+              // Build URL manually if resumeData exists but is malformed
+              let resumeUrl = DEFAULT_RESUME_URL;
+              if (hasValidResumeData) {
+                try {
+                  resumeUrl = resumeData.resumeUrl;
+                } catch (error) {
+                  console.error('[BottomNav] Error accessing resumeUrl:', error);
+                  resumeUrl = DEFAULT_RESUME_URL;
+                }
+              } else if (resumeData) {
+                // Construct URL from parts if resumeUrl is missing but other data exists
+                const juz = resumeData.juzNumber || 1;
+                const surah = resumeData.surahNumber || 1;
+                const ayah = resumeData.ayahNumber || 1;
+                resumeUrl = `/dashboard/juz/${juz}/surah/${surah}?ayah=${ayah}`;
+                console.log('[BottomNav] Constructed URL from parts:', resumeUrl);
+              }
+              
+              // SAFETY CHECK #3: Safe display name with fallback
+              const displayName = resumeData?.surahName || DEFAULT_SURAH_NAME;
+              
+              // SAFETY CHECK #4: Wrap in Error Boundary
               return (
-                <Link
-                  key={item.href}
-                  href={resumeUrl}
-                  className="relative -mt-8 flex-shrink-0"
-                >
-                  <motion.div
-                    whileTap={{ scale: 0.95 }}
-                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-600/30"
+                <ErrorBoundary key={item.href} fallback={<StartReadingButton />}>
+                  <Link
+                    href={resumeUrl}
+                    className="relative -mt-8 flex-shrink-0"
                   >
-                    <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white ml-0.5" />
-                  </motion.div>
-                  {displayName && (
+                    <motion.div
+                      whileTap={{ scale: 0.95 }}
+                      className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-600/30"
+                    >
+                      <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white ml-0.5" />
+                    </motion.div>
                     <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[60px] sm:max-w-none">
                       <span className="text-[8px] sm:text-[10px] text-[#8E7F71] dark:text-gray-500 block text-center truncate">
                         {displayName}
                       </span>
                     </div>
-                  )}
-                </Link>
+                  </Link>
+                </ErrorBoundary>
               );
             }
 

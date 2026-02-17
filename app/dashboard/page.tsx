@@ -136,15 +136,52 @@ export default async function DashboardPage() {
   const translationCode = user.selectedTranslation || 'en.sahih';
   const enableWordByWordAudio = user.enableWordByWordAudio || false;
 
-  // Process resume data (replaces /api/user/resume endpoint)
-  const resumeData = lastActivePuzzle ? {
-    resumeUrl: `/dashboard/juz/${lastActivePuzzle.juzId?.number || 1}/surah/${lastActivePuzzle.surahId?.number || 1}?ayah=${lastActivePuzzle.content?.ayahNumber || 1}`,
-    puzzleId: lastActivePuzzle._id.toString(),
-    juzNumber: lastActivePuzzle.juzId?.number || 1,
-    surahNumber: lastActivePuzzle.surahId?.number || 1,
-    ayahNumber: lastActivePuzzle.content?.ayahNumber || 1,
-    surahName: lastActivePuzzle.surahId?.nameEnglish || 'Al-Fatiha',
-  } : null;
+  // ============================================================================
+  // CRASH SAFEGUARD: Resume data construction with multiple safety checks
+  // ============================================================================
+  // This prevents crashes for new users who have null/undefined progress data
+  // ============================================================================
+  let resumeData = null;
+  
+  if (lastActivePuzzle) {
+    try {
+      // SAFETY CHECK: Validate all required fields before constructing URL
+      const juzNumber = lastActivePuzzle.juzId?.number ?? 1;
+      const surahNumber = lastActivePuzzle.surahId?.number ?? 1;
+      const ayahNumber = lastActivePuzzle.content?.ayahNumber ?? 1;
+      const surahName = lastActivePuzzle.surahId?.nameEnglish ?? 'Al-Fatiha';
+      const puzzleId = lastActivePuzzle._id?.toString() ?? '';
+      
+      // DEBUG: Log resume data construction for debugging
+      console.log('[Dashboard] Constructing resume data:', {
+        juzNumber,
+        surahNumber,
+        ayahNumber,
+        surahName,
+        puzzleId,
+      });
+      
+      // Only create resumeData if we have valid puzzle ID
+      if (puzzleId) {
+        resumeData = {
+          resumeUrl: `/dashboard/juz/${juzNumber}/surah/${surahNumber}?ayah=${ayahNumber}`,
+          puzzleId,
+          juzNumber,
+          surahNumber,
+          ayahNumber,
+          surahName,
+        };
+      } else {
+        console.warn('[Dashboard] lastActivePuzzle missing _id, using null resumeData');
+      }
+    } catch (error) {
+      console.error('[Dashboard] Error constructing resume data:', error);
+      // Fail gracefully - resumeData stays null, will show "Start Reading" button
+      resumeData = null;
+    }
+  } else {
+    console.log('[Dashboard] No lastActivePuzzle found - new user, showing "Start Reading" button');
+  }
 
   // All data is now serialized as plain JSON (no Mongoose documents)
   return (
