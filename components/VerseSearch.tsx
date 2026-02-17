@@ -441,7 +441,6 @@ export default function VerseSearch() {
                             {surah.arabic}
                           </div>
                         </div>
-                        <BookOpen className="w-4 h-4 text-[#8E7F71] dark:text-gray-400" />
                       </button>
                     ))}
                   </div>
