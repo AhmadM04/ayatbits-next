@@ -4,13 +4,19 @@ import { checkSubscription } from '@/lib/subscription';
 import OnboardingClient from './OnboardingClient';
 
 export default async function OnboardingPage() {
-  // Check if user has access
+  // ========================================================================
+  // LOOP BREAKER FIX: Allow all authenticated users to onboard
+  // ========================================================================
+  // Free tier users should complete onboarding too - don't block them
+  // They'll see upgrade prompts in the dashboard for premium features
+  // ========================================================================
+  
   let user;
   try {
     user = await requireDashboardAccess();
   } catch (error) {
-    // User doesn't have access, redirect to pricing
-    redirect('/pricing');
+    // Only redirect to sign-in if not authenticated at all
+    redirect('/sign-in');
   }
 
   // Check if user has already completed onboarding
@@ -18,11 +24,8 @@ export default async function OnboardingPage() {
     redirect('/dashboard');
   }
 
-  // Check if user has subscription access
-  const hasAccess = checkSubscription(user);
-  if (!hasAccess) {
-    redirect('/pricing');
-  }
+  // Allow all authenticated users to complete onboarding (Free tier included)
+  // No subscription check needed here
 
   return (
     <OnboardingClient

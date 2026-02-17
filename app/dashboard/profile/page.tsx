@@ -69,9 +69,11 @@ export default async function ProfilePage() {
     dbUser.hasDirectAccess === true ||
     dbUser.role === 'admin';
 
-  if (!hasAccess) {
-    redirect('/pricing');
-  }
+  // LOOP BREAKER FIX: Allow all authenticated users to access profile
+  // Free tier users can view/edit their profile too
+  // if (!hasAccess) {
+  //   redirect('/pricing');
+  // }
 
   // Filter progress data by actual user ID (post-query filtering is faster than pre-query when user is already loaded)
   const userCompletedProgress = completedProgress.filter(

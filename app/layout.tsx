@@ -230,9 +230,9 @@ export default function RootLayout({
       signUpUrl="/sign-up"
       // Disable Clerk monetization features since we use custom Stripe integration
       telemetry={false}
-      // Configure token refresh strategy
+      // Configure redirect URL after sign-in/sign-up
       afterSignInUrl="/dashboard"
-      afterSignUpUrl="/onboarding"
+      afterSignUpUrl="/dashboard"
     >
       <html lang="en" suppressHydrationWarning>
         <head>

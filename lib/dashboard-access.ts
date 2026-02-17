@@ -180,16 +180,14 @@ export async function requireDashboardAccess() {
       return dbUser;
     }
 
-    // Use the standard checkSubscription function
-    const hasAccess = checkSubscription(dbUser);
-    console.log('[requireDashboardAccess] Subscription check result:', hasAccess);
-
-    if (!hasAccess) {
-      console.log('[requireDashboardAccess] No access - redirecting to pricing');
-      redirect('/pricing');
-    }
-
-    console.log('[requireDashboardAccess] Access granted');
+    // ========================================================================
+    // LOOP BREAKER FIX: Allow all authenticated users to access dashboard
+    // ========================================================================
+    // Free tier users (without subscriptions) can access dashboard with limited features
+    // DO NOT redirect to pricing - just let them through
+    // The dashboard will show upgrade prompts for limited features
+    // ========================================================================
+    console.log('[requireDashboardAccess] Authenticated user - access granted (includes Free tier)');
     return dbUser;
   } catch (error: any) {
     console.error('Dashboard access error:', error);

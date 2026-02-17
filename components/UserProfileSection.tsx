@@ -110,12 +110,22 @@ export default function UserProfileSection() {
         </div>
       )}
 
-      {/* Sign Out Confirmation Dialog */}
+      {/* Sign Out Confirmation Dialog - Fixed Positioning & Centered */}
       {showSignOutConfirm && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] animate-in fade-in">
+        <div 
+          className="fixed inset-0 bg-black/60 z-[100] animate-in fade-in overflow-y-auto"
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            minHeight: '100vh',
+            padding: '1rem'
+          }}
+        >
           <div 
             ref={confirmRef}
-            className="bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl w-[90%] max-w-md p-6 animate-in zoom-in-95"
+            className="bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl w-[90%] max-w-md p-6 animate-in zoom-in-95 my-auto"
+            style={{ margin: 'auto' }}
           >
             <h3 className="text-lg font-semibold text-white mb-2">
               {t('settings.signOutTitle')}
