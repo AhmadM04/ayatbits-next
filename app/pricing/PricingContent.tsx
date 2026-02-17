@@ -28,6 +28,7 @@ export default function PricingContent() {
     plan: string;
     tier: string;
     daysUntilExpiry?: number | null;
+    status?: string; // NEW: Stripe subscription status (trialing, active, etc.)
   } | null>(null);
   
   // Trial state
@@ -94,6 +95,7 @@ export default function PricingContent() {
             plan: data.plan,
             tier: data.tier,
             daysUntilExpiry: data.daysUntilExpiry,
+            status: data.subscriptionStatus, // NEW: Store subscription status
           });
         }
 
@@ -416,13 +418,19 @@ export default function PricingContent() {
             >
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Check className="w-5 h-5 text-green-500" />
-                <h3 className="text-lg font-semibold text-green-400">{t('pricing.youHaveAccess')}</h3>
+                <h3 className="text-lg font-semibold text-green-400">
+                  {/* UPDATED: Dynamic heading based on subscription status */}
+                  {subscriptionDetails.status === 'trialing' && "You're currently on Trial"}
+                  {subscriptionDetails.status === 'active' && 'Your subscription is active'}
+                  {!subscriptionDetails.status && t('pricing.youHaveAccess')}
+                </h3>
               </div>
               <p className="text-gray-300 mb-2">
                 {subscriptionDetails.plan === 'lifetime' && 'You have Lifetime access'}
                 {subscriptionDetails.plan === 'monthly' && 'You have a Monthly subscription'}
                 {subscriptionDetails.plan === 'yearly' && 'You have a Yearly subscription'}
-                {subscriptionDetails.plan === 'trial' && `You have a Trial (${subscriptionDetails.daysUntilExpiry || 7} days remaining)`}
+                {subscriptionDetails.plan === 'trial' && subscriptionDetails.daysUntilExpiry && 
+                  `${subscriptionDetails.daysUntilExpiry} ${subscriptionDetails.daysUntilExpiry === 1 ? 'day' : 'days'} remaining`}
                 {subscriptionDetails.plan === 'granted' && subscriptionDetails.daysUntilExpiry && 
                   `You have temporary access (${subscriptionDetails.daysUntilExpiry} days remaining)`}
                 {subscriptionDetails.plan === 'granted' && !subscriptionDetails.daysUntilExpiry && 
@@ -430,7 +438,9 @@ export default function PricingContent() {
                 {subscriptionDetails.plan === 'admin' && 'You have Admin access'}
               </p>
               <p className="text-sm text-gray-400 mb-4">
-                No need to subscribe - you already have access to the platform.
+                {subscriptionDetails.status === 'trialing' 
+                  ? 'Enjoy full access during your trial period.' 
+                  : 'No need to subscribe - you already have access to the platform.'}
               </p>
               <Link href="/dashboard" className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg font-medium transition-colors">
                 {t('pricing.goToDashboard')}

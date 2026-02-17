@@ -82,6 +82,7 @@ export async function GET() {
         grantType: 'none',
         daysUntilExpiry: null,
         hasStripeSubscription,
+        subscriptionStatus: 'active', // Admins always have active status
         // Trial status
         hasUsedTrial: user.hasUsedTrial || false,
         isTrialActive: false,
@@ -102,6 +103,7 @@ export async function GET() {
         grantType,
         daysUntilExpiry,
         hasStripeSubscription,
+        subscriptionStatus: user.subscriptionStatus || 'active', // Admin-granted status
         // Trial status
         hasUsedTrial: user.hasUsedTrial || false,
         isTrialActive: trialActive,
@@ -125,6 +127,7 @@ export async function GET() {
         grantType: 'none',
         daysUntilExpiry: null,
         hasStripeSubscription,
+        subscriptionStatus: 'active', // Lifetime is always active
         // Trial status
         hasUsedTrial: user.hasUsedTrial || false,
         isTrialActive: false,
@@ -163,6 +166,7 @@ export async function GET() {
         grantType: 'none',
         daysUntilExpiry: user.subscriptionStatus === SubscriptionStatusEnum.TRIALING ? daysRemaining : null,
         hasStripeSubscription,
+        subscriptionStatus: user.subscriptionStatus, // CRITICAL: Return the actual Stripe status
         // Trial status
         hasUsedTrial: user.hasUsedTrial || false,
         isTrialActive: trialActive,
@@ -191,6 +195,7 @@ export async function GET() {
         grantType: 'none',
         daysUntilExpiry: daysRemaining,
         hasStripeSubscription,
+        subscriptionStatus: 'trialing', // Legacy trial status
         // Trial status
         hasUsedTrial: user.hasUsedTrial || false,
         isTrialActive: trialActive,
@@ -211,6 +216,7 @@ export async function GET() {
         grantType: 'none',
         daysUntilExpiry: trialDaysLeft,
         hasStripeSubscription,
+        subscriptionStatus: 'trialing', // New trial system status
         // Trial status
         hasUsedTrial: true,
         isTrialActive: true,
@@ -236,6 +242,7 @@ export async function GET() {
       grantType: 'none',
       daysUntilExpiry: null,
       hasStripeSubscription,
+      subscriptionStatus: user.subscriptionStatus || 'inactive', // Free tier status
       // Trial status (user on free tier)
       hasUsedTrial: user.hasUsedTrial || false,
       isTrialActive: false,

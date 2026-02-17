@@ -42,6 +42,7 @@ interface DashboardContentProps {
   trialDaysLeft?: number;
   subscriptionStatus?: string;
   subscriptionEndDate?: string;
+  hasUsedTrial?: boolean; // NEW: Track if user has used their trial
   resumeData?: ResumeData | null;
   juzs: Array<{
     _id: string;
@@ -68,6 +69,7 @@ export default function DashboardContent({
   trialDaysLeft,
   subscriptionStatus,
   subscriptionEndDate,
+  hasUsedTrial,
   juzs,
   resumeData,
 }: DashboardContentProps) {
@@ -420,20 +422,42 @@ export default function DashboardContent({
           </p>
         </div>
 
-        {/* Subscription Required Banner */}
-        {needsSubscription && (
+        {/* Trial/Subscription Banner - Three States */}
+        {needsSubscription && !showTrialBanner && (
           <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-300 dark:border-orange-500/30 rounded-xl">
-            <p className="text-sm text-orange-800 dark:text-orange-400 mb-2">
-              Start your 7-day free trial to access all puzzles and features.
-            </p>
-            <Link
-              href="/pricing?reason=needs_subscription"
-              className="inline-block px-4 py-2 bg-[#059669] hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors"
-            >
-              Start Free Trial
-            </Link>
+            {/* State A: Never used trial */}
+            {!hasUsedTrial && (
+              <>
+                <p className="text-sm text-orange-800 dark:text-orange-400 mb-2">
+                  Start your 7-day free trial to access all puzzles and features.
+                </p>
+                <Link
+                  href="/pricing?reason=needs_subscription"
+                  className="inline-block px-4 py-2 bg-[#059669] hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Start Free Trial
+                </Link>
+              </>
+            )}
+            
+            {/* State C: Trial ended/canceled */}
+            {hasUsedTrial && (
+              <>
+                <p className="text-sm text-orange-800 dark:text-orange-400 mb-2">
+                  Your trial has ended. Upgrade to Pro to keep full access.
+                </p>
+                <Link
+                  href="/pricing?reason=trial_ended"
+                  className="inline-block px-4 py-2 bg-[#059669] hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Upgrade Now
+                </Link>
+              </>
+            )}
           </div>
         )}
+        
+        {/* State B: Trial Active - Show "X days remaining" banner (handled by showTrialBanner below) */}
 
         {/* Daily Quote */}
         <div className="mb-6" data-tutorial="daily-quote">

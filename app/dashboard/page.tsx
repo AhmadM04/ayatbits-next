@@ -195,6 +195,7 @@ export default async function DashboardPage() {
       trialDaysLeft={trialDaysLeft}
       subscriptionStatus={user.subscriptionStatus}
       subscriptionEndDate={user.subscriptionEndDate?.toISOString()}
+      hasUsedTrial={user.hasUsedTrial || false}
       juzs={juzs}
       stats={stats}
       resumeData={resumeData}
