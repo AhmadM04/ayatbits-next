@@ -53,30 +53,50 @@ async function fetchVersesForPage(pageNumber: number): Promise<QuranVerse[]> {
 
 /**
  * Get cached verses for a specific Mushaf page
- * 
+ *
  * PERFORMANCE OPTIMIZATION:
  * - Verses are static (never change) so we cache them indefinitely
  * - First call: ~500ms (API fetch)
  * - Subsequent calls: ~5ms (cache hit)
  * - 100x speedup!
- * 
+ *
  * Cache Strategy:
- * - Cache Key: Dynamic per page (quran-page-verses-{pageNumber})
+ * - Cache Key: Explicit per-page key using zero-padded page number
+ *   e.g.  page 9  → 'quran-page-verses-009'
+ *         page 10 → 'quran-page-verses-010'   ← was broken with the old
+ *         page 11 → 'quran-page-verses-011'      implicit-argument approach
  * - Revalidation: 30 days (verses never change, but we revalidate occasionally)
  * - Tags: ['quran-data'] for manual cache purging if needed
+ *
+ * Why the explicit key matters:
+ * The previous implementation used a single static keyParts array
+ * (['quran-page-verses']) and relied on Next.js to hash the function
+ * argument into the cache key. This is fragile: if the hash for a
+ * particular argument (e.g. 10) ever collides with another entry, or
+ * if a transient API failure is cached as an empty result for 30 days,
+ * that page becomes permanently "Not Available" with no predictable
+ * key to clear. Using padStart(3, '0') makes every cache key unique,
+ * human-readable, and safe to inspect / purge manually.
  */
-export const getCachedVersesForPage = unstable_cache(
-  async (pageNumber: number) => {
-    console.log(`[CACHE MISS] Fetching verses for page ${pageNumber} from API`);
-    const verses = await fetchVersesForPage(pageNumber);
-    return verses;
-  },
-  ['quran-page-verses'], // Base cache key
-  {
-    revalidate: 2592000, // 30 days in seconds (verses never change)
-    tags: ['quran-data'], // Tag for manual invalidation
-  }
-);
+export function getCachedVersesForPage(pageNumber: number): Promise<QuranVerse[]> {
+  // Zero-pad the page number so keys are always the same width:
+  // 9 → '009', 10 → '010', 11 → '011', ... 604 → '604'
+  const formattedPage = pageNumber.toString().padStart(3, '0');
+
+  const cachedFetch = unstable_cache(
+    async () => {
+      console.log(`[CACHE MISS] Fetching verses for page ${formattedPage} from API`);
+      return fetchVersesForPage(pageNumber);
+    },
+    [`quran-page-verses-${formattedPage}`], // Explicit, unique key per page
+    {
+      revalidate: 2592000, // 30 days in seconds (verses never change)
+      tags: ['quran-data'], // Tag for manual invalidation
+    },
+  );
+
+  return cachedFetch();
+}
 
 /**
  * Prefetch verses for adjacent pages (optional optimization)

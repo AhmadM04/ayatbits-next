@@ -29,31 +29,36 @@ interface PuzzleSceneProps {
   /** English surah caption */
   puzzleSurahEnglish: string;
   /**
-   * When `true`, the answer area uses `direction: rtl` (correct for Arabic).
+   * When `true`, the answer area uses `flexDirection: row-reverse` (correct for Arabic).
    * Toggle to `false` to test LTR layout.
    */
   isRTL: boolean;
   /**
-   * Multiplies all stagger delays and divides spring frames.
+   * Multiplies all stagger delays.
    * 1 = original speed, 3 = smooth & cinematic, 5 = very slow.
    */
   animationSlowdown: number;
 }
 
 /**
- * Frame-Driven Puzzle Scene
- * =========================
+ * Frame-Driven Puzzle Scene — "Drag & Drop" Edition
+ * ==================================================
  * Uses the REAL tokenizeAyah() + HarakatColoredText from the AyatBits codebase.
+ *
+ * Each word animates as if it were physically "picked up" from the word bank
+ * and slowly released onto its slot:
+ *   • Low stiffness (60) + higher damping (14) + heavier mass (1.2) = fluid, weighted feel
+ *   • 240 px vertical travel + 40 px horizontal swoop = clear origin → destination path
+ *   • Scale 1.15 → 1.0  (word "shrinks" as it settles — feels dropped, not teleported)
+ *   • Drop-shadow reduces as the word lands (shadow = distance from surface)
+ *   • Word bank token lifts & fades right before its word is launched
  *
  * Timeline (relative to Sequence start, at slowdown = 1):
  *   Frame  0–10  : Section slides in
  *   Frame 10–30  : Empty answer slots appear
- *   Frame 30–…   : Words fly in one by one (staggered springs)
+ *   Frame 30–…   : Words fly in one by one (14-frame stagger each)
  *   Frame …+10   : Translation fades in
  *   Frame …+5    : Success badge pops in
- *
- * `animationSlowdown` stretches all timings proportionally so the
- * Studio's slider gives a live cinematic speed control.
  */
 export const PuzzleScene: React.FC<PuzzleSceneProps> = ({
   ratio,
@@ -80,12 +85,14 @@ export const PuzzleScene: React.FC<PuzzleSceneProps> = ({
 
   // ── Scaled timing constants ──────────────────────────────────
   const PLACE_START = Math.round(30 * animationSlowdown);
-  const STAGGER     = Math.round(8  * animationSlowdown);
+  /** Frames between each word launch — 14 gives enough time for the
+   *  drag-and-drop travel arc to be clearly visible at 30 fps.       */
+  const STAGGER = Math.round(14 * animationSlowdown);
 
   // ── Section entrance ────────────────────────────────────────
-  const entranceSpring  = spring({ frame: sf(frame), fps, config: { damping: 14, stiffness: 80, mass: 0.8 } });
-  const sectionOpacity  = interpolate(entranceSpring, [0, 1], [0, 1]);
-  const sectionY        = interpolate(entranceSpring, [0, 1], [60, 0]);
+  const entranceSpring = spring({ frame: sf(frame), fps, config: { damping: 14, stiffness: 80, mass: 0.8 } });
+  const sectionOpacity = interpolate(entranceSpring, [0, 1], [0, 1]);
+  const sectionY       = interpolate(entranceSpring, [0, 1], [60, 0]);
 
   // ── How many words are placed based on current frame ────────
   const placedCount = Math.min(
@@ -120,7 +127,6 @@ export const PuzzleScene: React.FC<PuzzleSceneProps> = ({
 
   const progress = tokens.length > 0 ? placedCount / tokens.length : 0;
 
-  // Derive slightly lighter shade for filled slot border
   const slotFillBorder = `${primaryColor}80`;
   const slotFillBg     = `${primaryColor}15`;
   const successGlow    = `${primaryColor}30`;
@@ -232,12 +238,15 @@ export const PuzzleScene: React.FC<PuzzleSceneProps> = ({
               height: '100%',
               background: primaryColor,
               borderRadius: 4,
-              transition: 'width 0.3s ease',
             }}
           />
         </div>
 
-        {/* Answer area — direction driven by isRTL prop */}
+        {/* Answer area
+            Layout rule: flexDirection row-reverse for RTL Arabic — this
+            places DOM index 0 on the far RIGHT (first Arabic word), which
+            is correct for RTL reading order. No `direction: rtl` needed —
+            combining it with row-reverse would double-reverse (cancel out). */}
         <div
           style={{
             width: '100%',
@@ -252,23 +261,53 @@ export const PuzzleScene: React.FC<PuzzleSceneProps> = ({
             flexWrap: 'wrap',
             justifyContent: 'flex-start',
             gap,
-            direction: isRTL ? 'rtl' : 'ltr',
           }}
         >
           {tokens.map((token, index) => {
             const isPlaced = index < placedCount;
 
+            // ── Drag-and-drop spring ─────────────────────────────────
+            // Lower stiffness (60)  → slower, heavier motion
+            // Higher damping (14)   → less overshoot, settles cleanly
+            // Higher mass (1.2)     → "weighty" feel on release
             const wordDelay  = PLACE_START + index * STAGGER;
             const wordSpring = spring({
               frame: sf(Math.max(0, frame - wordDelay)),
               fps,
-              config: { damping: 10, stiffness: 150, mass: 0.6 },
+              config: { damping: 14, stiffness: 60, mass: 1.2 },
             });
 
-            const wordY      = isPlaced ? interpolate(wordSpring, [0, 1], [80, 0]) : 0;
-            const wordOpacity = isPlaced ? interpolate(wordSpring, [0, 1], [0, 1]) : 0;
-            const wordScale  = isPlaced ? interpolate(wordSpring, [0, 1], [0.7, 1]) : 1;
+            // ── Travel path ──────────────────────────────────────────
+            // Vertical: 240 px below slot → 0  (visible origin from word bank)
+            const wordY = isPlaced
+              ? interpolate(wordSpring, [0, 1], [240, 0])
+              : 0;
 
+            // Horizontal swoop: approach slot from a slight inward angle.
+            // RTL (+X) or LTR (−X) so it looks natural for each direction.
+            const wordX = isPlaced
+              ? interpolate(wordSpring, [0, 0.5, 1], [isRTL ? 40 : -40, isRTL ? 8 : -8, 0])
+              : 0;
+
+            // ── Scale: slightly enlarged while "held", settles on drop ──
+            const wordScale = isPlaced
+              ? interpolate(wordSpring, [0, 0.5, 1], [1.15, 1.06, 1.0])
+              : 1;
+
+            // ── Opacity: quick fade-in (first 10 % of travel) ──────────
+            const wordOpacity = isPlaced
+              ? interpolate(wordSpring, [0, 0.1, 1], [0, 1, 1])
+              : 0;
+
+            // ── Drop shadow: large while held, disappears on landing ───
+            const shadowBlur = isPlaced
+              ? interpolate(wordSpring, [0, 0.8, 1], [24, 6, 0])
+              : 0;
+            const shadowY = isPlaced
+              ? interpolate(wordSpring, [0, 0.8, 1], [12, 3, 0])
+              : 0;
+
+            // ── Empty-slot pulse ────────────────────────────────────────
             const slotPulse =
               !isPlaced && frame >= 10
                 ? interpolate(Math.sin(frame * 0.1 + index), [-1, 1], [0.3, 0.6])
@@ -290,14 +329,22 @@ export const PuzzleScene: React.FC<PuzzleSceneProps> = ({
                   justifyContent: 'center',
                   opacity: isPlaced ? 1 : 0.5 + slotPulse,
                   padding: '0 12px',
-                  boxShadow: isPlaced ? `0 0 20px ${primaryColor}20` : 'none',
+                  // Slot glows once word settles
+                  boxShadow: isPlaced
+                    ? `0 0 20px ${primaryColor}20`
+                    : 'none',
                 }}
               >
                 {isPlaced ? (
                   <div
                     style={{
-                      transform: `translateY(${wordY}px) scale(${wordScale})`,
+                      transform: `translate(${wordX}px, ${wordY}px) scale(${wordScale})`,
                       opacity: wordOpacity,
+                      // Drop shadow: large when "held", fades to nothing on land
+                      filter: shadowBlur > 0
+                        ? `drop-shadow(0 ${shadowY}px ${shadowBlur}px rgba(0,0,0,0.45))`
+                        : 'none',
+                      willChange: 'transform, filter',
                     }}
                   >
                     {/* ── REAL HarakatColoredText from the codebase ── */}
@@ -322,7 +369,7 @@ export const PuzzleScene: React.FC<PuzzleSceneProps> = ({
           })}
         </div>
 
-        {/* Word bank */}
+        {/* Word bank — token "lifts" just before it disappears */}
         <div
           style={{
             display: 'flex',
@@ -333,15 +380,29 @@ export const PuzzleScene: React.FC<PuzzleSceneProps> = ({
           }}
         >
           {tokens.map((token, index) => {
-            const isPlaced   = index < placedCount;
+            const isPlaced = index < placedCount;
+            const wordDelay = PLACE_START + index * STAGGER;
+
+            // Fade window extended slightly to match the longer spring travel
             const bankOpacity = isPlaced
               ? interpolate(
                   frame,
-                  [PLACE_START + index * STAGGER - 2, PLACE_START + index * STAGGER + 3],
+                  [wordDelay - 4, wordDelay + 6],
                   [1, 0],
                   { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
                 )
               : 1;
+
+            // Lift effect: token rises and scales up in the ~6 frames before launch
+            const liftProgress =
+              !isPlaced && frame >= wordDelay - 6
+                ? interpolate(frame, [wordDelay - 6, wordDelay], [0, 1], {
+                    extrapolateLeft: 'clamp',
+                    extrapolateRight: 'clamp',
+                  })
+                : 0;
+            const bankScale = 1 + liftProgress * 0.12;
+            const bankY     = -liftProgress * 10;
 
             if (bankOpacity <= 0) return null;
 
@@ -355,6 +416,11 @@ export const PuzzleScene: React.FC<PuzzleSceneProps> = ({
                   border: `1px solid ${COLORS.border}`,
                   opacity: bankOpacity,
                   cursor: 'grab',
+                  transform: `translateY(${bankY}px) scale(${bankScale})`,
+                  boxShadow: liftProgress > 0
+                    ? `0 ${8 * liftProgress}px ${16 * liftProgress}px rgba(0,0,0,0.3)`
+                    : 'none',
+                  willChange: 'transform, box-shadow',
                 }}
               >
                 <span
@@ -372,7 +438,7 @@ export const PuzzleScene: React.FC<PuzzleSceneProps> = ({
           })}
         </div>
 
-        {/* Translation (fades in after all placed) */}
+        {/* Translation (fades in after all words are placed) */}
         {frame >= PLACE_START + 10 && (
           <div
             style={{
