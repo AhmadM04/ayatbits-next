@@ -53,7 +53,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: "#0a0a0a",
+  themeColor: "#16a34a",
   colorScheme: "dark",
 };
 
@@ -96,6 +96,15 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "black-translucent",
     title: siteName,
+  },
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
   },
   openGraph: {
     type: "website",

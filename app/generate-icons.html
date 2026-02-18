@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AyatBits Icon Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 1px solid #ddd;
+            margin: 10px;
+            border-radius: 8px;
+        }
+        button {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background: #15803d;
+        }
+        h1 {
+            color: #16a34a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 AyatBits Icon Generator</h1>
+        <p>Click the buttons below to download your icons:</p>
+        
+        <div>
+            <canvas id="icon192" width="192" height="192"></canvas>
+            <canvas id="icon512" width="512" height="512"></canvas>
+        </div>
+        
+        <div>
+            <button onclick="downloadIcon('icon192', 192, 42, 110, 'icon-192.png')">
+                Download icon-192.png
+            </button>
+            <button onclick="downloadIcon('icon512', 512, 112, 300, 'icon-512.png')">
+                Download icon-512.png
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function createIcon(canvasId, size, borderRadius, fontSize) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Create rounded rectangle path
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, borderRadius);
+            ctx.clip();
+            
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#16a34a');
+            gradient.addColorStop(1, '#15803d');
+            
+            // Fill background
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Draw Arabic Alif (أ)
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('أ', size / 2, size / 2);
+        }
+        
+        function downloadIcon(canvasId, size, borderRadius, fontSize, filename) {
+            // Clear and recreate the icon
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, size, size);
+            
+            // Reset transform
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            
+            // Recreate icon
+            createIcon(canvasId, size, borderRadius, fontSize);
+            
+            // Download
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+            }, 'image/png');
+        }
+        
+        // Generate previews on load
+        window.onload = function() {
+            createIcon('icon192', 192, 42, 110);
+            createIcon('icon512', 512, 112, 300);
+        };
+    </script>
+</body>
+</html>
