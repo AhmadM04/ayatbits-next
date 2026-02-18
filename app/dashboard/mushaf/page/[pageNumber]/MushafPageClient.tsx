@@ -48,6 +48,21 @@ export default function MushafPageClient({
   const [selectedHarakat, setSelectedHarakat] = useState<HarakatDefinition | null>(null);
   const [showHarakatModal, setShowHarakatModal] = useState(false);
 
+  // ── Persist current page to localStorage (debounced 1 s) ────────
+  // Writing on every swipe would hammer disk storage; the 1 s debounce
+  // ensures only the "settled" page is stored after rapid flipping.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem('last_viewed_mushaf_page', String(pageNumber));
+      } catch {
+        // localStorage unavailable (private browsing, storage full, etc.)
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [pageNumber]);
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

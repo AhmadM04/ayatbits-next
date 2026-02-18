@@ -11,7 +11,12 @@
     "lint:fix": "eslint --fix",
     "typecheck": "tsc --noEmit",
     "db:seed": "tsx -r dotenv/config scripts/seed.ts",
-    "db:migrate-clerkids": "tsx -r dotenv/config scripts/migrate-clerkids.ts"
+    "db:migrate-clerkids": "tsx -r dotenv/config scripts/migrate-clerkids.ts",
+    "remotion:studio": "npx remotion studio remotion/index.ts",
+    "remotion:render:vertical": "npx remotion render remotion/index.ts AyatBits-Vertical-9x16 out/vertical.mp4",
+    "remotion:render:square": "npx remotion render remotion/index.ts AyatBits-Square-4x3 out/square.mp4",
+    "remotion:render:horizontal": "npx remotion render remotion/index.ts AyatBits-Horizontal-16x9 out/horizontal.mp4",
+    "remotion:render:all": "npm run remotion:render:vertical && npm run remotion:render:square && npm run remotion:render:horizontal"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.980.0",
@@ -23,6 +28,7 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@react-email/components": "^1.0.4",
     "@react-email/render": "^2.0.2",
+    "@remotion/zod-types": "4.0.424",
     "@stripe/stripe-js": "^8.5.3",
     "@types/canvas-confetti": "^1.9.0",
     "@upstash/ratelimit": "^2.0.8",
@@ -43,10 +49,14 @@
     "stripe": "^20.0.0",
     "svix": "^1.84.1",
     "tailwind-merge": "^3.4.0",
+    "zod": "3.22.3",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.0.7",
+    "@remotion/bundler": "^4.0.424",
+    "@remotion/cli": "^4.0.424",
+    "@remotion/renderer": "^4.0.424",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20.19.25",
     "@types/react": "^19",
@@ -56,6 +66,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.6",
     "next-pwa": "^5.6.0",
+    "remotion": "^4.0.424",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
