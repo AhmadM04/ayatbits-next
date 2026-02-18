@@ -91,7 +91,7 @@ export default function AyahSelectorModal({
       <div className="relative bg-white dark:bg-[#111] border border-[#E5E7EB] dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-md mx-4 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[#E5E7EB] dark:border-white/10">
-          <h2 className="text-xl font-semibold text-[#4A3728] dark:text-white">Select Ayah</h2>
+          <h2 className="text-lg font-semibold text-[#4A3728] dark:text-white">Select Ayah</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"

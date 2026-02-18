@@ -326,7 +326,7 @@ export default function PuzzleDemo() {
   return (
     <div className="bg-[var(--bg-card)] rounded-xl shadow-lg p-6 md:p-8 border border-[var(--border-color)] transition-colors">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-[var(--text-primary)]">Try It Yourself</h3>
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Try It Yourself</h3>
         <button
           onClick={handleReset}
           className="text-sm text-green-600 hover:text-green-700 font-medium"

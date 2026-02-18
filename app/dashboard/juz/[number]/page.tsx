@@ -41,7 +41,7 @@ export default async function JuzPage({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Juz not found</h1>
+          <h1 className="text-xl font-bold text-gray-900 mb-2">Juz not found</h1>
           <a href="/dashboard" className="text-green-600 hover:underline">
             Go back to dashboard
           </a>

@@ -85,7 +85,7 @@ export default function FAQPage() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-6">
           <div className="mb-6">
-            <h2 className="text-xl font-bold mb-2">{t('faq.subtitle')}</h2>
+            <h2 className="text-lg font-bold mb-2">{t('faq.subtitle')}</h2>
             <p className="text-gray-400 text-sm">{t('faq.description')}</p>
           </div>
 

@@ -78,7 +78,7 @@ export default function ConfirmExitModal({
               <div className="p-2 rounded-lg bg-yellow-500/10">
                 <AlertTriangle className="w-5 h-5 text-yellow-500" />
               </div>
-              <h2 className="text-xl font-semibold text-white">
+              <h2 className="text-lg font-semibold text-white">
                 {t('puzzle.exitPuzzleTitle')}
               </h2>
             </div>

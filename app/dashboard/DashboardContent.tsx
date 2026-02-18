@@ -414,7 +414,7 @@ export default function DashboardContent({
       <main className="max-w-6xl mx-auto px-4 py-6">
         {/* Welcome Section */}
         <div className="mb-6" data-tutorial="welcome-section">
-          <h1 className="text-xl font-bold mb-1 text-[#4A3728] dark:text-white">
+          <h1 className="text-lg font-bold mb-1 text-[#4A3728] dark:text-white">
             {t('dashboard.welcome', { name: userFirstName || t('dashboard.learner') })}
           </h1>
           <p className="text-[#8E7F71] dark:text-gray-400 text-sm">

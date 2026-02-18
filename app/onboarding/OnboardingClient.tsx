@@ -243,7 +243,7 @@ export default function OnboardingClient({
                       <Sparkles className="w-4 h-4" />
                       <span>{t('onboarding.title')}</span>
                     </div>
-                    <h2 className="text-3xl font-bold mb-2">{t('onboarding.step1Title')}</h2>
+                    <h2 className="text-2xl font-bold mb-2">{t('onboarding.step1Title')}</h2>
                     <p className="text-gray-400">{t('onboarding.step1Description')}</p>
                   </div>
 
@@ -280,7 +280,7 @@ export default function OnboardingClient({
                   className="space-y-6"
                 >
                   <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold mb-2">{t('onboarding.step2Title')}</h2>
+                    <h2 className="text-2xl font-bold mb-2">{t('onboarding.step2Title')}</h2>
                     <p className="text-gray-400">{t('onboarding.step2Description')}</p>
                   </div>
 
@@ -332,7 +332,7 @@ export default function OnboardingClient({
                   className="space-y-6"
                 >
                   <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold mb-2">{t('onboarding.step3Title')}</h2>
+                    <h2 className="text-2xl font-bold mb-2">{t('onboarding.step3Title')}</h2>
                     <p className="text-gray-400">{t('onboarding.step3Description')}</p>
                   </div>
 
@@ -372,7 +372,7 @@ export default function OnboardingClient({
                   className="space-y-6"
                 >
                   <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold mb-2">{t('onboarding.step4Title')}</h2>
+                    <h2 className="text-2xl font-bold mb-2">{t('onboarding.step4Title')}</h2>
                     <p className="text-gray-400">{t('onboarding.step4Description')}</p>
                   </div>
 

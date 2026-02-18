@@ -48,7 +48,7 @@ export default function BillingContent({ user }: BillingContentProps) {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-xl font-bold text-[#4A3728] dark:text-white mb-2">{t('billing.title')}</h1>
+          <h1 className="text-lg font-bold text-[#4A3728] dark:text-white mb-2">{t('billing.title')}</h1>
           <p className="text-gray-600 dark:text-gray-400">{t('billing.manageInfo')}</p>
         </div>
 

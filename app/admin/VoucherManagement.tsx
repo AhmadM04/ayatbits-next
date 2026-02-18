@@ -129,7 +129,7 @@ export default function VoucherManagement() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Gift className="w-6 h-6 text-blue-500" />
-          <h2 className="text-2xl font-bold">Voucher Management</h2>
+          <h2 className="text-xl font-bold">Voucher Management</h2>
         </div>
         <button
           onClick={() => setShowCreateForm(!showCreateForm)}

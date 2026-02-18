@@ -106,7 +106,7 @@ export default function LikedAyahsContent() {
         ) : likedAyahs.length === 0 ? (
           <div className="text-center py-20">
             <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-[#4A3728] dark:text-white mb-2">{t('liked.noLikedYet')}</h2>
+            <h2 className="text-lg font-semibold text-[#4A3728] dark:text-white mb-2">{t('liked.noLikedYet')}</h2>
             <p className="text-[#8E7F71] dark:text-gray-400 text-sm mb-6">
               {t('liked.tapHeartToSave')}
             </p>

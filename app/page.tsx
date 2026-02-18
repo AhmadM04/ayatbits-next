@@ -296,7 +296,7 @@ export default function Home() {
                   </Link>
                 </motion.div>
 
-                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
                   <span className="text-white">{t('landing.heroTitle')}</span>
                   <br />
                   <span className="bg-gradient-to-r from-green-400 via-emerald-400 to-green-500 bg-clip-text text-transparent">
@@ -367,7 +367,7 @@ export default function Home() {
                 transition={{ duration: 0.6 }}
                 className="text-center mb-16"
               >
-                <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4">
                   {t('landing.whyAyatBits')}
                 </h2>
                 <p className="text-gray-400 max-w-xl mx-auto">
@@ -414,7 +414,7 @@ export default function Home() {
                         feature.color === 'orange' ? 'text-orange-500' : 'text-blue-500'
                       }`} />
                     </div>
-                    <h3 className="text-xl font-semibold mb-2 text-white">{feature.title}</h3>
+                    <h3 className="text-lg font-semibold mb-2 text-white">{feature.title}</h3>
                     <p className="text-gray-400 text-sm leading-relaxed">{feature.description}</p>
                   </ConditionalMotion>
                 ))}
@@ -455,7 +455,7 @@ export default function Home() {
                 transition={{ duration: 0.6 }}
                 className="text-center mb-16"
               >
-                <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4">
                   {t('landing.whatLearnersSay')}
                 </h2>
                 <p className="text-gray-400 max-w-xl mx-auto">
@@ -526,7 +526,7 @@ export default function Home() {
                   <Puzzle className="w-4 h-4" />
                   <span>{t('landing.tryItNow')}</span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4">
                   {t('landing.experienceTitle')}
                 </h2>
                 <p className="text-gray-400 max-w-xl mx-auto">
@@ -558,7 +558,7 @@ export default function Home() {
                   <Sparkles className="w-4 h-4" />
                   <span>{t('landing.howItWorks')}</span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4">
                   {t('landing.howItWorksTitle')}
                 </h2>
                 <p className="text-gray-400 max-w-xl mx-auto">
@@ -589,7 +589,7 @@ export default function Home() {
                     <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 text-green-400 font-bold mb-3 text-lg">
                       1
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">
+                    <h3 className="text-lg font-semibold text-white mb-2">
                       {t('landing.step1Title')}
                     </h3>
                     <p className="text-gray-400 text-sm leading-relaxed">
@@ -620,7 +620,7 @@ export default function Home() {
                     <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 text-green-400 font-bold mb-3 text-lg">
                       2
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">
+                    <h3 className="text-lg font-semibold text-white mb-2">
                       {t('landing.step2Title')}
                     </h3>
                     <p className="text-gray-400 text-sm leading-relaxed">
@@ -651,7 +651,7 @@ export default function Home() {
                     <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 text-green-400 font-bold mb-3 text-lg">
                       3
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">
+                    <h3 className="text-lg font-semibold text-white mb-2">
                       {t('landing.step3Title')}
                     </h3>
                     <p className="text-gray-400 text-sm leading-relaxed">
@@ -682,7 +682,7 @@ export default function Home() {
                     <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 text-green-400 font-bold mb-3 text-lg">
                       4
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">
+                    <h3 className="text-lg font-semibold text-white mb-2">
                       {t('landing.step4Title')}
                     </h3>
                     <p className="text-gray-400 text-sm leading-relaxed">
@@ -702,7 +702,7 @@ export default function Home() {
                 transition={{ duration: 0.6 }}
                 className="text-center mb-12"
               >
-                <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4">
                   {t('landing.chooseYourPlan')}
                 </h2>
                 <p className="text-gray-400 max-w-xl mx-auto">
@@ -753,7 +753,7 @@ export default function Home() {
                   className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-8 hover:border-green-500/30 transition-all duration-300"
                 >
                   <div className="mb-6">
-                    <h3 className="text-2xl font-bold text-white mb-2">{t('landing.basic')}</h3>
+                    <h3 className="text-xl font-bold text-white mb-2">{t('landing.basic')}</h3>
                     <div className="flex items-baseline gap-2">
                       <span className="text-4xl font-bold">
                         {billingPeriod === 'monthly' ? '€5.99' : '€49.99'}
@@ -819,7 +819,7 @@ export default function Home() {
                   </div>
 
                   <div className="mb-6">
-                    <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                    <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
                       {t('landing.pro')}
                       <Sparkles className="w-5 h-5 text-green-400" />
                     </h3>
@@ -902,7 +902,7 @@ export default function Home() {
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl" />
                 
                 <div className="relative z-10 text-center">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">
                     {t('landing.readyToTransform')}
                     <br />
                     <span className="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">

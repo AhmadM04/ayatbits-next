@@ -211,7 +211,7 @@ export default function PricingContent() {
                   <Sparkles className="w-4 h-4 text-green-500" />
                   <span className="text-green-400 text-sm font-medium">Start Your Journey</span>
                 </div>
-                <h1 className="text-3xl sm:text-4xl font-bold mb-4">
+                <h1 className="text-2xl sm:text-3xl font-bold mb-4">
                   Start your 7-day free trial
                 </h1>
                 <p className="text-gray-400 text-lg max-w-xl mx-auto">
@@ -220,7 +220,7 @@ export default function PricingContent() {
               </>
             ) : (
               <>
-                <h1 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                <h1 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                   Simple pricing
                 </h1>
                 <p className="text-gray-400 text-lg">
@@ -411,7 +411,7 @@ export default function PricingContent() {
               transition={{ delay: 0.5 }}
               className="mt-16 text-center"
             >
-              <h2 className="text-2xl font-bold mb-4">Questions?</h2>
+              <h2 className="text-xl font-bold mb-4">Questions?</h2>
               <p className="text-gray-400 mb-6">
                 Contact us at hello@ayatbits.com
               </p>

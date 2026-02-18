@@ -41,19 +41,19 @@ export default async function AdminPage() {
     <div className="min-h-screen bg-[#0a0a0a] text-white p-8">
       <div className="max-w-6xl mx-auto space-y-12">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Admin Panel</h1>
+          <h1 className="text-2xl font-bold mb-2">Admin Panel</h1>
           <p className="text-gray-400">Manage user access and waitlist signups</p>
         </div>
 
         {/* Grant Access Section */}
         <section>
-          <h2 className="text-2xl font-bold mb-6">Grant Premium Access</h2>
+          <h2 className="text-xl font-bold mb-6">Grant Premium Access</h2>
         <AdminForm action={grantAccessAction} />
         </section>
 
         {/* User Debug Tools Section */}
         <section>
-          <h2 className="text-2xl font-bold mb-6">User Debug Tools</h2>
+          <h2 className="text-xl font-bold mb-6">User Debug Tools</h2>
           <p className="text-gray-400 mb-4">Search for users and identify duplicate accounts</p>
           <UserDebugTools />
         </section>
@@ -65,7 +65,7 @@ export default async function AdminPage() {
 
         {/* Waitlist Management Section */}
         <section>
-          <h2 className="text-2xl font-bold mb-6">Waitlist Management</h2>
+          <h2 className="text-xl font-bold mb-6">Waitlist Management</h2>
           <WaitlistManagement />
         </section>
       </div>

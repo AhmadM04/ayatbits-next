@@ -38,7 +38,7 @@ export default async function SurahPage({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Surah not found</h1>
+          <h1 className="text-xl font-bold text-gray-900 mb-2">Surah not found</h1>
           <Link href="/dashboard" className="text-green-600 hover:underline">
             Go back to dashboard
           </Link>
@@ -72,7 +72,7 @@ export default async function SurahPage({
               <ArrowLeft className="w-5 h-5 text-gray-600" />
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{surah.nameEnglish}</h1>
+              <h1 className="text-xl font-bold text-gray-900">{surah.nameEnglish}</h1>
               <p className="text-lg text-gray-700">{surah.nameArabic}</p>
               <p className="text-sm text-gray-600">{puzzles.length} puzzles available</p>
             </div>

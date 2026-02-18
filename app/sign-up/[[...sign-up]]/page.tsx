@@ -17,7 +17,7 @@ function SignUpContent() {
       <header className="w-full border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-xl font-bold text-green-500">
+            <Link href="/" className="text-lg font-bold text-green-500">
               AyatBits
             </Link>
           </div>
@@ -32,7 +32,7 @@ function SignUpContent() {
         >
           {/* Custom Header */}
           <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold text-white mb-2">
+            <h1 className="text-2xl font-bold text-white mb-2">
               Start your journey
             </h1>
             <p className="text-gray-400 mb-4">

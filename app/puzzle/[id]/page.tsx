@@ -27,7 +27,7 @@ export default async function PuzzlePage({
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-2">Invalid puzzle ID</h1>
+          <h1 className="text-xl font-bold text-white mb-2">Invalid puzzle ID</h1>
           <a href="/dashboard" className="text-green-500 hover:underline">
             Go back to dashboard
           </a>
@@ -55,7 +55,7 @@ export default async function PuzzlePage({
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-2">Puzzle not found</h1>
+          <h1 className="text-xl font-bold text-white mb-2">Puzzle not found</h1>
           <a href="/dashboard" className="text-green-500 hover:underline">
             Go back to dashboard
           </a>
