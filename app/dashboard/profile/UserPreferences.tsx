@@ -132,28 +132,50 @@ export default function UserPreferences({
   }, []);
 
   const detectPushStatus = useCallback(async () => {
-    // Feature detection
-    if (
-      typeof window === 'undefined' ||
-      !('serviceWorker' in navigator) ||
-      !('PushManager' in window) ||
-      !('Notification' in window)
-    ) {
-      setPushStatus('unsupported');
-      return;
-    }
-
-    // If user has permanently denied notifications at the browser level
-    if (Notification.permission === 'denied') {
-      setPushStatus('denied');
-      return;
-    }
-
     try {
-      const registration = await navigator.serviceWorker.ready;
+      // ── 1. Environment checks ─────────────────────────────────────
+      // SSR guard
+      if (typeof window === 'undefined') {
+        setPushStatus('unsupported');
+        return;
+      }
+
+      // Service Worker + Push + Notification API must all be present.
+      // They are absent on insecure HTTP contexts, older browsers, and
+      // some in-app webviews.
+      if (
+        !('serviceWorker' in navigator) ||
+        !('PushManager' in window) ||
+        !('Notification' in window)
+      ) {
+        setPushStatus('unsupported');
+        return;
+      }
+
+      // ── 2. Handle "denied" permission ─────────────────────────────
+      if (Notification.permission === 'denied') {
+        setPushStatus('denied');
+        return;
+      }
+
+      // ── 3. Check for an *existing* SW registration ────────────────
+      // `navigator.serviceWorker.ready` hangs forever when no SW is
+      // registered (e.g. in dev mode where next-pwa disables itself).
+      // `getRegistration()` resolves immediately to `undefined` instead.
+      const registration = await navigator.serviceWorker.getRegistration();
+
+      if (!registration) {
+        // No service worker registered → push is unsupported at runtime
+        setPushStatus('unsupported');
+        return;
+      }
+
+      // ── 4. Check for an existing push subscription ────────────────
       const existingSub = await registration.pushManager.getSubscription();
       setPushStatus(existingSub ? 'subscribed' : 'unsubscribed');
     } catch {
+      // Any unexpected error → fall back to unsubscribed so the toggle
+      // is still interactive (user can try subscribing).
       setPushStatus('unsubscribed');
     }
   }, []);
@@ -178,7 +200,11 @@ export default function UserPreferences({
       }
 
       // 2. Subscribe via the PushManager
-      const registration = await navigator.serviceWorker.ready;
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) {
+        setPushStatus('unsupported');
+        return;
+      }
 
       const subscribeOptions: PushSubscriptionOptionsInit = {
         userVisibleOnly: true,
@@ -215,21 +241,23 @@ export default function UserPreferences({
     setPushLoading(true);
 
     try {
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (registration) {
+        const subscription = await registration.pushManager.getSubscription();
 
-      if (subscription) {
-        const endpoint = subscription.endpoint;
+        if (subscription) {
+          const endpoint = subscription.endpoint;
 
-        // 1. Unsubscribe in the browser
-        await subscription.unsubscribe();
+          // 1. Unsubscribe in the browser
+          await subscription.unsubscribe();
 
-        // 2. Remove from our backend
-        await fetch('/api/user/push-subscription', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ endpoint }),
-        });
+          // 2. Remove from our backend
+          await fetch('/api/user/push-subscription', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint }),
+          });
+        }
       }
 
       setPushStatus('unsubscribed');
