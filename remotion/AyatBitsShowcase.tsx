@@ -8,7 +8,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
-import { type CompositionProps } from './Schema';
+import { type CompositionProps, CROSS_FADE_FRAMES } from './Schema';
 import { Background } from './scenes/Background';
 import { HeroScene } from './scenes/HeroScene';
 import { PuzzleScene } from './scenes/PuzzleScene';
@@ -127,6 +127,14 @@ export const AyatBitsShowcase: React.FC<CompositionProps> = (props) => {
     fontFamily,
     animationSlowdown,
 
+    // Per-scene durations (seconds, from Studio sidebar)
+    heroDuration,
+    puzzleDuration,
+    dashboardDuration,
+    streakDuration,
+    featuresDuration,
+    ctaDuration,
+
     // Hero
     heroTitle,
     heroSubtitle,
@@ -165,35 +173,35 @@ export const AyatBitsShowcase: React.FC<CompositionProps> = (props) => {
   // ── Cross-fade overlap (frames) ────────────────────────────────
   // Adjacent sequences overlap by this many frames.
   // Keep in sync with the `TRANS` default in FadeSlide above.
-  const TRANS = 20;
+  const TRANS = CROSS_FADE_FRAMES;
 
-  // ── Base content durations ────────────────────────────────────
-  const HERO_BASE      = fps * 3;                    // 90  fr
-  const PUZZLE_BASE    = Math.round(fps * 4.5);      // 135 fr
-  const DASH_BASE      = fps * 4;                    // 120 fr
-  const STREAK_BASE    = Math.round(fps * 3.5);      // 105 fr
-  const FEATURES_BASE  = Math.round(fps * 3.5);      // 105 fr
-  const CTA_BASE       = Math.round(fps * 3.5);      // 105 fr
+  // ── Base content durations (derived from sidebar props) ────────
+  const HERO_BASE      = Math.round(heroDuration * fps);
+  const PUZZLE_BASE    = Math.round(puzzleDuration * fps);
+  const DASH_BASE      = Math.round(dashboardDuration * fps);
+  const STREAK_BASE    = Math.round(streakDuration * fps);
+  const FEATURES_BASE  = Math.round(featuresDuration * fps);
+  const CTA_BASE       = Math.round(ctaDuration * fps);
 
-  // ── Sequence starts (content starts at the same global frames) ─
+  // ── Sequence starts (dynamically chained) ──────────────────────
   // Each scene's content "starts" immediately when its Sequence opens —
   // the FadeSlide fade-in covers the first TRANS frames of that content.
   const HERO_START     = 0;
-  const PUZZLE_START   = HERO_START    + HERO_BASE;   // 90
-  const DASH_START     = PUZZLE_START  + PUZZLE_BASE; // 225
-  const STREAK_START   = DASH_START    + DASH_BASE;   // 345
-  const FEATURES_START = STREAK_START  + STREAK_BASE; // 450
-  const CTA_START      = FEATURES_START + FEATURES_BASE; // 555
+  const PUZZLE_START   = HERO_START    + HERO_BASE;
+  const DASH_START     = PUZZLE_START  + PUZZLE_BASE;
+  const STREAK_START   = DASH_START    + DASH_BASE;
+  const FEATURES_START = STREAK_START  + STREAK_BASE;
+  const CTA_START      = FEATURES_START + FEATURES_BASE;
 
   // ── Sequence durations (content + TRANS for outgoing overlap) ──
   // Each sequence runs TRANS frames past its content end so it can
   // fade out while the next sequence is fading in.
-  const HERO_DUR      = HERO_BASE     + TRANS; // 110
-  const PUZZLE_DUR    = PUZZLE_BASE   + TRANS; // 155
-  const DASH_DUR      = DASH_BASE     + TRANS; // 140
-  const STREAK_DUR    = STREAK_BASE   + TRANS; // 125
-  const FEATURES_DUR  = FEATURES_BASE + TRANS; // 125
-  const CTA_DUR       = CTA_BASE;              // 105 — last scene, no exit extension
+  const HERO_DUR      = HERO_BASE     + TRANS;
+  const PUZZLE_DUR    = PUZZLE_BASE   + TRANS;
+  const DASH_DUR      = DASH_BASE     + TRANS;
+  const STREAK_DUR    = STREAK_BASE   + TRANS;
+  const FEATURES_DUR  = FEATURES_BASE + TRANS;
+  const CTA_DUR       = CTA_BASE; // last scene — no exit extension
 
   return (
     <AbsoluteFill style={{ backgroundColor }}>

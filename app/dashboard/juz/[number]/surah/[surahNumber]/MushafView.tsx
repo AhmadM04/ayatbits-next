@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useLongPress } from '@/lib/hooks/useLongPress';
 
 interface Verse {
@@ -36,11 +37,34 @@ const isTitlePage = (surah: number, ayah: number): boolean => {
  * - Special center-aligned layout for title pages (Surah 1 and Surah 2:1-5)
  */
 export default function MushafView({ verses, onVerseLongPress }: MushafViewProps) {
+  const [activeVerseId, setActiveVerseId] = useState<string | null>(null);
+
   // Check if any verse is on a title page
   const hasTitlePageVerses = verses.some(verse => {
     const [surah, ayah] = verse.verse_key.split(':').map(Number);
     return isTitlePage(surah, ayah);
   });
+
+  /**
+   * Handle long-press activation:
+   * 1. Toggle the active highlight state
+   * 2. Fire a subtle 50ms haptic vibration (Android only — iOS lacks Vibration API)
+   * 3. Forward the event to the parent callback
+   */
+  const handleVerseLongPress = (verse: Verse) => {
+    // Toggle: deactivate if already active, otherwise activate this verse
+    const isActivating = activeVerseId !== verse.id;
+    setActiveVerseId(isActivating ? verse.id : null);
+
+    // Subtle haptic feedback — only fires at the moment the highlight toggles ON
+    if (isActivating) {
+      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate(50);
+      }
+    }
+
+    onVerseLongPress(verse);
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 pb-24">
@@ -59,9 +83,12 @@ export default function MushafView({ verses, onVerseLongPress }: MushafViewProps
           style={hasTitlePageVerses ? {} : { textAlignLast: 'center' }}
         >
           {verses.map((verse) => {
+            const isActive = activeVerseId === verse.id;
+
             const longPressHandlers = useLongPress(
-              () => onVerseLongPress(verse),
-              500
+              () => handleVerseLongPress(verse),
+              500,
+              { enableHaptics: false } // We handle haptics ourselves above
             );
 
             const isCompleted = verse.progress === 'COMPLETED' || verse.isCompleted;
@@ -79,7 +106,8 @@ export default function MushafView({ verses, onVerseLongPress }: MushafViewProps
                   className={`
                     relative w-full max-w-2xl mx-auto text-center cursor-pointer transition-colors select-none
                     ${isCompleted ? 'text-emerald-600 font-medium' : 'text-gray-900'}
-                    hover:bg-gray-50 rounded py-2
+                    ${isActive ? 'bg-emerald-100/60 rounded' : 'hover:bg-gray-50 rounded'}
+                    py-2
                   `}
                 >
                   {verse.text_uthmani}
@@ -94,7 +122,8 @@ export default function MushafView({ verses, onVerseLongPress }: MushafViewProps
               );
             }
 
-            // Regular verses - block layout if container is flex-col, otherwise inline
+            // Regular verses — inline with box-decoration-break for seamless
+            // multi-line highlights that don't get cut off at line breaks.
             return (
               <span
                 key={verse.id}
@@ -103,11 +132,19 @@ export default function MushafView({ verses, onVerseLongPress }: MushafViewProps
                   relative cursor-pointer transition-colors select-none
                   ${hasTitlePageVerses 
                     ? 'block text-right w-full self-end' 
-                    : 'inline px-1'
+                    : 'inline px-[4px]'
                   }
                   ${isCompleted ? 'text-emerald-600 font-medium' : 'text-gray-900'}
-                  hover:bg-gray-50 rounded
+                  ${isActive ? 'bg-emerald-100/60 rounded' : 'hover:bg-gray-50 rounded'}
                 `}
+                style={
+                  isActive
+                    ? {
+                        WebkitBoxDecorationBreak: 'clone',
+                        boxDecorationBreak: 'clone',
+                      }
+                    : undefined
+                }
               >
                 {verse.text_uthmani}
                 {/* End of Ayah Symbol - Emerald for completed, gray for incomplete */}

@@ -1,15 +1,30 @@
 import React from 'react';
 import { Composition } from 'remotion';
-import { compositionSchema, type CompositionProps } from './Schema';
+import {
+  compositionSchema,
+  type CompositionProps,
+  calculateTotalFrames,
+} from './Schema';
 import { AyatBitsShowcase } from './AyatBitsShowcase';
 import { CANVAS_SIZES } from './Theme';
 
 const FPS = 30;
-const DURATION_SECONDS = 22;
-const TOTAL_FRAMES = FPS * DURATION_SECONDS;
 
 // ── Shared default props (ratio is overridden per composition) ───────
 const BASE_DEFAULTS: CompositionProps = compositionSchema.parse({});
+
+/**
+ * calculateMetadata
+ * =================
+ * Called by Remotion whenever input props change in the Studio sidebar.
+ * Returns the updated `durationInFrames` so the timeline automatically
+ * stretches / shrinks when you tweak any scene duration slider.
+ */
+const calculateMetadata = ({ props }: { props: CompositionProps }) => {
+  return {
+    durationInFrames: calculateTotalFrames(props, FPS),
+  };
+};
 
 /**
  * RemotionRoot
@@ -24,6 +39,9 @@ const BASE_DEFAULTS: CompositionProps = compositionSchema.parse({});
  * z.number() fields  → numeric sliders
  * z.string() fields  → text inputs
  * z.array()  fields  → array editors
+ *
+ * `calculateMetadata` dynamically recomputes `durationInFrames`
+ * from the per-scene duration props — no manual total needed.
  */
 export const RemotionRoot: React.FC = () => {
   return (
@@ -32,36 +50,39 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="AyatBits-Vertical-9x16"
         component={AyatBitsShowcase}
-        durationInFrames={TOTAL_FRAMES}
+        durationInFrames={calculateTotalFrames(BASE_DEFAULTS, FPS)}
         fps={FPS}
         width={CANVAS_SIZES.vertical.width}
         height={CANVAS_SIZES.vertical.height}
         schema={compositionSchema}
         defaultProps={{ ...BASE_DEFAULTS, ratio: 'vertical' as const }}
+        calculateMetadata={calculateMetadata}
       />
 
       {/* ── Instagram (4:3 Square) ───────────────────────────── */}
       <Composition
         id="AyatBits-Square-4x3"
         component={AyatBitsShowcase}
-        durationInFrames={TOTAL_FRAMES}
+        durationInFrames={calculateTotalFrames(BASE_DEFAULTS, FPS)}
         fps={FPS}
         width={CANVAS_SIZES.square.width}
         height={CANVAS_SIZES.square.height}
         schema={compositionSchema}
         defaultProps={{ ...BASE_DEFAULTS, ratio: 'square' as const }}
+        calculateMetadata={calculateMetadata}
       />
 
       {/* ── YouTube (16:9 Horizontal) ────────────────────────── */}
       <Composition
         id="AyatBits-Horizontal-16x9"
         component={AyatBitsShowcase}
-        durationInFrames={TOTAL_FRAMES}
+        durationInFrames={calculateTotalFrames(BASE_DEFAULTS, FPS)}
         fps={FPS}
         width={CANVAS_SIZES.horizontal.width}
         height={CANVAS_SIZES.horizontal.height}
         schema={compositionSchema}
         defaultProps={{ ...BASE_DEFAULTS, ratio: 'horizontal' as const }}
+        calculateMetadata={calculateMetadata}
       />
     </>
   );

@@ -29,6 +29,22 @@ export const compositionSchema = z.object({
   /** Locked per composition — but visible in Studio for reference. */
   ratio: z.enum(['vertical', 'square', 'horizontal']).default('vertical'),
 
+  // ── Per-Scene Durations (seconds) ───────────────────────────────
+  // Each value is in seconds. The total video length is computed
+  // automatically via calculateMetadata in Main.tsx.
+  /** Duration of the Hero / Intro scene (seconds). */
+  heroDuration: z.number().min(1).max(15).step(0.5).default(3),
+  /** Duration of the Puzzle Reveal scene (seconds). */
+  puzzleDuration: z.number().min(1).max(15).step(0.5).default(4.5),
+  /** Duration of the Dashboard Preview scene (seconds). */
+  dashboardDuration: z.number().min(1).max(15).step(0.5).default(4),
+  /** Duration of the Streak Counter scene (seconds). */
+  streakDuration: z.number().min(1).max(15).step(0.5).default(3.5),
+  /** Duration of the Feature Highlights scene (seconds) — needs extra time for translation switch + AI tafsir demo. */
+  featuresDuration: z.number().min(1).max(30).step(0.5).default(9),
+  /** Duration of the Call-to-Action closing scene (seconds). */
+  ctaDuration: z.number().min(1).max(15).step(0.5).default(3.5),
+
   // ── Hero / Intro Scene ──────────────────────────────────────────
   heroTitle: z.string().default('AyatBits'),
   heroSubtitle: z.string().default('Gamified Quran Memorization'),
@@ -107,4 +123,28 @@ export const compositionSchema = z.object({
 
 /** Inferred TypeScript type — use this as the props type of AyatBitsShowcase. */
 export type CompositionProps = z.infer<typeof compositionSchema>;
+
+// ── Duration helpers ──────────────────────────────────────────────
+// Shared between Main.tsx (calculateMetadata) and AyatBitsShowcase.
+
+/** Cross-fade overlap in frames (keep in sync with FadeSlide default). */
+export const CROSS_FADE_FRAMES = 20;
+
+/**
+ * Compute total video duration in frames from the per-scene second values.
+ * Each scene's content is `Math.round(seconds × fps)` frames.
+ * The total is the sum of all content durations (the cross-fade overlap
+ * doesn't shorten the video because the last scene has no exit fade).
+ */
+export function calculateTotalFrames(props: CompositionProps, fps: number): number {
+  const sceneDurations = [
+    props.heroDuration,
+    props.puzzleDuration,
+    props.dashboardDuration,
+    props.streakDuration,
+    props.featuresDuration,
+    props.ctaDuration,
+  ];
+  return sceneDurations.reduce((sum, sec) => sum + Math.round(sec * fps), 0);
+}
 
