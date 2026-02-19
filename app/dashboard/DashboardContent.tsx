@@ -214,7 +214,7 @@ export default function DashboardContent({
                 <Link 
                   href="/dashboard/achievements"
                   className="group flex items-center gap-1.5 text-orange-500 hover:bg-gray-100 dark:hover:bg-white/5 px-2 py-1.5 rounded-lg transition-colors"
-                  data-tutorial="stats-cards"
+                  data-tutorial="streak-icon"
                 >
                   <div className="transition-transform hover:scale-110">
                     <Flame className="w-4 h-4 group-hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.6)] transition-all" />
@@ -340,7 +340,7 @@ export default function DashboardContent({
                     href="/dashboard/achievements"
                     onClick={() => setShowMobileMenu(false)}
                     className="flex items-center gap-3 p-3 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 hover:border-orange-500/30 rounded-xl transition-colors"
-                    data-tutorial="stats-cards"
+                    data-tutorial="streak-icon"
                   >
                     <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center">
                       <Flame className="w-5 h-5 text-orange-500" />

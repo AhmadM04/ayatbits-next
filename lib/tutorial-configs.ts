@@ -14,10 +14,11 @@ export const dashboardTutorialSteps: TutorialStep[] = [
   },
   {
     id: 'dashboard-stats',
-    target: '[data-tutorial="stats-cards"]',
+    target: '[data-tutorial="streak-icon"]',
     title: 'tutorial.trackProgress',
     message: 'tutorial.trackProgressMsg',
     placement: 'bottom',
+    requireManualAdvance: true,
   },
   {
     id: 'dashboard-quote',

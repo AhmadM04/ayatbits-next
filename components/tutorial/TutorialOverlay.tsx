@@ -15,6 +15,11 @@ export interface TutorialStep {
   params?: Record<string, string | number>;
   placement?: 'top' | 'bottom' | 'left' | 'right';
   offset?: { x?: number; y?: number };
+  /**
+   * When true, the tutorial will never auto-advance this step even if the
+   * target element cannot be found. The user must click "Next" manually.
+   */
+  requireManualAdvance?: boolean;
 }
 
 interface TutorialOverlayProps {
@@ -39,35 +44,51 @@ function isElementHidden(element: HTMLElement): boolean {
 }
 
 /**
- * Wait for an element to become fully visible and positioned
- * Uses polling to check if element has valid dimensions and position
+ * Find the first element matching `selector` that is actually visible.
+ * Uses querySelectorAll so that when multiple elements share the same
+ * data-tutorial attribute (e.g. a hidden desktop element AND a visible
+ * mobile-menu element), we always pick the visible one.
+ */
+function findFirstVisibleElement(selector: string): HTMLElement | null {
+  const elements = Array.from(
+    document.querySelectorAll(selector)
+  ) as HTMLElement[];
+
+  for (const el of elements) {
+    if (!isElementHidden(el)) {
+      const rect = el.getBoundingClientRect();
+      const hasValidDimensions = rect.width > 0 && rect.height > 0;
+      const hasReasonablePosition = !(
+        rect.top === 0 && rect.left === 0 &&
+        rect.right === 0 && rect.bottom === 0
+      );
+      if (hasValidDimensions && hasReasonablePosition) {
+        return el;
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Wait for an element to become fully visible and positioned.
+ * Polls ALL elements matching the selector and returns the first visible one.
+ * This handles the case where the same data-tutorial value is used on both a
+ * hidden desktop element and a visible mobile-menu element.
  */
 async function waitForElementVisible(
-  selector: string, 
-  maxAttempts: number = 10, 
+  selector: string,
+  maxAttempts: number = 10,
   intervalMs: number = 100
 ): Promise<HTMLElement | null> {
   for (let i = 0; i < maxAttempts; i++) {
-    const element = document.querySelector(selector) as HTMLElement;
-    
-    if (element && !isElementHidden(element)) {
-      // Element exists and is visible - check if it has valid dimensions
-      const rect = element.getBoundingClientRect();
-      // Valid if it has positive dimensions and is within viewport bounds
-      // (not at the mysterious 0,0 glitch position that happens during animations)
-      const hasValidDimensions = rect.width > 0 && rect.height > 0;
-      const hasReasonablePosition = !(rect.top === 0 && rect.left === 0 && rect.right === 0 && rect.bottom === 0);
-      
-      if (hasValidDimensions && hasReasonablePosition) {
-        // Element is properly rendered and positioned
-        return element;
-      }
+    const element = findFirstVisibleElement(selector);
+    if (element) {
+      return element;
     }
-    
     // Wait before next attempt
     await new Promise(resolve => setTimeout(resolve, intervalMs));
   }
-  
   return null;
 }
 
@@ -134,9 +155,12 @@ export function TutorialOverlay({
       const selector = step.target.startsWith('[data-tutorial') 
         ? step.target 
         : `[data-tutorial="${step.target}"]`;
-      
-      const element = document.querySelector(selector) as HTMLElement;
-      if (element && !isElementHidden(element)) {
+
+      // Use findFirstVisibleElement so we always pick the visible copy when
+      // the same data-tutorial value exists on both a hidden desktop element
+      // and a visible mobile-menu element.
+      const element = findFirstVisibleElement(selector);
+      if (element) {
         const rect = element.getBoundingClientRect();
         
         // Only update if the element has valid dimensions and position
@@ -159,39 +183,48 @@ export function TutorialOverlay({
         ? step.target 
         : `[data-tutorial="${step.target}"]`;
       
-      let element = document.querySelector(selector) as HTMLElement | null;
+      // Check if any visible copy of the target already exists
+      let element = findFirstVisibleElement(selector);
       
       // ========================================================================
       // MOBILE BURGER FIX: Auto-open menu if target is hidden
       // ========================================================================
-      if (!element || isElementHidden(element)) {
-        // Target doesn't exist or is hidden - try opening mobile menu
+      if (!element) {
+        // No visible target found - try opening mobile menu
         const menuOpened = tryOpenMobileMenu();
         
         if (menuOpened) {
           console.log(`Opened mobile menu for tutorial target: ${step.target}`);
           
-          // Wait for the element to become fully visible using polling
+          // Brief wait (200ms) so the Framer Motion menu animation completes
+          // and React has re-rendered the menu children before we start polling.
+          await new Promise(resolve => setTimeout(resolve, 200));
+
+          // Wait for the element to become fully visible using polling.
           // This accounts for:
           // - Menu animation (150ms as per motion.div transition)
           // - React re-render and DOM updates
           // - CSS transitions and animations
           // - Browser reflow and repaint
-          element = await waitForElementVisible(selector, 15, 100);
+          element = await waitForElementVisible(selector, 20, 100);
           
-          // If element still not accessible after waiting, skip to next step
+          // If element still not accessible after waiting, only auto-skip when
+          // the step does NOT require manual advancement.
           if (!element) {
             console.warn(`Tutorial target still not accessible after opening menu: ${step.target}`);
-            // Auto-skip to next step if element is not available
-            setTimeout(() => onNext(), 500);
+            if (!step.requireManualAdvance) {
+              setTimeout(() => onNext(), 500);
+            }
             return;
           }
           
           console.log(`Element now visible: ${step.target}`);
         } else {
           console.warn(`Tutorial target not found and menu not opened: ${step.target}`);
-          // Auto-skip to next step if element doesn't exist
-          setTimeout(() => onNext(), 500);
+          // Only auto-skip when the step allows it
+          if (!step.requireManualAdvance) {
+            setTimeout(() => onNext(), 500);
+          }
           return;
         }
       }
@@ -213,8 +246,10 @@ export function TutorialOverlay({
         updatePosition();
       } else {
         console.warn(`Tutorial target not found: ${step.target}`);
-        // Auto-skip to next step if element doesn't exist
-        setTimeout(() => onNext(), 500);
+        // Only auto-skip when the step allows it
+        if (!step.requireManualAdvance) {
+          setTimeout(() => onNext(), 500);
+        }
       }
     };
 
