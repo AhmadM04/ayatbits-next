@@ -3,6 +3,7 @@ export { default as AyahContextMenu } from './AyahContextMenu';
 export { default as PageNavigation } from './PageNavigation';
 export { default as SurahHeader } from './SurahHeader';
 export { default as MushafFAB } from './MushafFAB';
+export { default as TitlePageLayout } from './TitlePageLayout';
 export type { MushafVerse } from './AyahRow';
 
 

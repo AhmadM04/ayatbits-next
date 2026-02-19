@@ -10,6 +10,7 @@ import {
   AyahContextMenu,
   PageNavigation,
   SurahHeader,
+  TitlePageLayout,
   MushafVerse,
 } from '@/components/mushaf';
 import { HarakatModal, HarakatLegend } from '@/components/arabic';
@@ -133,13 +134,54 @@ export default function MushafPageClient({
   // Check if ANY verse on this page is a title page verse
   const hasAnyTitlePageVerse = verses.some(v => isTitlePageVerse(v.surahNumber, v.ayahNumber));
 
-  // Group verses by surah for rendering with headers
-  const renderVerses = () => {
+  // ── Title-page renderer (Pages 1 & 2) ─────────────────────────────
+  // Groups verses by surah and renders each group inside a shaped
+  // TitlePageLayout component (CSS shape-outside diamond / lens).
+  const renderTitlePage = () => {
+    const elements: React.ReactNode[] = [];
+    let currentSurah: number | null = null;
+    let currentSurahVerses: MushafVerse[] = [];
+
+    const flushVerses = () => {
+      if (currentSurahVerses.length > 0) {
+        elements.push(
+          <TitlePageLayout
+            key={`title-layout-${currentSurah}`}
+            verses={[...currentSurahVerses]}
+            onLongPress={handleLongPress}
+          />
+        );
+        currentSurahVerses = [];
+      }
+    };
+
+    verses.forEach((verse) => {
+      if (verse.ayahNumber === 1 && verse.surahNumber !== currentSurah) {
+        flushVerses();
+        currentSurah = verse.surahNumber;
+        elements.push(
+          <SurahHeader
+            key={`surah-header-${verse.surahNumber}`}
+            surahNumber={verse.surahNumber}
+            showBismillah={true}
+          />
+        );
+      } else if (currentSurah === null) {
+        currentSurah = verse.surahNumber;
+      }
+      currentSurahVerses.push(verse);
+    });
+
+    flushVerses();
+    return elements;
+  };
+
+  // ── Regular page renderer ───────────────────────────────────────────
+  const renderRegularPage = () => {
     const elements: React.ReactNode[] = [];
     let currentSurah: number | null = null;
 
-    verses.forEach((verse, index) => {
-      // Check if this is the start of a new surah
+    verses.forEach((verse) => {
       if (verse.ayahNumber === 1 && verse.surahNumber !== currentSurah) {
         currentSurah = verse.surahNumber;
         elements.push(
@@ -150,25 +192,25 @@ export default function MushafPageClient({
           />
         );
       } else if (currentSurah === null) {
-        // First verse of page but not start of surah
         currentSurah = verse.surahNumber;
       }
-
-      // Determine if this specific verse needs title page layout
-      const isTitleVerse = isTitlePageVerse(verse.surahNumber, verse.ayahNumber);
 
       elements.push(
         <AyahRow
           key={verse.id}
           verse={verse}
           onLongPress={handleLongPress}
-          isTitlePage={isTitleVerse}
+          isTitlePage={false}
         />
       );
     });
 
     return elements;
   };
+
+  // Choose renderer based on whether this is a title page
+  const renderVerses = () =>
+    hasAnyTitlePageVerse ? renderTitlePage() : renderRegularPage();
 
   return (
     <TutorialWrapper sectionId="mushaf_reading" steps={mushafTutorialSteps} delay={1000}>
@@ -238,18 +280,13 @@ export default function MushafPageClient({
           >
             {/* Arabic Text Container - MADANI MUSHAF STYLE */}
             <div
-              className={`
-                text-[1.5rem] sm:text-2xl md:text-3xl font-uthmani
-                ${hasAnyTitlePageVerse ? 'text-center flex flex-col items-center' : 'text-right'}
-              `}
+              className={
+                hasAnyTitlePageVerse
+                  ? ''                          // TitlePageLayout handles its own styles
+                  : 'text-[1.5rem] sm:text-2xl md:text-3xl font-uthmani text-right'
+              }
               dir="rtl"
-              style={hasAnyTitlePageVerse ? {
-                lineHeight: '3',
-                wordSpacing: '0.15em',
-                letterSpacing: '0.01em',
-                WebkitFontSmoothing: 'antialiased',
-                MozOsxFontSmoothing: 'grayscale',
-              } : { 
+              style={hasAnyTitlePageVerse ? undefined : {
                 lineHeight: '2.5',
                 wordSpacing: '0.15em',
                 letterSpacing: '0.01em',
