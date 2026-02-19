@@ -48,8 +48,8 @@ export default function LanguageSelector() {
         className="md:hidden w-full flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition-colors text-left group"
         aria-label="Select language"
       >
-        <div className="w-10 h-10 rounded-full bg-blue-50/50 flex items-center justify-center group-hover:bg-blue-100/50 transition-colors">
-          <Globe className="w-5 h-5 text-blue-600" />
+        <div className="w-10 h-10 rounded-full bg-blue-50/50 dark:bg-blue-900/20 flex items-center justify-center group-hover:bg-blue-100/50 dark:group-hover:bg-blue-800/30 transition-colors">
+          <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
         </div>
         <span className="text-sm text-[#4A3728] dark:text-white font-medium flex-1">
           {LOCALE_NAMES[locale]}
@@ -67,8 +67,8 @@ export default function LanguageSelector() {
               onClick={() => handleLocaleChange(loc)}
               className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
                 locale === loc
-                  ? 'bg-emerald-50/50 text-[#4A3728] font-medium'
-                  : 'text-[#8E7F71] hover:bg-gray-50 hover:text-[#4A3728]'
+                  ? 'bg-emerald-50/50 dark:bg-emerald-500/20 text-[#4A3728] dark:text-white font-medium'
+                  : 'text-[#8E7F71] dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-[#4A3728] dark:hover:text-white'
               }`}
             >
               {LOCALE_NAMES[loc]}

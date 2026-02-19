@@ -37,6 +37,39 @@ function isElementHidden(element: HTMLElement): boolean {
 }
 
 /**
+ * Wait for an element to become fully visible and positioned
+ * Uses polling to check if element has valid dimensions and position
+ */
+async function waitForElementVisible(
+  selector: string, 
+  maxAttempts: number = 10, 
+  intervalMs: number = 100
+): Promise<HTMLElement | null> {
+  for (let i = 0; i < maxAttempts; i++) {
+    const element = document.querySelector(selector) as HTMLElement;
+    
+    if (element && !isElementHidden(element)) {
+      // Element exists and is visible - check if it has valid dimensions
+      const rect = element.getBoundingClientRect();
+      // Valid if it has positive dimensions and is within viewport bounds
+      // (not at the mysterious 0,0 glitch position that happens during animations)
+      const hasValidDimensions = rect.width > 0 && rect.height > 0;
+      const hasReasonablePosition = !(rect.top === 0 && rect.left === 0 && rect.right === 0 && rect.bottom === 0);
+      
+      if (hasValidDimensions && hasReasonablePosition) {
+        // Element is properly rendered and positioned
+        return element;
+      }
+    }
+    
+    // Wait before next attempt
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+  
+  return null;
+}
+
+/**
  * Attempt to open mobile menu if tutorial target is hidden
  */
 function tryOpenMobileMenu(): boolean {
@@ -101,11 +134,21 @@ export function TutorialOverlay({
         : `[data-tutorial="${step.target}"]`;
       
       const element = document.querySelector(selector) as HTMLElement;
-      if (element) {
+      if (element && !isElementHidden(element)) {
         const rect = element.getBoundingClientRect();
-        setTargetRect(rect);
+        
+        // Only update if the element has valid dimensions and position
+        // This prevents the flash at 0,0 during animations
+        const hasValidDimensions = rect.width > 0 && rect.height > 0;
+        const hasReasonablePosition = !(rect.top === 0 && rect.left === 0 && rect.right === 0 && rect.bottom === 0);
+        
+        if (hasValidDimensions && hasReasonablePosition) {
+          setTargetRect(rect);
+        } else {
+          console.log(`Skipping invalid position for: ${step.target}`, rect);
+        }
       } else {
-        console.warn(`Tutorial target not found: ${step.target}`);
+        console.warn(`Tutorial target not found or hidden: ${step.target}`);
       }
     };
 
@@ -114,29 +157,40 @@ export function TutorialOverlay({
         ? step.target 
         : `[data-tutorial="${step.target}"]`;
       
-      let element = document.querySelector(selector) as HTMLElement;
+      let element = document.querySelector(selector) as HTMLElement | null;
       
       // ========================================================================
       // MOBILE BURGER FIX: Auto-open menu if target is hidden
       // ========================================================================
-      if (element && isElementHidden(element)) {
-        // Target exists but is hidden - try opening mobile menu
+      if (!element || isElementHidden(element)) {
+        // Target doesn't exist or is hidden - try opening mobile menu
         const menuOpened = tryOpenMobileMenu();
         
         if (menuOpened) {
-          // Wait for menu animation to complete (increased to 400ms for safety)
-          await new Promise(resolve => setTimeout(resolve, 400));
+          console.log(`Opened mobile menu for tutorial target: ${step.target}`);
           
-          // Re-query element after menu opens
-          element = document.querySelector(selector) as HTMLElement;
+          // Wait for the element to become fully visible using polling
+          // This accounts for:
+          // - Menu animation (150ms as per motion.div transition)
+          // - React re-render and DOM updates
+          // - CSS transitions and animations
+          // - Browser reflow and repaint
+          element = await waitForElementVisible(selector, 15, 100);
           
-          // If element still hidden or not found after opening menu, skip to next step
-          if (!element || isElementHidden(element)) {
+          // If element still not accessible after waiting, skip to next step
+          if (!element) {
             console.warn(`Tutorial target still not accessible after opening menu: ${step.target}`);
             // Auto-skip to next step if element is not available
             setTimeout(() => onNext(), 500);
             return;
           }
+          
+          console.log(`Element now visible: ${step.target}`);
+        } else {
+          console.warn(`Tutorial target not found and menu not opened: ${step.target}`);
+          // Auto-skip to next step if element doesn't exist
+          setTimeout(() => onNext(), 500);
+          return;
         }
       }
       
@@ -150,8 +204,11 @@ export function TutorialOverlay({
           inline: 'center',
         });
         
-        // Update position after scroll completes
-        setTimeout(updatePosition, 600);
+        // Wait for scroll to complete before updating position
+        await new Promise(resolve => setTimeout(resolve, 600));
+        
+        // Now update position after element is visible and scrolled into view
+        updatePosition();
       } else {
         console.warn(`Tutorial target not found: ${step.target}`);
         // Auto-skip to next step if element doesn't exist
@@ -161,8 +218,9 @@ export function TutorialOverlay({
 
     // Initial handling with delay to ensure DOM is ready
     setTimeout(() => {
+      // Don't call updatePosition() here - let handleTargetVisibility do it
+      // after ensuring the element is visible
       handleTargetVisibility();
-      updatePosition();
       
       // Force positioning recalculation by dispatching resize event
       window.dispatchEvent(new Event('resize'));
