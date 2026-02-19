@@ -48,14 +48,22 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     setCurrentSection(null);
   }, [currentSection]);
 
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
+    const step = steps[currentStep];
+
+    // Run the per-step lifecycle hook first (e.g. close mobile menu,
+    // wait for its closing animation) before advancing the step counter.
+    if (step?.onBeforeNext) {
+      await step.onBeforeNext();
+    }
+
     if (currentStep < steps.length - 1) {
       setCurrentStep(prev => prev + 1);
     } else {
       // Tutorial complete
       skipTutorial();
     }
-  }, [currentStep, steps.length, skipTutorial]);
+  }, [currentStep, steps, skipTutorial]);
 
   // Scroll lock is now managed by TutorialOverlay component
   // This provides better control over mobile scrolling behavior

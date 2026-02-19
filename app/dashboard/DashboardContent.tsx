@@ -142,8 +142,8 @@ export default function DashboardContent({
           offset: { y: 120 }, // Position more toward center of screen
         },
         languageSelectorTutorialStep, // language selector - NEW
-        dashboardTutorialSteps[2], // daily-quote
-        dashboardTutorialSteps[3], // juz-grid
+        dashboardTutorialSteps[2], // juz-grid (index 2 after reorder)
+        dashboardTutorialSteps[3], // daily-quote (index 3 after reorder)
         dashboardTutorialSteps[4], // bottom-nav
       ];
     }

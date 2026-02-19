@@ -20,6 +20,13 @@ export interface TutorialStep {
    * target element cannot be found. The user must click "Next" manually.
    */
   requireManualAdvance?: boolean;
+  /**
+   * Optional async hook called *before* the tutorial advances to the next step.
+   * Useful for side-effects like closing a mobile menu before the next step's
+   * target element comes into view. The tutorial waits for the returned Promise
+   * to resolve before incrementing the step counter.
+   */
+  onBeforeNext?: () => Promise<void>;
 }
 
 interface TutorialOverlayProps {

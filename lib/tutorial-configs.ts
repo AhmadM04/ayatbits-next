@@ -1,5 +1,40 @@
 import { TutorialStep } from '@/components/tutorial';
 
+// ============================================================================
+// Shared lifecycle helpers
+// ============================================================================
+
+/**
+ * Close the mobile burger menu (if it is currently open) and wait for its
+ * closing animation to finish before resolving.
+ *
+ * This is used as an `onBeforeNext` hook on tutorial steps that are displayed
+ * inside the mobile menu, so that the menu is neatly closed before the
+ * tutorial moves to the next step that lives on the main page.
+ *
+ * @param delayMs  How long to wait after triggering the close (default 300 ms).
+ *                 The burger-menu animation is 150 ms; the extra buffer lets
+ *                 React flush and the viewport settle before the next step
+ *                 starts positioning itself.
+ */
+async function closeMobileMenuForTutorial(delayMs = 300): Promise<void> {
+  const burgerButton = document.querySelector(
+    '[data-mobile-menu-toggle]'
+  ) as HTMLButtonElement | null;
+
+  if (burgerButton) {
+    const isMenuOpen = burgerButton.getAttribute('data-menu-open') === 'true';
+    if (isMenuOpen) {
+      burgerButton.click(); // triggers the React state toggle that closes the menu
+      await new Promise<void>(resolve => setTimeout(resolve, delayMs));
+    }
+  }
+}
+
+// ============================================================================
+// Dashboard tutorial steps
+// ============================================================================
+
 /**
  * Dashboard Tutorial Configuration
  * Note: title and message are now translation keys from lib/i18n.tsx
@@ -18,20 +53,25 @@ export const dashboardTutorialSteps: TutorialStep[] = [
     title: 'tutorial.trackProgress',
     message: 'tutorial.trackProgressMsg',
     placement: 'bottom',
+    // Never auto-advance — the user must click Next manually.
     requireManualAdvance: true,
-  },
-  {
-    id: 'dashboard-quote',
-    target: '[data-tutorial="daily-quote"]',
-    title: 'tutorial.dailyInspiration',
-    message: 'tutorial.dailyInspirationMsg',
-    placement: 'bottom',
+    // When the user clicks Next, close the burger menu first so that Step 3
+    // can scroll to its target on the main dashboard without the menu
+    // obscuring the viewport.
+    onBeforeNext: () => closeMobileMenuForTutorial(300),
   },
   {
     id: 'dashboard-juz',
     target: '[data-tutorial="juz-grid"]',
     title: 'tutorial.exploreQuran',
     message: 'tutorial.exploreQuranMsg',
+    placement: 'bottom',
+  },
+  {
+    id: 'dashboard-quote',
+    target: '[data-tutorial="daily-quote"]',
+    title: 'tutorial.dailyInspiration',
+    message: 'tutorial.dailyInspirationMsg',
     placement: 'bottom',
   },
   {
