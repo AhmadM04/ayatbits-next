@@ -64,7 +64,16 @@ export interface IUser extends Document {
   // User Preferences
   themePreference?: 'light' | 'dark' | 'system';
   emailNotifications?: boolean;
-  inAppNotifications?: boolean; // Future feature
+  inAppNotifications?: boolean;
+  // Web Push subscriptions (one per device/browser)
+  pushSubscriptions?: {
+    endpoint: string;
+    keys: {
+      p256dh: string;
+      auth: string;
+    };
+    createdAt?: Date;
+  }[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -131,6 +140,15 @@ const userSchema = new mongoose.Schema<IUser>(
     themePreference: { type: String, enum: ['light', 'dark', 'system'], default: 'dark' },
     emailNotifications: { type: Boolean, default: true },
     inAppNotifications: { type: Boolean, default: true },
+    // Web Push subscriptions (one per device/browser)
+    pushSubscriptions: [{
+      endpoint: { type: String, required: true },
+      keys: {
+        p256dh: { type: String, required: true },
+        auth: { type: String, required: true },
+      },
+      createdAt: { type: Date, default: Date.now },
+    }],
   },
   { timestamps: true }
 );
