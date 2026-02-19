@@ -54,7 +54,8 @@ export const languageSelectorTutorialStep: TutorialStep = {
 };
 
 /**
- * Puzzle Tutorial Configuration
+ * Puzzle Tutorial Configuration (static default — 3 hints)
+ * Prefer createPuzzleTutorialSteps(hintCount) when the actual ayah is available.
  */
 export const puzzleTutorialSteps: TutorialStep[] = [
   {
@@ -83,10 +84,28 @@ export const puzzleTutorialSteps: TutorialStep[] = [
     target: '[data-tutorial="hint-button"]',
     title: 'tutorial.needHelp',
     message: 'tutorial.needHelpMsg',
+    params: { count: 3 },
     placement: 'left',
     offset: { x: -20 },
   },
 ];
+
+/**
+ * Create puzzle tutorial steps with a dynamic hint count.
+ * The last step ("Need Help?") will show the real number of hints
+ * available for the current ayah instead of a hardcoded value.
+ *
+ * @param hintCount - Result of calculateTipsForAyah(wordCount)
+ */
+export function createPuzzleTutorialSteps(hintCount: number): TutorialStep[] {
+  return [
+    ...puzzleTutorialSteps.slice(0, -1),
+    {
+      ...puzzleTutorialSteps[puzzleTutorialSteps.length - 1],
+      params: { count: hintCount },
+    },
+  ];
+}
 
 /**
  * Profile Tutorial Configuration

@@ -153,6 +153,7 @@
     "returnToDashboard": "Return to Dashboard"
   },
   "juz": {
+    "juzLabel": "Juz {number}",
     "surahs": "Surahs in this Juz",
     "surahsCount": "{count} Surahs",
     "progress": "Progress",
@@ -628,7 +629,7 @@
     "answerArea": "Answer Area",
     "answerAreaMsg": "Drop words here in the correct order. Tap any word to hear its pronunciation.",
     "needHelp": "Need Help?",
-    "needHelpMsg": "Stuck? Use the hint button to reveal the next word. You have 3 hints per puzzle.",
+    "needHelpMsg": "Stuck? Use the hint button to reveal the next word. You have {count} hints for this puzzle.",
     "listenLearn": "Listen & Learn",
     "listenLearnMsg": "Toggle transliteration to see pronunciation, or tap tafsir to understand the deeper meaning.",
     "understandAyah": "Understand the Ayah",

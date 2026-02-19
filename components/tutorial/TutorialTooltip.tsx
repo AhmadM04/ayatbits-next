@@ -8,6 +8,8 @@ import { useState, useEffect, useRef } from 'react';
 interface TutorialTooltipProps {
   title: string;
   message: string;
+  /** Optional interpolation params passed to the i18n t() function, e.g. { count: 3 } */
+  params?: Record<string, string | number>;
   currentStep: number;
   totalSteps: number;
   onNext: () => void;
@@ -19,6 +21,7 @@ interface TutorialTooltipProps {
 export function TutorialTooltip({
   title,
   message,
+  params,
   currentStep,
   totalSteps,
   onNext,
@@ -105,7 +108,7 @@ export function TutorialTooltip({
 
   // Translate title and message if they are translation keys (dot notation)
   const translatedTitle = title.includes('.') ? t(title) : title;
-  const translatedMessage = message.includes('.') ? t(message) : message;
+  const translatedMessage = message.includes('.') ? t(message, params) : message;
 
   return (
     <motion.div

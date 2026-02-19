@@ -11,6 +11,8 @@ export interface TutorialStep {
   target: string; // CSS selector or data-tutorial attribute
   title: string;
   message: string;
+  /** Optional interpolation params for the message translation key, e.g. { count: 3 } */
+  params?: Record<string, string | number>;
   placement?: 'top' | 'bottom' | 'left' | 'right';
   offset?: { x?: number; y?: number };
 }
@@ -405,6 +407,7 @@ export function TutorialOverlay({
           <TutorialTooltip
             title={step.title}
             message={step.message}
+            params={step.params}
             currentStep={currentStep}
             totalSteps={steps.length}
             onNext={onNext}

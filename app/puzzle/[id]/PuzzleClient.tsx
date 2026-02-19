@@ -9,8 +9,10 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SuccessAnimation, SparkleAnimation } from '@/components/animations';
 import { TutorialWrapper, useTutorial } from '@/components/tutorial';
-import { puzzleTutorialSteps } from '@/lib/tutorial-configs';
+import { createPuzzleTutorialSteps } from '@/lib/tutorial-configs';
 import { resetTutorial } from '@/lib/tutorial-manager';
+import { calculateTipsForAyah } from '@/lib/tips-system';
+import { tokenizeAyah } from '@/lib/puzzle-logic';
 import { useI18n } from '@/lib/i18n';
 import { usePreventBack } from '@/lib/hooks/usePreventBack';
 
@@ -181,7 +183,8 @@ export default function PuzzleClient({
 
   const handleRestartTutorial = () => {
     resetTutorial('puzzle_guide');
-    startTutorial('puzzle_guide', puzzleTutorialSteps);
+    const hintCount = calculateTipsForAyah(tokenizeAyah(ayahText).length);
+    startTutorial('puzzle_guide', createPuzzleTutorialSteps(hintCount));
     setShowHelpMenu(false);
   };
 

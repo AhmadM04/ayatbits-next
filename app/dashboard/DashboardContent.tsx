@@ -523,7 +523,7 @@ export default function DashboardContent({
                       <div className="text-xl font-bold text-[#059669] mb-1 transition-transform hover:scale-110">
                         {juz.number}
                       </div>
-                      <div className="text-xs text-[#8E7F71] dark:text-gray-500 mb-2 truncate">{juz.name}</div>
+                      <div className="text-xs text-[#8E7F71] dark:text-gray-500 mb-2 truncate">{t('juz.juzLabel', { number: juz.number })}</div>
                       <div className="w-full bg-gray-100 dark:bg-white/5 rounded-full h-1.5 mb-1 overflow-hidden">
                         <motion.div
                           className="bg-gradient-to-r from-[#059669] to-emerald-500 h-1.5 rounded-full"
