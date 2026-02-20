@@ -99,7 +99,8 @@ export default function OnboardingClient({
 
       if (response.ok) {
         router.refresh();
-        router.push('/dashboard');
+        // Redirect to pricing so the user selects a plan before accessing the app
+        router.push('/pricing');
       } else {
         showToast('Failed to skip onboarding', 'error');
       }
@@ -155,7 +156,8 @@ export default function OnboardingClient({
       if (response.ok) {
         showToast('Profile completed!', 'success');
         router.refresh();
-        router.push('/dashboard');
+        // Redirect to pricing so the user selects a plan before accessing the app
+        router.push('/pricing');
       } else {
         showToast(data.error || 'Failed to save preferences', 'error');
       }

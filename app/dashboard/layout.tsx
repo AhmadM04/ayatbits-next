@@ -31,21 +31,67 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       // Direct database query - FAST, no HTTP overhead
       const dbUser = await User.findOne({ 
         clerkIds: clerkUser.id 
-      }).select('onboardingCompleted onboardingSkipped trialStartedAt hasUsedTrial subscriptionStatus').lean();
+      }).select(
+        'onboardingCompleted onboardingSkipped trialStartedAt hasUsedTrial subscriptionStatus ' +
+        'subscriptionPlan subscriptionEndDate hasDirectAccess role trialEndsAt'
+      ).lean();
       
-      // If user exists and hasn't completed/skipped onboarding, redirect
-      // EXCEPTION: Allow users with active trials (they bypassed onboarding by starting trial)
-      if (dbUser && !dbUser.onboardingCompleted && !dbUser.onboardingSkipped) {
-        // Check if user has an active trial (trial start bypasses onboarding)
-        const hasActiveTrial = dbUser.trialStartedAt && 
-                              dbUser.hasUsedTrial && 
-                              dbUser.subscriptionStatus === 'trialing';
-        
-        if (!hasActiveTrial) {
-          console.log('[Dashboard Layout] User needs onboarding, redirecting...');
-          redirect('/onboarding');
-        } else {
-          console.log('[Dashboard Layout] User has active trial, allowing access without onboarding');
+      if (dbUser) {
+        // ====================================================================
+        // GUARD 1: Onboarding check (existing)
+        // ====================================================================
+        if (!dbUser.onboardingCompleted && !dbUser.onboardingSkipped) {
+          // Trial start bypasses the onboarding requirement
+          const hasActiveTrial =
+            dbUser.trialStartedAt &&
+            dbUser.hasUsedTrial &&
+            dbUser.subscriptionStatus === 'trialing';
+
+          if (!hasActiveTrial) {
+            console.log('[Dashboard Layout] User needs onboarding, redirecting...');
+            redirect('/onboarding');
+          } else {
+            console.log('[Dashboard Layout] User has active trial, allowing access without onboarding');
+          }
+        }
+
+        // ====================================================================
+        // GUARD 2: Plan selection check
+        // A user without any active plan must choose one before using the app.
+        // ====================================================================
+        const now = new Date();
+        const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+        const isAdmin          = dbUser.role === 'admin';
+        const hasDirectAccess  = dbUser.hasDirectAccess === true;
+        const hasLifetime      = dbUser.subscriptionPlan === 'lifetime' &&
+                                 dbUser.subscriptionStatus === 'active';
+        // Active or trialing Stripe subscription that hasn't expired
+        const hasActiveStripe  = (
+          dbUser.subscriptionStatus === 'active' ||
+          dbUser.subscriptionStatus === 'trialing'
+        ) &&
+          dbUser.subscriptionEndDate &&
+          new Date(dbUser.subscriptionEndDate) > now;
+        // Legacy trial field
+        const hasLegacyTrial   = dbUser.trialEndsAt &&
+                                 new Date(dbUser.trialEndsAt) > now;
+        // New trial system: trialStartedAt + 7 days
+        const hasNewTrial      = dbUser.trialStartedAt &&
+                                 dbUser.hasUsedTrial &&
+                                 (new Date(dbUser.trialStartedAt).getTime() + TRIAL_DURATION_MS) > now.getTime();
+
+        const hasPlan =
+          isAdmin ||
+          hasDirectAccess ||
+          hasLifetime ||
+          hasActiveStripe ||
+          hasLegacyTrial ||
+          hasNewTrial;
+
+        if (!hasPlan) {
+          console.log('[Dashboard Layout] User has no active plan, redirecting to /pricing...');
+          redirect('/pricing');
         }
       }
     } catch (error) {
