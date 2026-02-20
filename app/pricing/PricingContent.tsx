@@ -75,6 +75,8 @@ export default function PricingContent() {
   const isTrialFlow = mounted ? searchParams.get('trial') === 'true' : false;
   const reason = mounted ? searchParams.get('reason') : null;
   const isProcessingPayment = mounted ? searchParams.get('success') === 'true' : false;
+  // Bug 2 fix: detect when the user returned via Stripe's cancel_url (?canceled=true)
+  const isCanceled = mounted ? searchParams.get('canceled') === 'true' : false;
 
   // PERFORMANCE FIX: Access check is now handled by AccessProvider
   // We just need to sync subscription details when access changes
@@ -95,7 +97,7 @@ export default function PricingContent() {
             plan: data.plan,
             tier: data.tier,
             daysUntilExpiry: data.daysUntilExpiry,
-            status: data.subscriptionStatus, // NEW: Store subscription status
+            status: data.subscriptionStatus,
           });
         }
 
@@ -108,6 +110,12 @@ export default function PricingContent() {
         });
       } catch (error) {
         console.error('[PricingContent] Error fetching subscription details:', error);
+        // Ensure trial status is at least set to a safe default on error
+        setTrialStatus(prev => prev ?? {
+          hasUsedTrial: false,
+          isTrialActive: false,
+          trialDaysLeft: 0,
+        });
       }
     };
     
@@ -117,6 +125,14 @@ export default function PricingContent() {
       setSubscriptionDetails(null);
     }
     
+    // Bug 2 fix: When the user returns from a canceled Stripe session, do NOT
+    // start the polling loop. The user has no access (they canceled), and polling
+    // would trigger refetchAccess() every 2 s, keeping checkingAccess=true in
+    // short bursts that permanently disable the plan buttons.
+    if (isCanceled) {
+      return;
+    }
+
     // Poll for access changes after payment (only if user doesn't have access yet)
     const pollInterval = setInterval(() => {
       if (!hasAccess) {
@@ -127,7 +143,7 @@ export default function PricingContent() {
     return () => {
       clearInterval(pollInterval);
     };
-  }, [mounted, isLoaded, user, hasAccess, router]);
+  }, [mounted, isLoaded, user, hasAccess, router, isCanceled]);
 
   // Validate voucher
   const validateVoucher = async (code: string) => {
@@ -231,28 +247,24 @@ export default function PricingContent() {
   };
 
   // Handle trial start - now uses Stripe checkout with no-card trial
-  const handleStartTrial = async (tier: 'basic' | 'pro') => {
+  // Bug 1 fix: accept the plan's priceId directly so yearly plans use the
+  // yearly price instead of always falling back to the monthly one.
+  const handleStartTrial = async (tier: 'basic' | 'pro', priceId: string) => {
     setStartingTrial(tier);
     
     try {
-      // Determine the appropriate price ID based on tier (default to monthly for trial)
-      const priceId = tier === 'pro' 
-        ? process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID 
-        : process.env.NEXT_PUBLIC_STRIPE_BASIC_MONTHLY_PRICE_ID;
-
       // Call checkout endpoint - it will handle trial logic automatically
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: priceId || 'price_monthly', tier }),
+        body: JSON.stringify({ priceId, tier }),
       });
       
       const data = await response.json();
       
       if (data.url) {
-        // Redirect to Stripe Checkout
+        // Redirect to Stripe Checkout – keep loading state active during redirect
         window.location.href = data.url;
-        // Keep loading state active during redirect
         return;
       } else if (data.redirect) {
         // User already has access
@@ -262,11 +274,12 @@ export default function PricingContent() {
       } else {
         console.error('[PricingContent] ❌ Trial start failed:', data.error);
         alert(data.error || 'Failed to start trial');
-        setStartingTrial(null);
       }
     } catch (error) {
       console.error('[PricingContent] Trial start error:', error);
       alert('Failed to start trial. Please try again.');
+    } finally {
+      // Always clear the loading spinner unless we are in the middle of a redirect
       setStartingTrial(null);
     }
   };
@@ -292,19 +305,22 @@ export default function PricingContent() {
       const data = await response.json();
       
       if (data.url) {
+        // Keep spinner active during redirect
         window.location.href = data.url;
+        return;
       } else if (data.redirect) {
         alert(data.error || t('pricing.alreadyHaveAccess'));
         window.location.href = data.redirect;
+        return;
       } else {
         console.error('[PricingContent] No URL or redirect in response');
-        setLoadingPlan(null);
         alert(data.error || t('pricing.checkoutFailed'));
       }
     } catch (error) {
       console.error('[PricingContent] Checkout error:', error);
-      setLoadingPlan(null);
       alert(t('pricing.errorOccurred'));
+    } finally {
+      setLoadingPlan(null);
     }
   };
 
@@ -712,7 +728,7 @@ export default function PricingContent() {
                     // User hasn't used trial yet - show trial button
                     return (
                       <button
-                        onClick={() => handleStartTrial(plan.tier)}
+                        onClick={() => handleStartTrial(plan.tier, plan.priceId)}
                         disabled={startingTrial !== null || checkingAccess}
                         className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                           plan.popular
