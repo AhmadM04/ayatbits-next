@@ -247,17 +247,20 @@ export default function PricingContent() {
   };
 
   // Handle trial start - now uses Stripe checkout with no-card trial
-  // Bug 1 fix: accept the plan's priceId directly so yearly plans use the
-  // yearly price instead of always falling back to the monthly one.
-  const handleStartTrial = async (tier: 'basic' | 'pro', priceId: string) => {
+  // Bug 1 fix: accept the plan's priceId and interval directly so yearly plans
+  // use the correct yearly price instead of falling back to the monthly one.
+  const handleStartTrial = async (tier: 'basic' | 'pro', priceId: string, interval: 'monthly' | 'yearly') => {
     setStartingTrial(tier);
     
     try {
+      // DEBUG: log the exact priceId being sent to the checkout API
+      console.log('[PricingContent] handleStartTrial', { tier, interval, selectedPriceId: priceId });
+
       // Call checkout endpoint - it will handle trial logic automatically
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId, tier }),
+        body: JSON.stringify({ priceId, tier, interval }),
       });
       
       const data = await response.json();
@@ -285,7 +288,7 @@ export default function PricingContent() {
   };
 
   // Handle subscription (for upgrades after trial or direct purchase)
-  const handleSubscribe = async (priceId: string, tier: 'basic' | 'pro') => {
+  const handleSubscribe = async (priceId: string, tier: 'basic' | 'pro', interval: 'monthly' | 'yearly') => {
     setLoadingPlan(priceId);
     
     try {
@@ -296,10 +299,13 @@ export default function PricingContent() {
         return;
       }
 
+      // DEBUG: log the exact priceId being sent to the checkout API
+      console.log('[PricingContent] handleSubscribe', { tier, interval, selectedPriceId: priceId });
+
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId, tier }),
+        body: JSON.stringify({ priceId, tier, interval }),
       });
       
       const data = await response.json();
@@ -345,6 +351,7 @@ export default function PricingContent() {
   const plans = [
     {
       tier: 'basic' as const,
+      interval: 'monthly' as const,
       name: t('pricing.basicMonthly'),
       price: '€5.99',
       period: t('pricing.perMonth'),
@@ -353,6 +360,7 @@ export default function PricingContent() {
     },
     {
       tier: 'basic' as const,
+      interval: 'yearly' as const,
       name: t('pricing.basicYearly'),
       price: '€49.99',
       period: t('pricing.perYear'),
@@ -364,6 +372,7 @@ export default function PricingContent() {
     },
     {
       tier: 'pro' as const,
+      interval: 'monthly' as const,
       name: t('pricing.proMonthly'),
       price: '€11.99',
       period: t('pricing.perMonth'),
@@ -372,6 +381,7 @@ export default function PricingContent() {
     },
     {
       tier: 'pro' as const,
+      interval: 'yearly' as const,
       name: t('pricing.proYearly'),
       price: '€99.99',
       period: t('pricing.perYear'),
@@ -695,7 +705,7 @@ export default function PricingContent() {
                     if (trialStatus?.hasUsedTrial && !trialStatus.isTrialActive) {
                       return (
                         <button
-                          onClick={() => handleSubscribe(plan.priceId, plan.tier)}
+                          onClick={() => handleSubscribe(plan.priceId, plan.tier, plan.interval)}
                           disabled={loadingPlan !== null || checkingAccess}
                           className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                             plan.popular
@@ -728,7 +738,7 @@ export default function PricingContent() {
                     // User hasn't used trial yet - show trial button
                     return (
                       <button
-                        onClick={() => handleStartTrial(plan.tier, plan.priceId)}
+                        onClick={() => handleStartTrial(plan.tier, plan.priceId, plan.interval)}
                         disabled={startingTrial !== null || checkingAccess}
                         className={`group relative w-full h-12 rounded-xl font-semibold overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                           plan.popular

@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { priceId, tier } = body;
+    const { priceId, tier, interval } = body;
 
     // Validate tier
     if (!tier || (tier !== 'basic' && tier !== 'pro')) {
@@ -82,9 +82,25 @@ export async function POST(req: NextRequest) {
     // Real Stripe price IDs look like: price_1A2B3C4D5E6F7G8H
     const isValidStripePriceId = priceId && priceId.startsWith('price_') && priceId.length > 20;
 
-    // Determine plan type (monthly/yearly) from priceId
-    const isYearly = priceId.includes('yearly') || priceId.includes('year');
+    // Determine plan type (monthly/yearly).
+    // Prefer the explicit `interval` field sent by the client (always correct).
+    // Fall back to a string-contains check on priceId only for legacy/fallback IDs
+    // that contain the word "yearly" (e.g. the placeholder 'price_pro_yearly').
+    // NOTE: real Stripe price IDs (e.g. price_1RDfqX2...) never contain "yearly",
+    //       so relying on priceId alone always returned 'monthly' — this was the bug.
+    const isYearly = interval === 'yearly'
+      || priceId.includes('yearly')
+      || priceId.includes('year');
     const plan = isYearly ? 'yearly' : 'monthly';
+
+    // DEBUG: log exactly what was received so the wrong-priceId issue is traceable
+    logger.info('[checkout] Received checkout request', {
+      priceId,
+      tier,
+      interval,
+      isValidStripePriceId,
+      resolvedPlan: plan,
+    });
 
     // If priceId is provided and valid, use it; otherwise create a price on the fly
     let lineItems: any[];
